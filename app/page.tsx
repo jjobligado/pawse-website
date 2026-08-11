@@ -5,6 +5,14 @@ export default function HomePage() {
         <p className="text-lg mb-8">           
             A desktop productivity app combining a focus timer with a virtual companion. Built for students, professionals, and cat lovers.                                 
         </p>                                                                    
-      </div>                                                                    
+      </div>
+      
+      // How it Works
+
+      //Meet your Companions
+
+      //Pomodoro Analytics
+
+      //Coming Soon
     );                                                                          
 }
