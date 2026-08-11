@@ -12,6 +12,16 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-accent: #35A6F1;
+  --color-accent-highlight: #A8DCFF;
+  --color-highlight: #E89150;
+  --color-companion-tux: #ECFEA9;
+  --color-companion-ginger: #FEE1A9;
+  --color-companion-void: #E0A9FE;
+  --color-ink: #141414;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
