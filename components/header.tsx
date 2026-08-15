@@ -1,16 +1,21 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Header() {                                            
     return (                                                                    
-    <header className="w-full border-b bg-white dark:bg-black py-4 px-6">     
-        <div className="max-w-6xl mx-auto flex items-center justify-between">                                                                                                                       
-        <Link href="/" className="flex items-center gap-2 group">                                                             
-            {/* Logo Placeholder*/}                        
+    <header className="w-full flex py-4 px-10 justify-start items-center border-b border-stoke bg-white dark:bg-black">                                                                                                                           
+        <Link href="/" className="flex items-center gap-4 group">                                                             
+            <Image
+                src="/pawse-temp-logo.png"
+                alt="Pawse Logo"
+                width={32}
+                height={32}
+                className="group-hover:scale-110 transition-transform duration-300 ease-in-out"
+            />                   
             <span className="font-pixel text-2xl font-bold tracking-wider">                                                                         
             PAWSE                                                             
             </span>                                                                
-        </Link>                                                             
-        </div>                                                                  
+        </Link>                                                                                                                               
     </header>                                                                 
     );                                                                          
 }
