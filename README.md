@@ -8,9 +8,8 @@
 
   <p align="center">
     <img src="https://img.shields.io/badge/Status-Work%20in%20Progress-FFB84D?style=for-the-badge" alt="Status: Work in Progress" />
-    <!-- 🔗 REPLACE "YOUR_FIGMA_LINK_HERE" BELOW WITH YOUR FIGMA SHARE URL -->
-    <a href="YOUR_FIGMA_LINK_HERE" target="_blank">
-      <img src="https://img.shields.io/badge/Figma-View%20UI%2FUX%20Design-F24E1E?style=for-the-badge&logo=figma&logoColor=white" alt="View Figma Design" />
+    <a href="https://www.figma.com/proto/FsuvrgBgDhXWWgXD07xibf/PAWSE?node-id=815-902&viewport=749%2C-1162%2C0.09&t=6HIhDw5qDHAMRLnh-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=736%3A3063&page-id=651%3A108" target="_blank">
+      <img src="https://img.shields.io/badge/Figma-View%20UI%2FUX%20Prototype-F24E1E?style=for-the-badge&logo=figma&logoColor=white" alt="View Figma Prototype" />
     </a>
   </p>
 
@@ -42,8 +41,7 @@ This repository houses the **official web platform for Pawse**, designed to intr
 
 This website was designed with a **design-first workflow** in **Figma** prior to frontend implementation, focusing on warm, approachable visuals that blend retro pixel charm with clean, modern web usability.
 
-> 🔗 **Figma Design & Prototype:** [View the Interactive Design in Figma](YOUR_FIGMA_LINK_HERE)  
-> *(Replace `YOUR_FIGMA_LINK_HERE` with your Figma file or prototype link)*
+> 🔗 **Figma Interactive Prototype:** [Try the Interactive Prototype in Figma](https://www.figma.com/proto/FsuvrgBgDhXWWgXD07xibf/PAWSE?node-id=815-902&viewport=749%2C-1162%2C0.09&t=6HIhDw5qDHAMRLnh-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=736%3A3063&page-id=651%3A108)
 
 ### 🖼️ UI Mockup Preview
 <!-- 📸 TO ADD YOUR MOCKUP: Export your Figma frame as "figma-mockup.png", place it in the /public folder, and update the src below if needed -->
