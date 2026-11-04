@@ -197,11 +197,13 @@ export default function HomePage() {
 
             {/* Meet your Companions */}
             <section className="relative w-full pt-24 pb-12 md:pt-32 md:pb-16 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden">
-                {/* Circular Soft Radial Glow that stays contained and doesn't reach the edges */}
+                {/* Soft Oval Ambient Glow */}
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[540px] sm:h-[540px] rounded-full bg-[radial-gradient(circle_at_center,rgba(168,220,255,0.85)_0%,rgba(211,237,255,0.45)_40%,rgba(255,255,255,0)_70%)]"
-                />
+                    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                >
+                    <div className="w-[580px] h-[290px] sm:w-[780px] sm:h-[350px] md:w-[1000px] md:h-[420px] lg:w-[1240px] lg:h-[480px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(142,204,255,0.92)_0%,rgba(168,220,255,0.65)_35%,rgba(211,237,255,0.35)_58%,rgba(255,255,255,0)_75%)] animate-ambient-glow will-change-transform" />
+                </div>
 
                 <div className="relative z-10 w-full max-w-[1140px] flex flex-col items-center gap-6">
                     <div className="flex justify-center items-center">
