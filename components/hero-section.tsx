@@ -348,7 +348,7 @@ export default function HeroSection() {
                             <a
                                 href={platformInfo.altPlatformFile}
                                 download={platformInfo.altPlatformFile.split("/").pop()}
-                                className="hover:text-[#232323] transition-colors underline decoration-1 decoration-[#C4C4C8] hover:decoration-[#8E8E93] underline-offset-4"
+                                className="hover:text-black transition-all underline decoration-1 decoration-[#C4C4C8] hover:decoration-[1.5px] hover:decoration-black underline-offset-4"
                             >
                                 {platformInfo.altPlatformText}
                             </a>
@@ -367,9 +367,9 @@ export default function HeroSection() {
                             href="https://github.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 hover:text-[#232323] transition-colors group"
+                            className="inline-flex items-center gap-1.5 hover:text-black transition-all group"
                         >
-                            <span className="underline decoration-1 decoration-[#C4C4C8] group-hover:decoration-[#8E8E93] underline-offset-4">
+                            <span className="underline decoration-1 decoration-[#C4C4C8] group-hover:decoration-[1.5px] group-hover:decoration-black underline-offset-4 transition-all">
                                 View on GitHub
                             </span>
                             <svg
@@ -379,7 +379,7 @@ export default function HeroSection() {
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                                 aria-hidden="true"
-                                className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                                className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-black"
                             >
                                 <path
                                     d="M5 12H19"
@@ -387,6 +387,7 @@ export default function HeroSection() {
                                     strokeWidth="1"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
+                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
                                 />
                                 <path
                                     d="M12 5L19 12L12 19"
@@ -394,6 +395,7 @@ export default function HeroSection() {
                                     strokeWidth="1"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
+                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
                                 />
                             </svg>
                         </Link>
