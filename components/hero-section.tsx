@@ -124,8 +124,29 @@ export default function HeroSection() {
                         <span className="block whitespace-nowrap">The Coziest Way</span>
                         <span className="block whitespace-nowrap">
                             to Get Things{" "}
-                            <span className="relative inline-block animate-hero-done">
+                            <span className="group/done relative inline-block animate-hero-done cursor-pointer transition-transform duration-200 ease-out hover:-translate-y-0.5">
                                 Done
+                                {/* Pixel Sparkle / Confetti Burst (Suggestion 4) */}
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -top-1 left-2 w-2.5 h-2.5 bg-accent border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-x-4 group-hover/done:-translate-y-4 group-hover/done:rotate-12 transition-all duration-300 ease-out"
+                                />
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -top-2 left-1/2 w-2 h-2 bg-companion-ginger border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:translate-x-1 group-hover/done:-translate-y-5 group-hover/done:-rotate-12 transition-all duration-300 delay-75 ease-out"
+                                />
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute top-0 right-1 w-3 h-3 bg-companion-tux border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:translate-x-5 group-hover/done:-translate-y-3 group-hover/done:rotate-45 transition-all duration-300 delay-50 ease-out"
+                                />
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute bottom-3 -left-1 w-2 h-2 bg-companion-void border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-x-5 group-hover/done:translate-y-1 transition-all duration-300 delay-100 ease-out"
+                                />
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute bottom-2 -right-1 w-2 h-2 bg-accent-highlight border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:translate-x-5 group-hover/done:translate-y-2 group-hover/done:-rotate-12 transition-all duration-300 delay-75 ease-out"
+                                />
                                 <span
                                     aria-hidden="true"
                                     className="absolute left-[1%] right-[1%] bottom-[0.06em] h-[3px] md:h-[5px] bg-accent animate-hero-done-line"
