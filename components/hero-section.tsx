@@ -277,7 +277,7 @@ export default function HeroSection() {
                                 className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
                             />
                         )}
-                        <span className="font-pixel text-lg md:text-xl font-medium text-white">
+                        <span className="font-pixel text-lg md:text-xl font-normal text-white">
                             {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                         </span>
                     </Link>
