@@ -151,15 +151,21 @@ export default function HomePage() {
                 <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] auto-rows-[1fr] lg:auto-rows-auto items-stretch gap-3 mt-2">
                     {howItWorksSteps.map((step) => (
                         <div key={step.number} className="contents">
-                            <div className="w-full h-full min-h-[230px] flex flex-col justify-center items-center py-8 px-6 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)]">
-                                <div className="w-full flex flex-col items-center gap-3">
+                            <div className="group relative overflow-hidden w-full h-full min-h-[230px] flex flex-col justify-center items-center py-8 px-6 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default">
+                                {/* Liquid rising fill underlay */}
+                                <div
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -inset-x-0 bottom-0 h-[150%] bg-[linear-gradient(to_top,#C8E8FF_0%,#C8E8FF_70%,transparent_100%)] translate-y-full group-hover:translate-y-0 transition-transform duration-600 ease-out"
+                                />
+
+                                <div className="relative z-10 w-full flex flex-col items-center gap-3">
                                     <div className="w-full flex flex-col items-center gap-2">
-                                        <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0">
+                                        <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
                                             <span className="text-sm font-semibold text-white">
                                                 {step.number}
                                             </span>
                                         </div>
-                                        <h3 className="text-lg font-semibold text-[#141414] text-center tracking-[0.01em] leading-snug">
+                                        <h3 className="text-lg font-semibold text-[#141414] group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em] leading-snug">
                                             <span className="block whitespace-nowrap">
                                                 {step.titleLines[0]}
                                             </span>
@@ -168,7 +174,7 @@ export default function HomePage() {
                                             </span>
                                         </h3>
                                     </div>
-                                    <p className="max-w-[200px] text-base text-[#4B5563] text-center leading-relaxed">
+                                    <p className="max-w-[200px] text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
                                         {step.description}
                                     </p>
                                 </div>
@@ -379,10 +385,16 @@ export default function HomePage() {
                     {comingSoonItems.map((item) => (
                         <div
                             key={item.title}
-                            className="w-full h-full min-h-[230px] p-7 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] flex flex-col justify-center items-center gap-3"
+                            className="group relative overflow-hidden w-full h-full min-h-[230px] p-7 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default flex flex-col justify-center items-center gap-3"
                         >
-                            <div className="w-full flex flex-col justify-center items-center gap-1.5">
-                                <div className="w-10 h-10 relative flex items-center justify-center shrink-0">
+                            {/* Liquid rising fill underlay */}
+                            <div
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -inset-x-0 bottom-0 h-[150%] bg-[linear-gradient(to_top,#C8E8FF_0%,#C8E8FF_70%,transparent_100%)] translate-y-full group-hover:translate-y-0 transition-transform duration-600 ease-out"
+                            />
+
+                            <div className="relative z-10 w-full flex flex-col justify-center items-center gap-1.5">
+                                <div className="w-10 h-10 relative flex items-center justify-center shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
                                     <Image
                                         src={item.icon}
                                         alt=""
@@ -391,11 +403,11 @@ export default function HomePage() {
                                         className="w-10 h-10 object-contain"
                                     />
                                 </div>
-                                <h3 className="text-lg md:text-xl font-semibold text-[#141414] text-center tracking-[0.01em]">
+                                <h3 className="text-lg md:text-xl font-semibold text-[#141414] group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em]">
                                     {item.title}
                                 </h3>
                             </div>
-                            <p className="max-w-[260px] text-base text-[#4B5563] text-center leading-relaxed">
+                            <p className="relative z-10 max-w-[260px] text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
                                 {item.description}
                             </p>
                         </div>
