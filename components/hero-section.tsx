@@ -367,14 +367,10 @@ export default function HeroSection() {
                             href="https://github.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 font-medium hover:text-[#232323] transition-colors group"
+                            className="inline-flex items-center gap-1.5 hover:text-[#232323] transition-colors group"
                         >
-                            <span className="relative inline-block">
+                            <span className="underline decoration-1 decoration-[#C4C4C8] group-hover:decoration-[#8E8E93] underline-offset-4">
                                 View on GitHub
-                                <span
-                                    aria-hidden="true"
-                                    className="absolute left-[2%] right-[2%] -bottom-0.5 h-[1px] bg-[#C4C4C8] group-hover:bg-[#8E8E93] transition-colors"
-                                />
                             </span>
                             <svg
                                 width="16"
