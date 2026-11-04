@@ -18,13 +18,15 @@ This specification details the client-side operating system detection, adaptive 
 
 ## 2. Frontend Implementation Overview
 
-- **Source File**: `components/hero-section.tsx`
-- **Hook Pattern**: React 19 `useSyncExternalStore` (ensures zero server/client hydration mismatch).
+- **Hook File**: `hooks/use-platform.ts`
+- **UI Component**: `components/hero-section.tsx`
+- **Hook Pattern**: Custom React 19 hook `usePlatform()` using `useSyncExternalStore` (zero SSR hydration mismatches).
+- **QA/Dev Switcher**: Allows developers and testers to preview any OS locally via `?os=linux`, `?os=mac`, `?os=mobile` (automatically disabled in production).
 - **DOM Signifiers**: The main download anchor contains `data-os="{windows|mac|linux|mobile|other}"` for automated testing, analytics tracking, and script hooking.
 
 ### Configuration Object (`PLATFORM_CONFIG`)
 
-In `components/hero-section.tsx`, all download definitions are centralized in `PLATFORM_CONFIG`:
+In `hooks/use-platform.ts`, all download definitions are centralized in `PLATFORM_CONFIG`:
 
 ```typescript
 const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
@@ -108,7 +110,7 @@ If hosting installers on an external CDN (e.g. AWS S3, Cloudflare R2) or GitHub 
    NEXT_PUBLIC_DOWNLOAD_WINDOWS_URL="https://github.com/jjobligado/pawse-app/releases/latest/download/pawse-setup.exe"
    NEXT_PUBLIC_DOWNLOAD_MAC_URL="https://github.com/jjobligado/pawse-app/releases/latest/download/pawse.dmg"
    ```
-2. Update `PLATFORM_CONFIG` in `components/hero-section.tsx`:
+2. Update `PLATFORM_CONFIG` in `hooks/use-platform.ts`:
    ```typescript
    windows: {
        href: process.env.NEXT_PUBLIC_DOWNLOAD_WINDOWS_URL || "/downloads/pawse-setup.exe",
