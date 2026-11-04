@@ -1,112 +1,14 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-type DetectedPlatform = "windows" | "mac" | "linux" | "mobile" | "other";
-
-interface PlatformDownloadInfo {
-    label: string;
-    fileName?: string;
-    href: string;
-    isDownload: boolean;
-    isMobileShare?: boolean;
-    altPlatformText?: string;
-    altPlatformFile?: string;
-    iconType: "download" | "share" | "bell";
-}
-
-const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
-    windows: {
-        label: "Download for Windows",
-        fileName: "pawse-setup.exe",
-        href: "/downloads/pawse-setup.exe",
-        isDownload: true,
-        altPlatformText: "Also available for macOS",
-        altPlatformFile: "/downloads/pawse.dmg",
-        iconType: "download",
-    },
-    mac: {
-        label: "Download for Mac",
-        fileName: "pawse.dmg",
-        href: "/downloads/pawse.dmg",
-        isDownload: true,
-        altPlatformText: "Also available for Windows",
-        altPlatformFile: "/downloads/pawse-setup.exe",
-        iconType: "download",
-    },
-    linux: {
-        label: "Notify Me for Linux",
-        href: "#beta",
-        isDownload: false,
-        altPlatformText: "Linux build in progress",
-        iconType: "bell",
-    },
-    mobile: {
-        label: "Send to My Desktop",
-        href: "#",
-        isDownload: false,
-        isMobileShare: true,
-        altPlatformText: "PAWSE is built for Windows & Mac",
-        iconType: "share",
-    },
-    other: {
-        label: "Download for Windows",
-        fileName: "pawse-setup.exe",
-        href: "/downloads/pawse-setup.exe",
-        isDownload: true,
-        altPlatformText: "Also available for macOS",
-        altPlatformFile: "/downloads/pawse.dmg",
-        iconType: "download",
-    },
-};
-
-function getClientPlatform(): DetectedPlatform {
-    if (typeof window === "undefined" || !window.navigator) {
-        return "windows";
-    }
-
-    const ua = window.navigator.userAgent.toLowerCase();
-    const platform = window.navigator.platform?.toLowerCase() || "";
-    const maxTouchPoints = window.navigator.maxTouchPoints || 0;
-
-    const isMobileOrTablet =
-        /iphone|ipad|ipod|android|mobile|tablet|silk|blackberry|iemobile|kindle/i.test(ua) ||
-        (/mac/i.test(platform) && maxTouchPoints > 1); // iPadOS
-
-    if (isMobileOrTablet) {
-        return "mobile";
-    }
-    if (/macintosh|macintel|macppc|mac68k|darwin/i.test(ua) || /mac/i.test(platform)) {
-        return "mac";
-    }
-    if (/win32|win64|windows|wince/i.test(ua) || /win/i.test(platform)) {
-        return "windows";
-    }
-    if (/linux/i.test(ua) || /linux/i.test(platform)) {
-        return "linux";
-    }
-    return "other";
-}
-
-function getServerPlatform(): DetectedPlatform {
-    return "windows";
-}
-
-function subscribePlatform() {
-    return () => {};
-}
+import { usePlatform } from "@/hooks/use-platform";
 
 export default function HeroSection() {
     const [scrollY, setScrollY] = useState(0);
     const [copied, setCopied] = useState(false);
-
-    const detectedPlatform = useSyncExternalStore(
-        subscribePlatform,
-        getClientPlatform,
-        getServerPlatform
-    );
+    const { platform: detectedPlatform, config: platformInfo } = usePlatform();
 
     useEffect(() => {
         let ticking = false;
@@ -124,8 +26,6 @@ export default function HeroSection() {
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-
-    const platformInfo = PLATFORM_CONFIG[detectedPlatform];
 
     const handleCTAClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (platformInfo.isMobileShare) {
