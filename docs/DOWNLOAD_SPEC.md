@@ -141,3 +141,88 @@ When the Linux release is ready:
 2. Change `linux.label` to `"Download for Linux"`.
 3. Set `linux.href` to your package target (e.g. `pawse.AppImage`, `.deb`, or `.tar.gz`).
 4. Change `linux.iconType` from `"bell"` to `"download"`.
+
+---
+
+## 5. How to Test Different Operating Systems (Without Extra Devices)
+
+Developers and QA engineers do not need physical Windows, Mac, Linux, or Mobile devices to test every platform state. Use one of the four methods below:
+
+### Method 1: URL Preview Switcher (Fastest & Zero-Config)
+
+During local development (`NODE_ENV !== 'production'`), the `usePlatform` hook monitors the `?os=` query parameter. Simply append the target platform to your local URL:
+
+| Target Platform to Test | Local URL | Rendered CTA | Target Action |
+| :--- | :--- | :--- | :--- |
+| **Windows Desktop** | `http://localhost:3000/?os=windows` | `[↓] Download for Windows` | Downloads `pawse-setup.exe` |
+| **macOS Desktop** | `http://localhost:3000/?os=mac` | `[↓] Download for Mac` | Downloads `pawse.dmg` |
+| **Linux Desktop** | `http://localhost:3000/?os=linux` | `[🔔] Notify Me for Linux` | Smooth-scrolls to `#beta` & focuses email input |
+| **Mobile / Tablet** | `http://localhost:3000/?os=mobile` | `[↗] Send to My Desktop` | Copies URL to clipboard with 2.5s green success badge |
+
+> [!NOTE]
+> **Production Safety**: This override is strictly gated behind `process.env.NODE_ENV !== "production"`. It is completely disabled and ignored on production builds.
+
+---
+
+### Method 2: Browser DevTools User-Agent Emulation (Native Detection Test)
+
+To test the real User-Agent and platform detection regex without using query parameters:
+
+1. Open **DevTools** in Chrome, Edge, or Brave (`F12` or `Ctrl + Shift + I` / `Cmd + Option + I`).
+2. Open the Command Menu: `Ctrl + Shift + P` (`Cmd + Shift + P` on macOS).
+3. Type `Network conditions` and press **Enter**.
+4. In the **Network conditions** drawer at the bottom:
+   - Uncheck **"Use browser default"** next to **User agent**.
+   - Choose a preset from the dropdown:
+     - **Chrome — Mac**: Emulates macOS desktop detection.
+     - **Chrome — Linux**: Emulates Linux desktop detection.
+     - **Chrome — Windows**: Emulates Windows desktop detection.
+     - **Safari — iPhone iOS** or **Chrome — Android Mobile**: Emulates mobile detection.
+5. Refresh the page (`F5` or `Ctrl + R`).
+
+---
+
+### Method 3: Mobile & Tablet Simulation (Device Mode)
+
+To test the mobile CTA behavior, touch events, and clipboard copy feedback:
+
+1. In DevTools, click the **Toggle device toolbar** button or press `Ctrl + Shift + M` (`Cmd + Shift + M`).
+2. Select a device (e.g. **iPhone 14 Pro**, **Pixel 7**, or **iPad Air**).
+3. Reload the page so the browser registers mobile touch points.
+4. Click **"Send to My Desktop"**:
+   - The button triggers `navigator.clipboard.writeText(window.location.href)`.
+   - The button text and color morph into a green `[✓] Link Copied to Clipboard! 🐾` state for 2.5 seconds before smoothly reverting.
+
+---
+
+### Method 4: Automated E2E Testing (Playwright / Cypress)
+
+You can easily automate platform verification in continuous integration. The primary CTA anchor renders a predictable `data-os` DOM attribute (`data-os="windows"`, `data-os="mac"`, `data-os="linux"`, `data-os="mobile"`):
+
+```typescript
+// Example: Playwright test suite (e2e/download-cta.spec.ts)
+import { test, expect } from '@playwright/test';
+
+test.describe('Platform-adaptive Download CTA', () => {
+  test('renders Mac download button when macOS user-agent is present', async ({ browser }) => {
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    });
+    const page = await context.newPage();
+    await page.goto('http://localhost:3000');
+
+    const cta = page.locator('a[data-os="mac"]');
+    await expect(cta).toBeVisible();
+    await expect(cta).toContainText('Download for Mac');
+    await expect(cta).toHaveAttribute('href', '/downloads/pawse.dmg');
+  });
+
+  test('URL override forces Linux waitlist CTA in development', async ({ page }) => {
+    await page.goto('http://localhost:3000/?os=linux');
+    const cta = page.locator('a[data-os="linux"]');
+    await expect(cta).toBeVisible();
+    await expect(cta).toContainText('Notify Me for Linux');
+    await expect(cta).toHaveAttribute('href', '#beta');
+  });
+});
+```

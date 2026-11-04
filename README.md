@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./public/pawse-temp-logo.png" alt="Pawse Logo" width="90" />
+  <img src="./public/images/logo.png" alt="Pawse Logo" width="90" />
 
   # 🐾 Pawse — Official Website
   **The Coziest Way to Get Things Done**
@@ -104,3 +104,16 @@ The Figma design tokens are translated directly into CSS custom properties and T
 
 4. **Open in your browser:**  
    Visit [http://localhost:3000](http://localhost:3000) to view the application.
+
+---
+
+## 🧪 Testing Different Operating Systems (Without Extra Devices)
+
+You can test how the landing page adapts its primary Call-to-Action (CTA) for different platforms without needing separate physical devices:
+
+- **Windows Desktop:** [`http://localhost:3000/?os=windows`](http://localhost:3000/?os=windows) → *[↓] Download for Windows (.exe)*
+- **macOS Desktop:** [`http://localhost:3000/?os=mac`](http://localhost:3000/?os=mac) → *[↓] Download for Mac (.dmg)*
+- **Linux Desktop:** [`http://localhost:3000/?os=linux`](http://localhost:3000/?os=linux) → *[🔔] Notify Me for Linux (Waitlist anchor)*
+- **Mobile / Tablet:** [`http://localhost:3000/?os=mobile`](http://localhost:3000/?os=mobile) → *[↗] Send to My Desktop (Clipboard copy feedback)*
+
+For browser DevTools User-Agent emulation instructions, automated Playwright/Cypress test snippets, and developer handoff guidelines for installer files, see the [Download System Specification & Platform Matrix](docs/DOWNLOAD_SPEC.md).
