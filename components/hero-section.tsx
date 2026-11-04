@@ -170,29 +170,88 @@ export default function HeroSection() {
                         <span className="block whitespace-nowrap">The Coziest Way</span>
                         <span className="block whitespace-nowrap">
                             to Get Things{" "}
-                            <span className="group/done relative inline-block animate-hero-done cursor-pointer transition-transform duration-200 ease-out hover:-translate-y-0.5">
+                            <span className="group/done relative inline-block animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5">
                                 Done
-                                {/* Pixel Sparkle / Confetti Burst (Suggestion 4) */}
+
+                                {/* Fish 1: Orange - Directly over 'D' */}
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute -top-1 left-2 w-2.5 h-2.5 bg-accent border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-x-4 group-hover/done:-translate-y-4 group-hover/done:rotate-12 transition-all duration-300 ease-out"
-                                />
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[12%] left-[4%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-20 group-active/done:scale-110 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-1 block">
+                                        <Image
+                                            src="/images/completed-orange-fish.png"
+                                            alt=""
+                                            width={24}
+                                            height={24}
+                                            className="w-4 h-4 md:w-5 md:h-5 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 2: Tuxedo - Directly over 'o' */}
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute -top-2 left-1/2 w-2 h-2 bg-companion-ginger border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:translate-x-1 group-hover/done:-translate-y-5 group-hover/done:-rotate-12 transition-all duration-300 delay-75 ease-out"
-                                />
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[28%] left-[30%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:rotate-15 group-active/done:scale-110 transition-all duration-300 delay-[50ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-2 block">
+                                        <Image
+                                            src="/images/completed-tuxedo-fish.png"
+                                            alt=""
+                                            width={28}
+                                            height={28}
+                                            className="w-5 h-5 md:w-6 md:h-6 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 3: Black - Right in the center seam between 'o' and 'n' */}
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute top-0 right-1 w-3 h-3 bg-companion-tux border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:translate-x-5 group-hover/done:-translate-y-3 group-hover/done:rotate-45 transition-all duration-300 delay-50 ease-out"
-                                />
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[53%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[98%] group-hover/done:rotate-[24deg] group-active/done:scale-110 transition-all duration-300 delay-[25ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-3 block">
+                                        <Image
+                                            src="/images/completed-black-fish.png"
+                                            alt=""
+                                            width={24}
+                                            height={24}
+                                            className="w-4 h-4 md:w-5 md:h-5 [image-rendering:pixelated] drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 4: Orange - Directly over 'n' */}
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute bottom-3 -left-1 w-2 h-2 bg-companion-void border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-x-5 group-hover/done:translate-y-1 transition-all duration-300 delay-100 ease-out"
-                                />
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[30%] left-[70%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-12 group-active/done:scale-110 transition-all duration-300 delay-[80ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-4 block">
+                                        <Image
+                                            src="/images/completed-orange-fish.png"
+                                            alt=""
+                                            width={28}
+                                            height={28}
+                                            className="w-5 h-5 md:w-6 md:h-6 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 5: Tuxedo - Directly over 'e' */}
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute bottom-2 -right-1 w-2 h-2 bg-accent-highlight border border-[#232323] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:translate-x-5 group-hover/done:translate-y-2 group-hover/done:-rotate-12 transition-all duration-300 delay-75 ease-out"
-                                />
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[24%] left-[90%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:rotate-8 group-active/done:scale-110 transition-all duration-300 delay-[110ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-5 block">
+                                        <Image
+                                            src="/images/completed-tuxedo-fish.png"
+                                            alt=""
+                                            width={28}
+                                            height={28}
+                                            className="w-5 h-5 md:w-6 md:h-6 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
+                                        />
+                                    </span>
+                                </span>
                                 <span
                                     aria-hidden="true"
                                     className="absolute left-[1%] right-[1%] bottom-[0.06em] h-[3px] md:h-[5px] bg-accent animate-hero-done-line"
