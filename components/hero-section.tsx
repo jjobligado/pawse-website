@@ -1,11 +1,112 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+type DetectedPlatform = "windows" | "mac" | "linux" | "mobile" | "other";
+
+interface PlatformDownloadInfo {
+    label: string;
+    fileName?: string;
+    href: string;
+    isDownload: boolean;
+    isMobileShare?: boolean;
+    altPlatformText?: string;
+    altPlatformFile?: string;
+    iconType: "download" | "share" | "bell";
+}
+
+const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
+    windows: {
+        label: "Download for Windows",
+        fileName: "pawse-setup.exe",
+        href: "/downloads/pawse-setup.exe",
+        isDownload: true,
+        altPlatformText: "Also available for macOS",
+        altPlatformFile: "/downloads/pawse.dmg",
+        iconType: "download",
+    },
+    mac: {
+        label: "Download for Mac",
+        fileName: "pawse.dmg",
+        href: "/downloads/pawse.dmg",
+        isDownload: true,
+        altPlatformText: "Also available for Windows",
+        altPlatformFile: "/downloads/pawse-setup.exe",
+        iconType: "download",
+    },
+    linux: {
+        label: "Notify Me for Linux",
+        href: "#beta",
+        isDownload: false,
+        altPlatformText: "Linux build in progress",
+        iconType: "bell",
+    },
+    mobile: {
+        label: "Send to My Desktop",
+        href: "#",
+        isDownload: false,
+        isMobileShare: true,
+        altPlatformText: "PAWSE is built for Windows & Mac",
+        iconType: "share",
+    },
+    other: {
+        label: "Download for Windows",
+        fileName: "pawse-setup.exe",
+        href: "/downloads/pawse-setup.exe",
+        isDownload: true,
+        altPlatformText: "Also available for macOS",
+        altPlatformFile: "/downloads/pawse.dmg",
+        iconType: "download",
+    },
+};
+
+function getClientPlatform(): DetectedPlatform {
+    if (typeof window === "undefined" || !window.navigator) {
+        return "windows";
+    }
+
+    const ua = window.navigator.userAgent.toLowerCase();
+    const platform = window.navigator.platform?.toLowerCase() || "";
+    const maxTouchPoints = window.navigator.maxTouchPoints || 0;
+
+    const isMobileOrTablet =
+        /iphone|ipad|ipod|android|mobile|tablet|silk|blackberry|iemobile|kindle/i.test(ua) ||
+        (/mac/i.test(platform) && maxTouchPoints > 1); // iPadOS
+
+    if (isMobileOrTablet) {
+        return "mobile";
+    }
+    if (/macintosh|macintel|macppc|mac68k|darwin/i.test(ua) || /mac/i.test(platform)) {
+        return "mac";
+    }
+    if (/win32|win64|windows|wince/i.test(ua) || /win/i.test(platform)) {
+        return "windows";
+    }
+    if (/linux/i.test(ua) || /linux/i.test(platform)) {
+        return "linux";
+    }
+    return "other";
+}
+
+function getServerPlatform(): DetectedPlatform {
+    return "windows";
+}
+
+function subscribePlatform() {
+    return () => {};
+}
+
 export default function HeroSection() {
     const [scrollY, setScrollY] = useState(0);
+    const [copied, setCopied] = useState(false);
+
+    const detectedPlatform = useSyncExternalStore(
+        subscribePlatform,
+        getClientPlatform,
+        getServerPlatform
+    );
 
     useEffect(() => {
         let ticking = false;
@@ -23,6 +124,51 @@ export default function HeroSection() {
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const platformInfo = PLATFORM_CONFIG[detectedPlatform];
+
+    const handleCTAClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (platformInfo.isMobileShare) {
+            e.preventDefault();
+            const shareUrl = window.location.href;
+
+            // Try native mobile sharing first (AirDrop, device send, messaging)
+            if (typeof navigator !== "undefined" && navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "PAWSE — The Coziest Way to Get Things Done",
+                        text: "A desktop productivity app combining a focus timer with a virtual companion.",
+                        url: shareUrl,
+                    });
+                    return;
+                } catch {
+                    // User dismissed share sheet or share failed; fallback to clipboard copy
+                }
+            }
+
+            // Fallback: copy link to clipboard and show feedback
+            try {
+                if (typeof navigator !== "undefined" && navigator.clipboard) {
+                    await navigator.clipboard.writeText(shareUrl);
+                }
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2500);
+            } catch {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2500);
+            }
+        } else if (platformInfo.href === "#beta") {
+            e.preventDefault();
+            const betaElement = document.getElementById("beta");
+            if (betaElement) {
+                betaElement.scrollIntoView({ behavior: "smooth" });
+                const emailInput = betaElement.querySelector<HTMLInputElement>("input[type='email']");
+                if (emailInput) {
+                    emailInput.focus();
+                }
+            }
+        }
+    };
 
     // Clamp parallax offsets so they stay smooth within the hero viewport
     const clampedScroll = Math.min(scrollY, 700);
@@ -167,27 +313,102 @@ export default function HeroSection() {
                 {/* Download Options */}
                 <div className="w-full pt-2 flex flex-col justify-center items-center gap-3.5 animate-hero-fade-up-3">
                     <Link
-                        href="#download"
-                        className="group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] bg-accent shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)]"
+                        href={platformInfo.href}
+                        download={platformInfo.fileName}
+                        onClick={handleCTAClick}
+                        data-os={detectedPlatform}
+                        className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
+                            copied
+                                ? "bg-[#10B981] hover:bg-[#059669]"
+                                : "bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE]"
+                        }`}
                     >
-                        <Image
-                            src="/images/download-icon.svg"
-                            alt=""
-                            width={20}
-                            height={20}
-                            className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
-                        />
+                        {copied ? (
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-white"
+                            >
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        ) : platformInfo.iconType === "share" ? (
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-white transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            >
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                <polyline points="16 6 12 2 8 6" />
+                                <line x1="12" y1="2" x2="12" y2="15" />
+                            </svg>
+                        ) : platformInfo.iconType === "bell" ? (
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-white transition-transform duration-200 ease-out group-hover:rotate-12"
+                            >
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                        ) : (
+                            <Image
+                                src="/images/download-icon.svg"
+                                alt=""
+                                width={20}
+                                height={20}
+                                className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
+                            />
+                        )}
                         <span className="font-pixel text-lg md:text-xl font-semibold text-white">
-                            Download for Windows
+                            {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                         </span>
                     </Link>
 
-                    <div className="flex items-center justify-center">
+                    {/* Secondary Contextual Meta-Row */}
+                    <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]">
+                        {/* Alternative Platform Override Link / Status */}
+                        {platformInfo.altPlatformFile ? (
+                            <a
+                                href={platformInfo.altPlatformFile}
+                                download={platformInfo.altPlatformFile.split("/").pop()}
+                                className="hover:text-[#232323] transition-colors underline decoration-1 decoration-[#C4C4C8] hover:decoration-[#8E8E93] underline-offset-4"
+                            >
+                                {platformInfo.altPlatformText}
+                            </a>
+                        ) : platformInfo.altPlatformText ? (
+                            <span className="text-[#5F5F5F]">
+                                {platformInfo.altPlatformText}
+                            </span>
+                        ) : null}
+
+                        {platformInfo.altPlatformText && (
+                            <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
+                        )}
+
+                        {/* View on GitHub */}
                         <Link
                             href="https://github.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5F5F5F] hover:text-[#232323] tracking-[0.02em] transition-colors group"
+                            className="inline-flex items-center gap-1.5 font-medium hover:text-[#232323] transition-colors group"
                         >
                             <svg
                                 viewBox="0 0 24 24"
