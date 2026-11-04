@@ -1,0 +1,423 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePlatform } from "@/hooks/use-platform";
+
+export default function HeroSection() {
+    const [scrollY, setScrollY] = useState(0);
+    const [copied, setCopied] = useState(false);
+    const { platform: detectedPlatform, config: platformInfo } = usePlatform();
+
+    useEffect(() => {
+        let ticking = false;
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    setScrollY(window.scrollY);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    const handleCTAClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (platformInfo.isMobileShare) {
+            e.preventDefault();
+            const shareUrl = window.location.href;
+
+            // Try native mobile sharing first (AirDrop, device send, messaging)
+            if (typeof navigator !== "undefined" && navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "PAWSE — The Coziest Way to Get Things Done",
+                        text: "A desktop productivity app combining a focus timer with a virtual companion.",
+                        url: shareUrl,
+                    });
+                    return;
+                } catch {
+                    // User dismissed share sheet or share failed; fallback to clipboard copy
+                }
+            }
+
+            // Fallback: copy link to clipboard and show feedback
+            try {
+                if (typeof navigator !== "undefined" && navigator.clipboard) {
+                    await navigator.clipboard.writeText(shareUrl);
+                }
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2500);
+            } catch {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2500);
+            }
+        } else if (platformInfo.href === "#beta") {
+            e.preventDefault();
+            const betaElement = document.getElementById("beta");
+            if (betaElement) {
+                betaElement.scrollIntoView({ behavior: "smooth" });
+                const emailInput = betaElement.querySelector<HTMLInputElement>("input[type='email']");
+                if (emailInput) {
+                    emailInput.focus();
+                }
+            }
+        }
+    };
+
+    // Clamp parallax offsets so they stay smooth within the hero viewport
+    const clampedScroll = Math.min(scrollY, 700);
+    const gingerParallax = clampedScroll * -0.09;
+    const voidParallax = clampedScroll * -0.05;
+    const tuxParallax = clampedScroll * -0.07;
+    const showcaseParallax = clampedScroll * -0.03;
+
+    return (
+        <section className="relative w-full max-w-[1440px] mx-auto pt-16 pb-16 md:pt-24 md:pb-28 px-6 md:px-10 flex flex-col items-center bg-white">
+            {/* Scattered Cats on Left & Right Sides */}
+            <div className="pointer-events-none hidden md:block absolute inset-0 max-w-[1320px] mx-auto z-20">
+                {/* Left Top Cat (Ginger) */}
+                <div
+                    style={{ transform: `translate3d(0, ${gingerParallax}px, 0)` }}
+                    className="absolute left-2 lg:left-8 top-10 lg:top-12 transition-transform duration-75 ease-out"
+                >
+                    <div className="animate-cat-pop-1">
+                        <div className="animate-cat-float-1">
+                            <div className="pointer-events-auto group relative w-[130px] h-[130px] lg:w-[165px] lg:h-[165px] -rotate-6 hover:rotate-0 hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer">
+                                {/* Pixel Speech Bubble */}
+                                <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-200 whitespace-nowrap z-30">
+                                    <span className="font-pixel text-xs font-semibold text-[#232323]">
+                                        Let&apos;s sprint! ⚡
+                                    </span>
+                                </div>
+                                <Image
+                                    src="/images/orange-cat-56586a.png"
+                                    alt="Ginger companion"
+                                    width={165}
+                                    height={165}
+                                    className="w-full h-full object-contain select-none"
+                                    priority
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Left Bottom Cat (Void) */}
+                <div
+                    style={{ transform: `translate3d(0, ${voidParallax}px, 0)` }}
+                    className="absolute left-8 lg:left-24 top-[250px] lg:top-[280px] transition-transform duration-75 ease-out"
+                >
+                    <div className="animate-cat-pop-3">
+                        <div className="animate-cat-float-2">
+                            <div className="pointer-events-auto group relative w-[125px] h-[125px] lg:w-[155px] lg:h-[155px] rotate-6 hover:rotate-0 hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer">
+                                {/* Pixel Speech Bubble */}
+                                <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-white border-2 border-[#232323] opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-200 whitespace-nowrap shadow-[2px_2px_0px_0px_#232323] z-30">
+                                    <span className="font-pixel text-xs font-semibold text-[#232323]">
+                                        Deep flow... 🌙
+                                    </span>
+                                </div>
+                                <Image
+                                    src="/images/black-cat.png"
+                                    alt="Void companion"
+                                    width={155}
+                                    height={155}
+                                    className="w-full h-full object-contain select-none"
+                                    priority
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Center Cat (Tuxedo) */}
+                <div
+                    style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
+                    className="absolute right-4 lg:right-14 top-[130px] lg:top-[150px] transition-transform duration-75 ease-out"
+                >
+                    <div className="animate-cat-pop-2">
+                        <div className="animate-cat-float-3">
+                            <div className="pointer-events-auto group relative w-[140px] h-[140px] lg:w-[175px] lg:h-[175px] rotate-6 hover:rotate-0 hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer">
+                                {/* Pixel Speech Bubble */}
+                                <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-white border-2 border-[#232323] opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-200 whitespace-nowrap shadow-[2px_2px_0px_0px_#232323] z-30">
+                                    <span className="font-pixel text-xs font-semibold text-[#232323]">
+                                        purr... 🐾
+                                    </span>
+                                </div>
+                                <Image
+                                    src="/images/tuxedo-cat.png"
+                                    alt="Tux companion"
+                                    width={175}
+                                    height={175}
+                                    className="w-full h-full object-contain select-none"
+                                    priority
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Centered Hero Copy & Actions */}
+            <div className="relative z-10 w-full flex flex-col items-center gap-6">
+                <div className="w-full flex justify-center items-center animate-hero-fade-up-1">
+                    <h1 className="font-pixel text-[clamp(2.125rem,6.8vw,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
+                        <span className="block whitespace-nowrap">The Coziest Way</span>
+                        <span className="block whitespace-nowrap">
+                            to Get Things{" "}
+                            <span className="group/done relative inline-block pr-6 md:pr-8 animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5 before:absolute before:-inset-y-8 before:-inset-x-6 before:content-['']">
+                                <span className="relative inline-block">
+                                    Done
+                                    <span
+                                        aria-hidden="true"
+                                        className="absolute left-1 right-1 bottom-[calc(0.06em-5px)] h-[3px] md:h-[5px] bg-accent animate-hero-done-line"
+                                    />
+                                </span>
+
+                                {/* Fish 1: Orange - Directly over 'D' */}
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[1%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-20 group-active/done:scale-110 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-1 block">
+                                        <Image
+                                            src="/images/completed-orange-fish.png"
+                                            alt=""
+                                            width={32}
+                                            height={32}
+                                            className="w-6 h-6 md:w-7 md:h-7 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 2: Tuxedo - Directly over 'o' */}
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[32%] left-[24%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:rotate-15 group-active/done:scale-110 transition-all duration-300 delay-[50ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-2 block">
+                                        <Image
+                                            src="/images/completed-tuxedo-fish.png"
+                                            alt=""
+                                            width={36}
+                                            height={36}
+                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 3: Black - Right in the center seam between 'o' and 'n' */}
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[42%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[98%] group-hover/done:rotate-[24deg] group-active/done:scale-110 transition-all duration-300 delay-[25ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-3 block">
+                                        <Image
+                                            src="/images/completed-black-fish.png"
+                                            alt=""
+                                            width={32}
+                                            height={32}
+                                            className="w-6 h-6 md:w-7 md:h-7 [image-rendering:pixelated] drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 4: Orange - Directly over 'n' */}
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[34%] left-[60%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-12 group-active/done:scale-110 transition-all duration-300 delay-[80ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-4 block">
+                                        <Image
+                                            src="/images/completed-orange-fish.png"
+                                            alt=""
+                                            width={36}
+                                            height={36}
+                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
+                                        />
+                                    </span>
+                                </span>
+
+                                {/* Fish 5: Tuxedo - Directly over 'e' */}
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none select-none absolute z-20 leading-none top-[22%] left-[82%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[80%] group-hover/done:rotate-8 group-active/done:scale-110 transition-all duration-300 delay-[110ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                >
+                                    <span className="animate-fish-swim-5 block">
+                                        <Image
+                                            src="/images/completed-tuxedo-fish.png"
+                                            alt=""
+                                            width={36}
+                                            height={36}
+                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
+                                        />
+                                    </span>
+                                </span>
+                            </span>
+                        </span>
+                    </h1>
+                </div>
+
+                {/* Subtitle */}
+                <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
+                    <p className="max-w-[620px] text-base md:text-lg text-[#5F5F5F] text-center tracking-[0.01em] leading-relaxed">
+                        A desktop productivity app combining a focus timer with a virtual
+                        companion. Built for students, professionals, and cat lovers.
+                    </p>
+                </div>
+
+                {/* Download Options */}
+                <div className="w-full pt-2 flex flex-col justify-center items-center gap-3.5 animate-hero-fade-up-3">
+                    <Link
+                        href={platformInfo.href}
+                        download={platformInfo.fileName}
+                        onClick={handleCTAClick}
+                        data-os={detectedPlatform}
+                        className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
+                            copied
+                                ? "bg-[#10B981] hover:bg-[#059669]"
+                                : "bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE]"
+                        }`}
+                    >
+                        {copied ? (
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-white"
+                            >
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        ) : platformInfo.iconType === "share" ? (
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-white transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            >
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                <polyline points="16 6 12 2 8 6" />
+                                <line x1="12" y1="2" x2="12" y2="15" />
+                            </svg>
+                        ) : platformInfo.iconType === "bell" ? (
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-white transition-transform duration-200 ease-out group-hover:rotate-12"
+                            >
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                        ) : (
+                            <Image
+                                src="/images/download-icon.svg"
+                                alt=""
+                                width={20}
+                                height={20}
+                                className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
+                            />
+                        )}
+                        <span className="font-pixel text-lg md:text-xl font-normal text-white">
+                            {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
+                        </span>
+                    </Link>
+
+                    {/* Secondary Contextual Meta-Row */}
+                    <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]">
+                        {/* Alternative Platform Override Link / Status */}
+                        {platformInfo.altPlatformFile ? (
+                            <a
+                                href={platformInfo.altPlatformFile}
+                                download={platformInfo.altPlatformFile.split("/").pop()}
+                                className="hover:text-black transition-all underline decoration-1 decoration-[#C4C4C8] hover:decoration-[1.5px] hover:decoration-black underline-offset-4"
+                            >
+                                {platformInfo.altPlatformText}
+                            </a>
+                        ) : platformInfo.altPlatformText ? (
+                            <span className="text-[#5F5F5F]">
+                                {platformInfo.altPlatformText}
+                            </span>
+                        ) : null}
+
+                        {platformInfo.altPlatformText && (
+                            <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
+                        )}
+
+                        {/* View on GitHub */}
+                        <Link
+                            href="https://github.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 hover:text-black transition-all group"
+                        >
+                            <span className="underline decoration-1 decoration-[#C4C4C8] group-hover:decoration-[1.5px] group-hover:decoration-black underline-offset-4 transition-all">
+                                View on GitHub
+                            </span>
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                                className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-black"
+                            >
+                                <path
+                                    d="M5 12H19"
+                                    stroke="currentColor"
+                                    strokeWidth="1"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
+                                />
+                                <path
+                                    d="M12 5L19 12L12 19"
+                                    stroke="currentColor"
+                                    strokeWidth="1"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
+                                />
+                            </svg>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            {/* App Visuals Showcase Container (Peeking at the bottom of the Hero) */}
+            <div
+                style={{ transform: `translate3d(0, ${showcaseParallax}px, 0)` }}
+                className="relative z-10 w-full max-w-[1040px] mt-12 md:mt-16 transition-transform duration-75 ease-out"
+            >
+                <div className="animate-hero-fade-up-4">
+                    <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-3xl border-2 border-stroke bg-[linear-gradient(180deg,#F8FAFC_0%,#EBF6FF_100%)] shadow-[0px_12px_40px_0px_rgba(0,0,0,0.08)] flex items-center justify-center p-6">
+                        <span className="font-pixel text-lg md:text-xl text-[#5F5F5F]/60 select-none">
+                            App Visuals Preview
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
