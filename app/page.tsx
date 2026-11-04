@@ -140,7 +140,7 @@ export default function HomePage() {
             {/* How it Works */}
             <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white">
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-center">
+                    <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
                         How it Works
                     </h2>
                 </div>
@@ -205,7 +205,7 @@ export default function HomePage() {
 
                 <div className="relative z-10 w-full max-w-[1140px] flex flex-col items-center gap-6">
                     <div className="flex justify-center items-center">
-                        <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-center">
+                        <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
                             Meet your Companions
                         </h2>
                     </div>
@@ -263,8 +263,9 @@ export default function HomePage() {
             <section className="w-full max-w-[1280px] mx-auto py-12 md:py-16 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-8 bg-white">
                 <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
                     <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-                        <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-left">
-                            Your quiet co-working space
+                        <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-left leading-[1.1]">
+                            <span className="block whitespace-nowrap">Your quiet</span>
+                            <span className="block whitespace-nowrap">co-working space</span>
                         </h2>
                         <p className="text-base md:text-lg text-[#5F5F5F] text-left leading-relaxed">
                             No jarring alarms. No visual clutter. While your timer counts
@@ -284,8 +285,9 @@ export default function HomePage() {
                     <TimerMockup />
 
                     <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-                        <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-left">
-                            Time to play and recharge
+                        <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-left leading-[1.1]">
+                            <span className="block whitespace-nowrap">Time to play</span>
+                            <span className="block whitespace-nowrap">and recharge</span>
                         </h2>
                         <p className="text-base md:text-lg text-[#5F5F5F] text-left leading-relaxed">
                             When the interval ends, the quiet time is over. Your companion
@@ -302,7 +304,7 @@ export default function HomePage() {
                 <div className="w-full pt-12 pb-24 md:pt-16 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-[linear-gradient(180deg,#FFFFFF_0%,#DCF1FF_80%,#A8DCFF_100%)]">
                     <div className="w-full max-w-[1140px] flex flex-col items-stretch gap-6">
                         <div className="flex justify-center items-center">
-                            <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-center">
+                            <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
                                 Dashboard
                             </h2>
                         </div>
@@ -369,7 +371,7 @@ export default function HomePage() {
             {/* Coming Soon */}
             <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white">
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-center">
+                    <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
                         Coming Soon...
                     </h2>
                 </div>
@@ -421,7 +423,7 @@ export default function HomePage() {
                 className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
             >
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-3xl md:text-4xl font-semibold text-[#232323] text-center">
+                    <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
                         Help Us Shape the Future of PAWSE
                     </h2>
                 </div>
