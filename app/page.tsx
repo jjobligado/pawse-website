@@ -1,5 +1,6 @@
 import Image from "next/image";
 import HeroSection from "@/components/hero-section";
+import CompanionCards from "@/components/companion-cards";
 
 const howItWorksSteps = [
     {
@@ -217,43 +218,7 @@ export default function HomePage() {
                     </p>
 
                     {/* Stacked Cards Interactive Group */}
-                    <div className="group relative w-full max-w-[1050px] min-h-[190px] flex flex-col md:flex-row justify-center items-center gap-4">
-                        {/* Stacked view (default on desktop, fans out on hover) */}
-                        <div className="relative w-[340px] h-[190px] md:group-hover:hidden">
-                            <Image
-                                src="/images/stacked-companions.png"
-                                alt="Tux, Ginger, and Void companion cards"
-                                width={459}
-                                height={200}
-                                className="w-full h-full object-contain scale-120"
-                            />
-                        </div>
-
-                        {/* Expanded view on hover (desktop) */}
-                        <div className="hidden md:group-hover:flex flex-row justify-center items-center gap-4 w-full min-h-[190px]">
-                            <Image
-                                src="/images/card-tux.png"
-                                alt="Tux - Classic 25-minute session"
-                                width={330}
-                                height={125}
-                                className="w-[330px] h-auto object-contain transition-transform duration-300 hover:scale-105"
-                            />
-                            <Image
-                                src="/images/card-ginger.png"
-                                alt="Ginger - Sprint 15-minute session"
-                                width={330}
-                                height={125}
-                                className="w-[330px] h-auto object-contain transition-transform duration-300 hover:scale-105"
-                            />
-                            <Image
-                                src="/images/card-void.png"
-                                alt="Void - Focused 50-minute session"
-                                width={330}
-                                height={125}
-                                className="w-[330px] h-auto object-contain transition-transform duration-300 hover:scale-105"
-                            />
-                        </div>
-                    </div>
+                    <CompanionCards />
 
                     <p className="text-base md:text-lg text-[#5F5F5F] text-center">
                         Pick the pace that matches how you actually focus.
