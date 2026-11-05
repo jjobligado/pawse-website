@@ -1,220 +1,236 @@
-export default function PrivacyPage() {
-  return (
-    <section className="bg-white px-6 py-20 sm:px-10 lg:px-40">
-      <div className="mx-auto max-w-4xl text-black">
-        
-        {/* Header / Preamble */}
-        <div className="mb-16 text-center">
-          <h1 className="mb-8 font-pixel text-5xl font-semibold text-accent sm:text-6xl">
-            Privacy Policy
-          </h1>
-          <div className="mx-auto max-w-3xl space-y-4 font-sans text-base leading-relaxed text-black/80">
-            <p>
-              PAWSE (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is a desktop productivity application that combines a focus timer with a virtual cat companion. This Privacy Policy explains what information we collect, why we collect it, how we use it, and the choices available to you. It applies to the PAWSE website, including our beta and launch signup form, and to the PAWSE desktop application. It does not apply to third-party websites or services that we may link to, such as our GitHub repository.
-            </p>
-            <p>
-              PAWSE is currently in active development. As we introduce new features, including user accounts, Google Sign-In, and cloud synchronization, this policy will be updated to reflect those changes.
-            </p>
-            <p className="font-bold text-black">
-              Effective from August 00, 2026
-            </p>
-            <p className="font-bold text-black">
-              Last Updated: August 00, 2026
-            </p>
-          </div>
-        </div>
+export default function PrivacyPolicy() {
+    return (
+        <section className="bg-white px-6 py-20 sm:px-10 lg:px-40">
+            <div className="mx-auto max-w-4xl text-black">
+                
+                {/* Header / Preamble */}
+                <div className="mb-16 text-center">
+                    <h1 className="mb-8 font-pixel text-5xl font-semibold text-accent sm:text-6xl">
+                        Privacy Policy
+                    </h1>
+                    <div className="mx-auto max-w-3xl space-y-4 font-sans text-base leading-relaxed text-black/80">
+                        <p>
+                            PAWSE (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is a desktop productivity application that combines a focus timer with a virtual cat companion. It is operated by meowskrrt, a team based in the Republic of the Philippines.
+                        </p>
+                        <p>
+                            This Privacy Policy explains what information we collect, why we collect it, how we use it, and the choices available to you. It applies to the PAWSE website, including our beta and launch signup form, and to the PAWSE desktop application. It does not apply to third-party websites or services that you access through external links, such as our GitHub repository.
+                        </p>
+                        <p>
+                            PAWSE is currently in active development. The current version does not offer user accounts, Google Sign-In, or cloud synchronization of application data. This policy will be updated as our features and information-handling practices change.
+                        </p>
+                        <div className="font-sans text-black pt-4">
+                            <p><strong className="text-black">Effective date: </strong>November 7, 2026</p> 
+                            <p><strong className="text-black">Last updated: </strong>November 7, 2026</p>
+                        </div>
+                    </div>
+                </div>
 
-        {/* Policy Content */}
-        <div className="space-y-12 font-sans text-base leading-relaxed text-black/80">
-          
-          {/* Section 1 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              1. Information We Collect
-            </h2>
-            
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-bold text-black">a. Information you provide directly</h3>
-                <ul className="mt-2 list-inside list-disc space-y-1 pl-4">
-                  <li>Your email address, if you sign up for launch updates, beta communications, or create an account.</li>
-                  <li>Account details, if you create one. This may be an email and password combination, or, if you choose to sign in with Google, basic profile information provided by Google, such as your name, email address, and profile picture.</li>
-                </ul>
-              </div>
+                {/* Policy Content */}
+                <div className="space-y-12 font-sans text-base leading-relaxed text-black/80">
+                    
+                    {/* Section 1 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            1. Information We Handle
+                        </h2>
+                        
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="font-bold text-black">a. Information you provide directly</h3>
+                                <ul className="mt-2 list-inside list-disc space-y-1 pl-4">
+                                    <li>Your email address, if you sign up for launch updates or beta communications.</li>
+                                    <li>Information you provide when contacting us for support or submitting feedback, including your contact details, message contents, and any screenshots, attachments, or bug reports you choose to share.</li>
+                                </ul>
+                            </div>
 
-              <div>
-                <h3 className="font-bold text-black">b. Information collected automatically (account holders only)</h3>
-                <ul className="mt-2 list-inside list-disc space-y-1 pl-4">
-                  <li>Usage data, including your focus session history, total focus time, completed Pomodoros, favorite companion, and weekly activity patterns.</li>
-                  <li>Technical data, such as your IP address and general device or operating system information. [Confirm before publishing whether this information is actually collected.]</li>
-                </ul>
-              </div>
+                            <div>
+                                <h3 className="font-bold text-black">b. Information stored locally on your device</h3>
+                                <p className="mt-1">
+                                    PAWSE stores application data locally using an unencrypted SQLite database (pawse.db) and local application storage. Locally stored information includes your focus session history, progress statistics, companion preferences, and application settings. Its timer, companion, and progress features work offline. The application does not automatically upload session data, focus history, or diagnostic reports to us or third-party services. It connects to GitHub for software update checks, as described below. You may also choose to share information with us when submitting a support request or bug report.
+                                </p>
+                            </div>
 
-              <p>
-                <strong className="text-black">c. Cookies and similar technologies:</strong> Our website may use cookies or similar technologies to remember your preferences and, where applicable, to understand how the website is used. [Update this section once you confirm which tools, if any, are used, such as a basic analytics tool.] You may control cookies through your browser settings. Please note that disabling cookies may affect certain website functions.
-              </p>
-              <p>
-                <strong className="text-black">d. Guest Mode:</strong> If you use PAWSE without creating an account, your data is stored locally on your device using SQLite and is not transmitted to our servers.
-              </p>
+                            <div>
+                                <h3 className="font-bold text-black">c. Technical information</h3>
+                                <p className="mt-1">
+                                    The PAWSE desktop application connects to GitHub to check for software updates. This process may disclose your IP address and basic operating system details to GitHub&apos;s servers. The desktop app does not automatically send telemetry, crash logs, or analytics to our team. <br />
+                                    [If applicable: Our landing website may collect basic web analytics such as IP addresses or request timestamps to help us monitor site traffic.]
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 className="font-bold text-black">d. Cookies and similar technologies</h3>
+                                <p className="mt-1">
+                                    The desktop application stores preferences, such as audio volume and toggle settings, locally on your device. These preferences are not automatically transmitted to us. <br />
+                                    [If applicable: Our landing website may use cookies or similar tracking technologies for basic analytics. You can manage your cookie preferences through your browser settings.]
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Section 2 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            2. How We Use Your Information
+                        </h2>
+                        <p className="mb-2">The application uses locally stored information to operate its features, remember your preferences, and display your progress.</p>
+                        <p className="mb-2">We use information we receive for the following purposes:</p>
+                        <ul className="mb-4 list-inside list-disc space-y-1 pl-4">
+                            <li>To send you updates that you have chosen to receive, such as launch announcements or beta program communications.</li>
+                            <li>To respond to support requests or feedback.</li>
+                            <li>To investigate reported bugs and improve PAWSE using feedback you choose to submit.</li>
+                            <li>To monitor website performance and deliver software updates.</li>
+                        </ul>
+                        <p>
+                            We rely on your consent to send optional launch and beta communications. You may withdraw your consent at any time by unsubscribing. We rely on our legitimate interest in maintaining and updating PAWSE where the processing is necessary for that purpose and does not override your rights and freedoms.
+                        </p>
+                    </section>
+
+                    {/* Section 3 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            3. How We Share Your Information
+                        </h2>
+                        <p className="mb-2">We do not sell your personal information. We may disclose information to:</p>
+                        <ul className="mb-4 list-inside list-disc space-y-2 pl-4">
+                            <li><strong className="text-black">Service providers.</strong> Providers that help us operate the website, manage signup submissions, deliver requested emails, or handle support communications, where those services are used.</li>
+                            <li><strong className="text-black">Supabase.</strong> We use Supabase to store and manage email addresses submitted through our website for beta testing and launch updates.</li>
+                            <li><strong className="text-black">GitHub.</strong> We use GitHub to distribute application updates. GitHub receives technical information when your application checks for or downloads updates, as described in Section 1(c).</li>
+                            <li><strong className="text-black">Authorities.</strong> Where disclosure is required to comply with an applicable legal obligation or valid legal process.</li>
+                        </ul>
+                        <p>
+                            Permission to use feedback under our Terms and Conditions does not authorize us to publish personal information included in that feedback.
+                        </p>
+                    </section>
+
+                    {/* Section 4 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            4. International Data Transfers
+                        </h2>
+                        <p>
+                            We are based in the Republic of the Philippines. Because we use international service providers for our landing website and update delivery, any information you submit online (such as email signups) or automatic update requests may be processed on servers located outside the Philippines.
+                        </p>
+                    </section>
+
+                    {/* Section 5 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            5. Data Storage and Security
+                        </h2>
+                        <ul className="mb-4 list-inside list-disc space-y-2 pl-4">
+                            <li><strong className="text-black">Local storage.</strong> Application data is stored on your device in an unencrypted SQLite database (pawse.db) and other local application storage.</li>
+                            <li><strong className="text-black">Information submitted to us.</strong> Beta and launch signup information is stored in Supabase. Support messages and feedback are stored through [email or support service provider].</li>
+                        </ul>
+                        <p>
+                            We take reasonable measures to protect information under our control. However, no method of storage or transmission can be guaranteed to be completely secure, and we cannot guarantee the absolute security of local files if your device is compromised.
+                        </p>
+                    </section>
+
+                    {/* Section 6 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            6. Data Retention
+                        </h2>
+                        <ul className="list-inside list-disc space-y-2 pl-4">
+                            <li><strong className="text-black">Local application data.</strong> Local data remains on your device until it is removed. Uninstalling PAWSE may not remove all application data. To delete locally stored data, fully close PAWSE and delete the PAWSE application data folder located in your operating system&apos;s standard user data directory. This permanently removes your saved progress and preferences. Reopening PAWSE may create new local data.</li>
+                            <li><strong className="text-black">Launch and beta communications.</strong> Email addresses are retained for the duration of the beta program and initial launch phase. If you unsubscribe, we may retain a limited record of your email to prevent sending you future communications.</li>
+                            <li><strong className="text-black">Support and feedback.</strong> Messages, bug reports, and attachments are retained for as long as necessary to address your inquiry or resolve the reported issue.</li>
+                            <li><strong className="text-black">Technical information.</strong> Update request logs managed by GitHub are subject to GitHub&apos;s data retention policies.</li>
+                        </ul>
+                    </section>
+
+                    {/* Section 7 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            7. Your Privacy Rights and Choices
+                        </h2>
+                        <p className="mb-2">Depending on applicable law, you may have some or all of the following rights regarding your personal information:</p>
+                        <ul className="mb-4 list-inside list-disc space-y-1 pl-4">
+                            <li>Access the personal information we hold about you.</li>
+                            <li>Correct inaccurate information.</li>
+                            <li>Request deletion of your information.</li>
+                            <li>Restrict or object to certain processing.</li>
+                            <li>Request a portable copy of your information where applicable.</li>
+                            <li>Withdraw your consent where processing is based on consent.</li>
+                            <li>Lodge a complaint with the relevant data protection or privacy authority.</li>
+                        </ul>
+                        <p className="mb-4 font-bold text-black">
+                            In the Philippines, the relevant authority is the National Privacy Commission.
+                        </p>
+                        <p className="mb-2">You may also:</p>
+                        <ul className="mb-4 list-inside list-disc space-y-1 pl-4">
+                            <li>Use the current PAWSE desktop application without creating an account.</li>
+                            <li>Unsubscribe from optional emails through the unsubscribe link provided in our emails.</li>
+                            <li>Remove locally stored application data by following the instructions in Section 6.</li>
+                            <li>Contact us at [email address] to make a request concerning information we hold about you.</li>
+                        </ul>
+                        <p className="mb-4">
+                            We cannot remotely access or delete application data that exists only on your device. If you choose to send us a copy through a support request, that copy is handled according to this policy.
+                        </p>
+                        <p>
+                            We may request information reasonably necessary to verify your identity and respond to a privacy request.
+                        </p>
+                    </section>
+
+                    {/* Section 8 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            8. Do Not Track and Global Privacy Control
+                        </h2>
+                        <p>
+                            The desktop application does not track your activity across other websites. Its network connections for software updates are described in Section 1(c).
+                        </p>
+                    </section>
+
+                    {/* Section 9 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            9. Third-Party Links
+                        </h2>
+                        <p>
+                            Our website and application may link to third-party sites, such as our GitHub repository or LinkedIn pages. This policy does not cover those sites. We encourage you to review their privacy practices separately.
+                        </p>
+                    </section>
+
+                    {/* Section 10 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            10. Children&apos;s Privacy
+                        </h2>
+                        <p className="mb-4">
+                            Consistent with our Terms and Conditions, PAWSE is intended for users aged 13 and older. Users below the age of majority where they live may use the Service only with the permission and supervision of a parent or legal guardian.
+                        </p>
+                        <p>
+                            We do not knowingly collect personal information from children under 13. If you believe that a child under 13 has provided us with personal information, please contact us at [email address] so that we can investigate and take appropriate steps to delete it.
+                        </p>
+                    </section>
+
+                    {/* Section 11 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            11. Changes to This Policy
+                        </h2>
+                        <p className="mb-4">
+                            We may update this policy as PAWSE evolves or our information-handling practices change. We will update the &quot;Last updated&quot; date above whenever this policy is revised.
+                        </p>
+                        <p>
+                            For significant changes, we will provide appropriate notice, such as through our website or an in-app notice. Where applicable law requires consent for a new use of personal information, we will obtain it before that processing begins.
+                        </p>
+                    </section>
+
+                    {/* Section 12 */}
+                    <section>
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                            12. Contact Us
+                        </h2>
+                        <p>
+                            If you have questions about this policy or your personal information, please contact us at [email address].
+                        </p>
+                    </section>
+
+                </div>
             </div>
-          </section>
-
-          {/* Section 2 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              2. How We Use Your Information
-            </h2>
-            <p className="mb-2">We use the information described above for the following purposes:</p>
-            <ul className="mb-4 list-inside list-disc space-y-1 pl-4">
-              <li>To operate and maintain the application, including synchronizing your focus data across devices if you have an account.</li>
-              <li>To send you updates that you have chosen to receive, such as launch announcements or beta program communications.</li>
-              <li>To understand aggregated usage patterns and improve PAWSE.</li>
-              <li>To respond to support requests or feedback that you send to us.</li>
-            </ul>
-            <p className="mb-4">
-              Where applicable law requires us to identify a legal basis for processing your personal data, we rely on your consent for optional communications, the performance of a contract to provide core account features such as data synchronization, and our legitimate interests in maintaining and improving PAWSE in a manner that does not override your privacy rights.
-            </p>
-            <p>
-              We do not use your personal information for automated decision-making that produces legal or similarly significant effects on you.
-            </p>
-          </section>
-
-          {/* Section 3 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              3. How We Share Your Information
-            </h2>
-            <p className="mb-2">We do not sell your personal information. We may share information with the following parties:</p>
-            <ul className="list-inside list-disc space-y-2 pl-4">
-              <li><strong className="text-black">Google.</strong> If you choose to sign in with Google, subject to Google&apos;s own privacy policy.</li>
-              <li><strong className="text-black">Supabase.</strong> Our cloud database provider, used to store and synchronize your account data. Supabase acts on our behalf and does not use your data for its own purposes.</li>
-              <li><strong className="text-black">Analytics or crash reporting tools, if any.</strong> [Confirm before publishing.]</li>
-              <li><strong className="text-black">Authorities.</strong> If required to comply with a legal obligation.</li>
-            </ul>
-          </section>
-
-          {/* Section 4 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              4. International Data Transfers
-            </h2>
-            <p>
-              Supabase may store data on servers located outside your country of residence. [Confirm the specific region once your Supabase project region is finalized.] Where your information is transferred internationally, we take steps to ensure it remains protected consistent with this policy and applicable law.
-            </p>
-          </section>
-
-          {/* Section 5 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              5. Data Storage and Security
-            </h2>
-            <ul className="list-inside list-disc space-y-2 pl-4">
-              <li><strong className="text-black">Local storage.</strong> Session data is stored on your device using SQLite.</li>
-              <li><strong className="text-black">Cloud storage (account holders only).</strong> Synchronized data is stored using Supabase and linked to your account through a unique identifier.</li>
-              <li>We take reasonable measures to protect your information. However, no method of storage or transmission can be guaranteed to be completely secure.</li>
-            </ul>
-          </section>
-
-          {/* Section 6 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              6. Data Retention
-            </h2>
-            <ul className="list-inside list-disc space-y-2 pl-4">
-              <li>Local data remains on your device until you delete the application or clear its data.</li>
-              <li>Cloud data is retained while your account is active and is deleted within [specify number] days of account deletion.</li>
-              <li>Emails collected for launch or beta updates are retained until you unsubscribe.</li>
-            </ul>
-          </section>
-
-          {/* Section 7 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              7. Your Privacy Rights
-            </h2>
-            <p className="mb-2">Depending on where you live, applicable law may give you some or all of the following rights regarding your personal data:</p>
-            <ul className="mb-4 list-inside list-disc space-y-1 pl-4">
-              <li>Access the personal data we hold about you.</li>
-              <li>Correct inaccurate data.</li>
-              <li>Request deletion of your data. This right is sometimes referred to as the right to be forgotten or the right to delete, depending on the applicable law.</li>
-              <li>Restrict or object to certain processing of your data.</li>
-              <li>Request a portable copy of your data.</li>
-              <li>Opt out of the sale or sharing of personal information. Please note that we do not currently sell or share personal information.</li>
-              <li>Limit the use of sensitive personal information.</li>
-              <li>Withdraw your consent at any time, where processing is based on consent.</li>
-              <li>Lodge a complaint with your local data protection or privacy authority.</li>
-              <li>Not be discriminated against for exercising any of these rights.</li>
-            </ul>
-            <p className="mb-2">All users, regardless of location, may also:</p>
-            <ul className="list-inside list-disc space-y-1 pl-4">
-              <li>Use Guest Mode to avoid providing any account-linked personal information.</li>
-              <li>Unsubscribe from emails at any time using the link included in any email we send.</li>
-              <li>Contact us at [support email] to exercise any of the rights described above.</li>
-            </ul>
-          </section>
-
-          {/* Section 8 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              8. Do Not Track and Global Privacy Control
-            </h2>
-            <p>
-              Some web browsers send &quot;Do Not Track&quot; or Global Privacy Control signals. [Confirm your actual handling before publishing. For example: &quot;We currently honor Global Privacy Control signals as an opt out of sale or sharing,&quot; or &quot;We do not currently respond to Do Not Track signals, as there is no accepted standard for how to interpret them.&quot;]
-            </p>
-          </section>
-
-          {/* Section 9 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              9. Third-Party Links
-            </h2>
-            <p>
-              Our website may link to third-party sites, such as our Github repository or social media pages. This policy does not cover those sites. We encourage you to review their privacy practices separately.
-            </p>
-          </section>
-
-          {/* Section 10 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              10. Children&apos;s Privacy
-            </h2>
-            <p>
-              PAWSE is not directed to children under the age of 13, and we do not knowingly collect personal information from children in this age group. If you believe that a child has provided us with personal information, please contact us so that we can delete it.
-            </p>
-          </section>
-
-          {/* Section 11 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              11. Data Security
-            </h2>
-            <p>
-              We implement industry-standard security measures to protect your personal information from unauthorized access, disclosure, alteration, or destruction. However, no method of transmission over the internet is completely secure.
-            </p>
-          </section>
-
-          {/* Section 12 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              12. Changes to This Policy
-            </h2>
-            <p>
-              We may update this policy as PAWSE evolves. We will update the &quot;Last Updated&quot; date above, and for significant changes, we will provide reasonable notice, such as an in-app or email notice.
-            </p>
-          </section>
-
-          {/* Section 13 */}
-          <section>
-            <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
-              13. Contact Us
-            </h2>
-            <p>
-              If you have questions about this policy or your data, please contact us at [support email].
-            </p>
-          </section>
-
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    );
 }
