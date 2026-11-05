@@ -141,8 +141,22 @@ function getServerPlatform(): DetectedPlatform {
     return "windows";
 }
 
-function subscribePlatform() {
+let isClientHydrated = false;
+
+function subscribePlatform(onStoreChange: () => void) {
+    if (!isClientHydrated) {
+        isClientHydrated = true;
+        // Notify store after initial hydration finishes to trigger clean client-side platform adoption
+        Promise.resolve().then(onStoreChange);
+    }
     return () => {};
+}
+
+function getClientSnapshot(): DetectedPlatform {
+    if (!isClientHydrated) {
+        return getServerPlatform();
+    }
+    return getClientPlatform();
 }
 
 /**
@@ -152,7 +166,7 @@ function subscribePlatform() {
 export function usePlatform() {
     const platform = useSyncExternalStore(
         subscribePlatform,
-        getClientPlatform,
+        getClientSnapshot,
         getServerPlatform
     );
 

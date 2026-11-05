@@ -304,6 +304,7 @@ export default function HeroSection() {
                 {/* Download Options */}
                 <div className="w-full pt-2 flex flex-col justify-center items-center gap-3.5 animate-hero-fade-up-3">
                     <Link
+                        suppressHydrationWarning
                         href={platformInfo.href}
                         download={platformInfo.fileName}
                         onClick={handleCTAClick}
@@ -374,7 +375,10 @@ export default function HeroSection() {
                     </Link>
 
                     {/* Secondary Contextual Meta-Row */}
-                    <div className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]">
+                    <div
+                        suppressHydrationWarning
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]"
+                    >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
                         ) : (
