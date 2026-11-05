@@ -4,6 +4,15 @@ import { useSyncExternalStore } from "react";
 
 export type DetectedPlatform = "windows" | "mac" | "linux" | "mobile" | "other";
 
+export interface DesktopPlatformOption {
+    id: "windows" | "mac" | "linux";
+    name: string;
+    subtitle: string;
+    extension: string;
+    fileName: string;
+    href: string;
+}
+
 export interface PlatformDownloadInfo {
     label: string;
     fileName?: string;
@@ -15,14 +24,40 @@ export interface PlatformDownloadInfo {
     iconType: "download" | "share" | "bell";
 }
 
+export const DESKTOP_PLATFORMS: DesktopPlatformOption[] = [
+    {
+        id: "windows",
+        name: "Windows",
+        subtitle: "Windows 10 & 11 (64-bit)",
+        extension: ".exe",
+        fileName: "pawse-setup.exe",
+        href: "/downloads/pawse-setup.exe",
+    },
+    {
+        id: "mac",
+        name: "macOS",
+        subtitle: "Apple Silicon & Intel",
+        extension: ".dmg",
+        fileName: "pawse.dmg",
+        href: "/downloads/pawse.dmg",
+    },
+    {
+        id: "linux",
+        name: "Linux",
+        subtitle: "64-bit Linux (x86_64)",
+        extension: ".AppImage",
+        fileName: "pawse.AppImage",
+        href: "/downloads/pawse.AppImage",
+    },
+];
+
 export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
     windows: {
         label: "Download for Windows",
         fileName: "pawse-setup.exe",
         href: "/downloads/pawse-setup.exe",
         isDownload: true,
-        altPlatformText: "Also available for macOS",
-        altPlatformFile: "/downloads/pawse.dmg",
+        altPlatformText: "Other platforms",
         iconType: "download",
     },
     mac: {
@@ -30,23 +65,23 @@ export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
         fileName: "pawse.dmg",
         href: "/downloads/pawse.dmg",
         isDownload: true,
-        altPlatformText: "Also available for Windows",
-        altPlatformFile: "/downloads/pawse-setup.exe",
+        altPlatformText: "Other platforms",
         iconType: "download",
     },
     linux: {
-        label: "Notify Me for Linux",
-        href: "#beta",
-        isDownload: false,
-        altPlatformText: "Linux build in progress",
-        iconType: "bell",
+        label: "Download for Linux",
+        fileName: "pawse.AppImage",
+        href: "/downloads/pawse.AppImage",
+        isDownload: true,
+        altPlatformText: "Other platforms",
+        iconType: "download",
     },
     mobile: {
         label: "Send to My Desktop",
         href: "#",
         isDownload: false,
         isMobileShare: true,
-        altPlatformText: "PAWSE is built for Windows & Mac",
+        altPlatformText: "PAWSE is built for Windows, Mac & Linux",
         iconType: "share",
     },
     other: {
@@ -54,8 +89,7 @@ export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
         fileName: "pawse-setup.exe",
         href: "/downloads/pawse-setup.exe",
         isDownload: true,
-        altPlatformText: "Also available for macOS",
-        altPlatformFile: "/downloads/pawse.dmg",
+        altPlatformText: "Other platforms",
         iconType: "download",
     },
 };
@@ -127,6 +161,7 @@ export function usePlatform() {
     return {
         platform,
         config,
+        desktopPlatforms: DESKTOP_PLATFORMS,
         isMobile: platform === "mobile",
         isDownload: config.isDownload,
     };
