@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
                     <h1 className="mb-8 font-pixel text-5xl font-semibold text-accent sm:text-6xl">
                         Privacy Policy
                     </h1>
-                    <div className="mx-auto max-w-3xl space-y-4 font-sans text-base leading-relaxed text-black/80">
+                    <div className="mx-auto max-w-3xl space-y-4 font-sans text-base leading-relaxed text-[#141414]">
                         <p>
                             PAWSE (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is a desktop productivity application that combines a focus timer with a virtual cat companion. It is operated by meowskrrt, a team based in the Republic of the Philippines.
                         </p>
@@ -18,25 +18,25 @@ export default function PrivacyPolicy() {
                         <p>
                             PAWSE is currently in active development. The current version does not offer user accounts, Google Sign-In, or cloud synchronization of application data. This policy will be updated as our features and information-handling practices change.
                         </p>
-                        <div className="font-sans text-black pt-4">
-                            <p><strong className="text-black">Effective date: </strong>November 7, 2026</p> 
-                            <p><strong className="text-black">Last updated: </strong>November 7, 2026</p>
+                        <div className="font-sans text-[#141414] pt-4">
+                            <p><strong className="text-[#141414]">Effective date: </strong>November 7, 2026</p> 
+                            <p><strong className="text-[#141414]">Last updated: </strong>November 7, 2026</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Policy Content */}
-                <div className="space-y-12 font-sans text-base leading-relaxed text-black/80">
+                <div className="space-y-12 font-sans text-base leading-relaxed text-[#141414]">
                     
                     {/* Section 1 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             1. Information We Handle
                         </h2>
                         
                         <div className="space-y-6">
                             <div>
-                                <h3 className="font-bold text-black">a. Information you provide directly</h3>
+                                <h3 className="font-bold text-[#141414]">a. Information you provide directly</h3>
                                 <ul className="mt-2 list-inside list-disc space-y-1 pl-4">
                                     <li>Your email address, if you sign up for launch updates or beta communications.</li>
                                     <li>Information you provide when contacting us for support or submitting feedback, including your contact details, message contents, and any screenshots, attachments, or bug reports you choose to share.</li>
@@ -44,14 +44,14 @@ export default function PrivacyPolicy() {
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-black">b. Information stored locally on your device</h3>
+                                <h3 className="font-bold text-[#141414]">b. Information stored locally on your device</h3>
                                 <p className="mt-1">
                                     PAWSE stores application data locally using an unencrypted SQLite database (pawse.db) and local application storage. Locally stored information includes your focus session history, progress statistics, companion preferences, and application settings. Its timer, companion, and progress features work offline. The application does not automatically upload session data, focus history, or diagnostic reports to us or third-party services. It connects to GitHub for software update checks, as described below. You may also choose to share information with us when submitting a support request or bug report.
                                 </p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-black">c. Technical information</h3>
+                                <h3 className="font-bold text-[#141414]">c. Technical information</h3>
                                 <p className="mt-1">
                                     The PAWSE desktop application connects to GitHub to check for software updates. This process may disclose your IP address and basic operating system details to GitHub&apos;s servers. The desktop app does not automatically send telemetry, crash logs, or analytics to our team. <br />
                                     [If applicable: Our landing website may collect basic web analytics such as IP addresses or request timestamps to help us monitor site traffic.]
@@ -59,7 +59,7 @@ export default function PrivacyPolicy() {
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-black">d. Cookies and similar technologies</h3>
+                                <h3 className="font-bold text-[#141414]">d. Cookies and similar technologies</h3>
                                 <p className="mt-1">
                                     The desktop application stores preferences, such as audio volume and toggle settings, locally on your device. These preferences are not automatically transmitted to us. <br />
                                     [If applicable: Our landing website may use cookies or similar tracking technologies for basic analytics. You can manage your cookie preferences through your browser settings.]
@@ -70,7 +70,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 2 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             2. How We Use Your Information
                         </h2>
                         <p className="mb-2">The application uses locally stored information to operate its features, remember your preferences, and display your progress.</p>
@@ -88,15 +88,15 @@ export default function PrivacyPolicy() {
 
                     {/* Section 3 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             3. How We Share Your Information
                         </h2>
                         <p className="mb-2">We do not sell your personal information. We may disclose information to:</p>
                         <ul className="mb-4 list-inside list-disc space-y-2 pl-4">
-                            <li><strong className="text-black">Service providers.</strong> Providers that help us operate the website, manage signup submissions, deliver requested emails, or handle support communications, where those services are used.</li>
-                            <li><strong className="text-black">Supabase.</strong> We use Supabase to store and manage email addresses submitted through our website for beta testing and launch updates.</li>
-                            <li><strong className="text-black">GitHub.</strong> We use GitHub to distribute application updates. GitHub receives technical information when your application checks for or downloads updates, as described in Section 1(c).</li>
-                            <li><strong className="text-black">Authorities.</strong> Where disclosure is required to comply with an applicable legal obligation or valid legal process.</li>
+                            <li><strong className="text-[#141414]">Service providers.</strong> Providers that help us operate the website, manage signup submissions, deliver requested emails, or handle support communications, where those services are used.</li>
+                            <li><strong className="text-[#141414]">Supabase.</strong> We use Supabase to store and manage email addresses submitted through our website for beta testing and launch updates.</li>
+                            <li><strong className="text-[#141414]">GitHub.</strong> We use GitHub to distribute application updates. GitHub receives technical information when your application checks for or downloads updates, as described in Section 1(c).</li>
+                            <li><strong className="text-[#141414]">Authorities.</strong> Where disclosure is required to comply with an applicable legal obligation or valid legal process.</li>
                         </ul>
                         <p>
                             Permission to use feedback under our Terms and Conditions does not authorize us to publish personal information included in that feedback.
@@ -105,7 +105,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 4 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             4. International Data Transfers
                         </h2>
                         <p>
@@ -115,12 +115,12 @@ export default function PrivacyPolicy() {
 
                     {/* Section 5 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             5. Data Storage and Security
                         </h2>
                         <ul className="mb-4 list-inside list-disc space-y-2 pl-4">
-                            <li><strong className="text-black">Local storage.</strong> Application data is stored on your device in an unencrypted SQLite database (pawse.db) and other local application storage.</li>
-                            <li><strong className="text-black">Information submitted to us.</strong> Beta and launch signup information is stored in Supabase. Support messages and feedback are stored through [email or support service provider].</li>
+                            <li><strong className="text-[#141414]">Local storage.</strong> Application data is stored on your device in an unencrypted SQLite database (pawse.db) and other local application storage.</li>
+                            <li><strong className="text-[#141414]">Information submitted to us.</strong> Beta and launch signup information is stored in Supabase. Support messages and feedback are stored through [email or support service provider].</li>
                         </ul>
                         <p>
                             We take reasonable measures to protect information under our control. However, no method of storage or transmission can be guaranteed to be completely secure, and we cannot guarantee the absolute security of local files if your device is compromised.
@@ -129,20 +129,20 @@ export default function PrivacyPolicy() {
 
                     {/* Section 6 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             6. Data Retention
                         </h2>
                         <ul className="list-inside list-disc space-y-2 pl-4">
-                            <li><strong className="text-black">Local application data.</strong> Local data remains on your device until it is removed. Uninstalling PAWSE may not remove all application data. To delete locally stored data, fully close PAWSE and delete the PAWSE application data folder located in your operating system&apos;s standard user data directory. This permanently removes your saved progress and preferences. Reopening PAWSE may create new local data.</li>
-                            <li><strong className="text-black">Launch and beta communications.</strong> Email addresses are retained for the duration of the beta program and initial launch phase. If you unsubscribe, we may retain a limited record of your email to prevent sending you future communications.</li>
-                            <li><strong className="text-black">Support and feedback.</strong> Messages, bug reports, and attachments are retained for as long as necessary to address your inquiry or resolve the reported issue.</li>
-                            <li><strong className="text-black">Technical information.</strong> Update request logs managed by GitHub are subject to GitHub&apos;s data retention policies.</li>
+                            <li><strong className="text-[#141414]">Local application data.</strong> Local data remains on your device until it is removed. Uninstalling PAWSE may not remove all application data. To delete locally stored data, fully close PAWSE and delete the PAWSE application data folder located in your operating system&apos;s standard user data directory. This permanently removes your saved progress and preferences. Reopening PAWSE may create new local data.</li>
+                            <li><strong className="text-[#141414]">Launch and beta communications.</strong> Email addresses are retained for the duration of the beta program and initial launch phase. If you unsubscribe, we may retain a limited record of your email to prevent sending you future communications.</li>
+                            <li><strong className="text-[#141414]">Support and feedback.</strong> Messages, bug reports, and attachments are retained for as long as necessary to address your inquiry or resolve the reported issue.</li>
+                            <li><strong className="text-[#141414]">Technical information.</strong> Update request logs managed by GitHub are subject to GitHub&apos;s data retention policies.</li>
                         </ul>
                     </section>
 
                     {/* Section 7 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             7. Your Privacy Rights and Choices
                         </h2>
                         <p className="mb-2">Depending on applicable law, you may have some or all of the following rights regarding your personal information:</p>
@@ -155,7 +155,7 @@ export default function PrivacyPolicy() {
                             <li>Withdraw your consent where processing is based on consent.</li>
                             <li>Lodge a complaint with the relevant data protection or privacy authority.</li>
                         </ul>
-                        <p className="mb-4 font-bold text-black">
+                        <p className="mb-4 font-bold text-[#141414]">
                             In the Philippines, the relevant authority is the National Privacy Commission.
                         </p>
                         <p className="mb-2">You may also:</p>
@@ -175,7 +175,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 8 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             8. Do Not Track and Global Privacy Control
                         </h2>
                         <p>
@@ -185,7 +185,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 9 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             9. Third-Party Links
                         </h2>
                         <p>
@@ -195,7 +195,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 10 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             10. Children&apos;s Privacy
                         </h2>
                         <p className="mb-4">
@@ -208,7 +208,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 11 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             11. Changes to This Policy
                         </h2>
                         <p className="mb-4">
@@ -221,7 +221,7 @@ export default function PrivacyPolicy() {
 
                     {/* Section 12 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             12. Contact Us
                         </h2>
                         <p>
