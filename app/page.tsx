@@ -13,7 +13,7 @@ const howItWorksSteps = [
     {
         number: "2",
         titleLines: ["Focus with Your", "Companion"],
-        description: "Work alongside your cat's unique routine. Zero distractions.",
+        description: "Work alongside your cat's routine. Zero distractions.",
         connector: "/images/refresh-ccw.svg",
         connectorAlt: "Cycle between focus and break",
     },
@@ -49,7 +49,7 @@ const comingSoonItems = [
         icon: "/images/stopwatch.png",
         title: "Custom Sessions",
         description:
-            "Set your own focus and break durations to match your personal workflow.",
+            "Set your own focus and break durations to fit into your personal workflow.",
     },
     {
         icon: "/images/audio-icon.svg",
@@ -141,7 +141,7 @@ export default function HomePage() {
             {/* How it Works */}
             <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white">
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                         How it Works
                     </h2>
                 </div>
@@ -152,7 +152,7 @@ export default function HomePage() {
                 <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] auto-rows-[1fr] lg:auto-rows-auto items-stretch gap-3 mt-2">
                     {howItWorksSteps.map((step) => (
                         <div key={step.number} className="contents">
-                            <div className="group relative overflow-hidden w-full h-full min-h-[230px] flex flex-col justify-center items-center py-8 px-6 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default">
+                            <div className="group relative overflow-hidden w-full max-w-[420px] lg:max-w-none mx-auto h-full min-h-[230px] flex flex-col justify-center items-center py-8 px-5 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default">
                                 {/* Liquid rising fill underlay */}
                                 <div
                                     aria-hidden="true"
@@ -175,7 +175,7 @@ export default function HomePage() {
                                             </span>
                                         </h3>
                                     </div>
-                                    <p className="max-w-[200px] text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
+                                    <p className="w-full max-w-[260px] lg:max-w-[210px] text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed text-balance">
                                         {step.description}
                                     </p>
                                 </div>
@@ -224,7 +224,7 @@ export default function HomePage() {
 
                 <div className="relative z-10 w-full max-w-[1140px] flex flex-col items-center gap-6">
                     <div className="flex justify-center items-center">
-                        <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
+                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                             Meet your Companions
                         </h2>
                     </div>
@@ -246,7 +246,7 @@ export default function HomePage() {
             <section className="w-full max-w-[1280px] mx-auto py-12 md:py-16 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-8 bg-white">
                 <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
                     <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-                        <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-left leading-[1.1]">
+                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-left leading-[1.1]">
                             <span className="block whitespace-nowrap">Your quiet</span>
                             <span className="block whitespace-nowrap">co-working space</span>
                         </h2>
@@ -268,7 +268,7 @@ export default function HomePage() {
                     <TimerMockup />
 
                     <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-                        <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-left leading-[1.1]">
+                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-left leading-[1.1]">
                             <span className="block whitespace-nowrap">Time to play</span>
                             <span className="block whitespace-nowrap">and recharge</span>
                         </h2>
@@ -287,7 +287,7 @@ export default function HomePage() {
                 <div className="w-full pt-12 pb-24 md:pt-16 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-[linear-gradient(180deg,#FFFFFF_0%,#DCF1FF_80%,#A8DCFF_100%)]">
                     <div className="w-full max-w-[1140px] flex flex-col items-stretch gap-6">
                         <div className="flex justify-center items-center">
-                            <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
+                            <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                                 Dashboard
                             </h2>
                         </div>
@@ -354,7 +354,7 @@ export default function HomePage() {
             {/* Coming Soon */}
             <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white">
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                         Coming Soon...
                     </h2>
                 </div>
@@ -366,11 +366,11 @@ export default function HomePage() {
                     </p>
                 </div>
 
-                <div className="w-full grid grid-cols-1 md:grid-cols-3 auto-rows-fr gap-6 mt-2">
+                <div className="w-full grid grid-cols-1 md:grid-cols-3 auto-rows-fr gap-3.5 sm:gap-4 mt-2">
                     {comingSoonItems.map((item) => (
                         <div
                             key={item.title}
-                            className="group relative overflow-hidden w-full h-full min-h-[230px] p-7 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default flex flex-col justify-center items-center gap-3"
+                            className="group relative overflow-hidden w-full max-w-[420px] md:max-w-none mx-auto h-full min-h-[220px] p-6 sm:p-7 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default flex flex-col justify-center items-center gap-3"
                         >
                             {/* Liquid rising fill underlay */}
                             <div
@@ -392,7 +392,7 @@ export default function HomePage() {
                                     {item.title}
                                 </h3>
                             </div>
-                            <p className="relative z-10 max-w-[260px] text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
+                            <p className="relative z-10 w-full max-w-[320px] md:max-w-none text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed text-balance">
                                 {item.description}
                             </p>
                         </div>
@@ -406,7 +406,7 @@ export default function HomePage() {
                 className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
             >
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-3xl sm:text-4xl md:text-5xl font-semibold text-[#232323] text-center leading-[1.1]">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                         Help Us Shape the Future of PAWSE
                     </h2>
                 </div>

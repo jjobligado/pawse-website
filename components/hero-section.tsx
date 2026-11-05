@@ -196,7 +196,7 @@ export default function HeroSection() {
             {/* Centered Hero Copy & Actions */}
             <div className="relative z-30 w-full flex flex-col items-center gap-6">
                 <div className="w-full flex justify-center items-center animate-hero-fade-up-1">
-                    <h1 className="font-pixel text-[clamp(2.125rem,6.8vw,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
+                    <h1 className="font-pixel text-[clamp(2.625rem,5.5vw+1.15rem,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
                         <span className="block whitespace-nowrap">The Coziest Way</span>
                         <span className="block whitespace-nowrap">
                             to Get Things{" "}
