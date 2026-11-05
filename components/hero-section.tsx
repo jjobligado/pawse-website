@@ -510,7 +510,7 @@ export default function HeroSection() {
 
                         {/* View on GitHub */}
                         <Link
-                            href="https://github.com"
+                            href="https://github.com/educ-jkescritor/Pawse"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 hover:text-black transition-colors duration-200 group"
