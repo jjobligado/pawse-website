@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
@@ -8,7 +8,37 @@ import { usePlatform } from "@/hooks/use-platform";
 export default function HeroSection() {
     const [scrollY, setScrollY] = useState(0);
     const [copied, setCopied] = useState(false);
-    const { platform: detectedPlatform, config: platformInfo } = usePlatform();
+    const [platformsOpen, setPlatformsOpen] = useState(false);
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const {
+        platform: detectedPlatform,
+        config: platformInfo,
+        desktopPlatforms,
+        isMobile,
+    } = usePlatform();
+
+    useEffect(() => {
+        if (!platformsOpen) return;
+
+        const handleClickOutside = (e: MouseEvent) => {
+            if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+                setPlatformsOpen(false);
+            }
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setPlatformsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [platformsOpen]);
 
     useEffect(() => {
         let ticking = false;
@@ -164,7 +194,7 @@ export default function HeroSection() {
             </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className="relative z-10 w-full flex flex-col items-center gap-6">
+            <div className="relative z-30 w-full flex flex-col items-center gap-6">
                 <div className="w-full flex justify-center items-center animate-hero-fade-up-1">
                     <h1 className="font-pixel text-[clamp(2.125rem,6.8vw,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
                         <span className="block whitespace-nowrap">The Coziest Way</span>
@@ -344,34 +374,148 @@ export default function HeroSection() {
                     </Link>
 
                     {/* Secondary Contextual Meta-Row */}
-                    <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]">
-                        {/* Alternative Platform Override Link / Status */}
-                        {platformInfo.altPlatformFile ? (
-                            <a
-                                href={platformInfo.altPlatformFile}
-                                download={platformInfo.altPlatformFile.split("/").pop()}
-                                className="hover:text-black transition-all underline decoration-1 decoration-[#C4C4C8] hover:decoration-[1.5px] hover:decoration-black underline-offset-4"
-                            >
-                                {platformInfo.altPlatformText}
-                            </a>
-                        ) : platformInfo.altPlatformText ? (
-                            <span className="text-[#5F5F5F]">
-                                {platformInfo.altPlatformText}
-                            </span>
-                        ) : null}
+                    <div className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]">
+                        {isMobile ? (
+                            <span>{platformInfo.altPlatformText}</span>
+                        ) : (
+                            <div ref={popoverRef} className="relative inline-flex items-center">
+                                {/* Other Platforms Popover Trigger */}
+                                <button
+                                    type="button"
+                                    onClick={() => setPlatformsOpen((prev) => !prev)}
+                                    aria-expanded={platformsOpen}
+                                    aria-haspopup="menu"
+                                    className={`inline-flex items-center gap-1 hover:text-black transition-colors duration-200 group cursor-pointer focus-visible:outline-none ${
+                                        platformsOpen
+                                            ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
+                                            : ""
+                                    }`}
+                                >
+                                    <span className="transition-colors duration-200 group-hover:[-webkit-text-stroke:0.35px_currentColor]">
+                                        {platformInfo.altPlatformText || "Other platforms"}
+                                    </span>
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                        className={`w-4 h-4 transition-all duration-200 group-hover:text-black group-hover:[stroke-width:1.5px] ${
+                                            platformsOpen
+                                                ? "rotate-180 text-black [stroke-width:1.5px]"
+                                                : ""
+                                        }`}
+                                    >
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                </button>
 
-                        {platformInfo.altPlatformText && (
-                            <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
+                                {/* Floating Other Platforms Popover Menu */}
+                                <div
+                                    role="menu"
+                                    aria-label="Download PAWSE for other platforms"
+                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[300px] sm:w-[320px] rounded-2xl bg-white border-2 border-stroke p-1.5 shadow-[0_20px_40px_-10px_rgba(20,20,20,0.16),0_4px_12px_-2px_rgba(20,20,20,0.08)] z-50 origin-top transition-all duration-200 ease-out ${
+                                        platformsOpen
+                                            ? "visible opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                                            : "invisible opacity-0 -translate-y-1.5 scale-95 pointer-events-none"
+                                    }`}
+                                >
+                                    <div className="flex flex-col gap-0.5">
+                                        {desktopPlatforms.map((item) => (
+                                            <a
+                                                key={item.id}
+                                                role="menuitem"
+                                                href={item.href}
+                                                download={item.fileName}
+                                                onClick={() => setPlatformsOpen(false)}
+                                                className="group/item flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F2F9FF] active:bg-[#E5F3FF] transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    {/* Platform Icon Badge */}
+                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent text-[#232323] group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
+                                                        {item.id === "windows" && (
+                                                            <svg
+                                                                width="15"
+                                                                height="15"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                                aria-hidden="true"
+                                                            >
+                                                                <path d="M3 3h8.5v8.5H3V3zm9.5 0H21v8.5h-8.5V3zM3 12.5h8.5V21H3v-8.5zm9.5 0H21V21h-8.5v-8.5z" />
+                                                            </svg>
+                                                        )}
+                                                        {item.id === "mac" && (
+                                                            <svg
+                                                                width="15"
+                                                                height="15"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                                aria-hidden="true"
+                                                            >
+                                                                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.48-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83zM15.96 6.33c.67-.81 1.12-1.94 1-3.08-.96.04-2.13.64-2.82 1.45-.61.7-.15 1.86-1.01 2.97 1.08.08 2.16-.53 2.83-1.34z" />
+                                                            </svg>
+                                                        )}
+                                                        {item.id === "linux" && (
+                                                            <svg
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                                aria-hidden="true"
+                                                            >
+                                                                <path d="M12 2C9.5 2 8 3.9 8 6.5c0 1.3.4 2.4.9 3.3C7.2 11.4 6 13.7 6 16.2c0 1.4.4 2.6 1.1 3.5-.4.3-.6.7-.6 1.1 0 .7.8 1.2 2 1.2.9 0 1.7-.3 2.1-.8.4.1.9.1 1.4.1s1-.1 1.4-.1c.4.5 1.2.8 2.1.8 1.2 0 2-.5 2-1.2 0-.4-.2-.8-.6-1.1.7-.9 1.1-2.1 1.1-3.5 0-2.5-1.2-4.8-2.9-6.4.5-.9.9-2 .9-3.3C16 3.9 14.5 2 12 2zm-1.5 4a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm3 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-1.5 2.3c1.1 0 2 .5 2 1.1s-.9 1.1-2 1.1-2-.5-2-1.1.9-1.1 2-1.1zm0 3.7c2 0 3.5 1.9 3.5 4.2 0 1.8-1.5 3.3-3.5 3.3s-3.5-1.5-3.5-3.3c0-2.3 1.5-4.2 3.5-4.2z" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-semibold text-[#141414] group-hover/item:text-black">
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="text-[11px] text-[#5F5F5F] whitespace-nowrap">
+                                                            {item.subtitle}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* File Format & Download Action */}
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-[#5F5F5F] group-hover/item:text-accent shrink-0 transition-colors">
+                                                    {item.extension}
+                                                    <svg
+                                                        width="13"
+                                                        height="13"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.75"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path d="M12 5v14M19 12l-7 7-7-7" />
+                                                    </svg>
+                                                </span>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         )}
+
+                        <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
 
                         {/* View on GitHub */}
                         <Link
                             href="https://github.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 hover:text-black transition-all group"
+                            className="inline-flex items-center gap-1 hover:text-black transition-colors duration-200 group"
                         >
-                            <span className="underline decoration-1 decoration-[#C4C4C8] group-hover:decoration-[1.5px] group-hover:decoration-black underline-offset-4 transition-all">
+                            <span className="transition-colors duration-200 group-hover:[-webkit-text-stroke:0.35px_currentColor]">
                                 View on GitHub
                             </span>
                             <svg
@@ -381,10 +525,10 @@ export default function HeroSection() {
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                                 aria-hidden="true"
-                                className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-black"
+                                className="w-4 h-4 transition-colors duration-200 group-hover:text-black"
                             >
                                 <path
-                                    d="M5 12H19"
+                                    d="M6 12H18"
                                     stroke="currentColor"
                                     strokeWidth="1"
                                     strokeLinecap="round"
@@ -392,7 +536,7 @@ export default function HeroSection() {
                                     className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
                                 />
                                 <path
-                                    d="M12 5L19 12L12 19"
+                                    d="M12 6L18 12L12 18"
                                     stroke="currentColor"
                                     strokeWidth="1"
                                     strokeLinecap="round"

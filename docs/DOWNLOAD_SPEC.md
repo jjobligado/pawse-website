@@ -8,11 +8,11 @@ This specification details the client-side operating system detection, adaptive 
 
 | Target Platform / Device | Client Detection Triggers | Primary CTA Label & Icon | Click Action | Visual States (Default / Hover / Active) | Secondary Meta-Row Content | Target File / Payload |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Windows Desktop** | `Windows`, `Win32`, `Win64` | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Also available for macOS (.dmg)` • `View on GitHub ↗` | `pawse-setup.exe` (`.exe`) |
-| **macOS Desktop** | `Macintosh`, `MacIntel` *(non-touch)* | `[↓] Download for Mac` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Also available for Windows (.exe)` • `View on GitHub ↗` | `pawse.dmg` (`.dmg`) |
-| **Linux Desktop** | `Linux`, `X11` *(excluding Android)* | `[🔔] Notify Me for Linux` | Smooth-scrolls to `#beta` & focuses email input | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Linux build in progress` • `View on GitHub ↗` | N/A (Waitlist anchor) |
-| **Mobile & Tablets** *(iOS, iPadOS, Android)* | `iPhone`, `iPad`, `Android`, `Mobile`, `Tablet`, `maxTouchPoints > 1` | `[↗] Send to My Desktop`<br>*(Turns into `[✓] Link Copied to Clipboard! 🐾`)* | 1. Tries Web Share API (`navigator.share`)<br>2. Copies `window.location.href` to clipboard with 2.5s success state | **Base:** `#35A6F1`<br>**Copied:** `#10B981`<br>**Active:** `#059669` | `PAWSE is built for Windows & Mac` • `View on GitHub ↗` | Clipboard URL payload |
-| **Fallback / Unknown** | Unrecognized desktop user-agent | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Also available for macOS (.dmg)` • `View on GitHub ↗` | `pawse-setup.exe` (`.exe`) |
+| **Windows Desktop** | `Windows`, `Win32`, `Win64` | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Other platforms ▾` • `View on GitHub ↗` | `pawse-setup.exe` (`.exe`) |
+| **macOS Desktop** | `Macintosh`, `MacIntel` *(non-touch)* | `[↓] Download for Mac` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Other platforms ▾` • `View on GitHub ↗` | `pawse.dmg` (`.dmg`) |
+| **Linux Desktop** | `Linux`, `X11` *(excluding Android)* | `[↓] Download for Linux` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Other platforms ▾` • `View on GitHub ↗` | `pawse.AppImage` (`.AppImage`) |
+| **Mobile & Tablets** *(iOS, iPadOS, Android)* | `iPhone`, `iPad`, `Android`, `Mobile`, `Tablet`, `maxTouchPoints > 1` | `[↗] Send to My Desktop`<br>*(Turns into `[✓] Link Copied to Clipboard! 🐾`)* | 1. Tries Web Share API (`navigator.share`)<br>2. Copies `window.location.href` to clipboard with 2.5s success state | **Base:** `#35A6F1`<br>**Copied:** `#10B981`<br>**Active:** `#059669` | `PAWSE is built for Windows, Mac & Linux ▾` • `View on GitHub ↗` | Clipboard URL payload |
+| **Fallback / Unknown** | Unrecognized desktop user-agent | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#35A6F1`<br>**Hover:** `#2394DF`<br>**Active:** `#1B7FBE` | `Other platforms ▾` • `View on GitHub ↗` | `pawse-setup.exe` (`.exe`) |
 
 ---
 
@@ -24,19 +24,45 @@ This specification details the client-side operating system detection, adaptive 
 - **QA/Dev Switcher**: Allows developers and testers to preview any OS locally via `?os=linux`, `?os=mac`, `?os=mobile` (automatically disabled in production).
 - **DOM Signifiers**: The main download anchor contains `data-os="{windows|mac|linux|mobile|other}"` for automated testing, analytics tracking, and script hooking.
 
-### Configuration Object (`PLATFORM_CONFIG`)
+### Configuration Object (`PLATFORM_CONFIG` & `DESKTOP_PLATFORMS`)
 
-In `hooks/use-platform.ts`, all download definitions are centralized in `PLATFORM_CONFIG`:
+In `hooks/use-platform.ts`, all download definitions and popover items are centralized in `PLATFORM_CONFIG` and `DESKTOP_PLATFORMS`:
 
 ```typescript
-const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
+export const DESKTOP_PLATFORMS: DesktopPlatformOption[] = [
+    {
+        id: "windows",
+        name: "Windows",
+        subtitle: "Windows 10 & 11 (64-bit)",
+        extension: ".exe",
+        fileName: "pawse-setup.exe",
+        href: "/downloads/pawse-setup.exe",
+    },
+    {
+        id: "mac",
+        name: "macOS",
+        subtitle: "Apple Silicon & Intel",
+        extension: ".dmg",
+        fileName: "pawse.dmg",
+        href: "/downloads/pawse.dmg",
+    },
+    {
+        id: "linux",
+        name: "Linux",
+        subtitle: "64-bit Linux (x86_64)",
+        extension: ".AppImage",
+        fileName: "pawse.AppImage",
+        href: "/downloads/pawse.AppImage",
+    },
+];
+
+export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
     windows: {
         label: "Download for Windows",
         fileName: "pawse-setup.exe",
         href: "/downloads/pawse-setup.exe",
         isDownload: true,
-        altPlatformText: "Also available for macOS",
-        altPlatformFile: "/downloads/pawse.dmg",
+        altPlatformText: "Other platforms",
         iconType: "download",
     },
     mac: {
@@ -44,23 +70,23 @@ const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
         fileName: "pawse.dmg",
         href: "/downloads/pawse.dmg",
         isDownload: true,
-        altPlatformText: "Also available for Windows",
-        altPlatformFile: "/downloads/pawse-setup.exe",
+        altPlatformText: "Other platforms",
         iconType: "download",
     },
     linux: {
-        label: "Notify Me for Linux",
-        href: "#beta",
-        isDownload: false,
-        altPlatformText: "Linux build in progress",
-        iconType: "bell",
+        label: "Download for Linux",
+        fileName: "pawse.AppImage",
+        href: "/downloads/pawse.AppImage",
+        isDownload: true,
+        altPlatformText: "Other platforms",
+        iconType: "download",
     },
     mobile: {
         label: "Send to My Desktop",
         href: "#",
         isDownload: false,
         isMobileShare: true,
-        altPlatformText: "PAWSE is built for Windows & Mac",
+        altPlatformText: "PAWSE is built for Windows, Mac & Linux",
         iconType: "share",
     },
     other: {
@@ -68,8 +94,7 @@ const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
         fileName: "pawse-setup.exe",
         href: "/downloads/pawse-setup.exe",
         isDownload: true,
-        altPlatformText: "Also available for macOS",
-        altPlatformFile: "/downloads/pawse.dmg",
+        altPlatformText: "Other platforms",
         iconType: "download",
     },
 };
@@ -91,10 +116,11 @@ If hosting installers directly via Next.js:
    └── public/
        └── downloads/
            ├── pawse-setup.exe   <-- Windows installer
-           └── pawse.dmg         <-- macOS installer
+           ├── pawse.dmg         <-- macOS installer
+           └── pawse.AppImage    <-- Linux AppImage
    ```
 2. Any file placed inside `public/downloads/` is automatically served by Next.js at `/downloads/<filename>`.
-3. The existing `PLATFORM_CONFIG` hrefs are already set to `/downloads/pawse-setup.exe` and `/downloads/pawse.dmg`.
+3. The existing `PLATFORM_CONFIG` and `DESKTOP_PLATFORMS` hrefs are already set to `/downloads/pawse-setup.exe`, `/downloads/pawse.dmg`, and `/downloads/pawse.AppImage`.
 
 > [!NOTE]
 > Ensure Git LFS (`git-lfs`) is configured if committing large binaries (>50MB) to Git, or add `public/downloads/*.exe` and `public/downloads/*.dmg` to `.gitignore` and upload them during CI/CD build deployment.
@@ -109,8 +135,9 @@ If hosting installers on an external CDN (e.g. AWS S3, Cloudflare R2) or GitHub 
    ```env
    NEXT_PUBLIC_DOWNLOAD_WINDOWS_URL="https://github.com/jjobligado/pawse-app/releases/latest/download/pawse-setup.exe"
    NEXT_PUBLIC_DOWNLOAD_MAC_URL="https://github.com/jjobligado/pawse-app/releases/latest/download/pawse.dmg"
+   NEXT_PUBLIC_DOWNLOAD_LINUX_URL="https://github.com/jjobligado/pawse-app/releases/latest/download/pawse.AppImage"
    ```
-2. Update `PLATFORM_CONFIG` in `hooks/use-platform.ts`:
+2. Update `PLATFORM_CONFIG` and `DESKTOP_PLATFORMS` in `hooks/use-platform.ts`:
    ```typescript
    windows: {
        href: process.env.NEXT_PUBLIC_DOWNLOAD_WINDOWS_URL || "/downloads/pawse-setup.exe",
@@ -118,6 +145,10 @@ If hosting installers on an external CDN (e.g. AWS S3, Cloudflare R2) or GitHub 
    },
    mac: {
        href: process.env.NEXT_PUBLIC_DOWNLOAD_MAC_URL || "/downloads/pawse.dmg",
+       ...
+   },
+   linux: {
+       href: process.env.NEXT_PUBLIC_DOWNLOAD_LINUX_URL || "/downloads/pawse.AppImage",
        ...
    }
    ```
@@ -129,18 +160,15 @@ If hosting installers on an external CDN (e.g. AWS S3, Cloudflare R2) or GitHub 
 ### macOS (.dmg)
 - **Universal vs. Architecture-Specific**:
   - If distributing a Universal DMG (Intel + Apple Silicon), a single `pawse.dmg` suffices.
-  - If compiling separate binaries (e.g. `pawse-arm64.dmg` and `pawse-x64.dmg`), you can expand the detection logic in `components/hero-section.tsx` or provide a platform switcher on the secondary row.
+  - If compiling separate binaries (e.g. `pawse-arm64.dmg` and `pawse-x64.dmg`), you can expand `DESKTOP_PLATFORMS` in `hooks/use-platform.ts` to list both Apple Silicon and Intel options inside the `"Other platforms ▾"` popover.
 - **Code Signing & Notarization**: macOS Gatekeeper will block unsigned `.dmg` files. Ensure the artifact has been signed with an Apple Developer ID and notarized using `xcrun notarytool`.
 
 ### Windows (.exe)
 - **SmartScreen**: Unsigned `.exe` installers will trigger Windows Defender SmartScreen warnings. Sign the installer with an EV (Extended Validation) code-signing certificate to establish instant SmartScreen reputation.
 
-### Linux (Future Activation)
-When the Linux release is ready:
-1. Change `linux.isDownload` to `true`.
-2. Change `linux.label` to `"Download for Linux"`.
-3. Set `linux.href` to your package target (e.g. `pawse.AppImage`, `.deb`, or `.tar.gz`).
-4. Change `linux.iconType` from `"bell"` to `"download"`.
+### Linux (.AppImage)
+- **Universal Package**: `.AppImage` runs across Ubuntu, Fedora, Debian, Arch, and Linux Mint without root installation. Users simply make the binary executable (`chmod +x pawse.AppImage`) and run it.
+- If additional Linux formats (e.g. `.deb` or `.rpm`) are added later, append them to `DESKTOP_PLATFORMS` in `hooks/use-platform.ts`.
 
 ---
 
@@ -156,7 +184,7 @@ During local development (`NODE_ENV !== 'production'`), the `usePlatform` hook m
 | :--- | :--- | :--- | :--- |
 | **Windows Desktop** | `http://localhost:3000/?os=windows` | `[↓] Download for Windows` | Downloads `pawse-setup.exe` |
 | **macOS Desktop** | `http://localhost:3000/?os=mac` | `[↓] Download for Mac` | Downloads `pawse.dmg` |
-| **Linux Desktop** | `http://localhost:3000/?os=linux` | `[🔔] Notify Me for Linux` | Smooth-scrolls to `#beta` & focuses email input |
+| **Linux Desktop** | `http://localhost:3000/?os=linux` | `[↓] Download for Linux` | Downloads `pawse.AppImage` |
 | **Mobile / Tablet** | `http://localhost:3000/?os=mobile` | `[↗] Send to My Desktop` | Copies URL to clipboard with 2.5s green success badge |
 
 > [!NOTE]
@@ -217,12 +245,12 @@ test.describe('Platform-adaptive Download CTA', () => {
     await expect(cta).toHaveAttribute('href', '/downloads/pawse.dmg');
   });
 
-  test('URL override forces Linux waitlist CTA in development', async ({ page }) => {
+  test('URL override forces Linux download CTA in development', async ({ page }) => {
     await page.goto('http://localhost:3000/?os=linux');
     const cta = page.locator('a[data-os="linux"]');
     await expect(cta).toBeVisible();
-    await expect(cta).toContainText('Notify Me for Linux');
-    await expect(cta).toHaveAttribute('href', '#beta');
+    await expect(cta).toContainText('Download for Linux');
+    await expect(cta).toHaveAttribute('href', '/downloads/pawse.AppImage');
   });
 });
 ```
