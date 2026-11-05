@@ -8,29 +8,29 @@ export default function TermsAndService() {
                     <h1 className="mb-8 font-pixel text-5xl font-semibold text-accent sm:text-6xl">
                         Terms of Service
                     </h1>
-                    <div className="mx-auto max-w-3xl space-y-4 font-sans text-base leading-relaxed text-black/80">
+                    <div className="mx-auto max-w-3xl space-y-4 font-sans text-base leading-relaxed text-[#141414]">
                         <p>
                             Welcome to PAWSE. These Terms of Service (&quot;Terms&quot;) govern your access to and use of the PAWSE website and the PAWSE desktop application, together referred to as the &quot;Service,&quot; operated by meowskrrt, a team based in the Republic of the Philippines (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). By accessing our website, signing up for updates, or downloading and using the PAWSE application, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use the Service.
                         </p>
                         <p>
                             PAWSE is currently in active development. The current version does not offer user accounts, Google Sign-In, or cloud synchronization of application data. We will update these Terms as features or practices change.
                         </p>
-                        <div className="font-sans text-black pt-4">
-                            <p><strong className="text-black">Effective date: </strong>November 7, 2026</p> 
-                            <p><strong className="text-black">Last updated: </strong>November 7, 2026</p>
+                        <div className="font-sans text-[#141414] pt-4">
+                            <p><strong className="text-[#141414]">Effective date: </strong>November 7, 2026</p> 
+                            <p><strong className="text-[#141414]">Last updated: </strong>November 7, 2026</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Policy Content */}
-                <div className="space-y-12 font-sans text-base leading-relaxed text-black/80">
+                <div className="space-y-12 font-sans text-base leading-relaxed text-[#141414]">
                     
                     {/* Section 1 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             1. Use of the Service
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>You must be at least 13 years old to use PAWSE. If you are below the age of majority where you live, you may use the Service only with the permission and supervision of a parent or legal guardian who agrees to these Terms.</li>
                             <li>You agree to use the Service only for lawful purposes and in accordance with these Terms.</li>
                             <li>You agree not to use the Service to distribute malicious software, interfere with or disrupt the Service, or impersonate another person when contacting us or submitting feedback.</li>
@@ -40,10 +40,10 @@ export default function TermsAndService() {
 
                     {/* Section 2 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             2. Local Application Data and Privacy
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>You may use PAWSE without creating an account. Application data, including session history, progress statistics, companion preferences, and settings, is stored locally on your device.</li>
                             <li>The timer, companion, and progress features work offline. The application connects to GitHub to check for software updates.</li>
                             <li>The current version does not provide cloud synchronization of application data across devices.</li>
@@ -54,10 +54,10 @@ export default function TermsAndService() {
 
                     {/* Section 3 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             3. Beta Program and Pre-Release Software
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>PAWSE may be made available to you as part of a beta testing program or in another pre-release capacity.</li>
                             <li>Beta or pre-release versions of PAWSE may contain bugs, errors, or incomplete features, and may not function as intended.</li>
                             <li>You may choose to submit feedback or bug reports to help us improve the Service. Personal information included in these submissions is handled as described in our Privacy Policy.</li>
@@ -67,10 +67,10 @@ export default function TermsAndService() {
 
                     {/* Section 4 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             4. Intellectual Property
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>PAWSE, including its name, logo, pixel art, the Tux, Ginger, and Void companion designs, and associated branding, is owned by the respective rights holders within meowskrrt or their licensors and is protected by applicable intellectual property laws.</li>
                             <li>Your rights to use, copy, modify, and distribute PAWSE software are governed by the license accompanying the software. The PAWSE source code is made publicly available on GitHub under the MIT License, which governs your rights to the code it covers. These Terms do not limit rights granted under that open-source license.</li>
                             <li>Third-party components and assets remain subject to their respective licenses.</li>
@@ -81,7 +81,7 @@ export default function TermsAndService() {
 
                     {/* Section 5 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             5. Feedback
                         </h2>
                         <p className="mb-4">
@@ -94,10 +94,10 @@ export default function TermsAndService() {
 
                     {/* Section 6 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             6. Third-Party Services
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>PAWSE uses third-party services for certain functions, including Supabase to store website signup email addresses and GitHub to distribute application updates. Information handled in connection with these services is described in our Privacy Policy.</li>
                             <li>When you independently access third-party websites or services through external links, your use of those websites or services is subject to their applicable terms and privacy policies.</li>
                             <li>We do not control the availability, content, or practices of independently operated third-party websites or services. This does not exclude responsibilities we may have under applicable law.</li>
@@ -106,10 +106,10 @@ export default function TermsAndService() {
 
                     {/* Section 7 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             7. Disclaimers
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>To the extent permitted by applicable law, the Service is provided &quot;as is&quot; and &quot;as available,&quot; without warranties of any kind, whether express or implied, including warranties of merchantability, fitness for a particular purpose, or non-infringement.</li>
                             <li>We do not guarantee that the Service will be uninterrupted, error-free, or secure, particularly during active development or beta testing.</li>
                             <li>Nothing in these Terms excludes warranties or rights that cannot lawfully be excluded.</li>
@@ -118,10 +118,10 @@ export default function TermsAndService() {
 
                     {/* Section 8 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             8. Limitation of Liability
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>To the fullest extent permitted by applicable law, the persons or entity operating PAWSE under the name meowskrrt shall not be liable for indirect, incidental, special, consequential, or punitive damages, or loss of data, arising out of or related to your use of the Service.</li>
                             <li>Nothing in these Terms excludes or limits liability that cannot lawfully be excluded or limited, including liability for fraud or any mandatory rights or remedies available under applicable law.</li>
                         </ul>
@@ -129,10 +129,10 @@ export default function TermsAndService() {
 
                     {/* Section 9 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             9. Stopping Use and Access Restrictions
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>We may suspend or restrict access to online services we operate where reasonably necessary to address violations of these Terms, misuse, or security risks, subject to applicable law.</li>
                             <li>You may stop using the Service at any time. To remove locally stored application data, follow the instructions provided in our Privacy Policy or supporting documentation.</li>
                             <li>Restrictions on access to our online services do not override rights granted under applicable open-source licenses.</li>
@@ -142,10 +142,10 @@ export default function TermsAndService() {
 
                     {/* Section 10 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             10. Changes to the Service or These Terms
                         </h2>
-                        <ul className="list-inside list-disc space-y-2 pl-4">
+                        <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
                             <li>We may modify features or discontinue development, updates, support, or online services. Where reasonably practicable, we will provide notice of significant changes.</li>
                             <li>We may update these Terms as PAWSE evolves. We will update the &quot;Last updated&quot; date above and, for significant changes, provide reasonable notice and state when the changes take effect.</li>
                             <li>Where permitted by applicable law, your continued use of the Service after receiving notice of changes and after those changes take effect constitutes your acceptance of the updated Terms. Where applicable law requires express agreement, we will seek that agreement.</li>
@@ -155,7 +155,7 @@ export default function TermsAndService() {
 
                     {/* Section 11 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             11. Governing Law
                         </h2>
                         <p className="mb-4">
@@ -168,7 +168,7 @@ export default function TermsAndService() {
 
                     {/* Section 12 */}
                     <section>
-                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-black">
+                        <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
                             12. Contact Us
                         </h2>
                         <p>
