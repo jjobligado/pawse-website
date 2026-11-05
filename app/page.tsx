@@ -149,7 +149,7 @@ export default function HomePage() {
                     From choosing your companion to seeing your productivity grow.
                 </p>
 
-                <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] auto-rows-[1fr] lg:auto-rows-auto items-stretch gap-3 mt-2">
+                <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] auto-rows-auto items-stretch gap-y-2.5 sm:gap-y-3 lg:gap-3 mt-2">
                     {howItWorksSteps.map((step) => (
                         <div key={step.number} className="contents">
                             <div className="group relative overflow-hidden w-full max-w-[420px] lg:max-w-none mx-auto h-full min-h-[230px] flex flex-col justify-center items-center py-8 px-5 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default">
@@ -181,7 +181,7 @@ export default function HomePage() {
                                 </div>
                             </div>
                             {step.connector && (
-                                <div className="flex justify-center items-center shrink-0 py-1 lg:py-0">
+                                <div className="flex justify-center items-center shrink-0 py-0">
                                     <Image
                                         src={step.connector}
                                         alt={step.connectorAlt || ""}
@@ -366,7 +366,7 @@ export default function HomePage() {
                     </p>
                 </div>
 
-                <div className="w-full grid grid-cols-1 md:grid-cols-3 auto-rows-fr gap-3.5 sm:gap-4 mt-2">
+                <div className="w-full grid grid-cols-1 md:grid-cols-3 auto-rows-fr gap-6 mt-2">
                     {comingSoonItems.map((item) => (
                         <div
                             key={item.title}
