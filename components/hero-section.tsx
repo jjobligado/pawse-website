@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 
 export default function HeroSection() {
     const [scrollY, setScrollY] = useState(0);
@@ -91,11 +92,14 @@ export default function HeroSection() {
             e.preventDefault();
             const contactElement = document.getElementById("contact") || document.getElementById("beta");
             if (contactElement) {
-                contactElement.scrollIntoView({ behavior: "smooth" });
-                const emailInput = contactElement.querySelector<HTMLInputElement>("input[type='email']");
-                if (emailInput) {
-                    emailInput.focus();
-                }
+                smoothScrollTo(contactElement, {
+                    onComplete: () => {
+                        const emailInput = contactElement.querySelector<HTMLInputElement>("input[type='email']");
+                        if (emailInput) {
+                            emailInput.focus();
+                        }
+                    },
+                });
             }
         }
     };

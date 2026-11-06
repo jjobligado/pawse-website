@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
+    const [activeSection, setActiveSection] = useState<string>("");
     const { platform: detectedPlatform, config: platformInfo } = usePlatform();
 
     useEffect(() => {
@@ -19,8 +21,32 @@ export default function Header() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    useEffect(() => {
+        const sectionIds = ["how-it-works", "coming-soon", "contact"];
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveSection(entry.target.id);
+                    }
+                });
+            },
+            {
+                rootMargin: "-20% 0px -55% 0px",
+                threshold: 0,
+            }
+        );
+
+        sectionIds.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
     const navLinks = [
-        { label: "Companions", href: "#companions" },
         { label: "How It Works", href: "#how-it-works" },
         { label: "Coming Soon", href: "#coming-soon" },
         { label: "Contact", href: "#contact" },
@@ -31,14 +57,26 @@ export default function Header() {
             e.preventDefault();
             const heroCTA = document.getElementById("hero-cta");
             if (heroCTA) {
-                heroCTA.scrollIntoView({ behavior: "smooth" });
+                smoothScrollTo(heroCTA);
+            }
+        }
+    };
+
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        if (href.startsWith("#")) {
+            const targetId = href.slice(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                e.preventDefault();
+                smoothScrollTo(targetElement);
+                window.history.pushState(null, "", href);
             }
         }
     };
 
     return (
         <header
-            className={`sticky top-0 z-50 w-full h-[64px] bg-white/95 backdrop-blur-sm border-b transition-colors duration-200 ${
+            className={`sticky top-0 z-50 w-full h-[64px] bg-white/85 backdrop-blur-md border-b transition-colors duration-300 ${
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
@@ -60,15 +98,23 @@ export default function Header() {
 
                 {/* Nav Links (Visible on laptops & desktops where space permits) */}
                 <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.label}
-                            href={link.href}
-                            className="text-sm text-[#5F5F5F] tracking-[0.02em] hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor] transition-colors duration-200"
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isActive = activeSection === link.href.slice(1);
+                        return (
+                            <Link
+                                key={link.label}
+                                href={link.href}
+                                onClick={(e) => handleNavClick(e, link.href)}
+                                className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
+                                    isActive
+                                        ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
+                                        : "text-[#5F5F5F] hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
+                                }`}
+                            >
+                                {link.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 {/* Charcoal Download Button */}
