@@ -408,10 +408,10 @@ export default function HeroSection() {
                             </span>
                         </Link>
 
-                        {/* Tuxedo Companion (Symmetrically matched to Ginger's distance from center) */}
+                        {/* Tuxedo Companion (Symmetrically matched to Ginger's size and distance from center) */}
                         <div
                             style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
-                            className="absolute top-1/2 -translate-y-1/2 right-3 sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto transition-transform duration-75 ease-out"
+                            className="absolute -top-12 sm:top-1/2 sm:-translate-y-1/2 right-3 sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto transition-transform duration-75 ease-out"
                         >
                             <div className="animate-cat-pop-2">
                                 <div className="animate-cat-float-3">
@@ -422,7 +422,7 @@ export default function HeroSection() {
                                         aria-label="Interact with Tuxedo companion"
                                         aria-haspopup="true"
                                         aria-expanded={activeDialogueCat === "tuxedo"}
-                                        className={`group relative w-[84px] h-[84px] sm:w-[108px] sm:h-[108px] md:w-[130px] md:h-[130px] lg:w-[150px] lg:h-[150px] xl:w-[155px] xl:h-[155px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
+                                        className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
                                             bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
                                         }`}
                                     >
@@ -447,8 +447,8 @@ export default function HeroSection() {
                                         <Image
                                             src="/images/tuxedo-cat.png"
                                             alt="Tuxedo companion"
-                                            width={155}
-                                            height={155}
+                                            width={175}
+                                            height={175}
                                             className="w-full h-full object-contain select-none"
                                             priority
                                         />
@@ -640,11 +640,11 @@ export default function HeroSection() {
             {/* App Visuals Showcase Container (Peeking at the bottom of the Hero) */}
             <div
                 style={{ transform: `translate3d(0, ${showcaseParallax}px, 0)` }}
-                className="relative z-20 w-full max-w-[1040px] mt-20 sm:mt-24 md:mt-24 px-6 md:px-10 transition-transform duration-75 ease-out"
+                className="relative z-20 w-full max-w-[1040px] mt-24 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 transition-transform duration-75 ease-out"
             >
                 <div className="relative animate-hero-fade-up-4">
                     {/* Void: Sonny Angel Perched on the Laptop Bezel (Top-Left) */}
-                    <div className="absolute -top-[72px] sm:-top-[82px] md:-top-[90px] lg:-top-[100px] left-6 sm:left-10 md:left-16 lg:left-24 z-30 pointer-events-auto">
+                    <div className="absolute -top-[80px] sm:-top-[96px] md:-top-[112px] lg:-top-[128px] xl:-top-[136px] left-6 sm:left-10 md:left-16 lg:left-24 z-30 pointer-events-auto">
                         <div className="animate-cat-pop-3">
                             <div className="animate-cat-perch-3">
                                 <button
@@ -654,7 +654,7 @@ export default function HeroSection() {
                                     aria-label="Void companion perched like a Sonny Angel"
                                     aria-haspopup="true"
                                     aria-expanded={activeDialogueCat === "void"}
-                                    className={`group relative w-[94px] h-[94px] sm:w-[106px] sm:h-[106px] md:w-[116px] md:h-[116px] lg:w-[128px] lg:h-[128px] active:scale-95 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
+                                    className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] active:scale-95 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
                                         bouncingCat === "void" ? "animate-cat-tap" : ""
                                     }`}
                                 >
@@ -679,8 +679,8 @@ export default function HeroSection() {
                                     <Image
                                         src="/images/black-cat.png"
                                         alt="Void companion"
-                                        width={128}
-                                        height={128}
+                                        width={175}
+                                        height={175}
                                         className="w-full h-full object-contain select-none"
                                         priority
                                     />
