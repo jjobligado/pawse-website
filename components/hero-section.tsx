@@ -227,10 +227,12 @@ export default function HeroSection() {
 
             {/* Centered Hero Copy & Actions */}
             <div className="relative z-30 w-full flex flex-col items-center gap-6 px-6 md:px-10">
-                <div className="w-full flex justify-center items-center animate-hero-fade-up-1">
+                <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(2.35rem,4.5vw+1.1rem,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
-                        <span className="block whitespace-nowrap">The Coziest Way</span>
-                        <span className="block whitespace-nowrap">
+                        <span className="block whitespace-nowrap animate-hero-headline-1">
+                            <span className="animate-pixel-glint">The Coziest Way</span>
+                        </span>
+                        <span className="block whitespace-nowrap animate-hero-headline-2">
                             to Get Things{" "}
                             <span className="group/done relative inline-block pr-6 md:pr-8 animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5 before:absolute before:-inset-y-8 before:-inset-x-6 before:content-['']">
                                 <span className="relative inline-block">
@@ -343,7 +345,7 @@ export default function HeroSection() {
                             download={platformInfo.fileName}
                             onClick={handleCTAClick}
                             data-os={detectedPlatform}
-                            className={`group flex items-center justify-center gap-2 py-2.5 px-4 sm:px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
+                            className={`group flex items-center justify-center gap-2 py-2.5 px-4 sm:px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
                                 copied
                                     ? "bg-[#10B981] hover:bg-[#059669]"
                                     : "bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE]"
@@ -461,7 +463,7 @@ export default function HeroSection() {
                     {/* Secondary Contextual Meta-Row */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em]"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em] animate-hero-fade-up-3b"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
