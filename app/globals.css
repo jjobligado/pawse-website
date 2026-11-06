@@ -32,8 +32,13 @@ html {
   .animate-cat-tap,
   .animate-cat-perch-1,
   .animate-cat-perch-2,
-  .animate-cat-perch-3 {
+  .animate-cat-perch-3,
+  .animate-cat-intro-ginger,
+  .animate-cat-intro-tuxedo,
+  .animate-cat-intro-void {
     animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -54,15 +59,73 @@ body {
   }
 }
 
-@keyframes hero-cat-pop {
+@keyframes cat-intro-ginger {
   0% {
     opacity: 0;
-    transform: scale(0.85) translateY(10px);
+    transform: translateY(-55px) scale(0.65) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(8px) scale(1.08, 0.92) rotate(4deg);
+  }
+  80% {
+    transform: translateY(-3px) scale(0.97, 1.02) rotate(-1deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0) scale(1) rotate(0deg);
   }
+}
+
+.animate-cat-intro-ginger {
+  opacity: 0;
+  animation: cat-intro-ginger 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+}
+
+@keyframes cat-intro-tuxedo {
+  0% {
+    opacity: 0;
+    transform: translateX(65px) translateY(18px) scale(0.65) rotate(12deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateX(-6px) translateY(-4px) scale(1.07, 0.93) rotate(-3deg);
+  }
+  85% {
+    transform: translateX(2px) translateY(1px) scale(0.98, 1.02) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.animate-cat-intro-tuxedo {
+  opacity: 0;
+  animation: cat-intro-tuxedo 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+
+@keyframes cat-intro-void {
+  0% {
+    opacity: 0;
+    transform: translateY(65px) scale(0.65);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.08);
+  }
+  85% {
+    transform: translateY(2px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-cat-intro-void {
+  opacity: 0;
+  animation: cat-intro-void 0.85s cubic-bezier(0.34, 1.35, 0.64, 1) 0.75s forwards;
 }
 
 @keyframes hero-done-color {
@@ -113,20 +176,6 @@ body {
   animation: hero-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.65s forwards;
 }
 
-.animate-cat-pop-1 {
-  opacity: 0;
-  animation: hero-cat-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
-}
-
-.animate-cat-pop-2 {
-  opacity: 0;
-  animation: hero-cat-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.32s forwards;
-}
-
-.animate-cat-pop-3 {
-  opacity: 0;
-  animation: hero-cat-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.44s forwards;
-}
 
 .animate-cat-float-1 {
   animation: cat-idle-float 3.6s ease-in-out infinite;

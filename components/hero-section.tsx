@@ -181,7 +181,7 @@ export default function HeroSection() {
                 style={{ transform: `translate3d(0, ${gingerParallax}px, 0)` }}
                 className="absolute top-5 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-30 pointer-events-auto transition-transform duration-75 ease-out"
             >
-                <div className="animate-cat-pop-1">
+                <div className="animate-cat-intro-ginger">
                     <div className="animate-cat-float-1">
                         <button
                             type="button"
@@ -413,7 +413,7 @@ export default function HeroSection() {
                             style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
                             className="absolute -top-12 sm:top-1/2 sm:-translate-y-1/2 right-3 sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto transition-transform duration-75 ease-out"
                         >
-                            <div className="animate-cat-pop-2">
+                            <div className="animate-cat-intro-tuxedo">
                                 <div className="animate-cat-float-3">
                                     <button
                                         type="button"
@@ -645,7 +645,7 @@ export default function HeroSection() {
                 <div className="relative animate-hero-fade-up-4">
                     {/* Void: Sonny Angel Perched on the Laptop Bezel (Top-Left) */}
                     <div className="absolute -top-[80px] sm:-top-[96px] md:-top-[112px] lg:-top-[128px] xl:-top-[136px] left-6 sm:left-10 md:left-16 lg:left-24 z-30 pointer-events-auto">
-                        <div className="animate-cat-pop-3">
+                        <div className="animate-cat-intro-void">
                             <div className="animate-cat-perch-3">
                                 <button
                                     type="button"
