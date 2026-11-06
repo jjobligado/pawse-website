@@ -192,7 +192,10 @@ export default function HomePage() {
             <HeroSection />
 
             {/* How it Works */}
-            <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white">
+            <section
+                id="how-it-works"
+                className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
+            >
                 <div className="flex justify-center items-center">
                     <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                         How it Works
@@ -266,7 +269,10 @@ export default function HomePage() {
             </section>
 
             {/* Meet your Companions */}
-            <section className="relative w-full pt-24 pb-12 md:pt-32 md:pb-16 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden">
+            <section
+                id="companions"
+                className="scroll-mt-20 relative w-full pt-24 pb-12 md:pt-32 md:pb-16 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
+            >
                 {/* Dynamic Multi-Core Liquid Blue Current (Stretches Full Section Height & Bleeds Horizontally) */}
                 <div
                     aria-hidden="true"
@@ -421,7 +427,10 @@ export default function HomePage() {
             </section>
 
             {/* Coming Soon */}
-            <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-12 xl:px-16 2xl:px-20 flex flex-col items-stretch gap-6 bg-white">
+            <section
+                id="coming-soon"
+                className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-12 xl:px-16 2xl:px-20 flex flex-col items-stretch gap-6 bg-white"
+            >
                 <div className="flex justify-center items-center">
                     <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                         Coming Soon...
@@ -485,10 +494,10 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Beta Tester Signup */}
+            {/* Contact / Shape the Future */}
             <section
-                id="beta"
-                className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
+                id="contact"
+                className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
             >
                 <div className="flex justify-center items-center">
                     <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
@@ -507,7 +516,7 @@ export default function HomePage() {
 
                 <div className="w-full flex flex-col justify-center items-center mt-2">
                     <form
-                        action="#beta"
+                        action="#contact"
                         className="w-full max-w-[380px] py-[3px] pr-[3px] pl-5 rounded-[50px] bg-white border border-accent flex justify-between items-center"
                     >
                         <input

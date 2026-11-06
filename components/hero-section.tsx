@@ -87,12 +87,12 @@ export default function HeroSection() {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2500);
             }
-        } else if (platformInfo.href === "#beta") {
+        } else if (platformInfo.href === "#beta" || platformInfo.href === "#contact") {
             e.preventDefault();
-            const betaElement = document.getElementById("beta");
-            if (betaElement) {
-                betaElement.scrollIntoView({ behavior: "smooth" });
-                const emailInput = betaElement.querySelector<HTMLInputElement>("input[type='email']");
+            const contactElement = document.getElementById("contact") || document.getElementById("beta");
+            if (contactElement) {
+                contactElement.scrollIntoView({ behavior: "smooth" });
+                const emailInput = contactElement.querySelector<HTMLInputElement>("input[type='email']");
                 if (emailInput) {
                     emailInput.focus();
                 }
@@ -302,7 +302,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* Download Options */}
-                <div className="w-full pt-2 flex flex-col justify-center items-center gap-3.5 animate-hero-fade-up-3">
+                <div id="hero-cta" className="scroll-mt-24 w-full pt-2 flex flex-col justify-center items-center gap-3.5 animate-hero-fade-up-3">
                     <Link
                         suppressHydrationWarning
                         href={platformInfo.href}
