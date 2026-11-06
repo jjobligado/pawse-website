@@ -181,31 +181,6 @@ body {
   animation: hero-headline-pop 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.22s forwards;
 }
 
-@keyframes hero-pixel-glint {
-  0%, 75% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-pixel-glint {
-  background: linear-gradient(
-    90deg,
-    #232323 0%,
-    #232323 35%,
-    #35A6F1 50%,
-    #232323 65%,
-    #232323 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  animation: hero-pixel-glint 8s steps(16) 1.5s infinite;
-}
-
 .animate-hero-fade-up-2 {
   opacity: 0;
   animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.34s forwards;

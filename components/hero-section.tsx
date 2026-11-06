@@ -230,7 +230,7 @@ export default function HeroSection() {
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(2.35rem,4.5vw+1.1rem,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
-                            <span className="animate-pixel-glint">The Coziest Way</span>
+                            The Coziest Way
                         </span>
                         <span className="block whitespace-nowrap animate-hero-headline-2">
                             to Get Things{" "}
@@ -336,125 +336,129 @@ export default function HeroSection() {
                 </div>
 
                 {/* Download Options */}
-                <div id="hero-cta" className="scroll-mt-24 w-full pt-2 flex flex-col justify-center items-center gap-7 sm:gap-5 md:gap-4 animate-hero-fade-up-3">
-                    {/* Centered CTA Row with Symmetrically Balanced Tuxedo */}
+                <div id="hero-cta" className="scroll-mt-24 w-full pt-2 flex flex-col justify-center items-center gap-4 animate-hero-fade-up-3">
+                    {/* Centered CTA Row with Tuxedo Directly Beside the Button */}
                     <div className="relative w-full flex items-center justify-center">
-                        <Link
-                            suppressHydrationWarning
-                            href={platformInfo.href}
-                            download={platformInfo.fileName}
-                            onClick={handleCTAClick}
-                            data-os={detectedPlatform}
-                            className={`group flex items-center justify-center gap-2 py-2.5 px-4 sm:px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
-                                copied
-                                    ? "bg-[#10B981] hover:bg-[#059669]"
-                                    : "bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE]"
-                            }`}
-                        >
-                            {copied ? (
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="text-white"
-                                >
-                                    <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                            ) : platformInfo.iconType === "share" ? (
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="text-white transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                                >
-                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                                    <polyline points="16 6 12 2 8 6" />
-                                    <line x1="12" y1="2" x2="12" y2="15" />
-                                </svg>
-                            ) : platformInfo.iconType === "bell" ? (
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="text-white transition-transform duration-200 ease-out group-hover:rotate-12"
-                                >
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                                </svg>
-                            ) : (
-                                <Image
-                                    src="/images/download-icon.svg"
-                                    alt=""
-                                    width={20}
-                                    height={20}
-                                    className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
-                                />
-                            )}
-                            <span className="font-pixel text-lg md:text-xl font-normal text-white">
-                                {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
-                            </span>
-                        </Link>
-
-                        {/* Tuxedo Companion (Symmetrically matched to Ginger's size and distance from center) */}
-                        <div
-                            style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
-                            className="absolute -top-12 sm:top-1/2 sm:-translate-y-1/2 right-3 sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto transition-transform duration-75 ease-out"
-                        >
-                            <div className="animate-cat-intro-tuxedo">
-                                <div className="animate-cat-float-3">
-                                    <button
-                                        type="button"
-                                        data-companion-cat="tuxedo"
-                                        onClick={() => handleCatInteract("tuxedo")}
-                                        aria-label="Interact with Tuxedo companion"
-                                        aria-haspopup="true"
-                                        aria-expanded={activeDialogueCat === "tuxedo"}
-                                        className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
-                                            bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
-                                        }`}
+                        <div className="relative inline-flex items-center justify-center -translate-x-3 sm:translate-x-0">
+                            <Link
+                                suppressHydrationWarning
+                                href={platformInfo.href}
+                                download={platformInfo.fileName}
+                                onClick={handleCTAClick}
+                                data-os={detectedPlatform}
+                                className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
+                                    copied
+                                        ? "bg-[#10B981] hover:bg-[#059669]"
+                                        : "bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE]"
+                                }`}
+                            >
+                                {copied ? (
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-white"
                                     >
-                                        {/* Pixel Speech Bubble */}
-                                        <div
-                                            role="status"
-                                            aria-live="polite"
-                                            className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
-                                                activeDialogueCat === "tuxedo"
-                                                    ? "opacity-100 translate-y-0 scale-100"
-                                                    : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
-                                            }`}
-                                        >
-                                            <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
-                                                {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
-                                            </span>
-                                            <span
-                                                aria-hidden="true"
-                                                className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
-                                            />
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                ) : platformInfo.iconType === "share" ? (
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-white transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                    >
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                        <polyline points="16 6 12 2 8 6" />
+                                        <line x1="12" y1="2" x2="12" y2="15" />
+                                    </svg>
+                                ) : platformInfo.iconType === "bell" ? (
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-white transition-transform duration-200 ease-out group-hover:rotate-12"
+                                    >
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                    </svg>
+                                ) : (
+                                    <Image
+                                        src="/images/download-icon.svg"
+                                        alt=""
+                                        width={20}
+                                        height={20}
+                                        className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
+                                    />
+                                )}
+                                <span className="font-pixel text-lg md:text-xl font-normal text-white">
+                                    {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
+                                </span>
+                            </Link>
+
+                            {/* Tuxedo Companion (Directly beside CTA button with intentional gap) */}
+                            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3.5 sm:ml-5 md:ml-7 lg:ml-10 xl:ml-12 z-20 pointer-events-auto">
+                                <div
+                                    style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
+                                    className="transition-transform duration-75 ease-out"
+                                >
+                                    <div className="animate-cat-intro-tuxedo">
+                                        <div className="animate-cat-float-3">
+                                            <button
+                                                type="button"
+                                                data-companion-cat="tuxedo"
+                                                onClick={() => handleCatInteract("tuxedo")}
+                                                aria-label="Interact with Tuxedo companion"
+                                                aria-haspopup="true"
+                                                aria-expanded={activeDialogueCat === "tuxedo"}
+                                                className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
+                                                    bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
+                                                }`}
+                                            >
+                                                {/* Pixel Speech Bubble */}
+                                                <div
+                                                    role="status"
+                                                    aria-live="polite"
+                                                    className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
+                                                        activeDialogueCat === "tuxedo"
+                                                            ? "opacity-100 translate-y-0 scale-100"
+                                                            : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
+                                                    }`}
+                                                >
+                                                    <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
+                                                        {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
+                                                    </span>
+                                                    <span
+                                                        aria-hidden="true"
+                                                        className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
+                                                    />
+                                                </div>
+                                                <Image
+                                                    src="/images/tuxedo-cat.png"
+                                                    alt="Tuxedo companion"
+                                                    width={175}
+                                                    height={175}
+                                                    className="w-full h-full object-contain select-none"
+                                                    priority
+                                                />
+                                            </button>
                                         </div>
-                                        <Image
-                                            src="/images/tuxedo-cat.png"
-                                            alt="Tuxedo companion"
-                                            width={175}
-                                            height={175}
-                                            className="w-full h-full object-contain select-none"
-                                            priority
-                                        />
-                                    </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
