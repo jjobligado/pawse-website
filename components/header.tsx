@@ -38,21 +38,22 @@ export default function Header() {
 
     return (
         <header
-            className={`sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b-2 transition-colors duration-200 ${
+            className={`sticky top-0 z-50 w-full h-[64px] bg-white/95 backdrop-blur-sm border-b-2 transition-colors duration-200 ${
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div className="w-full flex py-2.5 px-6 sm:px-12 md:px-14 lg:px-20 max-w-[1440px] mx-auto justify-between items-center">
+            <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-[1440px] mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
                     <Image
                         src="/images/logo.png"
                         alt="Pawse Logo"
-                        width={34}
-                        height={33}
-                        className="group-hover:scale-110 transition-transform duration-300 ease-in-out"
+                        width={30}
+                        height={28}
+                        className="h-[22px] sm:h-[28px] w-auto object-contain group-hover:scale-110 transition-transform duration-300 ease-in-out"
+                        priority
                     />
-                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-[#232323]">
+                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-[#232323] leading-none flex items-center">
                         PAWSE
                     </span>
                 </Link>
@@ -77,16 +78,9 @@ export default function Header() {
                     download={platformInfo.fileName}
                     onClick={handleDownloadClick}
                     data-os={detectedPlatform}
-                    className="group flex items-center justify-center gap-2 py-1.5 px-4 sm:px-5 rounded-full bg-[#232323] hover:bg-black text-white shadow-sm hover:shadow transition-all duration-200 active:scale-95 cursor-pointer shrink-0"
+                    className="group h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full bg-[#232323] hover:bg-black text-white shadow-sm hover:shadow transition-all duration-200 active:scale-95 cursor-pointer shrink-0"
                 >
-                    <Image
-                        src="/images/download-icon.svg"
-                        alt=""
-                        width={14}
-                        height={14}
-                        className="w-3.5 h-3.5 text-white transition-transform duration-200 group-hover:translate-y-0.5"
-                    />
-                    <span className="font-pixel text-xs sm:text-sm font-medium tracking-wide">
+                    <span className="font-pixel text-sm sm:text-[17px] font-medium tracking-wide leading-none">
                         Download
                     </span>
                 </Link>
