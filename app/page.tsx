@@ -6,28 +6,60 @@ const howItWorksSteps = [
     {
         number: "1",
         titleLines: ["Pick Your", "Companion"],
-        description: "Three cats, three paces. Pick who focuses with you.",
+        stacked: [
+            "Three cats, three paces.",
+            "Pick who focuses with you.",
+        ],
+        desktop: [
+            "Three cats, three paces.",
+            "Pick who focuses",
+            "with you.",
+        ],
         connector: "/images/arrow-right-dark.svg",
         connectorAlt: "Next step",
     },
     {
         number: "2",
         titleLines: ["Focus with Your", "Companion"],
-        description: "Work alongside your cat's routine. Zero distractions.",
+        stacked: [
+            "Work alongside your cat's routine.",
+            "Zero distractions.",
+        ],
+        desktop: [
+            "Work alongside your",
+            "cat's routine. Zero",
+            "distractions.",
+        ],
         connector: "/images/refresh-ccw.svg",
         connectorAlt: "Cycle between focus and break",
     },
     {
         number: "3",
         titleLines: ["Time to Play", "and Recharge"],
-        description: "Take a breather, play, and see what they have to say.",
+        stacked: [
+            "Take a breather, play, and",
+            "see what they have to say.",
+        ],
+        desktop: [
+            "Take a breather, play,",
+            "and see what they",
+            "have to say.",
+        ],
         connector: "/images/arrow-right-dark.svg",
         connectorAlt: "Next step",
     },
     {
         number: "4",
         titleLines: ["Watch Your", "Progress Build"],
-        description: "Every session gets logged. Small sessions, big streaks.",
+        stacked: [
+            "Every session gets logged.",
+            "Small sessions, big streaks.",
+        ],
+        desktop: [
+            "Every session gets",
+            "logged. Small sessions,",
+            "big streaks.",
+        ],
     },
 ];
 
@@ -42,20 +74,41 @@ const comingSoonItems = [
     {
         icon: "/images/check-account.png",
         title: "Save Your Progress",
-        description:
-            "Create a profile to safely back up your streaks and history to the cloud.",
+        lines2: [
+            "Create a profile to safely back up",
+            "your streaks and history to the cloud.",
+        ],
+        lines3: [
+            "Create a profile to safely",
+            "back up your streaks and",
+            "history to the cloud.",
+        ],
     },
     {
         icon: "/images/stopwatch.png",
         title: "Custom Sessions",
-        description:
-            "Set your own focus and break durations to fit into your personal workflow.",
+        lines2: [
+            "Set your own focus and break durations",
+            "to fit into your personal workflow.",
+        ],
+        lines3: [
+            "Set your own focus and",
+            "break durations to fit into",
+            "your personal workflow.",
+        ],
     },
     {
         icon: "/images/audio-icon.svg",
         title: "Expanded Audio",
-        description:
-            "A richer library of ambient purrs, lo-fi tracks, and low-stimulation alarms.",
+        lines2: [
+            "A richer library of ambient purrs, lo-fi",
+            "tracks, and low-stimulation alarms.",
+        ],
+        lines3: [
+            "A richer library of ambient",
+            "purrs, lo-fi tracks, and",
+            "low-stimulation alarms.",
+        ],
     },
 ];
 
@@ -175,8 +228,24 @@ export default function HomePage() {
                                             </span>
                                         </h3>
                                     </div>
-                                    <p className="w-full max-w-[260px] lg:max-w-[210px] text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed text-balance">
-                                        {step.description}
+                                    <p className="w-full text-sm sm:text-base lg:text-sm xl:text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
+                                        {/* Stacked arrangement (<lg): 2 lines across all cards */}
+                                        <span className="block lg:hidden">
+                                            {step.stacked.map((line, idx) => (
+                                                <span key={idx} className="block">
+                                                    {line}
+                                                </span>
+                                            ))}
+                                        </span>
+
+                                        {/* 4-column desktop layout (lg:): 3 lines across all cards */}
+                                        <span className="hidden lg:block">
+                                            {step.desktop.map((line, idx) => (
+                                                <span key={idx} className="block">
+                                                    {line}
+                                                </span>
+                                            ))}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -352,7 +421,7 @@ export default function HomePage() {
             </section>
 
             {/* Coming Soon */}
-            <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white">
+            <section className="w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-12 xl:px-16 2xl:px-20 flex flex-col items-stretch gap-6 bg-white">
                 <div className="flex justify-center items-center">
                     <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
                         Coming Soon...
@@ -370,7 +439,7 @@ export default function HomePage() {
                     {comingSoonItems.map((item) => (
                         <div
                             key={item.title}
-                            className="group relative overflow-hidden w-full max-w-[420px] md:max-w-none mx-auto h-full min-h-[220px] p-6 sm:p-7 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default flex flex-col justify-center items-center gap-3"
+                            className="group relative overflow-hidden w-full max-w-[420px] md:max-w-none mx-auto h-full min-h-[220px] p-6 sm:p-6 lg:px-5 lg:py-6 xl:px-5 xl:py-7 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_75%,#A8DCFF_100%)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-[0_20px_35px_-4px_rgba(20,20,20,0.14),0_8px_16px_-4px_rgba(20,20,20,0.08)] cursor-default flex flex-col justify-center items-center gap-3"
                         >
                             {/* Liquid rising fill underlay */}
                             <div
@@ -392,8 +461,24 @@ export default function HomePage() {
                                     {item.title}
                                 </h3>
                             </div>
-                            <p className="relative z-10 w-full max-w-[320px] md:max-w-none text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed text-balance">
-                                {item.description}
+                            <p className="relative z-10 w-full text-sm sm:text-base lg:text-sm xl:text-[15px] 2xl:text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
+                                {/* 2-line layout: stacked (<md) and wide desktop (lg:) */}
+                                <span className="block md:hidden lg:block">
+                                    {item.lines2.map((line, idx) => (
+                                        <span key={idx} className="block">
+                                            {line}
+                                        </span>
+                                    ))}
+                                </span>
+
+                                {/* 3-line layout: compact 3-column tablet (md to lg) */}
+                                <span className="hidden md:block lg:hidden">
+                                    {item.lines3.map((line, idx) => (
+                                        <span key={idx} className="block">
+                                            {line}
+                                        </span>
+                                    ))}
+                                </span>
                             </p>
                         </div>
                     ))}
