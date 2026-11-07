@@ -1,16 +1,37 @@
+import Image from "next/image";
+import FeatureCard from "./feature-card";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 
 /**
- * Compact overview of the PAWSE loop. Each step links to the section that
- * explains it, so the strip doubles as in-page navigation (useful on mobile,
- * where the header has no nav links).
+ * The PAWSE loop in four cards. Each card links to the section that explains
+ * it, so the row doubles as in-page navigation (useful on mobile, where the
+ * header has no nav links). Connectors show the flow: steps 2 ↔ 3 cycle.
  */
 const STEPS = [
-    { title: "Pick Your Companion", body: "Three cats, three paces.", href: "#companions" },
-    { title: "Focus Together", body: "Quiet, distraction-free sessions.", href: "#focus" },
-    { title: "Take a Playful Break", body: "Recharge, then go again.", href: "#break" },
-    { title: "Watch Progress Build", body: "Every session gets logged.", href: "#progress" },
+    {
+        title: "Pick Your Companion",
+        body: "Three cats, three paces. Pick who focuses with you.",
+        href: "#companions",
+        connector: "/images/arrow-right-dark.svg",
+    },
+    {
+        title: "Focus with Your Companion",
+        body: "Work alongside your cat's routine. Zero distractions.",
+        href: "#focus",
+        connector: "/images/refresh-ccw.svg",
+    },
+    {
+        title: "Time to Play and Recharge",
+        body: "Take a breather, play, and see what they have to say.",
+        href: "#break",
+        connector: "/images/arrow-right-dark.svg",
+    },
+    {
+        title: "Watch Your Progress Build",
+        body: "Every session gets logged. Small sessions, big streaks.",
+        href: "#progress",
+    },
 ];
 
 export default function HowItWorksSection() {
@@ -21,46 +42,44 @@ export default function HowItWorksSection() {
                 From choosing your companion to seeing your progress grow.
             </SectionSubtitle>
 
-            <ol className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
+            <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] auto-rows-auto items-stretch gap-4 mt-2">
                 {STEPS.map((step, index) => (
-                    <li key={step.href}>
-                        <a
+                    <div key={step.href} className="contents">
+                        <FeatureCard
                             href={step.href}
-                            className="group h-full flex items-center gap-3.5 rounded-2xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#EEF8FF_100%)] px-4 py-4 transition-[border-color,transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_24px_-8px_rgba(20,20,20,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                            className="max-w-[420px] lg:max-w-none min-h-[230px] py-8 px-5"
                         >
-                            <span
-                                aria-hidden="true"
-                                className="w-8 h-8 shrink-0 rounded-full bg-accent flex items-center justify-center text-sm font-semibold text-ink"
-                            >
-                                {index + 1}
-                            </span>
-                            <span className="flex-1 min-w-0 flex flex-col">
-                                <span className="text-[15px] font-semibold text-ink-strong leading-snug">
-                                    {step.title}
-                                </span>
-                                <span className="text-sm text-ink-soft leading-snug">
+                            <div className="relative z-10 w-full flex flex-col items-center gap-3">
+                                <div className="w-full flex flex-col items-center gap-2">
+                                    <span
+                                        aria-hidden="true"
+                                        className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 text-sm font-semibold text-ink transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5"
+                                    >
+                                        {index + 1}
+                                    </span>
+                                    <h3 className="max-w-[16ch] text-lg font-semibold text-ink-strong group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em] leading-snug text-balance">
+                                        {step.title}
+                                    </h3>
+                                </div>
+                                <p className="w-full max-w-[26ch] text-sm sm:text-base lg:text-sm xl:text-base text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed text-balance">
                                     {step.body}
-                                </span>
-                            </span>
-                            {/* Down arrow: signals "jumps to a section below" */}
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                                className="shrink-0 text-muted transition-transform duration-300 group-hover:translate-y-0.5 group-hover:text-ink"
-                            >
-                                <path d="M12 5v14M19 12l-7 7-7-7" />
-                            </svg>
-                        </a>
-                    </li>
+                                </p>
+                            </div>
+                        </FeatureCard>
+                        {step.connector && (
+                            <div aria-hidden="true" className="flex justify-center items-center shrink-0">
+                                <Image
+                                    src={step.connector}
+                                    alt=""
+                                    width={20}
+                                    height={20}
+                                    className="rotate-90 lg:rotate-0"
+                                />
+                            </div>
+                        )}
+                    </div>
                 ))}
-            </ol>
+            </div>
         </Section>
     );
 }
