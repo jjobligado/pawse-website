@@ -26,9 +26,14 @@
    * - `accent` #35A6F1, the signature sky blue (2.67:1 vs white). Decoration only:
    *   underlines, borders, focus rings, glows, and fills behind DARK text (ink on
    *   accent = 5.89:1).
-   * - `accent-strong` #2394DF, one shade deeper (3.30:1 vs white). Only for LARGE
-   *   text: ≥24px, or ≥19px bold (e.g. bold 20px button labels, the hero "Done"),
-   *   and for icons/graphics (3:1). Never for small text.
+   * - `accent-strong` #2394DF, one shade deeper (3.30:1 vs white). For LARGE text
+   *   (≥24px, or ≥19px bold, e.g. the hero "Done") and icons/graphics (3:1).
+   *   Never for small text.
+   *   KNOWN EXCEPTION (deliberate, 2026-11): primary button labels (Download CTA,
+   *   Send Message) use white SEMIBOLD 18-20px on accent-strong. WCAG only counts
+   *   bold (700) as large at that size, so these fall short of AA (3.30:1 vs 4.5:1).
+   *   Bold read too heavy in the pixel font and darker fills clashed with the app
+   *   palette. To become fully compliant: bold, 24px+, or ink text on `accent`.
    * - Small blue text on white is not allowed in this palette; use ink with an
    *   accent underline or background instead.
    */

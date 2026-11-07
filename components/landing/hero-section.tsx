@@ -371,8 +371,8 @@ export default function HeroSection() {
                                 data-os={detectedPlatform}
                                 className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
                                     copied
-                                        ? "bg-success hover:bg-[#065F46]"
-                                        : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active"
+                                        ? "bg-success hover:bg-[#065F46] text-white"
+                                        : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white"
                                 }`}
                             >
                                 {copied ? (
@@ -385,7 +385,7 @@ export default function HeroSection() {
                                         strokeWidth="2.5"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-white"
+                                        aria-hidden="true"
                                     >
                                         <polyline points="20 6 9 17 4 12" />
                                     </svg>
@@ -399,22 +399,33 @@ export default function HeroSection() {
                                         strokeWidth="2"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-white transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                        aria-hidden="true"
+                                        className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                                     >
                                         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
                                         <polyline points="16 6 12 2 8 6" />
                                         <line x1="12" y1="2" x2="12" y2="15" />
                                     </svg>
                                 ) : (
-                                    <Image
-                                        src="/images/download-icon.svg"
-                                        alt=""
-                                        width={20}
-                                        height={20}
+                                    // Inline so the icon follows the label color (currentColor)
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
                                         className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
-                                    />
+                                    >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <path d="M7 10l5 5 5-5" />
+                                        <path d="M12 15V3" />
+                                    </svg>
                                 )}
-                                <span className="font-pixel text-xl font-bold text-white">
+                                <span className="font-pixel text-lg md:text-xl font-semibold">
                                     {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                                 </span>
                             </Link>
