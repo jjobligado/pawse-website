@@ -21,7 +21,7 @@ export interface PlatformDownloadInfo {
     isMobileShare?: boolean;
     altPlatformText?: string;
     altPlatformFile?: string;
-    iconType: "download" | "share" | "bell";
+    iconType: "download" | "share";
 }
 
 export const DESKTOP_PLATFORMS: DesktopPlatformOption[] = [

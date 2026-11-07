@@ -50,7 +50,7 @@ export default function Header() {
     const navLinks = [
         { label: "How It Works", href: "#how-it-works" },
         { label: "Coming Soon", href: "#coming-soon" },
-        { label: "Contact", href: "#contact" },
+        { label: "Contact Us", href: "#contact" },
     ];
 
     const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -62,27 +62,6 @@ export default function Header() {
             const heroCTA = document.getElementById("hero-cta");
             if (heroCTA) {
                 smoothScrollTo(heroCTA);
-            }
-        } else if (
-            platformInfo.href === "#beta" ||
-            platformInfo.href === "#contact"
-        ) {
-            e.preventDefault();
-            const contactElement =
-                document.getElementById("contact") ||
-                document.getElementById("beta");
-            if (contactElement) {
-                smoothScrollTo(contactElement, {
-                    onComplete: () => {
-                        const emailInput =
-                            contactElement.querySelector<HTMLInputElement>(
-                                "input[type='email']"
-                            );
-                        if (emailInput) {
-                            emailInput.focus();
-                        }
-                    },
-                });
             }
         }
     };

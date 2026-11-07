@@ -2,6 +2,7 @@ import Image from "next/image";
 import HeroSection from "@/components/hero-section";
 import CompanionCards from "@/components/companion-cards";
 import { DashboardSpreadSection } from "@/components/pixel-divider";
+import ContactSection from "@/components/contact-section";
 
 const howItWorksSteps = [
     {
@@ -478,54 +479,8 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Contact / Shape the Future */}
-            <section
-                id="contact"
-                className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
-            >
-                <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
-                        Help Us Shape the Future of PAWSE
-                    </h2>
-                </div>
-
-                <div className="px-4 md:px-10 flex justify-center items-center">
-                    <p className="max-w-[760px] text-base md:text-lg text-[#5F5F5F] text-center leading-relaxed">
-                        PAWSE version 1 is now live! But we&apos;re not done yet. Join our
-                        beta testers to help us hunt down bugs, tell us what&apos;s working
-                        (and what&apos;s not), and get first dibs on new features as they
-                        roll out.
-                    </p>
-                </div>
-
-                <div className="w-full flex flex-col justify-center items-center mt-2">
-                    <form
-                        action="#contact"
-                        className="w-full max-w-[380px] py-[3px] pr-[3px] pl-5 rounded-[50px] bg-white border border-accent flex justify-between items-center"
-                    >
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Enter your email"
-                            aria-label="Enter your email"
-                            required
-                            className="flex-1 bg-transparent text-sm md:text-base font-medium text-[#232323] placeholder:text-accent-highlight focus:outline-none pr-3"
-                        />
-                        <button
-                            type="submit"
-                            aria-label="Submit email"
-                            className="w-[42px] h-[42px] shrink-0 rounded-full flex items-center justify-center hover:brightness-95 transition-all cursor-pointer"
-                        >
-                            <Image
-                                src="/images/email-submit.svg"
-                                alt=""
-                                width={42}
-                                height={42}
-                            />
-                        </button>
-                    </form>
-                </div>
-            </section>
+            {/* Contact Us */}
+            <ContactSection />
         </div>
     );
 }
