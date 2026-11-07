@@ -152,7 +152,8 @@ function TimerMockup() {
                         alt="Tuxedo Cat Companion"
                         width={220}
                         height={220}
-                        className="w-full h-full object-cover"
+                        unoptimized
+                        className="w-full h-full object-cover [image-rendering:pixelated]"
                     />
                 </div>
 

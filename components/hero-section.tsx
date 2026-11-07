@@ -227,7 +227,8 @@ export default function HeroSection() {
                                 alt="Ginger companion"
                                 width={175}
                                 height={175}
-                                className="w-full h-full object-contain select-none"
+                                unoptimized
+                                className="w-full h-full object-contain select-none [image-rendering:pixelated]"
                                 priority
                             />
                         </button>
@@ -446,7 +447,8 @@ export default function HeroSection() {
                                                 alt="Tuxedo companion"
                                                 width={175}
                                                 height={175}
-                                                className="w-full h-full object-contain select-none"
+                                                unoptimized
+                                                className="w-full h-full object-contain select-none [image-rendering:pixelated]"
                                                 priority
                                             />
                                         </button>
@@ -679,7 +681,8 @@ export default function HeroSection() {
                                         alt="Void companion"
                                         width={175}
                                         height={175}
-                                        className="w-full h-full object-contain select-none"
+                                        unoptimized
+                                        className="w-full h-full object-contain select-none [image-rendering:pixelated]"
                                         priority
                                     />
                                 </button>
