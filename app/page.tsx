@@ -6,6 +6,7 @@ import BreakSection from "@/components/landing/break-section";
 import DashboardSection from "@/components/landing/dashboard-section";
 import ComingSoonSection from "@/components/landing/coming-soon-section";
 import FaqSection from "@/components/landing/faq-section";
+import DownloadBanner from "@/components/landing/download-banner";
 import ContactSection from "@/components/landing/contact-section";
 
 export default function HomePage() {
@@ -19,6 +20,7 @@ export default function HomePage() {
             <DashboardSection />
             <ComingSoonSection />
             <FaqSection />
+            <DownloadBanner />
             <ContactSection />
         </div>
     );

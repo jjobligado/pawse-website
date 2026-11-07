@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
+import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -40,7 +41,7 @@ export default function HeroSection() {
     const gingerParallaxRef = useRef<HTMLDivElement>(null);
     const tuxParallaxRef = useRef<HTMLDivElement>(null);
     const showcaseParallaxRef = useRef<HTMLDivElement>(null);
-    const [copied, setCopied] = useState(false);
+    const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const [activeDialogueCat, setActiveDialogueCat] = useState<CompanionCatId | null>(null);
     const [dialogueIndices, setDialogueIndices] = useState<Record<CompanionCatId, number>>({
@@ -164,36 +165,11 @@ export default function HeroSection() {
         };
     }, []);
 
-    const handleCTAClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleCTAClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        // Mobile visitors can't install a desktop app: share the link to their computer instead.
         if (platformInfo.isMobileShare) {
             e.preventDefault();
-            const shareUrl = window.location.href;
-
-            // Try native mobile sharing first (AirDrop, device send, messaging)
-            if (typeof navigator !== "undefined" && navigator.share) {
-                try {
-                    await navigator.share({
-                        title: "PAWSE — The Coziest Way to Get Things Done",
-                        text: "A calm Pomodoro timer for your desktop, with a pixel cat who focuses alongside you.",
-                        url: shareUrl,
-                    });
-                    return;
-                } catch {
-                    // User dismissed share sheet or share failed; fallback to clipboard copy
-                }
-            }
-
-            // Fallback: copy link to clipboard and show feedback
-            try {
-                if (typeof navigator !== "undefined" && navigator.clipboard) {
-                    await navigator.clipboard.writeText(shareUrl);
-                }
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2500);
-            } catch {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2500);
-            }
+            void sendToDesktop();
         }
     };
 
