@@ -19,13 +19,29 @@
   --color-ink-soft: #4B5563; /* card body copy */
   --color-muted: #5F5F5F; /* section subtitles, secondary text */
   --color-subtle: #71717A; /* helper labels ("Optional") */
-  --color-faint: #9CA3AF; /* input placeholders */
+  --color-faint: #767676; /* input placeholders (4.54:1, lightest gray that passes AA) */
 
-  /* Brand accent and its interaction states */
+  /*
+   * Brand accent: contrast rules (WCAG AA)
+   * - `accent` #35A6F1, the signature sky blue (2.67:1 vs white). Decoration only:
+   *   underlines, borders, focus rings, glows, and fills behind DARK text (ink on
+   *   accent = 5.89:1).
+   * - `accent-strong` #2394DF, one shade deeper (3.30:1 vs white). For LARGE text
+   *   (≥24px, or ≥19px bold, e.g. the hero "Done") and icons/graphics (3:1).
+   *   Never for small text.
+   *   KNOWN EXCEPTION (deliberate, 2026-11): primary button labels (Download CTA,
+   *   Send Message) use white SEMIBOLD 18-20px on accent-strong. WCAG only counts
+   *   bold (700) as large at that size, so these fall short of AA (3.30:1 vs 4.5:1).
+   *   Bold read too heavy in the pixel font and darker fills clashed with the app
+   *   palette. To become fully compliant: bold, 24px+, or ink text on `accent`.
+   * - Small blue text on white is not allowed in this palette; use ink with an
+   *   accent underline or background instead.
+   */
   --color-accent: #35A6F1;
-  --color-accent-hover: #2394DF;
-  --color-accent-active: #1B7FBE;
   --color-accent-highlight: #A8DCFF;
+  --color-accent-strong: #2394DF;
+  --color-accent-strong-hover: #1B7FBE;
+  --color-accent-strong-active: #1A74AE;
 
   /* Feedback states (text colors meet WCAG AA on white and on their soft backgrounds) */
   --color-danger: #B91C1C;
@@ -67,7 +83,7 @@ html {
   }
   /* Final state of the "Done" reveal (accent color + full underline). */
   .animate-hero-done {
-    color: var(--color-accent) !important;
+    color: var(--color-accent-strong) !important;
   }
 }
 
@@ -162,7 +178,7 @@ body {
     color: #232323;
   }
   100% {
-    color: var(--color-accent);
+    color: var(--color-accent-strong);
   }
 }
 

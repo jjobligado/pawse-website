@@ -9,7 +9,6 @@ const STEPS = [
         stacked: ["Three cats, three paces.", "Pick who focuses with you."],
         desktop: ["Three cats, three paces.", "Pick who focuses", "with you."],
         connector: "/images/arrow-right-dark.svg",
-        connectorAlt: "Next step",
     },
     {
         number: "2",
@@ -17,7 +16,6 @@ const STEPS = [
         stacked: ["Work alongside your cat's routine.", "Zero distractions."],
         desktop: ["Work alongside your", "cat's routine. Zero", "distractions."],
         connector: "/images/refresh-ccw.svg",
-        connectorAlt: "Cycle between focus and break",
     },
     {
         number: "3",
@@ -25,7 +23,6 @@ const STEPS = [
         stacked: ["Take a breather, play, and", "see what they have to say."],
         desktop: ["Take a breather, play,", "and see what they", "have to say."],
         connector: "/images/arrow-right-dark.svg",
-        connectorAlt: "Next step",
     },
     {
         number: "4",
@@ -53,7 +50,7 @@ export default function HowItWorksSection() {
                             <div className="relative z-10 w-full flex flex-col items-center gap-3">
                                 <div className="w-full flex flex-col items-center gap-2">
                                     <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
-                                        <span className="text-sm font-semibold text-white">
+                                        <span className="text-sm font-semibold text-ink">
                                             {step.number}
                                         </span>
                                     </div>
@@ -88,10 +85,10 @@ export default function HowItWorksSection() {
                             </div>
                         </FeatureCard>
                         {step.connector && (
-                            <div className="flex justify-center items-center shrink-0 py-0">
+                            <div aria-hidden="true" className="flex justify-center items-center shrink-0 py-0">
                                 <Image
                                     src={step.connector}
-                                    alt={step.connectorAlt || ""}
+                                    alt=""
                                     width={20}
                                     height={20}
                                     className="rotate-90 lg:rotate-0"

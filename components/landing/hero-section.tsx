@@ -50,6 +50,7 @@ export default function HeroSection() {
     });
     const [bouncingCat, setBouncingCat] = useState<CompanionCatId | null>(null);
     const popoverRef = useRef<HTMLDivElement>(null);
+    const platformsTriggerRef = useRef<HTMLButtonElement>(null);
     const {
         platform: detectedPlatform,
         config: platformInfo,
@@ -99,17 +100,29 @@ export default function HeroSection() {
             }
         };
 
+        // Escape closes the list and returns focus to the trigger so keyboard users stay oriented.
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
+                setPlatformsOpen(false);
+                platformsTriggerRef.current?.focus();
+            }
+        };
+
+        // Tabbing past the last platform link closes the list.
+        const container = popoverRef.current;
+        const handleFocusOut = (e: FocusEvent) => {
+            if (container && !container.contains(e.relatedTarget as Node | null)) {
                 setPlatformsOpen(false);
             }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("keydown", handleKeyDown);
+        container?.addEventListener("focusout", handleFocusOut);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("keydown", handleKeyDown);
+            container?.removeEventListener("focusout", handleFocusOut);
         };
     }, [platformsOpen]);
 
@@ -198,7 +211,6 @@ export default function HeroSection() {
                             data-companion-cat="ginger"
                             onClick={() => handleCatInteract("ginger")}
                             aria-label="Interact with Ginger companion"
-                            aria-haspopup="true"
                             aria-expanded={activeDialogueCat === "ginger"}
                             className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] rotate-6 hover:rotate-0 hover:-translate-y-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
                                 bouncingCat === "ginger" ? "animate-cat-tap" : ""
@@ -359,8 +371,8 @@ export default function HeroSection() {
                                 data-os={detectedPlatform}
                                 className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
                                     copied
-                                        ? "bg-[#10B981] hover:bg-[#059669]"
-                                        : "bg-accent hover:bg-accent-hover active:bg-accent-active"
+                                        ? "bg-success hover:bg-[#065F46] text-white"
+                                        : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white"
                                 }`}
                             >
                                 {copied ? (
@@ -373,7 +385,7 @@ export default function HeroSection() {
                                         strokeWidth="2.5"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-white"
+                                        aria-hidden="true"
                                     >
                                         <polyline points="20 6 9 17 4 12" />
                                     </svg>
@@ -387,22 +399,33 @@ export default function HeroSection() {
                                         strokeWidth="2"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        className="text-white transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                        aria-hidden="true"
+                                        className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                                     >
                                         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
                                         <polyline points="16 6 12 2 8 6" />
                                         <line x1="12" y1="2" x2="12" y2="15" />
                                     </svg>
                                 ) : (
-                                    <Image
-                                        src="/images/download-icon.svg"
-                                        alt=""
-                                        width={20}
-                                        height={20}
+                                    // Inline so the icon follows the label color (currentColor)
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
                                         className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
-                                    />
+                                    >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <path d="M7 10l5 5 5-5" />
+                                        <path d="M12 15V3" />
+                                    </svg>
                                 )}
-                                <span className="font-pixel text-lg md:text-xl font-normal text-white">
+                                <span className="font-pixel text-lg md:text-xl font-semibold">
                                     {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                                 </span>
                             </Link>
@@ -418,7 +441,6 @@ export default function HeroSection() {
                                             data-companion-cat="tuxedo"
                                             onClick={() => handleCatInteract("tuxedo")}
                                             aria-label="Interact with Tuxedo companion"
-                                            aria-haspopup="true"
                                             aria-expanded={activeDialogueCat === "tuxedo"}
                                             className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
                                                 bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
@@ -469,11 +491,12 @@ export default function HeroSection() {
                             <div ref={popoverRef} className="relative inline-flex items-center">
                                 {/* Other Platforms Popover Trigger */}
                                 <button
+                                    ref={platformsTriggerRef}
                                     type="button"
                                     onClick={() => setPlatformsOpen((prev) => !prev)}
                                     aria-expanded={platformsOpen}
-                                    aria-haspopup="menu"
-                                    className={`inline-flex items-center gap-1 hover:text-black transition-colors duration-200 group cursor-pointer focus-visible:outline-none ${
+                                    aria-controls="other-platforms-list"
+                                    className={`inline-flex items-center gap-1 rounded hover:text-black transition-colors duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
                                         platformsOpen
                                             ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
                                             : ""
@@ -502,10 +525,9 @@ export default function HeroSection() {
                                     </svg>
                                 </button>
 
-                                {/* Floating Other Platforms Popover Menu */}
+                                {/* Floating Other Platforms list (disclosure pattern: plain links, Tab to move) */}
                                 <div
-                                    role="menu"
-                                    aria-label="Download PAWSE for other platforms"
+                                    id="other-platforms-list"
                                     className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[300px] sm:w-[320px] rounded-2xl bg-white border-2 border-stroke p-1.5 shadow-[0_20px_40px_-10px_rgba(20,20,20,0.16),0_4px_12px_-2px_rgba(20,20,20,0.08)] z-50 origin-top transition-all duration-200 ease-out ${
                                         platformsOpen
                                             ? "visible opacity-100 translate-y-0 scale-100 pointer-events-auto"
@@ -516,7 +538,6 @@ export default function HeroSection() {
                                         {desktopPlatforms.map((item) => (
                                             <a
                                                 key={item.id}
-                                                role="menuitem"
                                                 href={item.href}
                                                 download={item.fileName}
                                                 onClick={() => setPlatformsOpen(false)}
@@ -524,7 +545,7 @@ export default function HeroSection() {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {/* Platform Icon Badge */}
-                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
+                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent-strong text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
                                                         {item.id === "windows" && (
                                                             <svg
                                                                 width="15"
@@ -571,7 +592,7 @@ export default function HeroSection() {
                                                 </div>
 
                                                 {/* File Format & Download Action */}
-                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-accent shrink-0 transition-colors">
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-ink shrink-0 transition-colors">
                                                     {item.extension}
                                                     <svg
                                                         width="13"
@@ -643,7 +664,7 @@ export default function HeroSection() {
                 className="relative z-20 w-full max-w-[1040px] mt-24 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 will-change-transform"
             >
                 <div className="relative animate-hero-fade-up-4">
-                    {/* Void: Sonny Angel Perched on the Laptop Bezel (Top-Left) */}
+                    {/* Void: perched on the app preview bezel (top-left) */}
                     <div className="absolute -top-[80px] sm:-top-[96px] md:-top-[112px] lg:-top-[128px] xl:-top-[136px] left-6 sm:left-10 md:left-16 lg:left-24 z-30 pointer-events-auto">
                         <div className="animate-cat-intro-void">
                             <div className="animate-cat-perch-3">
@@ -651,8 +672,7 @@ export default function HeroSection() {
                                     type="button"
                                     data-companion-cat="void"
                                     onClick={() => handleCatInteract("void")}
-                                    aria-label="Void companion perched like a Sonny Angel"
-                                    aria-haspopup="true"
+                                    aria-label="Interact with Void companion"
                                     aria-expanded={activeDialogueCat === "void"}
                                     className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] active:scale-95 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
                                         bouncingCat === "void" ? "animate-cat-tap" : ""
