@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
                                 <h3 className="font-bold text-[#141414]">c. Technical information</h3>
                                 <p className="mt-1">
                                     The PAWSE desktop application connects to GitHub to check for software updates. This process may disclose your IP address and basic operating system details to GitHub&apos;s servers. The desktop app does not automatically send telemetry, crash logs, or analytics to our team. <br />
-                                    [If applicable: Our landing website may collect basic web analytics such as IP addresses or request timestamps to help us monitor site traffic.]
+                                    Our landing website collects basic technical and usage information to monitor site traffic and website performance.
                                 </p>
                             </div>
 
@@ -62,7 +62,7 @@ export default function PrivacyPolicy() {
                                 <h3 className="font-bold text-[#141414]">d. Cookies and similar technologies</h3>
                                 <p className="mt-1">
                                     The desktop application stores preferences, such as audio volume and toggle settings, locally on your device. These preferences are not automatically transmitted to us. <br />
-                                    [If applicable: Our landing website may use cookies or similar tracking technologies for basic analytics. You can manage your cookie preferences through your browser settings.]
+                                    Our landing website uses cookies or similar technologies to understand how visitors use the website and help us improve it. You can manage or delete cookies through your browser settings.
                                 </p>
                             </div>
                         </div>
@@ -93,13 +93,13 @@ export default function PrivacyPolicy() {
                         </h2>
                         <p className="mb-2">We do not sell your personal information. We may disclose information to:</p>
                         <ul className="mb-4 list-inside list-disc space-y-2 pl-4">
-                            <li><strong className="text-[#141414]">Service providers.</strong> Providers that help us operate the website, manage signup submissions, deliver requested emails, or handle support communications, where those services are used.</li>
                             <li><strong className="text-[#141414]">Supabase.</strong> We use Supabase to store and manage email addresses submitted through our website for beta testing and launch updates.</li>
                             <li><strong className="text-[#141414]">GitHub.</strong> We use GitHub to distribute application updates. GitHub receives technical information when your application checks for or downloads updates, as described in Section 1(c).</li>
+                            <li><strong className="text-[#141414]">Google/Gmail.</strong> We use Gmail to receive and store support messages and feedback sent to pawseapp.team@gmail.com.</li>
                             <li><strong className="text-[#141414]">Authorities.</strong> Where disclosure is required to comply with an applicable legal obligation or valid legal process.</li>
                         </ul>
                         <p>
-                            Permission to use feedback under our Terms and Conditions does not authorize us to publish personal information included in that feedback.
+                            Permission to use feedback under our Terms of Service does not authorize us to publish personal information included in that feedback.
                         </p>
                     </section>
 
@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
                         </h2>
                         <ul className="mb-4 list-inside list-disc space-y-2 pl-4">
                             <li><strong className="text-[#141414]">Local storage.</strong> Application data is stored on your device in an unencrypted SQLite database (pawse.db) and other local application storage.</li>
-                            <li><strong className="text-[#141414]">Information submitted to us.</strong> Beta and launch signup information is stored in Supabase. Support messages and feedback are stored through [email or support service provider].</li>
+                            <li><strong className="text-[#141414]">Information submitted to us.</strong> Beta and launch signup information is stored in Supabase. Support messages and feedback sent to pawseapp.team@gmail.com are stored through Gmail, provided by Google.</li>
                         </ul>
                         <p>
                             We take reasonable measures to protect information under our control. However, no method of storage or transmission can be guaranteed to be completely secure, and we cannot guarantee the absolute security of local files if your device is compromised.
@@ -163,7 +163,7 @@ export default function PrivacyPolicy() {
                             <li>Use the current PAWSE desktop application without creating an account.</li>
                             <li>Unsubscribe from optional emails through the unsubscribe link provided in our emails.</li>
                             <li>Remove locally stored application data by following the instructions in Section 6.</li>
-                            <li>Contact us at [email address] to make a request concerning information we hold about you.</li>
+                            <li>Contact us at pawseapp.team@gmail.com to make a request concerning information we hold about you.</li>
                         </ul>
                         <p className="mb-4">
                             We cannot remotely access or delete application data that exists only on your device. If you choose to send us a copy through a support request, that copy is handled according to this policy.
@@ -176,7 +176,7 @@ export default function PrivacyPolicy() {
                     {/* Section 8 */}
                     <section>
                         <h2 className="mb-4 font-pixel text-3xl font-semibold text-[#232323]">
-                            8. Do Not Track and Global Privacy Control
+                            8. Desktop Tracking
                         </h2>
                         <p>
                             The desktop application does not track your activity across other websites. Its network connections for software updates are described in Section 1(c).
@@ -199,10 +199,10 @@ export default function PrivacyPolicy() {
                             10. Children&apos;s Privacy
                         </h2>
                         <p className="mb-4">
-                            Consistent with our Terms and Conditions, PAWSE is intended for users aged 13 and older. Users below the age of majority where they live may use the Service only with the permission and supervision of a parent or legal guardian.
+                            Consistent with our Terms of Service, PAWSE is intended for users aged 13 and older. Users below the age of majority where they live may use the Service only with the permission and supervision of a parent or legal guardian.
                         </p>
                         <p>
-                            We do not knowingly collect personal information from children under 13. If you believe that a child under 13 has provided us with personal information, please contact us at [email address] so that we can investigate and take appropriate steps to delete it.
+                            We do not knowingly collect personal information from children under 13. If you believe that a child under 13 has provided us with personal information, please contact us at pawseapp.team@gmail.com so that we can investigate and take appropriate steps to delete it.
                         </p>
                     </section>
 
@@ -225,7 +225,7 @@ export default function PrivacyPolicy() {
                             12. Contact Us
                         </h2>
                         <p>
-                            If you have questions about this policy or your personal information, please contact us at [email address].
+                            If you have questions about this policy or your personal information, please contact us at <strong className="text-[#141414]">pawseapp.team@gmail.com</strong>.
                         </p>
                     </section>
 
