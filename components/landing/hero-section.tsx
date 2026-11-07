@@ -330,7 +330,7 @@ export default function HeroSection() {
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
                     <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
-                        focuses alongside you.
+                        focuses alongside you. Free to download.
                     </p>
                 </div>
 
@@ -456,13 +456,11 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* Secondary meta row: the key fact + other platforms, one quiet line */}
+                    {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
                         className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b"
                     >
-                        <span>Free to download</span>
-                        <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
                         ) : (
