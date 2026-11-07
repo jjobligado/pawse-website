@@ -13,7 +13,18 @@
 }
 
 @theme {
+  /* Text / neutral scale (darkest → lightest) */
+  --color-ink-strong: #141414; /* card titles */
+  --color-ink: #232323; /* headings, primary text, charcoal button */
+  --color-ink-soft: #4B5563; /* card body copy */
+  --color-muted: #5F5F5F; /* section subtitles, secondary text */
+  --color-subtle: #71717A; /* helper labels ("Optional") */
+  --color-faint: #9CA3AF; /* input placeholders */
+
+  /* Brand accent and its interaction states */
   --color-accent: #35A6F1;
+  --color-accent-hover: #2394DF;
+  --color-accent-active: #1B7FBE;
   --color-accent-highlight: #A8DCFF;
   --color-companion-tux: #ECFEA9;
   --color-companion-ginger: #FEE1A9;

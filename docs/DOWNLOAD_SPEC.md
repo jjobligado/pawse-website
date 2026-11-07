@@ -19,7 +19,7 @@ This specification details the client-side operating system detection, adaptive 
 ## 2. Frontend Implementation Overview
 
 - **Hook File**: `hooks/use-platform.ts`
-- **UI Component**: `components/hero-section.tsx`
+- **UI Component**: `components/landing/hero-section.tsx`
 - **Hook Pattern**: Custom React 19 hook `usePlatform()` using `useSyncExternalStore` (zero SSR hydration mismatches).
 - **QA/Dev Switcher**: Allows developers and testers to preview any OS locally via `?os=windows`, `?os=mac`, `?os=linux`, or `?os=mobile` (automatically disabled in production).
 - **DOM Signifiers**: The main download anchor contains `data-os="{windows|mac|linux|mobile|other}"` for automated testing, analytics tracking, and script hooking.

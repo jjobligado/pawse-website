@@ -1,0 +1,76 @@
+import Image from "next/image";
+
+/** Static illustration of the PAWSE focus timer window. */
+export default function TimerMockup() {
+    return (
+        <div className="w-full lg:w-[56%] p-8 sm:py-12 sm:px-20 rounded-3xl border border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#D3EDFF_80%,#A8DCFF_100%)] flex items-center justify-center shrink-0">
+            <div className="relative w-[292px] h-[430px] bg-[#F6F8F7] rounded-lg shadow-[0px_0px_30px_0px_rgba(0,0,0,0.15)]">
+                {/* Timer Text */}
+                <div className="absolute left-[61px] top-[34px] w-[171px] h-[77px] flex items-start justify-center">
+                    <span className="font-pixel font-bold text-[56px] leading-none text-ink-strong text-center">
+                        24:49
+                    </span>
+                </div>
+
+                {/* Cycles (Fish Icons) */}
+                <div className="absolute left-[90px] top-[111px] h-4 flex items-center gap-1">
+                    <Image src="/images/fish.svg" alt="Completed cycle" width={25} height={25} />
+                    <Image src="/images/fish.svg" alt="Completed cycle" width={25} height={25} />
+                    <Image
+                        src="/images/fish.svg"
+                        alt="Remaining cycle"
+                        width={25}
+                        height={25}
+                        className="grayscale opacity-50"
+                    />
+                    <Image
+                        src="/images/fish.svg"
+                        alt="Remaining cycle"
+                        width={25}
+                        height={25}
+                        className="grayscale opacity-50"
+                    />
+                </div>
+
+                {/* Companion Sprite */}
+                <div className="absolute left-[36px] top-[150px] w-[220px] h-[220px]">
+                    <Image
+                        src="/images/tuxedo-cat.png"
+                        alt="Tuxedo Cat Companion"
+                        width={220}
+                        height={220}
+                        unoptimized
+                        className="w-full h-full object-cover [image-rendering:pixelated]"
+                    />
+                </div>
+
+                {/* Left Control Button (Audio) */}
+                <button
+                    type="button"
+                    aria-label="Toggle audio"
+                    className="absolute left-[76px] top-[358px] w-8 h-[31px] rounded-full bg-white border-[0.5px] border-[#DDDDDD] flex items-center justify-center"
+                >
+                    <Image src="/images/timer-icon-left.svg" alt="" width={16} height={16} />
+                </button>
+
+                {/* Center Control Button (Pause) */}
+                <button
+                    type="button"
+                    aria-label="Pause timer"
+                    className="absolute left-[124px] top-[351px] w-[44px] h-[45px] rounded-full bg-accent shadow-[0px_0px_4px_0px_rgba(255,255,255,0.25)] flex items-center justify-center"
+                >
+                    <Image src="/images/timer-icon-center.svg" alt="" width={44} height={45} />
+                </button>
+
+                {/* Right Control Button (Skip) */}
+                <button
+                    type="button"
+                    aria-label="Skip session"
+                    className="absolute left-[184px] top-[358px] w-8 h-[31px] rounded-full bg-white border-[0.5px] border-[#DDDDDD] flex items-center justify-center"
+                >
+                    <Image src="/images/timer-icon-right.svg" alt="" width={16} height={16} />
+                </button>
+            </div>
+        </div>
+    );
+}
