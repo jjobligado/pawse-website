@@ -215,41 +215,39 @@ export default function ContactSection() {
                             </div>
                         </fieldset>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4">
-                            <Field id="contact-name" label="Name" optional>
-                                <input
-                                    id="contact-name"
-                                    type="text"
-                                    name="name"
-                                    autoComplete="name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    maxLength={100}
-                                    disabled={isSending}
-                                    className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                                />
-                            </Field>
+                        <Field id="contact-name" label="Name" optional>
+                            <input
+                                id="contact-name"
+                                type="text"
+                                name="name"
+                                autoComplete="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                maxLength={100}
+                                disabled={isSending}
+                                className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                            />
+                        </Field>
 
-                            <Field id="contact-email" label="Email" error={errors.email}>
-                                <input
-                                    ref={emailRef}
-                                    id="contact-email"
-                                    type="email"
-                                    name="email"
-                                    autoComplete="email"
-                                    inputMode="email"
-                                    value={email}
-                                    onChange={(e) => updateEmail(e.target.value)}
-                                    placeholder="name@example.com"
-                                    maxLength={254}
-                                    disabled={isSending}
-                                    aria-required="true"
-                                    aria-invalid={errors.email ? true : undefined}
-                                    aria-describedby={errors.email ? "contact-email-error" : undefined}
-                                    className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                                />
-                            </Field>
-                        </div>
+                        <Field id="contact-email" label="Email" error={errors.email}>
+                            <input
+                                ref={emailRef}
+                                id="contact-email"
+                                type="email"
+                                name="email"
+                                autoComplete="email"
+                                inputMode="email"
+                                value={email}
+                                onChange={(e) => updateEmail(e.target.value)}
+                                placeholder="name@example.com"
+                                maxLength={254}
+                                disabled={isSending}
+                                aria-required="true"
+                                aria-invalid={errors.email ? true : undefined}
+                                aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                            />
+                        </Field>
 
                         <Field id="contact-message" label="Message" error={errors.message}>
                             <textarea
