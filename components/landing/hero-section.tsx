@@ -174,7 +174,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="relative w-full max-w-[1440px] mx-auto pt-28 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
+        <section id="hero" className="relative w-full max-w-[1440px] mx-auto pt-28 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
             {/* Ginger Companion (Upper Left on all screen sizes, balanced position) */}
             <div
                 ref={gingerParallaxRef}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { usePlatform } from "@/hooks/use-platform";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
 
@@ -11,6 +12,10 @@ export default function Header() {
     const [activeSection, setActiveSection] = useState<string>("");
     const [isDownloadPressed, setIsDownloadPressed] = useState(false);
     const { platform: detectedPlatform, config: platformInfo } = usePlatform();
+    // The header persists across page navigations, so the scrollspy re-binds per page.
+    const pathname = usePathname();
+    const router = useRouter();
+    const isHome = pathname === "/";
 
     useEffect(() => {
         const handleScroll = () => {
@@ -22,9 +27,10 @@ export default function Header() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Scrollspy: watch EVERY homepage section (not only the linked ones) so the
+    // highlight clears while reading sections that have no nav link (Focus, Break,
+    // Progress, the hero...) instead of sticking on the last linked one.
     useEffect(() => {
-        const sectionIds = ["how-it-works", "coming-soon", "contact"];
-
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -39,18 +45,17 @@ export default function Header() {
             }
         );
 
-        sectionIds.forEach((id) => {
-            const el = document.getElementById(id);
-            if (el) observer.observe(el);
-        });
+        document.querySelectorAll("main section[id]").forEach((el) => observer.observe(el));
 
         return () => observer.disconnect();
-    }, []);
+    }, [pathname]);
 
+    // "/#id" so the links also work from About / Privacy / Terms (they go back to the homepage).
     const navLinks = [
-        { label: "How It Works", href: "#how-it-works" },
-        { label: "Coming Soon", href: "#coming-soon" },
-        { label: "Contact Us", href: "#contact" },
+        { label: "How It Works", id: "how-it-works" },
+        { label: "Companions", id: "companions" },
+        { label: "FAQ", id: "faq" },
+        { label: "Contact", id: "contact" },
     ];
 
     const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -62,19 +67,20 @@ export default function Header() {
             const heroCTA = document.getElementById("hero-cta");
             if (heroCTA) {
                 smoothScrollTo(heroCTA);
+            } else {
+                // Not on the homepage: go to its download area instead.
+                router.push("/#hero-cta");
             }
         }
     };
 
-    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        if (href.startsWith("#")) {
-            const targetId = href.slice(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-                e.preventDefault();
-                smoothScrollTo(targetElement);
-                window.history.pushState(null, "", href);
-            }
+    // On the homepage, smooth-scroll in place; elsewhere let the link navigate to "/#id".
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+        const targetElement = document.getElementById(id);
+        if (targetElement) {
+            e.preventDefault();
+            smoothScrollTo(targetElement);
+            window.history.pushState(null, "", `#${id}`);
         }
     };
 
@@ -101,14 +107,15 @@ export default function Header() {
                 </Link>
 
                 {/* Nav Links (Visible on laptops & desktops where space permits) */}
-                <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
+                <nav aria-label="Main" className="hidden lg:flex items-center gap-7 xl:gap-9">
                     {navLinks.map((link) => {
-                        const isActive = activeSection === link.href.slice(1);
+                        const isActive = isHome && activeSection === link.id;
                         return (
                             <Link
-                                key={link.label}
-                                href={link.href}
-                                onClick={(e) => handleNavClick(e, link.href)}
+                                key={link.id}
+                                href={`/#${link.id}`}
+                                onClick={(e) => handleNavClick(e, link.id)}
+                                aria-current={isActive ? "location" : undefined}
                                 className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
                                     isActive
                                         ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
