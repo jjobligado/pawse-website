@@ -65,13 +65,13 @@ export default function ContactSection() {
             className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
         >
             <div className="flex justify-center items-center">
-                <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
+                <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-center leading-[1.1]">
                     Contact Us
                 </h2>
             </div>
 
             <div className="px-4 md:px-10 flex justify-center items-center">
-                <p className="max-w-[640px] text-base md:text-lg text-[#5F5F5F] text-center leading-relaxed">
+                <p className="max-w-[640px] text-base md:text-lg text-muted text-center leading-relaxed">
                     Have a question, spotted a bug, want to suggest a new
                     feature, or share feedback on your experience? Drop us a
                     message below and we&apos;ll get back to you.
@@ -96,18 +96,18 @@ export default function ContactSection() {
                             </svg>
                         </div>
 
-                        <h3 className="font-pixel text-2xl md:text-3xl font-semibold text-[#232323]">
+                        <h3 className="font-pixel text-2xl md:text-3xl font-semibold text-ink">
                             Message Sent!
                         </h3>
 
-                        <p className="max-w-[440px] text-sm sm:text-base text-[#5F5F5F] leading-relaxed">
+                        <p className="max-w-[440px] text-sm sm:text-base text-muted leading-relaxed">
                             Thanks for reaching out{name ? `, ${name}` : ""}!
                             We&apos;ve received your{" "}
-                            <span className="font-medium text-[#232323]">
+                            <span className="font-medium text-ink">
                                 {activeTopic.label.toLowerCase()}
                             </span>{" "}
                             note and will get back to you at{" "}
-                            <span className="font-medium text-[#232323]">
+                            <span className="font-medium text-ink">
                                 {email}
                             </span>{" "}
                             soon.
@@ -116,7 +116,7 @@ export default function ContactSection() {
                         <button
                             type="button"
                             onClick={handleReset}
-                            className="mt-2 py-2.5 px-6 rounded-full bg-white border-2 border-stroke hover:border-accent text-sm font-medium text-[#232323] transition-colors duration-200 cursor-pointer"
+                            className="mt-2 py-2.5 px-6 rounded-full bg-white border-2 border-stroke hover:border-accent text-sm font-medium text-ink transition-colors duration-200 cursor-pointer"
                         >
                             Send another message
                         </button>
@@ -128,7 +128,7 @@ export default function ContactSection() {
                     >
                         {/* Topic Pills (Single-line labels, left-aligned) */}
                         <div className="flex flex-col items-start gap-2.5">
-                            <span className="text-sm font-medium text-[#232323]">
+                            <span className="text-sm font-medium text-ink">
                                 What can we help you with?
                             </span>
                             <div
@@ -150,7 +150,7 @@ export default function ContactSection() {
                                             className={`px-2.5 sm:px-3.5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium border whitespace-nowrap text-left transition-all duration-150 cursor-pointer select-none ${
                                                 isActive
                                                     ? "bg-accent text-white border-accent shadow-[0px_4px_12px_0px_rgba(53,166,241,0.28)]"
-                                                    : "bg-white text-[#4B5563] border-stroke hover:border-accent hover:text-[#232323]"
+                                                    : "bg-white text-ink-soft border-stroke hover:border-accent hover:text-ink"
                                             }`}
                                         >
                                             {topic.label}
@@ -165,11 +165,11 @@ export default function ContactSection() {
                             <div className="flex items-center justify-between">
                                 <label
                                     htmlFor="contact-name"
-                                    className="text-sm font-medium text-[#232323]"
+                                    className="text-sm font-medium text-ink"
                                 >
                                     Name
                                 </label>
-                                <span className="text-xs text-[#71717A]">
+                                <span className="text-xs text-subtle">
                                     Optional
                                 </span>
                             </div>
@@ -180,7 +180,7 @@ export default function ContactSection() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="Your name"
-                                className="h-[46px] px-4 rounded-xl bg-white border-2 border-stroke text-sm md:text-base text-[#232323] placeholder:text-[#9CA3AF] transition-all duration-200 focus:outline-none focus:border-accent focus:shadow-[0_0_0_4px_rgba(168,220,255,0.4)]"
+                                className="h-[46px] px-4 rounded-xl bg-white border-2 border-stroke text-sm md:text-base text-ink placeholder:text-faint transition-all duration-200 focus:outline-none focus:border-accent focus:shadow-[0_0_0_4px_rgba(168,220,255,0.4)]"
                             />
                         </div>
 
@@ -188,7 +188,7 @@ export default function ContactSection() {
                         <div className="flex flex-col gap-1.5">
                             <label
                                 htmlFor="contact-email"
-                                className="text-sm font-medium text-[#232323]"
+                                className="text-sm font-medium text-ink"
                             >
                                 Email
                             </label>
@@ -200,7 +200,7 @@ export default function ContactSection() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="you@example.com"
                                 required
-                                className="h-[46px] px-4 rounded-xl bg-white border-2 border-stroke text-sm md:text-base text-[#232323] placeholder:text-[#9CA3AF] transition-all duration-200 focus:outline-none focus:border-accent focus:shadow-[0_0_0_4px_rgba(168,220,255,0.4)]"
+                                className="h-[46px] px-4 rounded-xl bg-white border-2 border-stroke text-sm md:text-base text-ink placeholder:text-faint transition-all duration-200 focus:outline-none focus:border-accent focus:shadow-[0_0_0_4px_rgba(168,220,255,0.4)]"
                             />
                         </div>
 
@@ -208,7 +208,7 @@ export default function ContactSection() {
                         <div className="flex flex-col gap-1.5">
                             <label
                                 htmlFor="contact-message"
-                                className="text-sm font-medium text-[#232323]"
+                                className="text-sm font-medium text-ink"
                             >
                                 Message
                             </label>
@@ -220,7 +220,7 @@ export default function ContactSection() {
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder={activeTopic.placeholder}
                                 required
-                                className="p-4 rounded-xl bg-white border-2 border-stroke text-sm md:text-base text-[#232323] placeholder:text-[#9CA3AF] resize-y transition-all duration-200 focus:outline-none focus:border-accent focus:shadow-[0_0_0_4px_rgba(168,220,255,0.4)]"
+                                className="p-4 rounded-xl bg-white border-2 border-stroke text-sm md:text-base text-ink placeholder:text-faint resize-y transition-all duration-200 focus:outline-none focus:border-accent focus:shadow-[0_0_0_4px_rgba(168,220,255,0.4)]"
                             />
                         </div>
 
@@ -228,7 +228,7 @@ export default function ContactSection() {
                         <div className="pt-2 flex justify-center">
                             <button
                                 type="submit"
-                                className="w-full sm:w-auto flex items-center justify-center py-2.5 px-10 rounded-full bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE] text-white font-pixel text-lg shadow-[0px_4px_18px_0px_rgba(53,166,241,0.28)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer"
+                                className="w-full sm:w-auto flex items-center justify-center py-2.5 px-10 rounded-full bg-accent hover:bg-accent-hover active:bg-accent-active text-white font-pixel text-lg shadow-[0px_4px_18px_0px_rgba(53,166,241,0.28)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer"
                             >
                                 Send Message
                             </button>

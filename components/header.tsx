@@ -95,7 +95,7 @@ export default function Header() {
                         className="h-[22px] sm:h-[28px] w-auto object-contain group-hover:scale-110 transition-transform duration-300 ease-in-out"
                         priority
                     />
-                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-[#232323] leading-none flex items-center">
+                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
                         PAWSE
                     </span>
                 </Link>
@@ -112,7 +112,7 @@ export default function Header() {
                                 className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
                                     isActive
                                         ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
-                                        : "text-[#5F5F5F] hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
+                                        : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
                                 }`}
                             >
                                 {link.label}
@@ -128,10 +128,10 @@ export default function Header() {
                     download={platformInfo.fileName}
                     onClick={handleDownloadClick}
                     data-os={detectedPlatform}
-                    className={`h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#232323] focus-visible:ring-offset-2 cursor-pointer shrink-0 select-none ${
+                    className={`h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 cursor-pointer shrink-0 select-none ${
                         isDownloadPressed
                             ? "bg-[#111111]"
-                            : "bg-[#232323] hover:bg-[#3F3F46] active:bg-[#111111]"
+                            : "bg-ink hover:bg-[#3F3F46] active:bg-[#111111]"
                     }`}
                 >
                     <span className="font-pixel text-sm sm:text-[17px] font-medium tracking-wide leading-none">

@@ -120,7 +120,7 @@ function TimerMockup() {
             <div className="relative w-[292px] h-[430px] bg-[#F6F8F7] rounded-lg shadow-[0px_0px_30px_0px_rgba(0,0,0,0.15)]">
                 {/* Timer Text */}
                 <div className="absolute left-[61px] top-[34px] w-[171px] h-[77px] flex items-start justify-center">
-                    <span className="font-pixel font-bold text-[56px] leading-none text-[#141414] text-center">
+                    <span className="font-pixel font-bold text-[56px] leading-none text-ink-strong text-center">
                         24:49
                     </span>
                 </div>
@@ -200,11 +200,11 @@ export default function HomePage() {
                 className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-6 bg-white"
             >
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-center leading-[1.1]">
                         How it Works
                     </h2>
                 </div>
-                <p className="text-base md:text-lg text-[#5F5F5F] text-center">
+                <p className="text-base md:text-lg text-muted text-center">
                     From choosing your companion to seeing your productivity grow.
                 </p>
 
@@ -225,7 +225,7 @@ export default function HomePage() {
                                                 {step.number}
                                             </span>
                                         </div>
-                                        <h3 className="text-lg font-semibold text-[#141414] group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em] leading-snug">
+                                        <h3 className="text-lg font-semibold text-ink-strong group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em] leading-snug">
                                             <span className="block whitespace-nowrap">
                                                 {step.titleLines[0]}
                                             </span>
@@ -234,7 +234,7 @@ export default function HomePage() {
                                             </span>
                                         </h3>
                                     </div>
-                                    <p className="w-full text-sm sm:text-base lg:text-sm xl:text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
+                                    <p className="w-full text-sm sm:text-base lg:text-sm xl:text-base text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed">
                                         {/* Stacked arrangement (<lg): 2 lines across all cards */}
                                         <span className="block lg:hidden">
                                             {step.stacked.map((line, idx) => (
@@ -302,19 +302,19 @@ export default function HomePage() {
 
                 <div className="relative z-10 w-full max-w-[1140px] flex flex-col items-center gap-6">
                     <div className="flex justify-center items-center">
-                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
+                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-center leading-[1.1]">
                             Meet your Companions
                         </h2>
                     </div>
 
-                    <p className="text-base md:text-lg text-[#5F5F5F] text-center">
+                    <p className="text-base md:text-lg text-muted text-center">
                         Every session comes with company.
                     </p>
 
                     {/* Stacked Cards Interactive Group */}
                     <CompanionCards />
 
-                    <p className="text-base md:text-lg text-[#5F5F5F] text-center">
+                    <p className="text-base md:text-lg text-muted text-center">
                         Pick the pace that matches how you actually focus.
                     </p>
                 </div>
@@ -324,11 +324,11 @@ export default function HomePage() {
             <section className="w-full max-w-[1280px] mx-auto py-12 md:py-16 px-6 md:px-12 lg:px-20 flex flex-col items-stretch gap-8 bg-white">
                 <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
                     <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-left leading-[1.1]">
+                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-left leading-[1.1]">
                             <span className="block whitespace-nowrap">Your quiet</span>
                             <span className="block whitespace-nowrap">co-working space</span>
                         </h2>
-                        <p className="text-base md:text-lg text-[#5F5F5F] text-left leading-relaxed">
+                        <p className="text-base md:text-lg text-muted text-left leading-relaxed">
                             No jarring alarms. No visual clutter. While your timer counts
                             down, your companion settles into their own low-stimulation
                             routine—whether that&apos;s reading a book, napping, or making
@@ -346,11 +346,11 @@ export default function HomePage() {
                     <TimerMockup />
 
                     <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-left leading-[1.1]">
+                        <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-left leading-[1.1]">
                             <span className="block whitespace-nowrap">Time to play</span>
                             <span className="block whitespace-nowrap">and recharge</span>
                         </h2>
-                        <p className="text-base md:text-lg text-[#5F5F5F] text-left leading-relaxed">
+                        <p className="text-base md:text-lg text-muted text-left leading-relaxed">
                             When the interval ends, the quiet time is over. Your companion
                             wakes up ready for energetic playtime. Trigger unique animations,
                             read their random thoughts, and give your brain a mindful break
@@ -363,12 +363,12 @@ export default function HomePage() {
             {/* Pomodoro Analytics / Dashboard */}
             <DashboardSpreadSection>
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-center leading-[1.1]">
                         Dashboard
                     </h2>
                 </div>
 
-                <p className="text-base md:text-lg text-[#5F5F5F] text-center">
+                <p className="text-base md:text-lg text-muted text-center">
                     Every session adds to the bigger picture. Watch your focus habit
                     take shape over time.
                 </p>
@@ -391,7 +391,7 @@ export default function HomePage() {
                                             className="w-full h-full object-contain"
                                         />
                                     </div>
-                                    <p className="flex-1 text-base md:text-lg text-[#232323] text-left">
+                                    <p className="flex-1 text-base md:text-lg text-ink text-left">
                                         {item}
                                     </p>
                                 </div>
@@ -418,13 +418,13 @@ export default function HomePage() {
                 className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-12 xl:px-16 2xl:px-20 flex flex-col items-stretch gap-6 bg-white"
             >
                 <div className="flex justify-center items-center">
-                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-center leading-[1.1]">
                         Coming Soon...
                     </h2>
                 </div>
 
                 <div className="px-4 md:px-10 flex justify-center items-center">
-                    <p className="text-base md:text-lg text-[#5F5F5F] text-center">
+                    <p className="text-base md:text-lg text-muted text-center">
                         We&apos;re just getting started! Here’s a sneak peek at what’s next
                         for PAWSE.
                     </p>
@@ -452,11 +452,11 @@ export default function HomePage() {
                                         className="w-10 h-10 object-contain"
                                     />
                                 </div>
-                                <h3 className="text-lg md:text-xl font-semibold text-[#141414] group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em]">
+                                <h3 className="text-lg md:text-xl font-semibold text-ink-strong group-hover:text-black transition-colors duration-300 text-center tracking-[0.01em]">
                                     {item.title}
                                 </h3>
                             </div>
-                            <p className="relative z-10 w-full text-sm sm:text-base lg:text-sm xl:text-[15px] 2xl:text-base text-[#4B5563] group-hover:text-[#232323] transition-colors duration-300 text-center leading-relaxed">
+                            <p className="relative z-10 w-full text-sm sm:text-base lg:text-sm xl:text-[15px] 2xl:text-base text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed">
                                 {/* 2-line layout: stacked (<md) and wide desktop (lg:) */}
                                 <span className="block md:hidden lg:block">
                                     {item.lines2.map((line, idx) => (

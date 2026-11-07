@@ -208,18 +208,18 @@ export default function HeroSection() {
                             <div
                                 role="status"
                                 aria-live="polite"
-                                className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
+                                className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
                                     activeDialogueCat === "ginger"
                                         ? "opacity-100 translate-y-0 scale-100"
                                         : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                 }`}
                             >
-                                <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
+                                <span className="font-pixel text-[11px] sm:text-xs font-semibold text-ink">
                                     {CAT_DIALOGUES.ginger[dialogueIndices.ginger]}
                                 </span>
                                 <span
                                     aria-hidden="true"
-                                    className="absolute -bottom-[5px] left-5 sm:left-1/2 sm:-translate-x-1/2 w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
+                                    className="absolute -bottom-[5px] left-5 sm:left-1/2 sm:-translate-x-1/2 w-2 h-2 bg-white border-r-2 border-b-2 border-ink rotate-45"
                                 />
                             </div>
                             <Image
@@ -239,7 +239,7 @@ export default function HeroSection() {
             {/* Centered Hero Copy & Actions */}
             <div className="relative z-30 w-full flex flex-col items-center gap-6 px-6 md:px-10">
                 <div className="w-full flex justify-center items-center">
-                    <h1 className="font-pixel text-[clamp(2.35rem,4.5vw+1.1rem,5rem)] font-semibold text-[#232323] text-center leading-[1.02]">
+                    <h1 className="font-pixel text-[clamp(2.35rem,4.5vw+1.1rem,5rem)] font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
                             The Coziest Way
                         </span>
@@ -340,7 +340,7 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-[#5F5F5F] text-center tracking-[0.01em] leading-relaxed">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed">
                         A desktop productivity app combining a focus timer with a virtual
                         companion. Built for students, professionals, and cat lovers.
                     </p>
@@ -360,7 +360,7 @@ export default function HeroSection() {
                                 className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
                                     copied
                                         ? "bg-[#10B981] hover:bg-[#059669]"
-                                        : "bg-accent hover:bg-[#2394DF] active:bg-[#1B7FBE]"
+                                        : "bg-accent hover:bg-accent-hover active:bg-accent-active"
                                 }`}
                             >
                                 {copied ? (
@@ -428,18 +428,18 @@ export default function HeroSection() {
                                             <div
                                                 role="status"
                                                 aria-live="polite"
-                                                className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
+                                                className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
                                                     activeDialogueCat === "tuxedo"
                                                         ? "opacity-100 translate-y-0 scale-100"
                                                         : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                                 }`}
                                             >
-                                                <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
+                                                <span className="font-pixel text-[11px] sm:text-xs font-semibold text-ink">
                                                     {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
                                                 </span>
                                                 <span
                                                     aria-hidden="true"
-                                                    className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
+                                                    className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-ink rotate-45"
                                                 />
                                             </div>
                                             <Image
@@ -461,7 +461,7 @@ export default function HeroSection() {
                     {/* Secondary Contextual Meta-Row */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#5F5F5F] tracking-[0.02em] animate-hero-fade-up-3b"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
@@ -524,7 +524,7 @@ export default function HeroSection() {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {/* Platform Icon Badge */}
-                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent text-[#232323] group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
+                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
                                                         {item.id === "windows" && (
                                                             <svg
                                                                 width="15"
@@ -561,17 +561,17 @@ export default function HeroSection() {
                                                     </div>
 
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-semibold text-[#141414] group-hover/item:text-black">
+                                                        <span className="text-sm font-semibold text-ink-strong group-hover/item:text-black">
                                                             {item.name}
                                                         </span>
-                                                        <span className="text-[11px] text-[#5F5F5F] whitespace-nowrap">
+                                                        <span className="text-[11px] text-muted whitespace-nowrap">
                                                             {item.subtitle}
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 {/* File Format & Download Action */}
-                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-[#5F5F5F] group-hover/item:text-accent shrink-0 transition-colors">
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-accent shrink-0 transition-colors">
                                                     {item.extension}
                                                     <svg
                                                         width="13"
@@ -662,18 +662,18 @@ export default function HeroSection() {
                                     <div
                                         role="status"
                                         aria-live="polite"
-                                        className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
+                                        className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
                                             activeDialogueCat === "void"
                                                 ? "opacity-100 translate-y-0 scale-100"
                                                 : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                         }`}
                                     >
-                                        <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
+                                        <span className="font-pixel text-[11px] sm:text-xs font-semibold text-ink">
                                             {CAT_DIALOGUES.void[dialogueIndices.void]}
                                         </span>
                                         <span
                                             aria-hidden="true"
-                                            className="absolute -bottom-[5px] left-5 sm:left-1/2 sm:-translate-x-1/2 w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
+                                            className="absolute -bottom-[5px] left-5 sm:left-1/2 sm:-translate-x-1/2 w-2 h-2 bg-white border-r-2 border-b-2 border-ink rotate-45"
                                         />
                                     </div>
                                     <Image
@@ -691,7 +691,7 @@ export default function HeroSection() {
                     </div>
 
                     <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-3xl border-2 border-stroke bg-[linear-gradient(180deg,#F8FAFC_0%,#EBF6FF_100%)] shadow-[0px_12px_40px_0px_rgba(0,0,0,0.08)] flex items-center justify-center p-6">
-                        <span className="font-pixel text-lg md:text-xl text-[#5F5F5F]/60 select-none">
+                        <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
                             App Visuals Preview
                         </span>
                     </div>
