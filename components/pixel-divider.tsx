@@ -21,25 +21,29 @@ interface PixelDividerProps {
 const TOTAL_COLS = 76;
 const CENTER_COL = (TOTAL_COLS - 1) / 2;
 
-// Exact integer column indices (0..75) from the 76x2 Figma grid for the dense base row
+// Row 0: Full 76-column solid blue pixel row bridging the gradient/footer and the 2 scattered rows
+const SOLID_ROW_COLS = Array.from({ length: TOTAL_COLS }, (_, i) => i);
+
+// Row 1: Exact integer column indices (0..75) from the Figma grid for the dense middle row
 const BASE_ROW_COLS = [
     0, 1, 2, 3, 5, 6, 8, 9, 11, 12, 14, 16, 19, 20, 22, 23, 24, 26, 29, 30, 31,
     35, 36, 38, 41, 42, 43, 45, 47, 48, 49, 50, 52, 55, 56, 57, 58, 60, 62, 63,
     66, 67, 69, 70, 71, 73, 74, 75,
 ];
 
-// Exact integer column indices (0..75) from the 76x2 Figma grid for the outer scattered row
+// Row 2: Exact integer column indices (0..75) from the Figma grid for the outer scattered row
 const OUTER_ROW_COLS = [
     0, 1, 5, 9, 10, 13, 15, 18, 20, 21, 23, 26, 27, 30, 32, 33, 35, 37, 40, 42,
     46, 48, 53, 54, 58, 59, 62, 65, 66, 68, 74, 75,
 ];
 
+const SOLID_ROW_SET = new Set(SOLID_ROW_COLS);
 const BASE_ROW_SET = new Set(BASE_ROW_COLS);
 const OUTER_ROW_SET = new Set(OUTER_ROW_COLS);
 
 interface PixelWindow {
     col: number;
-    isOuterRow: boolean;
+    rowIndex: 0 | 1 | 2;
     x: number;
     width: number;
     startP: number;
@@ -49,16 +53,20 @@ interface PixelWindow {
 function buildPixelWindows(): PixelWindow[] {
     const windows: PixelWindow[] = [];
 
-    const addRow = (cols: number[], rowSet: Set<number>, isOuterRow: boolean) => {
+    const addRow = (
+        cols: number[],
+        rowSet: Set<number>,
+        rowIndex: 0 | 1 | 2
+    ) => {
         for (const col of cols) {
             const distFromCenter = Math.abs(col - CENTER_COL) / CENTER_COL;
-            const hash = (col * 41 + (isOuterRow ? 19 : 7)) % 11;
+            const hash = (col * 41 + (rowIndex + 1) * 13) % 11;
 
-            // Curved center-out arc (matching the circular gradient wave front) + organic per-pixel digital jitter
+            // Curved center-out arc + organic per-pixel digital jitter
             const arcDistance = Math.pow(distFromCenter, 1.25);
-            const waveOffset = arcDistance * 0.36 + (hash / 10) * 0.16;
-            // Outer row blinks in right after the base row in that column
-            const rowOffset = isOuterRow ? 0.22 : 0;
+            const waveOffset = arcDistance * 0.30 + (hash / 10) * 0.14;
+            // Sequential cascade across the 3 rows (Row 0 -> Row 1 -> Row 2)
+            const rowOffset = rowIndex * 0.16;
             const duration = 0.24;
 
             const startP = waveOffset + rowOffset;
@@ -74,7 +82,7 @@ function buildPixelWindows(): PixelWindow[] {
 
             windows.push({
                 col,
-                isOuterRow,
+                rowIndex,
                 x,
                 width,
                 startP,
@@ -83,8 +91,9 @@ function buildPixelWindows(): PixelWindow[] {
         }
     };
 
-    addRow(BASE_ROW_COLS, BASE_ROW_SET, false);
-    addRow(OUTER_ROW_COLS, OUTER_ROW_SET, true);
+    addRow(SOLID_ROW_COLS, SOLID_ROW_SET, 0);
+    addRow(BASE_ROW_COLS, BASE_ROW_SET, 1);
+    addRow(OUTER_ROW_COLS, OUTER_ROW_SET, 2);
     return windows;
 }
 
@@ -214,35 +223,48 @@ export default function PixelDivider({
         };
     }, [applyPixelProgress, onRegisterUpdater]);
 
-    // Sub-pixel overlap bleed prevents hairline gaps between adjacent pixels
-    // and between the divider and the adjacent #A8DCFF section at any screen size or zoom level.
-    const baseRowY = direction === "down" ? -0.06 : 0.96;
-    const baseRowHeight = 1.12;
-    const outerRowY = direction === "down" ? 0.96 : 0;
-    const outerRowHeight = 1.04;
+    // Sub-pixel overlap bleed across all 3 rows prevents hairline gaps between adjacent pixels
+    // and between Row 0 and the adjacent #A8DCFF section at any screen size or zoom level.
+    const getRowY = (rowIndex: 0 | 1 | 2) => {
+        if (direction === "down") {
+            if (rowIndex === 0) return -0.06;
+            if (rowIndex === 1) return 0.95;
+            return 1.96;
+        } else {
+            if (rowIndex === 0) return 1.94;
+            if (rowIndex === 1) return 0.95;
+            return 0;
+        }
+    };
+
+    const getRowHeight = (rowIndex: 0 | 1 | 2) => {
+        if (rowIndex === 0) return 1.12;
+        if (rowIndex === 1) return 1.1;
+        return 1.04;
+    };
 
     const seamOverlapClass = direction === "down" ? "-mt-px" : "-mb-px";
 
     return (
         <svg
             ref={svgRef}
-            viewBox="0 0 76 2"
+            viewBox="0 0 76 3"
             preserveAspectRatio="none"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
-            className={`w-full aspect-[76/2] block select-none ${seamOverlapClass} ${className}`}
+            className={`w-full aspect-[76/3] block select-none ${seamOverlapClass} ${className}`}
         >
             {pixelWindows.map((pw, idx) => (
                 <rect
-                    key={`${pw.isOuterRow ? "outer" : "base"}-${pw.col}`}
+                    key={`row-${pw.rowIndex}-col-${pw.col}`}
                     ref={(el) => {
                         rectRefs.current[idx] = el;
                     }}
                     x={pw.x}
-                    y={pw.isOuterRow ? outerRowY : baseRowY}
+                    y={getRowY(pw.rowIndex)}
                     width={pw.width}
-                    height={pw.isOuterRow ? outerRowHeight : baseRowHeight}
+                    height={getRowHeight(pw.rowIndex)}
                     fill="#A8DCFF"
                     style={{
                         opacity: 0,
@@ -271,34 +293,36 @@ export function DashboardSpreadSection({ children }: { children: ReactNode }) {
         const applyUnifiedProgress = (p: number) => {
             const gradEl = gradientRef.current;
             if (gradEl) {
-                // Phase 1 (p: 0.00 -> 0.70): True circular radial spread from top-center (50% 0%)
-                // with zero rectangular scaling, expanding as a pure circle across the section.
-                const gradP = Math.min(Math.max(p / 0.70, 0), 1);
-                const easedGrad = 1 - Math.pow(1 - gradP, 1.85);
+                // Phase 1 (p: 0.00 -> 0.68): Top-to-bottom spread with zero scaleY compression
+                // and a wide 65%-tall multi-stop sine-eased vertical blend so there is never a harsh horizontal line.
+                const gradP = Math.min(Math.max(p / 0.68, 0), 1);
+                const easedGrad = 1 - Math.pow(1 - gradP, 1.8);
 
                 const opacity = Math.min(gradP * 3.5, 1);
 
-                // Pure circular reveal mask (circle farthest-corner at 50% 0%):
-                // - Expands from 0% radius at top-center out to 122% (covering the farthest bottom corners)
-                // - Bottom of the circle touches bottom-center first, then sweeps outward to the left/right corners
-                const outerR = easedGrad * 122;
-                const midR = easedGrad * 108;
-                const solidR = Math.max(0, easedGrad * 101 - (1 - easedGrad) * 16);
+                // The leading mist sweeps from 0% to 165%, with a 65%-tall feathered transition zone
+                const front = easedGrad * 165;
+                const s0 = Math.max(0, front - 65);
+                const s1 = Math.max(0, front - 50);
+                const s2 = Math.max(0, front - 35);
+                const s3 = Math.max(0, front - 20);
+                const s4 = Math.max(0, front - 8);
 
                 const mask =
                     easedGrad >= 0.995
                         ? "none"
-                        : `radial-gradient(circle farthest-corner at 50% 0%, #000 0%, #000 ${solidR.toFixed(1)}%, rgba(0,0,0,0.45) ${midR.toFixed(1)}%, transparent ${outerR.toFixed(1)}%)`;
+                        : `linear-gradient(180deg, #000 0%, #000 ${s0.toFixed(1)}%, rgba(0,0,0,0.82) ${s1.toFixed(1)}%, rgba(0,0,0,0.52) ${s2.toFixed(1)}%, rgba(0,0,0,0.22) ${s3.toFixed(1)}%, rgba(0,0,0,0.06) ${s4.toFixed(1)}%, transparent ${front.toFixed(1)}%)`;
 
                 gradEl.style.opacity = opacity.toFixed(3);
                 gradEl.style.webkitMaskImage = mask;
                 gradEl.style.maskImage = mask;
             }
 
-            // Phase 2 (p: 0.36 -> 1.00): Center pixels sprout right as the bottom of the circle
-            // touches the bottom-center seam (p = 0.36), rippling outward along the circular arc!
+            // Phase 2 (p: 0.34 -> 1.00): Row 0 (solid 76-pixel blue row) blinks in right as the
+            // soft vertical gradient blend arrives at the bottom border, smoothly merging the gradient
+            // into Row 1 and Row 2!
             if (pixelUpdaterRef.current) {
-                const pixelP = Math.min(Math.max((p - 0.36) / 0.64, 0), 1);
+                const pixelP = Math.min(Math.max((p - 0.34) / 0.66, 0), 1);
                 pixelUpdaterRef.current(pixelP);
             }
         };
