@@ -11,7 +11,7 @@ const FEATURES = [
 
 export default function DashboardSection() {
     return (
-        <DashboardSpreadSection>
+        <DashboardSpreadSection id="progress">
             <SectionTitle>Dashboard</SectionTitle>
             <SectionSubtitle>
                 Every session adds to the bigger picture. Watch your focus habit take
