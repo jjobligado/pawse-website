@@ -46,7 +46,7 @@ export default function Footer() {
                 <div className="flex flex-col gap-1 text-xs md:text-sm tracking-[0.02em] text-ink">
                     <a
                         href={`mailto:${CONTACT_EMAIL}`}
-                        className="w-fit underline decoration-accent decoration-2 underline-offset-4 hover:decoration-ink"
+                        className="w-fit link-underline hover:decoration-muted"
                     >
                         {CONTACT_EMAIL}
                     </a>
@@ -66,7 +66,7 @@ export default function Footer() {
                                 <li key={link.href}>
                                     <Link
                                         href={link.href}
-                                        className="text-[15px] text-ink underline-offset-4 decoration-accent decoration-2 hover:underline"
+                                        className="text-[15px] text-ink hover:link-underline"
                                     >
                                         {link.label}
                                     </Link>

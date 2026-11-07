@@ -428,3 +428,15 @@ body {
 .animate-fluid-bottom {
   animation: fluid-flow-bottom 12s ease-in-out 1.2s infinite alternate;
 }
+
+/*
+ * Text links: ink underline (never blue), thin, with a little breathing room.
+ * Hover lightens the underline. Change the weight here to update every link.
+ * Footer links use `hover:link-underline` so the underline only appears on hover.
+ */
+@utility link-underline {
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}

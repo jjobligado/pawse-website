@@ -456,11 +456,13 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* Secondary Contextual Meta-Row */}
+                    {/* Secondary meta row: the key fact + other platforms, one quiet line */}
                     <div
                         suppressHydrationWarning
                         className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b"
                     >
+                        <span>Free to download</span>
+                        <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
                         ) : (
@@ -590,62 +592,7 @@ export default function HeroSection() {
                                 </div>
                             </div>
                         )}
-
-                        <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
-
-                        {/* View on GitHub */}
-                        <Link
-                            href="https://github.com/educ-jkescritor/Pawse"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 hover:text-black transition-colors duration-200 group"
-                        >
-                            <span className="transition-colors duration-200 group-hover:[-webkit-text-stroke:0.35px_currentColor]">
-                                View on GitHub
-                            </span>
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                                className="w-4 h-4 transition-colors duration-200 group-hover:text-black"
-                            >
-                                <path
-                                    d="M6 12H18"
-                                    stroke="currentColor"
-                                    strokeWidth="1"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
-                                />
-                                <path
-                                    d="M12 6L18 12L12 18"
-                                    stroke="currentColor"
-                                    strokeWidth="1"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
-                                />
-                            </svg>
-                        </Link>
                     </div>
-
-                    {/* Trust line: answers "is there a catch?" before anyone has to ask */}
-                    <ul
-                        aria-label="Download details"
-                        className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-[13px] text-subtle tracking-[0.02em] animate-hero-fade-up-3b"
-                    >
-                        {["Free to download", "No account needed", "Works offline"].map((item, i) => (
-                            <li key={item} className="flex items-center gap-2">
-                                {i > 0 && (
-                                    <span aria-hidden="true" className="w-1 h-1 rounded-full bg-[#C4C4C8]" />
-                                )}
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
                 </div>
             </div>
 

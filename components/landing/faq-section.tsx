@@ -92,7 +92,7 @@ const FAQS: { question: string; answer: ReactNode }[] = [
                 Send us a message through the{" "}
                 <a
                     href="#contact"
-                    className="font-medium text-ink underline decoration-accent decoration-2 underline-offset-4 hover:decoration-ink"
+                    className="font-medium text-ink link-underline hover:decoration-muted"
                 >
                     contact form
                 </a>{" "}
