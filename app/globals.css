@@ -206,17 +206,33 @@ body {
   animation: hero-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.7s forwards;
 }
 
+/*
+ * CTA aura: the glow lives on a pseudo-element and only its opacity animates,
+ * so it runs on the compositor instead of repainting box-shadow every frame.
+ * It pulses three times to draw the eye on arrival, then rests.
+ */
 @keyframes cta-aura-pulse {
   0%, 100% {
-    box-shadow: 0px 0px 22px 0px rgba(53, 166, 241, 0.25);
+    opacity: 0;
   }
   50% {
-    box-shadow: 0px 0px 32px 3px rgba(53, 166, 241, 0.45);
+    opacity: 1;
   }
 }
 
 .animate-cta-aura {
-  animation: cta-aura-pulse 3.6s ease-in-out infinite;
+  position: relative;
+}
+
+.animate-cta-aura::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0px 0px 32px 3px rgba(53, 166, 241, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  animation: cta-aura-pulse 3.6s ease-in-out 1.2s 3;
 }
 
 
@@ -320,66 +336,59 @@ body {
   animation: fish-swim-gentle 2.4s ease-in-out 0.6s infinite;
 }
 
-/* Dynamic Fluid Blue Currents */
+/*
+ * Dynamic Fluid Blue Currents
+ * Only transform/opacity animate (compositor-only). Animating border-radius
+ * under a 30-56px blur forced a full re-blur every frame, and the corner shape
+ * is invisible under that much blur anyway. Slow cycles keep the section calm.
+ */
 @keyframes fluid-flow-left {
   0% {
     transform: translate3d(0px, 0px, 0) scale(0.96) rotate(0deg);
-    border-radius: 54% 46% 42% 58% / 60% 40% 60% 40%;
   }
   50% {
     transform: translate3d(150px, 50px, 0) scale(1.14) rotate(14deg);
-    border-radius: 42% 58% 62% 38% / 40% 60% 40% 60%;
   }
   100% {
     transform: translate3d(35px, -45px, 0) scale(1.02) rotate(-10deg);
-    border-radius: 60% 40% 52% 48% / 52% 48% 52% 48%;
   }
 }
 
 @keyframes fluid-flow-right {
   0% {
     transform: translate3d(0px, 0px, 0) scale(1) rotate(0deg);
-    border-radius: 46% 54% 60% 40% / 50% 50% 50% 50%;
   }
   50% {
     transform: translate3d(-160px, -50px, 0) scale(1.15) rotate(-16deg);
-    border-radius: 62% 38% 44% 56% / 38% 62% 38% 62%;
   }
   100% {
     transform: translate3d(-50px, 45px, 0) scale(0.95) rotate(12deg);
-    border-radius: 40% 60% 56% 44% / 58% 42% 58% 42%;
   }
 }
 
 @keyframes fluid-flow-bottom {
   0% {
     transform: translate3d(0px, 0px, 0) scale(0.94);
-    border-radius: 50% 50% 45% 55% / 55% 45% 55% 45%;
     opacity: 0.88;
   }
   50% {
     transform: translate3d(45px, -110px, 0) scale(1.16);
-    border-radius: 42% 58% 56% 44% / 45% 55% 45% 55%;
     opacity: 1;
   }
   100% {
     transform: translate3d(-35px, -50px, 0) scale(1.02);
-    border-radius: 58% 42% 48% 52% / 52% 48% 52% 48%;
     opacity: 0.92;
   }
 }
 
 .animate-fluid-left {
-  animation: fluid-flow-left 6.5s ease-in-out infinite alternate;
-  will-change: transform, border-radius;
+  animation: fluid-flow-left 14s ease-in-out infinite alternate;
 }
 
 .animate-fluid-right {
-  animation: fluid-flow-right 7.2s ease-in-out 0.8s infinite alternate;
-  will-change: transform, border-radius;
+  animation: fluid-flow-right 16s ease-in-out 0.8s infinite alternate;
 }
 
 .animate-fluid-bottom {
-  animation: fluid-flow-bottom 5.8s ease-in-out 1.2s infinite alternate;
-  will-change: transform, border-radius, opacity;
+  animation: fluid-flow-bottom 12s ease-in-out 1.2s infinite alternate;
 }
