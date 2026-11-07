@@ -26,6 +26,15 @@
   --color-accent-hover: #2394DF;
   --color-accent-active: #1B7FBE;
   --color-accent-highlight: #A8DCFF;
+
+  /* Feedback states (text colors meet WCAG AA on white and on their soft backgrounds) */
+  --color-danger: #B91C1C;
+  --color-danger-soft: #FEF2F2;
+  --color-danger-border: #FCA5A5;
+  --color-success: #047857;
+  --color-success-soft: #ECFDF5;
+  --color-control-track: #F4F4F5; /* segmented-control background */
+  --color-stroke-strong: #D4D4D8; /* input hover border */
   --color-companion-tux: #ECFEA9;
   --color-companion-ginger: #FEE1A9;
   --color-companion-void: #E0A9FE;
