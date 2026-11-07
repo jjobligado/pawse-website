@@ -21,6 +21,36 @@
   --color-stroke: #E4E4E7;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Reduced motion: every custom `animate-*` class is caught by one selector so
+ * new animations are covered automatically. Elements jump straight to their
+ * final, fully-visible state. Tailwind v4 rotate/translate/scale utilities use
+ * the individual CSS properties, so `transform: none` here does not undo them.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  [class*="animate-"],
+  [class*="animate-"]::after {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* The CTA aura is purely decorative; hide it instead of freezing it on. */
+  .animate-cta-aura::after {
+    opacity: 0 !important;
+  }
+  /* Final state of the "Done" reveal (accent color + full underline). */
+  .animate-hero-done {
+    color: var(--color-accent) !important;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -38,15 +68,73 @@ body {
   }
 }
 
-@keyframes hero-cat-pop {
+@keyframes cat-intro-ginger {
   0% {
     opacity: 0;
-    transform: scale(0.85) translateY(10px);
+    transform: translateY(-55px) scale(0.65) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(8px) scale(1.08, 0.92) rotate(4deg);
+  }
+  80% {
+    transform: translateY(-3px) scale(0.97, 1.02) rotate(-1deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0) scale(1) rotate(0deg);
   }
+}
+
+.animate-cat-intro-ginger {
+  opacity: 0;
+  animation: cat-intro-ginger 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+}
+
+@keyframes cat-intro-tuxedo {
+  0% {
+    opacity: 0;
+    transform: translateX(65px) translateY(18px) scale(0.65) rotate(12deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateX(-6px) translateY(-4px) scale(1.07, 0.93) rotate(-3deg);
+  }
+  85% {
+    transform: translateX(2px) translateY(1px) scale(0.98, 1.02) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.animate-cat-intro-tuxedo {
+  opacity: 0;
+  animation: cat-intro-tuxedo 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+
+@keyframes cat-intro-void {
+  0% {
+    opacity: 0;
+    transform: translateY(65px) scale(0.65);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.08);
+  }
+  85% {
+    transform: translateY(2px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-cat-intro-void {
+  opacity: 0;
+  animation: cat-intro-void 0.85s cubic-bezier(0.34, 1.35, 0.64, 1) 0.75s forwards;
 }
 
 @keyframes hero-done-color {
@@ -77,40 +165,76 @@ body {
   }
 }
 
-.animate-hero-fade-up-1 {
+@keyframes hero-headline-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-hero-headline-1 {
   opacity: 0;
-  animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+  animation: hero-headline-pop 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
+}
+
+.animate-hero-headline-2 {
+  opacity: 0;
+  animation: hero-headline-pop 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.22s forwards;
 }
 
 .animate-hero-fade-up-2 {
   opacity: 0;
-  animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards;
+  animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.34s forwards;
 }
 
 .animate-hero-fade-up-3 {
   opacity: 0;
-  animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+  animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.48s forwards;
+}
+
+.animate-hero-fade-up-3b {
+  opacity: 0;
+  animation: hero-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.62s forwards;
 }
 
 .animate-hero-fade-up-4 {
   opacity: 0;
-  animation: hero-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.65s forwards;
+  animation: hero-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.7s forwards;
 }
 
-.animate-cat-pop-1 {
-  opacity: 0;
-  animation: hero-cat-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+/*
+ * CTA aura: the glow lives on a pseudo-element and only its opacity animates,
+ * so it runs on the compositor instead of repainting box-shadow every frame.
+ * It pulses three times to draw the eye on arrival, then rests.
+ */
+@keyframes cta-aura-pulse {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-.animate-cat-pop-2 {
-  opacity: 0;
-  animation: hero-cat-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.32s forwards;
+.animate-cta-aura {
+  position: relative;
 }
 
-.animate-cat-pop-3 {
+.animate-cta-aura::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0px 0px 32px 3px rgba(53, 166, 241, 0.45);
   opacity: 0;
-  animation: hero-cat-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.44s forwards;
+  pointer-events: none;
+  animation: cta-aura-pulse 3.6s ease-in-out 1.2s 3;
 }
+
 
 .animate-cat-float-1 {
   animation: cat-idle-float 3.6s ease-in-out infinite;
@@ -124,15 +248,56 @@ body {
   animation: cat-idle-float 3.9s ease-in-out 1.2s infinite;
 }
 
+@keyframes cat-tap-hop {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  30% {
+    transform: scale(1.14, 0.88) translateY(-8px);
+  }
+  60% {
+    transform: scale(0.96, 1.04) translateY(-2px);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+.animate-cat-tap {
+  animation: cat-tap-hop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cat-perch-breathe {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+.animate-cat-perch-1 {
+  animation: cat-perch-breathe 3.4s ease-in-out infinite;
+}
+
+.animate-cat-perch-2 {
+  animation: cat-perch-breathe 3.9s ease-in-out 0.6s infinite;
+}
+
+.animate-cat-perch-3 {
+  animation: cat-perch-breathe 4.2s ease-in-out 1.2s infinite;
+}
+
 .animate-hero-done {
   color: #232323;
-  animation: hero-done-color 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+  animation: hero-done-color 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.48s forwards;
 }
 
 .animate-hero-done-line {
   transform: scaleX(0);
   transform-origin: left center;
-  animation: hero-done-underline 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.7s forwards;
+  animation: hero-done-underline 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.62s forwards;
 }
 
 @keyframes fish-swim-gentle {
@@ -171,26 +336,59 @@ body {
   animation: fish-swim-gentle 2.4s ease-in-out 0.6s infinite;
 }
 
-@keyframes ambient-glow-drift {
-  0%,
-  100% {
-    transform: translate(0px, 0px) scale(1) rotate(0deg);
-    opacity: 0.8;
-  }
-  25% {
-    transform: translate(45px, -18px) scale(1.08, 1.03) rotate(2deg);
-    opacity: 0.95;
+/*
+ * Dynamic Fluid Blue Currents
+ * Only transform/opacity animate (compositor-only). Animating border-radius
+ * under a 30-56px blur forced a full re-blur every frame, and the corner shape
+ * is invisible under that much blur anyway. Slow cycles keep the section calm.
+ */
+@keyframes fluid-flow-left {
+  0% {
+    transform: translate3d(0px, 0px, 0) scale(0.96) rotate(0deg);
   }
   50% {
-    transform: translate(-30px, 20px) scale(0.94, 1.05) rotate(-1.5deg);
-    opacity: 0.85;
+    transform: translate3d(150px, 50px, 0) scale(1.14) rotate(14deg);
   }
-  75% {
-    transform: translate(-40px, -15px) scale(1.05, 0.96) rotate(-2.2deg);
-    opacity: 0.95;
+  100% {
+    transform: translate3d(35px, -45px, 0) scale(1.02) rotate(-10deg);
   }
 }
 
-.animate-ambient-glow {
-  animation: ambient-glow-drift 6s ease-in-out infinite;
+@keyframes fluid-flow-right {
+  0% {
+    transform: translate3d(0px, 0px, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-160px, -50px, 0) scale(1.15) rotate(-16deg);
+  }
+  100% {
+    transform: translate3d(-50px, 45px, 0) scale(0.95) rotate(12deg);
+  }
+}
+
+@keyframes fluid-flow-bottom {
+  0% {
+    transform: translate3d(0px, 0px, 0) scale(0.94);
+    opacity: 0.88;
+  }
+  50% {
+    transform: translate3d(45px, -110px, 0) scale(1.16);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-35px, -50px, 0) scale(1.02);
+    opacity: 0.92;
+  }
+}
+
+.animate-fluid-left {
+  animation: fluid-flow-left 14s ease-in-out infinite alternate;
+}
+
+.animate-fluid-right {
+  animation: fluid-flow-right 16s ease-in-out 0.8s infinite alternate;
+}
+
+.animate-fluid-bottom {
+  animation: fluid-flow-bottom 12s ease-in-out 1.2s infinite alternate;
 }

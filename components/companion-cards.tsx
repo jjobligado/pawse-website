@@ -67,8 +67,13 @@ export default function CompanionCards() {
     };
 
     useEffect(() => {
-        setIsMounted(true);
-        measureOffsets();
+        // Initial state is resolved in the first animation frame (not synchronously in
+        // the effect body) so React doesn't do a cascading re-render on mount.
+        // Reduced motion: show the organized row immediately, with no fan-out transition.
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            const frame = window.requestAnimationFrame(() => setIsTriggered(true));
+            return () => window.cancelAnimationFrame(frame);
+        }
 
         const container = containerRef.current;
         if (!container) return;
@@ -102,9 +107,14 @@ export default function CompanionCards() {
 
         // If user has already scrolled past the section on mount, show organized immediately
         if (isAlreadyPassed) {
-            setIsTriggered(true);
-            return;
+            const frame = window.requestAnimationFrame(() => setIsTriggered(true));
+            return () => window.cancelAnimationFrame(frame);
         }
+
+        const mountFrame = window.requestAnimationFrame(() => {
+            setIsMounted(true);
+            measureOffsets();
+        });
 
         // If section is already 70% visible on initial load, wait the 300ms delay then fan out
         if (sectionRatio >= 0.7) {
@@ -134,6 +144,7 @@ export default function CompanionCards() {
         window.addEventListener("resize", measureOffsets);
 
         return () => {
+            window.cancelAnimationFrame(mountFrame);
             cancelDelay();
             observer.disconnect();
             window.removeEventListener("resize", measureOffsets);
@@ -184,7 +195,7 @@ export default function CompanionCards() {
     return (
         <div
             ref={containerRef}
-            className="relative w-full max-w-[1050px] min-h-[190px] flex flex-col md:flex-row justify-center items-center gap-4 py-2"
+            className="relative w-full max-w-[1050px] min-h-[190px] flex flex-col md:flex-row justify-center items-center gap-3 md:gap-3.5 py-2"
         >
             {CARDS.map((card, index) => {
                 const slotRef =
