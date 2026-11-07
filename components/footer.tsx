@@ -1,16 +1,40 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FooterSpreadSection } from "@/components/pixel-divider";
+import { CONTACT_EMAIL } from "@/lib/site-config";
+
+/*
+ * The footer doubles as mobile navigation (the header shows no section links
+ * on small screens). "/#…" hrefs work from every page, not just the homepage.
+ */
+const LINK_GROUPS = [
+    {
+        heading: "Product",
+        links: [
+            { label: "Download", href: "/#download" },
+            { label: "FAQ", href: "/#faq" },
+            { label: "Contact", href: "/#contact" },
+        ],
+    },
+    {
+        heading: "Company",
+        links: [
+            { label: "About", href: "/about" },
+            { label: "Privacy Policy", href: "/privacy" },
+            { label: "Terms of Service", href: "/terms" },
+        ],
+    },
+];
 
 export default function Footer() {
     return (
         <FooterSpreadSection>
-            {/* Left Group */}
+            {/* Brand */}
             <div className="relative z-10 flex flex-col justify-center gap-4 max-w-[600px]">
-                <Link href="/" className="flex items-center gap-3 group">
+                <Link href="/" className="flex items-center gap-3 group w-fit">
                     <Image
                         src="/images/logo.png"
-                        alt="Pawse Logo"
+                        alt="PAWSE home"
                         width={56}
                         height={54}
                         className="group-hover:scale-110 transition-transform duration-300 ease-in-out"
@@ -19,32 +43,39 @@ export default function Footer() {
                         PAWSE
                     </span>
                 </Link>
-                <p className="text-xs md:text-sm tracking-[0.02em] text-ink">
-                    © 2026 PAWSE App. All rights reserved.
-                </p>
+                <div className="flex flex-col gap-1 text-xs md:text-sm tracking-[0.02em] text-ink">
+                    <a
+                        href={`mailto:${CONTACT_EMAIL}`}
+                        className="w-fit underline decoration-accent decoration-2 underline-offset-4 hover:decoration-ink"
+                    >
+                        {CONTACT_EMAIL}
+                    </a>
+                    <p>© 2026 PAWSE App. All rights reserved.</p>
+                </div>
             </div>
 
-            {/* Right Group */}
-            <div className="relative z-10 flex flex-col items-start md:items-end gap-2">
-                <Link
-                    href="/about"
-                    className="text-base text-ink hover:underline"
-                >
-                    About
-                </Link>
-                <Link
-                    href="/privacy"
-                    className="text-base text-ink hover:underline"
-                >
-                    Privacy Policy
-                </Link>
-                <Link
-                    href="/terms"
-                    className="text-base text-ink hover:underline"
-                >
-                    Terms of Service
-                </Link>
-            </div>
+            {/* Links */}
+            <nav aria-label="Footer" className="relative z-10 flex gap-12 sm:gap-16">
+                {LINK_GROUPS.map((group) => (
+                    <div key={group.heading} className="flex flex-col gap-2.5">
+                        <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+                            {group.heading}
+                        </h2>
+                        <ul className="flex flex-col gap-2">
+                            {group.links.map((link) => (
+                                <li key={link.href}>
+                                    <Link
+                                        href={link.href}
+                                        className="text-[15px] text-ink underline-offset-4 decoration-accent decoration-2 hover:underline"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </nav>
         </FooterSpreadSection>
     );
 }
