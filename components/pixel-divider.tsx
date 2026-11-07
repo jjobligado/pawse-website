@@ -453,7 +453,7 @@ export function DashboardSpreadSection({ children }: { children: ReactNode }) {
         <section className="w-full flex flex-col">
             <div
                 ref={containerRef}
-                className="relative w-full pt-12 pb-24 md:pt-16 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
+                className="relative w-full pt-16 pb-24 md:pt-24 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
             >
                 {/* Unified Inertia Sky-Blue Gradient Layer */}
                 <div
