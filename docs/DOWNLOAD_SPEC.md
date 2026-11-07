@@ -8,11 +8,11 @@ This specification details the client-side operating system detection, adaptive 
 
 | Target Platform / Device | Client Detection Triggers | Primary CTA Label & Icon | Click Action | Visual States (Default / Hover / Active) | Secondary Meta-Row Content | Target File / Payload |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Windows Desktop** | `Windows`, `Win32`, `Win64` | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` • `View on GitHub →` | `pawse-setup.exe` (`.exe`) |
-| **macOS Desktop** | `Macintosh`, `MacIntel` *(non-touch)* | `[↓] Download for Mac` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` • `View on GitHub →` | `pawse.dmg` (`.dmg`) |
-| **Linux Desktop** | `Linux`, `X11` *(excluding Android)* | `[↓] Download for Linux` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` • `View on GitHub →` | `pawse.AppImage` (`.AppImage`) |
-| **Mobile & Tablets** *(iOS, iPadOS, Android)* | `iPhone`, `iPad`, `Android`, `Mobile`, `Tablet`, `maxTouchPoints > 1` | `[↗] Send to My Desktop`<br>*(Turns into `[✓] Link Copied to Clipboard! 🐾`)* | 1. Tries Web Share API (`navigator.share`)<br>2. Copies `window.location.href` to clipboard with 2.5s success state | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Copied:** `#047857` (`success`)<br>**Active:** `#065F46` | `PAWSE is built for Windows, Mac & Linux` • `View on GitHub →` | Clipboard URL payload |
-| **Fallback / Unknown** | Unrecognized desktop user-agent | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` • `View on GitHub →` | `pawse-setup.exe` (`.exe`) |
+| **Windows Desktop** | `Windows`, `Win32`, `Win64` | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` | `pawse-setup.exe` (`.exe`) |
+| **macOS Desktop** | `Macintosh`, `MacIntel` *(non-touch)* | `[↓] Download for Mac` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` | `pawse.dmg` (`.dmg`) |
+| **Linux Desktop** | `Linux`, `X11` *(excluding Android)* | `[↓] Download for Linux` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` | `pawse.AppImage` (`.AppImage`) |
+| **Mobile & Tablets** *(iOS, iPadOS, Android)* | `iPhone`, `iPad`, `Android`, `Mobile`, `Tablet`, `maxTouchPoints > 1` | `[↗] Send to My Desktop`<br>*(Turns into `[✓] Link Copied to Clipboard! 🐾`)* | 1. Tries Web Share API (`navigator.share`)<br>2. Copies `window.location.href` to clipboard with 2.5s success state | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Copied:** `#047857` (`success`)<br>**Active:** `#065F46` | `PAWSE is built for Windows, Mac & Linux` | Clipboard URL payload |
+| **Fallback / Unknown** | Unrecognized desktop user-agent | `[↓] Download for Windows` | Initiates browser file download | **Base:** `#2394DF` (`accent-strong`, white semibold text; known AA gap, see globals.css)<br>**Hover:** `#1B7FBE`<br>**Active:** `#1A74AE` | `Other platforms ▾` | `pawse-setup.exe` (`.exe`) |
 
 ---
 
@@ -36,8 +36,8 @@ Beneath the primary pill CTA button, the secondary meta-row provides cross-platf
 - **Mobile Behavior (`mobile`)**:
   - Replaces the dropdown trigger with plain non-interactive text (`"PAWSE is built for Windows, Mac & Linux"`) so mobile visitors are not prompted to download desktop binaries onto a phone or tablet.
 - **UI/UX & Optical Symmetry Standards**:
-  - Neither `Other platforms ▾` nor `View on GitHub →` uses a text underline, relying on their trailing geometric icons (`▾` and `→`) as non-color signifiers (`WCAG 1.4.1`).
-  - Both `16×16` (`viewBox="0 0 24 24"`) icons share identical internal `12`-unit span and `6`-unit diagonal arm geometry (`points="6 9 12 15 18 9"` and `M6 12H18` + `M12 6L18 12L12 18`) and `gap-1` (`4px`) spacing.
+  - `Other platforms ▾` uses no text underline; its trailing chevron (`▾`) is the non-color signifier (`WCAG 1.4.1`). The earlier `View on GitHub →` link was removed (PAWSE is not open source); "Free to download" now lives in the hero subtitle.
+  - The chevron is a `16×16` (`viewBox="0 0 24 24"`) icon (`points="6 9 12 15 18 9"`) with `gap-1` (`4px`) spacing to its label.
   - On hover (and while the menu is open), text weight thickens in-place via `[-webkit-text-stroke:0.35px_currentColor]` and icon strokes thicken from `1px` to `1.5px` (`[stroke-width:1.5px]`), eliminating horizontal layout shifts.
 
 ### Configuration Object (`PLATFORM_CONFIG` & `DESKTOP_PLATFORMS`)

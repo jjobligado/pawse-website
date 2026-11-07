@@ -144,7 +144,7 @@ export default function ContactSection() {
     return (
         <section
             id="contact"
-            className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
+            className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-16 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
         >
             <SectionTitle>Contact Us</SectionTitle>
 
@@ -186,7 +186,7 @@ export default function ContactSection() {
                         <button
                             type="button"
                             onClick={handleReset}
-                            className="mt-2 text-sm font-medium text-ink underline decoration-accent decoration-2 underline-offset-4 hover:decoration-ink transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                            className="mt-2 text-sm font-medium text-ink link-underline hover:decoration-muted transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                         >
                             Send another message
                         </button>
@@ -373,10 +373,10 @@ function AlertIcon({ className = "" }: { className?: string }) {
     );
 }
 
-/** "Prefer email?" row: the address as text, plus a copy button for webmail users. */
+/** "Prefer email?" row: clicking the address copies it (works for webmail users too). */
 function EmailFallback() {
     const [copyState, setCopyState] = useState<"idle" | "copied" | "manual">("idle");
-    const addressRef = useRef<HTMLSpanElement>(null);
+    const addressRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         if (copyState === "idle") return;
@@ -404,21 +404,21 @@ function EmailFallback() {
 
     return (
         <div className="flex flex-col items-center gap-1 text-sm text-muted text-center">
-            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5">
+            <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
                 <span>Prefer email?</span>
-                <span ref={addressRef} className="font-medium text-ink select-all break-all">
-                    {CONTACT_EMAIL}
-                </span>
                 <button
+                    ref={addressRef}
                     type="button"
                     onClick={handleCopy}
-                    className="inline-flex items-center min-h-8 px-3 rounded-full bg-white border border-stroke text-xs font-medium text-ink-soft hover:border-accent hover:text-ink transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    title="Click to copy"
+                    aria-label={`Copy email address ${CONTACT_EMAIL}`}
+                    className="font-medium text-ink break-all link-underline hover:decoration-muted cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                 >
-                    {copyState === "copied" ? "Copied" : "Copy"}
+                    {CONTACT_EMAIL}
                 </button>
             </div>
             <span aria-live="polite" className="min-h-5 text-xs">
-                {copyState === "copied" && "Email address copied to clipboard."}
+                {copyState === "copied" && "Copied to clipboard."}
                 {copyState === "manual" && "Address selected. Press Ctrl+C (⌘C on Mac) to copy."}
             </span>
         </div>

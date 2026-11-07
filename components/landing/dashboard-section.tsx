@@ -11,11 +11,11 @@ const FEATURES = [
 
 export default function DashboardSection() {
     return (
-        <DashboardSpreadSection>
-            <SectionTitle>Dashboard</SectionTitle>
-            <SectionSubtitle>
-                Every session adds to the bigger picture. Watch your focus habit take
-                shape over time.
+        <DashboardSpreadSection id="progress">
+            <SectionTitle>Watch Your Focus Habit Grow</SectionTitle>
+            <SectionSubtitle className="text-center text-balance">
+                Every session adds to the bigger picture, tracked automatically and
+                kept right on your device.
             </SectionSubtitle>
 
             <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 mt-2">

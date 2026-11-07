@@ -5,7 +5,7 @@ export default function CompanionsSection() {
     return (
         <section
             id="companions"
-            className="scroll-mt-20 relative w-full pt-24 pb-12 md:pt-32 md:pb-16 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
+            className="scroll-mt-20 relative w-full py-16 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
         >
             {/* Dynamic Multi-Core Liquid Blue Current (Stretches Full Section Height & Bleeds Horizontally) */}
             <div
@@ -32,13 +32,16 @@ export default function CompanionsSection() {
             </div>
 
             <div className="relative z-10 w-full max-w-[1140px] flex flex-col items-center gap-6">
-                <SectionTitle>Meet your Companions</SectionTitle>
+                <SectionTitle>Meet Your Companions</SectionTitle>
                 <SectionSubtitle>Every session comes with company.</SectionSubtitle>
 
                 {/* Stacked Cards Interactive Group */}
                 <CompanionCards />
 
-                <SectionSubtitle>Pick the pace that matches how you actually focus.</SectionSubtitle>
+                <SectionSubtitle className="text-center text-balance">
+                    Three cats, three paces: 15, 25, or 50-minute sessions. Pick the one
+                    that matches how you actually focus.
+                </SectionSubtitle>
             </div>
         </section>
     );

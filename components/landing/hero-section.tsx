@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
+import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -40,7 +41,7 @@ export default function HeroSection() {
     const gingerParallaxRef = useRef<HTMLDivElement>(null);
     const tuxParallaxRef = useRef<HTMLDivElement>(null);
     const showcaseParallaxRef = useRef<HTMLDivElement>(null);
-    const [copied, setCopied] = useState(false);
+    const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const [activeDialogueCat, setActiveDialogueCat] = useState<CompanionCatId | null>(null);
     const [dialogueIndices, setDialogueIndices] = useState<Record<CompanionCatId, number>>({
@@ -164,41 +165,16 @@ export default function HeroSection() {
         };
     }, []);
 
-    const handleCTAClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleCTAClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        // Mobile visitors can't install a desktop app: share the link to their computer instead.
         if (platformInfo.isMobileShare) {
             e.preventDefault();
-            const shareUrl = window.location.href;
-
-            // Try native mobile sharing first (AirDrop, device send, messaging)
-            if (typeof navigator !== "undefined" && navigator.share) {
-                try {
-                    await navigator.share({
-                        title: "PAWSE — The Coziest Way to Get Things Done",
-                        text: "A desktop productivity app combining a focus timer with a virtual companion.",
-                        url: shareUrl,
-                    });
-                    return;
-                } catch {
-                    // User dismissed share sheet or share failed; fallback to clipboard copy
-                }
-            }
-
-            // Fallback: copy link to clipboard and show feedback
-            try {
-                if (typeof navigator !== "undefined" && navigator.clipboard) {
-                    await navigator.clipboard.writeText(shareUrl);
-                }
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2500);
-            } catch {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2500);
-            }
+            void sendToDesktop();
         }
     };
 
     return (
-        <section className="relative w-full max-w-[1440px] mx-auto pt-28 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
+        <section id="hero" className="relative w-full max-w-[1440px] mx-auto pt-28 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
             {/* Ginger Companion (Upper Left on all screen sizes, balanced position) */}
             <div
                 ref={gingerParallaxRef}
@@ -353,8 +329,8 @@ export default function HeroSection() {
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
                     <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed">
-                        A desktop productivity app combining a focus timer with a virtual
-                        companion. Built for students, professionals, and cat lovers.
+                        A calm Pomodoro timer for your desktop, with a pixel cat who
+                        focuses alongside you. Free to download.
                     </p>
                 </div>
 
@@ -480,7 +456,7 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* Secondary Contextual Meta-Row */}
+                    {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
                         className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b"
@@ -614,46 +590,6 @@ export default function HeroSection() {
                                 </div>
                             </div>
                         )}
-
-                        <span className="w-1 h-1 rounded-full bg-[#C4C4C8]" aria-hidden="true" />
-
-                        {/* View on GitHub */}
-                        <Link
-                            href="https://github.com/educ-jkescritor/Pawse"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 hover:text-black transition-colors duration-200 group"
-                        >
-                            <span className="transition-colors duration-200 group-hover:[-webkit-text-stroke:0.35px_currentColor]">
-                                View on GitHub
-                            </span>
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                                className="w-4 h-4 transition-colors duration-200 group-hover:text-black"
-                            >
-                                <path
-                                    d="M6 12H18"
-                                    stroke="currentColor"
-                                    strokeWidth="1"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
-                                />
-                                <path
-                                    d="M12 6L18 12L12 18"
-                                    stroke="currentColor"
-                                    strokeWidth="1"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="transition-all duration-200 group-hover:[stroke-width:1.5px]"
-                                />
-                            </svg>
-                        </Link>
                     </div>
                 </div>
             </div>

@@ -4,9 +4,11 @@ import TimerMockup from "./timer-mockup";
 export default function BreakSection() {
     return (
         <SplitFeature
-            titleLines={["Time to play", "and recharge"]}
+            id="break"
+            titleLines={["Time to Play", "and Recharge"]}
             media={<TimerMockup />}
             mediaFirst
+            spacing="pair-end"
         >
             When the interval ends, the quiet time is over. Your companion wakes up
             ready for energetic playtime. Trigger unique animations, read their
