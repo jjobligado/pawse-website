@@ -336,9 +336,9 @@ export default function HeroSection() {
                 </div>
 
                 {/* Download Options */}
-                <div id="hero-cta" className="scroll-mt-24 w-full pt-2 flex flex-col justify-center items-center gap-4 animate-hero-fade-up-3">
-                    {/* Centered CTA Row with Tuxedo Directly Beside the Button */}
-                    <div className="relative w-full flex items-center justify-center">
+                <div id="hero-cta" className="scroll-mt-24 w-full -mx-6 md:-mx-10 pt-2 flex flex-col justify-center items-center gap-4 animate-hero-fade-up-3">
+                    {/* Centered CTA Row with Tuxedo Symmetrically Balanced to Ginger */}
+                    <div className="relative w-full max-w-[1440px] flex items-center justify-center">
                         <div className="relative inline-flex items-center justify-center -translate-x-3 sm:translate-x-0">
                             <Link
                                 suppressHydrationWarning
@@ -410,54 +410,54 @@ export default function HeroSection() {
                                     {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                                 </span>
                             </Link>
+                        </div>
 
-                            {/* Tuxedo Companion (Directly beside CTA button with intentional gap) */}
-                            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3.5 sm:ml-5 md:ml-7 lg:ml-10 xl:ml-12 z-20 pointer-events-auto">
-                                <div
-                                    style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
-                                    className="transition-transform duration-75 ease-out"
-                                >
-                                    <div className="animate-cat-intro-tuxedo">
-                                        <div className="animate-cat-float-3">
-                                            <button
-                                                type="button"
-                                                data-companion-cat="tuxedo"
-                                                onClick={() => handleCatInteract("tuxedo")}
-                                                aria-label="Interact with Tuxedo companion"
-                                                aria-haspopup="true"
-                                                aria-expanded={activeDialogueCat === "tuxedo"}
-                                                className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
-                                                    bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
+                        {/* Tuxedo Companion (Symmetrically matched to Ginger's distance from center) */}
+                        <div className="absolute top-1/2 -translate-y-1/2 left-[calc(50%+122px)] sm:left-auto sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto">
+                            <div
+                                style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
+                                className="transition-transform duration-75 ease-out"
+                            >
+                                <div className="animate-cat-intro-tuxedo">
+                                    <div className="animate-cat-float-3">
+                                        <button
+                                            type="button"
+                                            data-companion-cat="tuxedo"
+                                            onClick={() => handleCatInteract("tuxedo")}
+                                            aria-label="Interact with Tuxedo companion"
+                                            aria-haspopup="true"
+                                            aria-expanded={activeDialogueCat === "tuxedo"}
+                                            className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
+                                                bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
+                                            }`}
+                                        >
+                                            {/* Pixel Speech Bubble */}
+                                            <div
+                                                role="status"
+                                                aria-live="polite"
+                                                className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
+                                                    activeDialogueCat === "tuxedo"
+                                                        ? "opacity-100 translate-y-0 scale-100"
+                                                        : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                                 }`}
                                             >
-                                                {/* Pixel Speech Bubble */}
-                                                <div
-                                                    role="status"
-                                                    aria-live="polite"
-                                                    className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-[#232323] shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap z-40 transition-all duration-200 ${
-                                                        activeDialogueCat === "tuxedo"
-                                                            ? "opacity-100 translate-y-0 scale-100"
-                                                            : "opacity-0 translate-y-2 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
-                                                    }`}
-                                                >
-                                                    <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
-                                                        {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
-                                                    </span>
-                                                    <span
-                                                        aria-hidden="true"
-                                                        className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
-                                                    />
-                                                </div>
-                                                <Image
-                                                    src="/images/tuxedo-cat.png"
-                                                    alt="Tuxedo companion"
-                                                    width={175}
-                                                    height={175}
-                                                    className="w-full h-full object-contain select-none"
-                                                    priority
+                                                <span className="font-pixel text-[11px] sm:text-xs font-semibold text-[#232323]">
+                                                    {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
+                                                </span>
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-[#232323] rotate-45"
                                                 />
-                                            </button>
-                                        </div>
+                                            </div>
+                                            <Image
+                                                src="/images/tuxedo-cat.png"
+                                                alt="Tuxedo companion"
+                                                width={175}
+                                                height={175}
+                                                className="w-full h-full object-contain select-none"
+                                                priority
+                                            />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
