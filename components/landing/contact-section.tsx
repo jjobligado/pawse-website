@@ -1,6 +1,7 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
+import { SectionTitle } from "./section-heading";
 
 type ContactTopicId = "general" | "feature" | "bug" | "feedback";
 
@@ -64,11 +65,7 @@ export default function ContactSection() {
             id="contact"
             className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-24 md:py-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
         >
-            <div className="flex justify-center items-center">
-                <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink text-center leading-[1.1]">
-                    Contact Us
-                </h2>
-            </div>
+            <SectionTitle>Contact Us</SectionTitle>
 
             <div className="px-4 md:px-10 flex justify-center items-center">
                 <p className="max-w-[640px] text-base md:text-lg text-muted text-center leading-relaxed">
