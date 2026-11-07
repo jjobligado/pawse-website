@@ -4,7 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
-import { smoothScrollTo } from "@/lib/smooth-scroll";
+
+// Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
+const PARALLAX_MAX_SCROLL = 700;
+const PARALLAX_SPEED = {
+    ginger: -0.09,
+    tux: -0.07,
+    showcase: -0.03,
+} as const;
 
 type CompanionCatId = "ginger" | "tuxedo" | "void";
 
@@ -30,7 +37,9 @@ const CAT_DIALOGUES: Record<CompanionCatId, string[]> = {
 };
 
 export default function HeroSection() {
-    const [scrollY, setScrollY] = useState(0);
+    const gingerParallaxRef = useRef<HTMLDivElement>(null);
+    const tuxParallaxRef = useRef<HTMLDivElement>(null);
+    const showcaseParallaxRef = useRef<HTMLDivElement>(null);
     const [copied, setCopied] = useState(false);
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const [activeDialogueCat, setActiveDialogueCat] = useState<CompanionCatId | null>(null);
@@ -104,21 +113,42 @@ export default function HeroSection() {
         };
     }, [platformsOpen]);
 
+    // Parallax writes transforms straight to the DOM via refs, so scrolling never
+    // re-renders this component. Updates stop once the hero is scrolled out of range.
     useEffect(() => {
-        let ticking = false;
-        const handleScroll = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    setScrollY(window.scrollY);
-                    ticking = false;
-                });
-                ticking = true;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
+            [gingerParallaxRef, PARALLAX_SPEED.ginger],
+            [tuxParallaxRef, PARALLAX_SPEED.tux],
+            [showcaseParallaxRef, PARALLAX_SPEED.showcase],
+        ];
+
+        let frame = 0;
+        let lastScroll = -1;
+
+        const apply = () => {
+            frame = 0;
+            const scroll = Math.min(window.scrollY, PARALLAX_MAX_SCROLL);
+            if (scroll === lastScroll) return;
+            lastScroll = scroll;
+            for (const [ref, speed] of layers) {
+                if (ref.current) {
+                    ref.current.style.transform = `translate3d(0, ${(scroll * speed).toFixed(2)}px, 0)`;
+                }
             }
         };
 
-        handleScroll();
+        const handleScroll = () => {
+            if (!frame) frame = window.requestAnimationFrame(apply);
+        };
+
+        apply();
         window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            if (frame) window.cancelAnimationFrame(frame);
+        };
     }, []);
 
     const handleCTAClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -154,19 +184,12 @@ export default function HeroSection() {
         }
     };
 
-    // Clamp parallax offsets so they stay smooth within the hero viewport
-    const clampedScroll = Math.min(scrollY, 700);
-    const gingerParallax = clampedScroll * -0.09;
-    const voidParallax = clampedScroll * -0.05;
-    const tuxParallax = clampedScroll * -0.07;
-    const showcaseParallax = clampedScroll * -0.03;
-
     return (
         <section className="relative w-full max-w-[1440px] mx-auto pt-28 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
             {/* Ginger Companion (Upper Left on all screen sizes, balanced position) */}
             <div
-                style={{ transform: `translate3d(0, ${gingerParallax}px, 0)` }}
-                className="absolute top-5 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-30 pointer-events-auto transition-transform duration-75 ease-out"
+                ref={gingerParallaxRef}
+                className="absolute top-5 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-30 pointer-events-auto will-change-transform"
             >
                 <div className="animate-cat-intro-ginger">
                     <div className="animate-cat-float-1">
@@ -386,10 +409,7 @@ export default function HeroSection() {
 
                         {/* Tuxedo Companion (Symmetrically matched to Ginger's distance from center) */}
                         <div className="absolute top-1/2 -translate-y-1/2 left-[calc(50%+122px)] sm:left-auto sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto">
-                            <div
-                                style={{ transform: `translate3d(0, ${tuxParallax}px, 0)` }}
-                                className="transition-transform duration-75 ease-out"
-                            >
+                            <div ref={tuxParallaxRef} className="will-change-transform">
                                 <div className="animate-cat-intro-tuxedo">
                                     <div className="animate-cat-float-3">
                                         <button
@@ -617,8 +637,8 @@ export default function HeroSection() {
 
             {/* App Visuals Showcase Container (Peeking at the bottom of the Hero) */}
             <div
-                style={{ transform: `translate3d(0, ${showcaseParallax}px, 0)` }}
-                className="relative z-20 w-full max-w-[1040px] mt-24 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 transition-transform duration-75 ease-out"
+                ref={showcaseParallaxRef}
+                className="relative z-20 w-full max-w-[1040px] mt-24 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 will-change-transform"
             >
                 <div className="relative animate-hero-fade-up-4">
                     {/* Void: Sonny Angel Perched on the Laptop Bezel (Top-Left) */}
