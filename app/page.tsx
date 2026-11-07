@@ -1,6 +1,7 @@
 import Image from "next/image";
 import HeroSection from "@/components/hero-section";
 import CompanionCards from "@/components/companion-cards";
+import { DashboardSpreadSection } from "@/components/pixel-divider";
 
 const howItWorksSteps = [
     {
@@ -358,73 +359,56 @@ export default function HomePage() {
             </section>
 
             {/* Pomodoro Analytics / Dashboard */}
-            <section className="w-full flex flex-col">
-                <div className="w-full pt-12 pb-24 md:pt-16 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-[linear-gradient(180deg,#FFFFFF_0%,#DCF1FF_80%,#A8DCFF_100%)]">
-                    <div className="w-full max-w-[1140px] flex flex-col items-stretch gap-6">
-                        <div className="flex justify-center items-center">
-                            <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
-                                Dashboard
-                            </h2>
-                        </div>
-
-                        <p className="text-base md:text-lg text-[#5F5F5F] text-center">
-                            Every session adds to the bigger picture. Watch your focus habit
-                            take shape over time.
-                        </p>
-
-                        <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 mt-2">
-                            {/* Feature Checklist */}
-                            <div className="w-full lg:w-[440px] flex flex-col items-stretch gap-4">
-                                <div className="w-full flex flex-col items-stretch gap-3.5">
-                                    {dashboardFeatures.map((item) => (
-                                        <div
-                                            key={item}
-                                            className="w-full flex items-center gap-3.5"
-                                        >
-                                            <div className="w-6 h-6 shrink-0 relative">
-                                                <Image
-                                                    src="/images/check-account.png"
-                                                    alt=""
-                                                    width={24}
-                                                    height={24}
-                                                    className="w-full h-full object-contain"
-                                                />
-                                            </div>
-                                            <p className="flex-1 text-base md:text-lg text-[#232323] text-left">
-                                                {item}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Dashboard Preview Image */}
-                            <div className="w-full max-w-[600px] lg:flex-1 shrink-0 shadow-[0px_0px_30px_0px_rgba(0,0,0,0.15)] rounded-xl overflow-hidden bg-white">
-                                <Image
-                                    src="/images/dashboard.png"
-                                    alt="PAWSE Dashboard showing focus time, completed pomodoros, favorite companion, and weekly flow"
-                                    width={600}
-                                    height={433}
-                                    className="w-full h-auto object-cover"
-                                />
-                            </div>
-                        </div>
-                    </div>
+            <DashboardSpreadSection>
+                <div className="flex justify-center items-center">
+                    <h2 className="font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-[#232323] text-center leading-[1.1]">
+                        Dashboard
+                    </h2>
                 </div>
 
-                {/* Pixels Divider */}
-                <Image
-                    src="/images/pixels-analytics.svg"
-                    alt=""
-                    width={1440}
-                    height={38}
-                    aria-hidden="true"
-                    className="w-full h-auto block select-none rotate-180 -scale-x-100"
-                />
+                <p className="text-base md:text-lg text-[#5F5F5F] text-center">
+                    Every session adds to the bigger picture. Watch your focus habit
+                    take shape over time.
+                </p>
 
-                {/* Extra Padding */}
-                <div className="w-full h-16 md:h-24 bg-white" />
-            </section>
+                <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 mt-2">
+                    {/* Feature Checklist */}
+                    <div className="w-full lg:w-[440px] flex flex-col items-stretch gap-4">
+                        <div className="w-full flex flex-col items-stretch gap-3.5">
+                            {dashboardFeatures.map((item) => (
+                                <div
+                                    key={item}
+                                    className="w-full flex items-center gap-3.5"
+                                >
+                                    <div className="w-6 h-6 shrink-0 relative">
+                                        <Image
+                                            src="/images/check-account.png"
+                                            alt=""
+                                            width={24}
+                                            height={24}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                    <p className="flex-1 text-base md:text-lg text-[#232323] text-left">
+                                        {item}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Dashboard Preview Image */}
+                    <div className="w-full max-w-[600px] lg:flex-1 shrink-0 shadow-[0px_0px_30px_0px_rgba(0,0,0,0.15)] rounded-xl overflow-hidden bg-white">
+                        <Image
+                            src="/images/dashboard.png"
+                            alt="PAWSE Dashboard showing focus time, completed pomodoros, favorite companion, and weekly flow"
+                            width={600}
+                            height={433}
+                            className="w-full h-auto object-cover"
+                        />
+                    </div>
+                </div>
+            </DashboardSpreadSection>
 
             {/* Coming Soon */}
             <section

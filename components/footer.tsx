@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import PixelDivider from "@/components/pixel-divider";
 
 export default function Footer() {
     return (
@@ -8,14 +9,7 @@ export default function Footer() {
             <div className="w-full h-16 bg-white" />
 
             {/* Pixel Divider */}
-            <Image
-                src="/images/pixels-footer.svg"
-                alt=""
-                width={1440}
-                height={38}
-                aria-hidden="true"
-                className="w-full h-auto block select-none"
-            />
+            <PixelDivider direction="up" />
 
             {/* Footer Content */}
             <footer className="w-full flex flex-col md:flex-row py-12 md:py-16 px-6 md:px-16 lg:px-[120px] justify-between items-start md:items-end gap-8 bg-accent-highlight">
