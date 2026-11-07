@@ -9,6 +9,7 @@ import { smoothScrollTo } from "@/lib/smooth-scroll";
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState<string>("");
+    const [isDownloadPressed, setIsDownloadPressed] = useState(false);
     const { platform: detectedPlatform, config: platformInfo } = usePlatform();
 
     useEffect(() => {
@@ -53,11 +54,35 @@ export default function Header() {
     ];
 
     const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        setIsDownloadPressed(true);
+        window.setTimeout(() => setIsDownloadPressed(false), 180);
+
         if (platformInfo.isMobileShare) {
             e.preventDefault();
             const heroCTA = document.getElementById("hero-cta");
             if (heroCTA) {
                 smoothScrollTo(heroCTA);
+            }
+        } else if (
+            platformInfo.href === "#beta" ||
+            platformInfo.href === "#contact"
+        ) {
+            e.preventDefault();
+            const contactElement =
+                document.getElementById("contact") ||
+                document.getElementById("beta");
+            if (contactElement) {
+                smoothScrollTo(contactElement, {
+                    onComplete: () => {
+                        const emailInput =
+                            contactElement.querySelector<HTMLInputElement>(
+                                "input[type='email']"
+                            );
+                        if (emailInput) {
+                            emailInput.focus();
+                        }
+                    },
+                });
             }
         }
     };
@@ -124,7 +149,11 @@ export default function Header() {
                     download={platformInfo.fileName}
                     onClick={handleDownloadClick}
                     data-os={detectedPlatform}
-                    className="group h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full bg-[#232323] hover:bg-black text-white shadow-sm hover:shadow transition-all duration-200 active:scale-95 cursor-pointer shrink-0"
+                    className={`h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#232323] focus-visible:ring-offset-2 cursor-pointer shrink-0 select-none ${
+                        isDownloadPressed
+                            ? "bg-[#111111]"
+                            : "bg-[#232323] hover:bg-[#3F3F46] active:bg-[#111111]"
+                    }`}
                 >
                     <span className="font-pixel text-sm sm:text-[17px] font-medium tracking-wide leading-none">
                         Download
