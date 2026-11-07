@@ -5,6 +5,7 @@ import FocusSection from "@/components/landing/focus-section";
 import BreakSection from "@/components/landing/break-section";
 import DashboardSection from "@/components/landing/dashboard-section";
 import ComingSoonSection from "@/components/landing/coming-soon-section";
+import FaqSection from "@/components/landing/faq-section";
 import ContactSection from "@/components/landing/contact-section";
 
 export default function HomePage() {
@@ -17,6 +18,7 @@ export default function HomePage() {
             <BreakSection />
             <DashboardSection />
             <ComingSoonSection />
+            <FaqSection />
             <ContactSection />
         </div>
     );
