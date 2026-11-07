@@ -98,7 +98,7 @@ export default function TermsAndService() {
                             6. Third-Party Services
                         </h2>
                         <ul className="list-inside list-disc text-[#141414] space-y-2 pl-4">
-                            <li>PAWSE uses third-party services for certain functions, including Supabase to store website signup email addresses and GitHub to distribute application updates. Information handled in connection with these services is described in our Privacy Policy.</li>
+                            <li>PAWSE uses third-party services for certain functions, including Supabase to store website signup email addresses, GitHub to distribute application updates, and Google/Gmail to receive and store support messages and feedback. Information handled in connection with these services is described in our Privacy Policy.</li>
                             <li>When you independently access third-party websites or services through external links, your use of those websites or services is subject to their applicable terms and privacy policies.</li>
                             <li>We do not control the availability, content, or practices of independently operated third-party websites or services. This does not exclude responsibilities we may have under applicable law.</li>
                         </ul>
@@ -172,7 +172,7 @@ export default function TermsAndService() {
                             12. Contact Us
                         </h2>
                         <p>
-                            If you have questions about these Terms or the Service, please contact us at [support email].
+                            If you have questions about these Terms or the Service, please contact us at <strong className="text-[#141414]">pawseapp.team@gmail.com</strong>.
                         </p>
                     </section>
 
