@@ -359,8 +359,8 @@ export default function HeroSection() {
                                 data-os={detectedPlatform}
                                 className={`group flex items-center justify-center gap-2 py-2.5 px-7 rounded-[50px] shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
                                     copied
-                                        ? "bg-[#10B981] hover:bg-[#059669]"
-                                        : "bg-accent hover:bg-accent-hover active:bg-accent-active"
+                                        ? "bg-success hover:bg-[#065F46]"
+                                        : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active"
                                 }`}
                             >
                                 {copied ? (
@@ -524,7 +524,7 @@ export default function HeroSection() {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {/* Platform Icon Badge */}
-                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
+                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent-strong text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
                                                         {item.id === "windows" && (
                                                             <svg
                                                                 width="15"
@@ -571,7 +571,7 @@ export default function HeroSection() {
                                                 </div>
 
                                                 {/* File Format & Download Action */}
-                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-accent shrink-0 transition-colors">
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-accent-strong shrink-0 transition-colors">
                                                     {item.extension}
                                                     <svg
                                                         width="13"

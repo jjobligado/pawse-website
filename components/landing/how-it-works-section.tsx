@@ -52,7 +52,7 @@ export default function HowItWorksSection() {
                         <FeatureCard className="max-w-[420px] lg:max-w-none min-h-[230px] py-8 px-5">
                             <div className="relative z-10 w-full flex flex-col items-center gap-3">
                                 <div className="w-full flex flex-col items-center gap-2">
-                                    <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
+                                    <div className="w-7 h-7 rounded-full bg-accent-strong flex items-center justify-center shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
                                         <span className="text-sm font-semibold text-white">
                                             {step.number}
                                         </span>
