@@ -25,24 +25,29 @@ html {
   scroll-behavior: smooth;
 }
 
+/*
+ * Reduced motion: every custom `animate-*` class is caught by one selector so
+ * new animations are covered automatically. Elements jump straight to their
+ * final, fully-visible state. Tailwind v4 rotate/translate/scale utilities use
+ * the individual CSS properties, so `transform: none` here does not undo them.
+ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .animate-cat-tap,
-  .animate-cat-perch-1,
-  .animate-cat-perch-2,
-  .animate-cat-perch-3,
-  .animate-cat-intro-ginger,
-  .animate-cat-intro-tuxedo,
-  .animate-cat-intro-void,
-  .animate-hero-headline-1,
-  .animate-hero-headline-2,
-  .animate-pixel-glint,
-  .animate-cta-aura {
+  [class*="animate-"],
+  [class*="animate-"]::after {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+  /* The CTA aura is purely decorative; hide it instead of freezing it on. */
+  .animate-cta-aura::after {
+    opacity: 0 !important;
+  }
+  /* Final state of the "Done" reveal (accent color + full underline). */
+  .animate-hero-done {
+    color: var(--color-accent) !important;
   }
 }
 
