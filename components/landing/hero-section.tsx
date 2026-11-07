@@ -414,7 +414,7 @@ export default function HeroSection() {
                                         className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
                                     />
                                 )}
-                                <span className="font-pixel text-lg md:text-xl font-normal text-white">
+                                <span className="font-pixel text-xl font-bold text-white">
                                     {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                                 </span>
                             </Link>
@@ -581,7 +581,7 @@ export default function HeroSection() {
                                                 </div>
 
                                                 {/* File Format & Download Action */}
-                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-accent-strong shrink-0 transition-colors">
+                                                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted group-hover/item:text-ink shrink-0 transition-colors">
                                                     {item.extension}
                                                     <svg
                                                         width="13"

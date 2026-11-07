@@ -22,20 +22,21 @@
   --color-faint: #767676; /* input placeholders (4.54:1, lightest gray that passes AA) */
 
   /*
-   * Brand accent.
-   * `accent` is the signature sky blue: use it for decoration only (underlines,
-   * borders, focus rings, glows, icons on light grounds). It is 2.67:1 against
-   * white, so it must never carry text.
-   * `accent-strong` is the same hue deepened to pass WCAG AA: use it for button
-   * fills with white text and for blue text on white (4.78:1 → 5.93:1).
-   * `accent-display` is only for very large text (≥24px), e.g. the hero "Done" (3.3:1).
+   * Brand accent: contrast rules (WCAG AA)
+   * - `accent` #35A6F1, the signature sky blue (2.67:1 vs white). Decoration only:
+   *   underlines, borders, focus rings, glows, and fills behind DARK text (ink on
+   *   accent = 5.89:1).
+   * - `accent-strong` #2394DF, one shade deeper (3.30:1 vs white). Only for LARGE
+   *   text: ≥24px, or ≥19px bold (e.g. bold 20px button labels, the hero "Done"),
+   *   and for icons/graphics (3:1). Never for small text.
+   * - Small blue text on white is not allowed in this palette; use ink with an
+   *   accent underline or background instead.
    */
   --color-accent: #35A6F1;
   --color-accent-highlight: #A8DCFF;
-  --color-accent-strong: #1977BA;
-  --color-accent-strong-hover: #166FAE;
-  --color-accent-strong-active: #1468A3;
-  --color-accent-display: #2394DF;
+  --color-accent-strong: #2394DF;
+  --color-accent-strong-hover: #1B7FBE;
+  --color-accent-strong-active: #1A74AE;
 
   /* Feedback states (text colors meet WCAG AA on white and on their soft backgrounds) */
   --color-danger: #B91C1C;
@@ -77,7 +78,7 @@ html {
   }
   /* Final state of the "Done" reveal (accent color + full underline). */
   .animate-hero-done {
-    color: var(--color-accent-display) !important;
+    color: var(--color-accent-strong) !important;
   }
 }
 
@@ -172,7 +173,7 @@ body {
     color: #232323;
   }
   100% {
-    color: var(--color-accent-display);
+    color: var(--color-accent-strong);
   }
 }
 

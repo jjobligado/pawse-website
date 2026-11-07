@@ -186,7 +186,7 @@ export default function ContactSection() {
                         <button
                             type="button"
                             onClick={handleReset}
-                            className="mt-2 text-sm font-medium text-accent-strong hover:text-ink underline-offset-4 hover:underline transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                            className="mt-2 text-sm font-medium text-ink underline decoration-accent decoration-2 underline-offset-4 hover:decoration-ink transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                         >
                             Send another message
                         </button>
@@ -302,7 +302,7 @@ export default function ContactSection() {
                             type="submit"
                             disabled={isSending || !isContactFormConfigured}
                             aria-busy={isSending}
-                            className="w-full flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white font-pixel text-lg shadow-[0px_4px_18px_0px_rgba(53,166,241,0.28)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-accent-strong"
+                            className="w-full flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white font-pixel text-xl font-bold shadow-[0px_4px_18px_0px_rgba(53,166,241,0.28)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-accent-strong"
                         >
                             {isSending && (
                                 <span
