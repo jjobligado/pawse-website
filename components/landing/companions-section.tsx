@@ -38,7 +38,10 @@ export default function CompanionsSection() {
                 {/* Stacked Cards Interactive Group */}
                 <CompanionCards />
 
-                <SectionSubtitle>Pick the pace that matches how you actually focus.</SectionSubtitle>
+                <SectionSubtitle className="text-center text-balance">
+                    Three cats, three paces: 15, 25, or 50-minute sessions. Pick the one
+                    that matches how you actually focus.
+                </SectionSubtitle>
             </div>
         </section>
     );

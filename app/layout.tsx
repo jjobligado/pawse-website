@@ -17,7 +17,7 @@ const pixelifySans = Pixelify_Sans({
 export const metadata: Metadata = {
   title: "PAWSE — The Coziest Way to Get Things Done",
   description:
-    "A desktop productivity app combining a focus timer with a virtual companion. Built for students, professionals, and cat lovers.",
+    "A calm Pomodoro timer for your desktop, with a pixel cat who focuses alongside you. Free to download for Windows, macOS and Linux. Works offline.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

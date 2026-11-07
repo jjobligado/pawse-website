@@ -174,7 +174,7 @@ export default function HeroSection() {
                 try {
                     await navigator.share({
                         title: "PAWSE — The Coziest Way to Get Things Done",
-                        text: "A desktop productivity app combining a focus timer with a virtual companion.",
+                        text: "A calm Pomodoro timer for your desktop, with a pixel cat who focuses alongside you.",
                         url: shareUrl,
                     });
                     return;
@@ -353,8 +353,8 @@ export default function HeroSection() {
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
                     <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed">
-                        A desktop productivity app combining a focus timer with a virtual
-                        companion. Built for students, professionals, and cat lovers.
+                        A calm Pomodoro timer for your desktop, with a pixel cat who
+                        focuses alongside you.
                     </p>
                 </div>
 
@@ -655,6 +655,21 @@ export default function HeroSection() {
                             </svg>
                         </Link>
                     </div>
+
+                    {/* Trust line: answers "is there a catch?" before anyone has to ask */}
+                    <ul
+                        aria-label="Download details"
+                        className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-[13px] text-subtle tracking-[0.02em] animate-hero-fade-up-3b"
+                    >
+                        {["Free to download", "No account needed", "Works offline"].map((item, i) => (
+                            <li key={item} className="flex items-center gap-2">
+                                {i > 0 && (
+                                    <span aria-hidden="true" className="w-1 h-1 rounded-full bg-[#C4C4C8]" />
+                                )}
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </div>
 
