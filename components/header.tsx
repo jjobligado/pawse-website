@@ -128,8 +128,8 @@ export default function Header() {
                     })}
                 </nav>
 
-                {/* Charcoal Download Button */}
-                <Link
+                {/* Charcoal Download Button: a plain <a>, not next/link (Link prefetches its href as a page; installers are files) */}
+                <a
                     suppressHydrationWarning
                     href={platformInfo.href}
                     download={platformInfo.fileName}
@@ -150,7 +150,7 @@ export default function Header() {
                     <span className="font-pixel text-sm sm:text-[17px] font-semibold tracking-wide leading-none">
                         Download
                     </span>
-                </Link>
+                </a>
             </div>
         </header>
     );

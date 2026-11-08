@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 
@@ -339,7 +338,8 @@ export default function HeroSection() {
                     {/* Centered CTA Row with Tuxedo Symmetrically Balanced to Ginger */}
                     <div className="relative w-full max-w-[1440px] flex items-center justify-center">
                         <div className="relative inline-flex items-center justify-center -translate-x-3 sm:translate-x-0">
-                            <Link
+                            {/* Plain <a>, not next/link: Link prefetches its href as a page, but installers are files */}
+                            <a
                                 suppressHydrationWarning
                                 href={platformInfo.href}
                                 download={platformInfo.fileName}
@@ -404,7 +404,7 @@ export default function HeroSection() {
                                 <span className="font-pixel text-base min-[360px]:text-lg md:text-xl font-semibold">
                                     {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                                 </span>
-                            </Link>
+                            </a>
                         </div>
                     </div>
 
