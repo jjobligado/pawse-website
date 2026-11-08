@@ -14,8 +14,11 @@
 
 @theme {
   /* Text / neutral scale (darkest → lightest) */
+  --color-white: #FFFFFF; /* text and icons on blue fills (buttons, step numbers) */
   --color-ink-strong: #141414; /* card titles */
   --color-ink: #232323; /* headings, primary text, charcoal button */
+  --color-ink-hover: #3F3F46; /* charcoal button hover (lighter) */
+  --color-ink-active: #111111; /* charcoal button pressed (darker) */
   --color-ink-soft: #4B5563; /* card body copy */
   --color-muted: #5F5F5F; /* section subtitles, secondary text */
   --color-subtle: #71717A; /* helper labels ("Optional") */
@@ -430,13 +433,31 @@ body {
 }
 
 /*
- * Text links: ink underline (never blue), thin, with a little breathing room.
- * Hover lightens the underline. Change the weight here to update every link.
- * Footer links use `hover:link-underline` so the underline only appears on hover.
+ * Text links. One source of truth so every link behaves the same:
+ * - underline follows the text color (ink on the page, red inside error alerts;
+ *   never blue)
+ * - 1px at rest, 2px on hover: the SAME hover weight for every underlined link
+ * Footer links use `hover:link-underline` (underline only appears on hover)
+ * together with `link-hover-weight`.
  */
 @utility link-underline {
   text-decoration-line: underline;
-  text-decoration-color: var(--color-ink);
+  text-decoration-color: currentColor;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
+  transition: text-decoration-thickness 150ms ease-out;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/*
+ * Slightly heavier text on hover without layout shift (same technique as the
+ * header nav): a hairline stroke instead of a font-weight change.
+ */
+@utility link-hover-weight {
+  &:hover {
+    -webkit-text-stroke: 0.35px currentColor;
+  }
 }

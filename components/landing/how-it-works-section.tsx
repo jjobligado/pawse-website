@@ -53,7 +53,7 @@ export default function HowItWorksSection() {
                                 <div className="w-full flex flex-col items-center gap-2">
                                     <span
                                         aria-hidden="true"
-                                        className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 text-sm font-semibold text-ink transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5"
+                                        className="w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 text-sm font-semibold text-white transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-0.5"
                                     >
                                         {index + 1}
                                     </span>
