@@ -37,6 +37,9 @@
    *   bold (700) as large at that size, so these fall short of AA (3.30:1 vs 4.5:1).
    *   Bold read too heavy in the pixel font and darker fills clashed with the app
    *   palette. To become fully compliant: bold, 24px+, or ink text on `accent`.
+   *   KNOWN EXCEPTION (deliberate, 2026-11): How It Works step numbers are white
+   *   14px semibold on `accent` (2.67:1 vs 4.5:1), chosen for visual consistency
+   *   with the white button labels. Compliant alternative: ink numbers (5.89:1).
    * - Small blue text on white is not allowed in this palette; use ink with an
    *   accent underline or background instead.
    */
