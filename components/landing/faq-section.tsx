@@ -5,10 +5,13 @@ import { SectionSubtitle, SectionTitle } from "./section-heading";
 /*
  * Answers use only product facts confirmed by the team (Nov 2026). Update this
  * list when anything changes (pricing, code signing, accounts, platforms).
+ * "plain" is the text-only answer for search engines; keep it in sync with "answer".
  */
-const FAQS: { question: string; answer: ReactNode }[] = [
+/** Exported for the FAQPage structured data (components/landing/structured-data.tsx). */
+export const FAQS: { question: string; plain: string; answer: ReactNode }[] = [
     {
         question: "What is the Pomodoro Technique?",
+        plain: "It's a simple way to work: focus for a set amount of time, then take a short break, and repeat. PAWSE times each round for you and gives you a companion to focus with.",
         answer: (
             <>
                 It&apos;s a simple way to work: focus for a set amount of time, then take
@@ -19,14 +22,17 @@ const FAQS: { question: string; answer: ReactNode }[] = [
     },
     {
         question: "Is PAWSE free?",
+        plain: "Yes. PAWSE is free to download.",
         answer: <>Yes. PAWSE is free to download.</>,
     },
     {
         question: "Which platforms does PAWSE support?",
+        plain: "PAWSE is available for Windows, macOS, and Linux.",
         answer: <>PAWSE is available for Windows, macOS, and Linux.</>,
     },
     {
         question: "Do I need an account?",
+        plain: "No. Download it, open it, and start a session. Optional profiles for backing up your progress are coming soon.",
         answer: (
             <>
                 No. Download it, open it, and start a session. Optional profiles for
@@ -36,6 +42,7 @@ const FAQS: { question: string; answer: ReactNode }[] = [
     },
     {
         question: "Does PAWSE work offline? Where is my data stored?",
+        plain: "Yes, PAWSE works offline. Your sessions and stats are stored locally on your device.",
         answer: (
             <>
                 Yes, PAWSE works offline. Your sessions and stats are stored locally on
@@ -45,6 +52,7 @@ const FAQS: { question: string; answer: ReactNode }[] = [
     },
     {
         question: "Why does my computer show a warning when I install PAWSE?",
+        plain: "PAWSE isn't code-signed yet, so your system may show a security warning the first time you open it. Only download PAWSE from the official website. On Windows, select More info, then Run anyway. On macOS, go to System Settings, Privacy & Security, and select Open Anyway. On Linux, make the AppImage executable, then open it.",
         answer: (
             <>
                 <p>
@@ -74,6 +82,7 @@ const FAQS: { question: string; answer: ReactNode }[] = [
     },
     {
         question: "Can I change the session length?",
+        plain: "Each companion has its own pace: Ginger runs 15-minute sessions, Tux 25, and Void 50. Custom focus and break durations are coming soon.",
         answer: (
             <>
                 Each companion has its own pace: Ginger runs 15-minute sessions, Tux 25,
@@ -83,10 +92,12 @@ const FAQS: { question: string; answer: ReactNode }[] = [
     },
     {
         question: "Will PAWSE let me know when a session ends?",
+        plain: "Yes. PAWSE plays a sound and shows a notification when a session ends.",
         answer: <>Yes. PAWSE plays a sound and shows a notification when a session ends.</>,
     },
     {
         question: "How do I report a bug or suggest a feature?",
+        plain: "Send us a message through the contact form on the PAWSE website and choose Bug or Feature.",
         answer: (
             <>
                 Send us a message through the{" "}

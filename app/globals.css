@@ -54,9 +54,31 @@
   --color-danger-soft: #FEF2F2;
   --color-danger-border: #FCA5A5;
   --color-success: #047857;
+  --color-success-hover: #065F46;
   --color-success-soft: #ECFDF5;
-  --color-control-track: #F4F4F5; /* segmented-control background */
+  --color-control-track: #F4F4F5; /* segmented-control background, neutral icon badges */
   --color-stroke-strong: #D4D4D8; /* input hover border */
+
+  /* Surfaces */
+  --color-sky-50: #F2F9FF; /* lightest blue tint: list-item hover, wash gradient end */
+  --color-sky-100: #E5F3FF; /* list-item pressed */
+  --color-sky-200: #D3EDFF; /* sky gradient middle */
+  --color-sky-fill: #C8E8FF; /* card "liquid fill" on hover */
+  --color-mockup-surface: #F6F8F7; /* timer-window illustration background */
+  --color-mockup-stroke: #DDDDDD; /* timer-window illustration control borders */
+
+  /*
+   * Elevation. One shadow per purpose, so depth reads the same everywhere.
+   * (Tailwind generates shadow-raised, shadow-elevated, ... from these.)
+   */
+  --shadow-control: 0 1px 3px rgb(20 20 20 / 0.12), 0 1px 2px rgb(20 20 20 / 0.06); /* selected segment */
+  --shadow-raised: 0 12px 32px -12px rgb(20 20 20 / 0.1); /* resting cards: contact form, app preview */
+  --shadow-elevated: 0 20px 40px -10px rgb(20 20 20 / 0.16), 0 4px 12px -2px rgb(20 20 20 / 0.08); /* hover lift, popovers, skip link */
+  --shadow-screenshot: 0 0 30px 0 rgb(0 0 0 / 0.15); /* app screenshots and mockups */
+  --shadow-pixel: 2px 2px 0 0 var(--color-ink); /* hard pixel shadow: speech bubbles */
+  --shadow-glow: 0 4px 18px 0 rgb(53 166 241 / 0.28); /* blue buttons at rest */
+  --shadow-glow-hover: 0 8px 30px 0 rgb(53 166 241 / 0.45);
+  --shadow-glow-active: 0 2px 14px 0 rgb(53 166 241 / 0.3);
   --color-companion-tux: #ECFEA9;
   --color-companion-ginger: #FEE1A9;
   --color-companion-void: #E0A9FE;
@@ -464,4 +486,25 @@ body {
   &:hover {
     -webkit-text-stroke: 0.35px currentColor;
   }
+}
+
+/*
+ * Surface gradients. One definition each, so every card and band shares the
+ * same sky tones (they previously varied between 70/75/80% stops).
+ * - surface-sky:      signature white → light-blue card/band (How It Works,
+ *                     Coming Soon, timer mockup, download banner, dashboard band)
+ * - surface-wash:     barely-there tint for large resting surfaces (contact
+ *                     card, app preview frame)
+ * - surface-sky-fill: the "liquid" that rises inside cards on hover
+ */
+@utility surface-sky {
+  background-image: linear-gradient(180deg, #ffffff 0%, var(--color-sky-200) 75%, var(--color-accent-highlight) 100%);
+}
+
+@utility surface-wash {
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffffff 55%, var(--color-sky-50) 100%);
+}
+
+@utility surface-sky-fill {
+  background-image: linear-gradient(to top, var(--color-sky-fill) 0%, var(--color-sky-fill) 70%, transparent 100%);
 }

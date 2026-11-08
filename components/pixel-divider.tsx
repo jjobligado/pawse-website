@@ -462,7 +462,7 @@ export function DashboardSpreadSection({ id, children }: { id?: string; children
                     style={{
                         opacity: 0,
                     }}
-                    className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(180deg,#FFFFFF_0%,#DCF1FF_80%,#A8DCFF_100%)] will-change-[opacity]"
+                    className="pointer-events-none absolute inset-0 z-0 surface-sky will-change-[opacity]"
                 />
 
                 {/* Dashboard Foreground Content */}

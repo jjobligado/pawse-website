@@ -42,7 +42,7 @@ export default function DashboardSection() {
                 </div>
 
                 {/* Dashboard Preview Image */}
-                <div className="w-full max-w-[600px] lg:flex-1 shrink-0 shadow-[0px_0px_30px_0px_rgba(0,0,0,0.15)] rounded-xl overflow-hidden bg-white">
+                <div className="w-full max-w-[600px] lg:flex-1 shrink-0 shadow-screenshot rounded-xl overflow-hidden bg-white">
                     <Image
                         src="/images/dashboard.png"
                         alt="PAWSE Dashboard showing focus time, completed pomodoros, favorite companion, and weekly flow"

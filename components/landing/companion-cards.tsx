@@ -195,7 +195,7 @@ export default function CompanionCards() {
     return (
         <div
             ref={containerRef}
-            className="relative w-full max-w-[1050px] min-h-[190px] flex flex-col md:flex-row justify-center items-center gap-3 md:gap-3.5 py-2"
+            className="relative w-full max-w-[1050px] min-h-[190px] flex flex-col lg:flex-row justify-center items-center gap-3 lg:gap-3.5 py-2"
         >
             {CARDS.map((card, index) => {
                 const slotRef =
@@ -205,7 +205,7 @@ export default function CompanionCards() {
                     <div
                         key={card.name}
                         ref={slotRef}
-                        className="relative flex justify-center items-center w-[280px] sm:w-[310px] md:w-[330px] shrink-0 hover:z-40"
+                        className="relative flex justify-center items-center w-[280px] sm:w-[310px] lg:w-[270px] xl:w-[330px] shrink-0 hover:z-40"
                     >
                         {/* Smooth animated fan-out container */}
                         <div style={getCardStyle(index)} className="w-full">
