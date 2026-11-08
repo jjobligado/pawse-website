@@ -135,13 +135,19 @@ export default function Header() {
                     download={platformInfo.fileName}
                     onClick={handleDownloadClick}
                     data-os={detectedPlatform}
+                    // Visible text stays "Download"; the accessible name says which file ("Download PAWSE for Windows").
+                    aria-label={
+                        platformInfo.isMobileShare
+                            ? "Download PAWSE"
+                            : platformInfo.label.replace("Download", "Download PAWSE")
+                    }
                     className={`h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 cursor-pointer shrink-0 select-none ${
                         isDownloadPressed
-                            ? "bg-[#111111]"
-                            : "bg-ink hover:bg-[#3F3F46] active:bg-[#111111]"
+                            ? "bg-ink-active"
+                            : "bg-ink hover:bg-ink-hover active:bg-ink-active"
                     }`}
                 >
-                    <span className="font-pixel text-sm sm:text-[17px] font-medium tracking-wide leading-none">
+                    <span className="font-pixel text-sm sm:text-[17px] font-semibold tracking-wide leading-none">
                         Download
                     </span>
                 </Link>

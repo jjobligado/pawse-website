@@ -186,7 +186,7 @@ export default function ContactSection() {
                         <button
                             type="button"
                             onClick={handleReset}
-                            className="mt-2 text-sm font-medium text-ink link-underline hover:decoration-muted transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                            className="mt-2 text-sm font-medium text-ink link-underline transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                         >
                             Send another message
                         </button>
@@ -290,7 +290,7 @@ export default function ContactSection() {
                                         ? status.reason
                                         : "The contact form is unavailable right now."}{" "}
                                     Please email us at{" "}
-                                    <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-2">
+                                    <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium link-underline">
                                         {CONTACT_EMAIL}
                                     </a>
                                     .
@@ -412,7 +412,7 @@ function EmailFallback() {
                     onClick={handleCopy}
                     title="Click to copy"
                     aria-label={`Copy email address ${CONTACT_EMAIL}`}
-                    className="font-medium text-ink break-all link-underline hover:decoration-muted cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                    className="font-medium text-ink break-all link-underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                 >
                     {CONTACT_EMAIL}
                 </button>

@@ -92,7 +92,7 @@ const FAQS: { question: string; answer: ReactNode }[] = [
                 Send us a message through the{" "}
                 <a
                     href="#contact"
-                    className="font-medium text-ink link-underline hover:decoration-muted"
+                    className="font-medium text-ink link-underline"
                 >
                     contact form
                 </a>{" "}
@@ -114,7 +114,7 @@ export default function FaqSection() {
                 {FAQS.map((faq) => (
                     <details key={faq.question} className="group py-1">
                         <summary className="flex items-center justify-between gap-4 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
-                            <span className="text-base md:text-[17px] font-semibold text-ink-strong leading-snug">
+                            <span className="text-base md:text-[17px] font-medium text-ink-strong leading-snug">
                                 {faq.question}
                             </span>
                             {/* Plus that turns into a minus when open */}

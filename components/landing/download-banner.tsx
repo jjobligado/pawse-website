@@ -104,7 +104,7 @@ export default function DownloadBanner() {
                                         <a
                                             href={p.href}
                                             download={p.fileName}
-                                            className="font-medium text-ink link-underline hover:decoration-muted"
+                                            className="font-medium text-ink link-underline"
                                         >
                                             {p.name}
                                         </a>
