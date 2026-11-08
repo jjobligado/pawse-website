@@ -436,7 +436,8 @@ body {
  * Text links. One source of truth so every link behaves the same:
  * - underline follows the text color (ink on the page, red inside error alerts;
  *   never blue)
- * - 1px at rest, 2px on hover: the SAME hover weight for every underlined link
+ * - 1px at rest, 1.5px on hover: the SAME hover weight for every underlined link
+ *   (1px is the thinnest line that renders reliably on standard-resolution screens)
  * Footer links use `hover:link-underline` (underline only appears on hover)
  * together with `link-hover-weight`.
  */
@@ -448,7 +449,7 @@ body {
   transition: text-decoration-thickness 150ms ease-out;
 
   &:hover {
-    text-decoration-thickness: 2px;
+    text-decoration-thickness: 1.5px;
   }
 }
 
