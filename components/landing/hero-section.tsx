@@ -196,7 +196,7 @@ export default function HeroSection() {
                             <div
                                 role="status"
                                 aria-live="polite"
-                                className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap select-none z-40 transition-all duration-200 ${
+                                className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap select-none z-40 transition-all duration-200 ${
                                     activeDialogueCat === "ginger"
                                         ? "visible opacity-100 translate-y-0 scale-100"
                                         : "invisible opacity-0 translate-y-2 scale-90 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
@@ -345,9 +345,9 @@ export default function HeroSection() {
                                 download={platformInfo.fileName}
                                 onClick={handleCTAClick}
                                 data-os={detectedPlatform}
-                                className={`group flex items-center justify-center gap-2 py-2.5 px-5 min-[360px]:px-7 rounded-[50px] whitespace-nowrap shadow-[0px_0px_24px_0px_rgba(53,166,241,0.25)] animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0px_8px_30px_0px_rgba(53,166,241,0.45)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_2px_14px_0px_rgba(53,166,241,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
+                                className={`group flex items-center justify-center gap-2 py-2.5 px-5 min-[360px]:px-7 rounded-[50px] whitespace-nowrap shadow-glow animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-glow-hover active:translate-y-0 active:scale-[0.97] active:shadow-glow-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
                                     copied
-                                        ? "bg-success hover:bg-[#065F46] text-white"
+                                        ? "bg-success hover:bg-success-hover text-white"
                                         : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white"
                                 }`}
                             >
@@ -456,7 +456,7 @@ export default function HeroSection() {
                                 {/* Floating Other Platforms list (disclosure pattern: plain links, Tab to move) */}
                                 <div
                                     id="other-platforms-list"
-                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[300px] sm:w-[320px] rounded-2xl bg-white border-2 border-stroke p-1.5 shadow-[0_20px_40px_-10px_rgba(20,20,20,0.16),0_4px_12px_-2px_rgba(20,20,20,0.08)] z-50 origin-top transition-all duration-200 ease-out ${
+                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[300px] sm:w-[320px] rounded-2xl bg-white border-2 border-stroke p-1.5 shadow-elevated z-50 origin-top transition-all duration-200 ease-out ${
                                         platformsOpen
                                             ? "visible opacity-100 translate-y-0 scale-100 pointer-events-auto"
                                             : "invisible opacity-0 -translate-y-1.5 scale-95 pointer-events-none"
@@ -469,11 +469,11 @@ export default function HeroSection() {
                                                 href={item.href}
                                                 download={item.fileName}
                                                 onClick={() => setPlatformsOpen(false)}
-                                                className="group/item flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F2F9FF] active:bg-[#E5F3FF] transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                                                className="group/item flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl hover:bg-sky-50 active:bg-sky-100 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {/* Platform Icon Badge */}
-                                                    <div className="w-8 h-8 rounded-lg bg-[#F4F4F5] group-hover/item:bg-accent-strong text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
+                                                    <div className="w-8 h-8 rounded-lg bg-control-track group-hover/item:bg-accent-strong text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
                                                         {item.id === "windows" && (
                                                             <svg
                                                                 width="15"
@@ -563,7 +563,7 @@ export default function HeroSection() {
                                         <div
                                             role="status"
                                             aria-live="polite"
-                                            className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap select-none z-40 transition-all duration-200 ${
+                                            className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap select-none z-40 transition-all duration-200 ${
                                                 activeDialogueCat === "tuxedo"
                                                     ? "visible opacity-100 translate-y-0 scale-100"
                                                     : "invisible opacity-0 translate-y-2 scale-90 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
@@ -618,7 +618,7 @@ export default function HeroSection() {
                                     <div
                                         role="status"
                                         aria-live="polite"
-                                        className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-[2px_2px_0px_0px_#232323] whitespace-nowrap select-none z-40 transition-all duration-200 ${
+                                        className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap select-none z-40 transition-all duration-200 ${
                                             activeDialogueCat === "void"
                                                 ? "visible opacity-100 translate-y-0 scale-100"
                                                 : "invisible opacity-0 translate-y-2 scale-90 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
@@ -646,7 +646,7 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-3xl border-2 border-stroke bg-[linear-gradient(180deg,#F8FAFC_0%,#EBF6FF_100%)] shadow-[0px_12px_40px_0px_rgba(0,0,0,0.08)] flex items-center justify-center p-6">
+                    <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-3xl border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
                         <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
                             App Visuals Preview
                         </span>

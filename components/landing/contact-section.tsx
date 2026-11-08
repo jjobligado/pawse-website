@@ -153,7 +153,7 @@ export default function ContactSection() {
                 we&apos;ll get back to you.
             </p>
 
-            <div className="w-full max-w-[600px] mt-2 p-5 sm:p-8 rounded-3xl border-2 border-stroke bg-[linear-gradient(180deg,#FFFFFF_0%,#FFFFFF_55%,#F2F9FF_100%)] shadow-[0px_12px_32px_-12px_rgba(20,20,20,0.08)]">
+            <div className="w-full max-w-[600px] mt-2 p-5 sm:p-8 rounded-3xl border-2 border-stroke surface-wash shadow-raised">
                 {status.state === "sent" ? (
                     <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3">
                         <div className="w-11 h-11 rounded-full bg-success-soft text-success flex items-center justify-center">
@@ -207,7 +207,7 @@ export default function ContactSection() {
                                             onChange={() => setSelectedTopic(topic.id)}
                                             className="peer sr-only"
                                         />
-                                        <span className="flex w-full items-center justify-center min-h-9 px-1 rounded-full text-[13px] font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] duration-150 hover:text-ink peer-checked:bg-white peer-checked:text-ink peer-checked:shadow-[0_1px_3px_rgba(20,20,20,0.12),0_1px_2px_rgba(20,20,20,0.06)] peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
+                                        <span className="flex w-full items-center justify-center min-h-9 px-1 rounded-full text-[13px] font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] duration-150 hover:text-ink peer-checked:bg-white peer-checked:text-ink peer-checked:shadow-control peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
                                             {topic.short}
                                         </span>
                                     </label>
@@ -302,7 +302,7 @@ export default function ContactSection() {
                             type="submit"
                             disabled={isSending || !isContactFormConfigured}
                             aria-busy={isSending}
-                            className="w-full flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white font-pixel text-lg font-semibold shadow-[0px_4px_18px_0px_rgba(53,166,241,0.28)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-accent-strong"
+                            className="w-full flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white font-pixel text-lg font-semibold shadow-glow transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-accent-strong"
                         >
                             {isSending && (
                                 <span

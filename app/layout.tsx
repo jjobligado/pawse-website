@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* Keyboard users can jump past the header; hidden until focused */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-full focus:bg-white focus:text-sm focus:font-medium focus:text-ink focus:shadow-[0_4px_16px_rgba(20,20,20,0.15)] focus:outline-none focus:ring-2 focus:ring-accent"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-full focus:bg-white focus:text-sm focus:font-medium focus:text-ink focus:shadow-elevated focus:outline-none focus:ring-2 focus:ring-accent"
         >
           Skip to content
         </a>
