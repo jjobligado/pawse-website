@@ -39,7 +39,7 @@ export default function CompanionsSection() {
                 <CompanionCards />
 
                 <SectionSubtitle className="text-center text-balance">
-                    Three cats, three paces: 15, 25, or 50-minute sessions. Pick the one
+                    Three cats, three paces: 15, 25, or 50‑minute sessions. Pick the one
                     that matches how you actually focus.
                 </SectionSubtitle>
             </div>
