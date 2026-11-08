@@ -147,7 +147,7 @@ export default function Header() {
                             : "bg-ink hover:bg-ink-hover active:bg-ink-active"
                     }`}
                 >
-                    <span className="font-pixel text-sm sm:text-[17px] font-medium tracking-wide leading-none">
+                    <span className="font-pixel text-sm sm:text-[17px] font-semibold tracking-wide leading-none">
                         Download
                     </span>
                 </Link>
