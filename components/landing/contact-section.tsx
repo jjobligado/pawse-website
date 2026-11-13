@@ -7,44 +7,6 @@ import { CONTACT_EMAIL } from "@/lib/site-config";
 import { SectionTitle } from "./section-heading";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
-type ContactTopicId = "general" | "feature" | "bug" | "feedback";
-
-interface ContactTopic {
-    id: ContactTopicId;
-    /** Short segment label (keeps all four on one line at every width). */
-    short: string;
-    /** Full name used in the email subject and confirmation. */
-    label: string;
-    placeholder: string;
-}
-
-const CONTACT_TOPICS: ContactTopic[] = [
-    {
-        id: "general",
-        short: "General",
-        label: "General Inquiry",
-        placeholder: "How can we help?",
-    },
-    {
-        id: "feature",
-        short: "Feature",
-        label: "Feature Request",
-        placeholder: "What would you like to see, and how would it help your focus routine?",
-    },
-    {
-        id: "bug",
-        short: "Bug",
-        label: "Bug Report",
-        placeholder: "What happened, how to reproduce it, and your PAWSE version.",
-    },
-    {
-        id: "feedback",
-        short: "Feedback",
-        label: "App Feedback",
-        placeholder: "What's working well, and what could be better?",
-    },
-];
-
 const OS_NAMES: Partial<Record<DetectedPlatform, string>> = {
     windows: "Windows",
     mac: "macOS",
@@ -54,9 +16,9 @@ const OS_NAMES: Partial<Record<DetectedPlatform, string>> = {
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;
 
-type FieldErrors = Partial<Record<"email" | "message", string>>;
+type FieldErrors = Partial<Record<"email" | "subject" | "message", string>>;
 
-function validate(email: string, message: string): FieldErrors {
+function validate(email: string, subject: string, message: string): FieldErrors {
     const errors: FieldErrors = {};
     const trimmedEmail = email.trim();
     const trimmedMessage = message.trim();
@@ -64,6 +26,8 @@ function validate(email: string, message: string): FieldErrors {
     if (!trimmedEmail) errors.email = "Enter your email so we can reply.";
     else if (!EMAIL_PATTERN.test(trimmedEmail))
         errors.email = "Enter a valid email address, like name@example.com.";
+
+    if (!subject.trim()) errors.subject = "Add a subject so we know what it's about.";
 
     if (!trimmedMessage) errors.message = "Write a message before sending.";
     else if (trimmedMessage.length < MIN_MESSAGE_LENGTH)
@@ -78,9 +42,9 @@ const INPUT_CLASSES =
 type Status = { state: "idle" | "sending" | "sent" } | { state: "error"; reason: string };
 
 export default function ContactSection() {
-    const [selectedTopic, setSelectedTopic] = useState<ContactTopicId>("general");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
     const [botcheck, setBotcheck] = useState(false);
     const [errors, setErrors] = useState<FieldErrors>({});
@@ -88,12 +52,11 @@ export default function ContactSection() {
     const [status, setStatus] = useState<Status>({ state: "idle" });
 
     const emailRef = useRef<HTMLInputElement>(null);
+    const subjectRef = useRef<HTMLInputElement>(null);
     const messageRef = useRef<HTMLTextAreaElement>(null);
     const successHeadingRef = useRef<HTMLHeadingElement>(null);
     const { platform } = usePlatform();
 
-    const activeTopic =
-        CONTACT_TOPICS.find((t) => t.id === selectedTopic) ?? CONTACT_TOPICS[0];
     const isSending = status.state === "sending";
 
     // Move focus to the confirmation so screen readers announce it and keyboard users aren't lost.
@@ -104,11 +67,15 @@ export default function ContactSection() {
     // After the first submit attempt, errors update live as the visitor fixes each field.
     const updateEmail = (value: string) => {
         setEmail(value);
-        if (hasTriedSubmit) setErrors((prev) => ({ ...prev, email: validate(value, message).email }));
+        if (hasTriedSubmit) setErrors((prev) => ({ ...prev, email: validate(value, subject, message).email }));
+    };
+    const updateSubject = (value: string) => {
+        setSubject(value);
+        if (hasTriedSubmit) setErrors((prev) => ({ ...prev, subject: validate(email, value, message).subject }));
     };
     const updateMessage = (value: string) => {
         setMessage(value);
-        if (hasTriedSubmit) setErrors((prev) => ({ ...prev, message: validate(email, value).message }));
+        if (hasTriedSubmit) setErrors((prev) => ({ ...prev, message: validate(email, subject, value).message }));
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -116,14 +83,15 @@ export default function ContactSection() {
         if (isSending) return;
 
         setHasTriedSubmit(true);
-        const nextErrors = validate(email, message);
+        const nextErrors = validate(email, subject, message);
         setErrors(nextErrors);
         if (nextErrors.email) return emailRef.current?.focus();
+        if (nextErrors.subject) return subjectRef.current?.focus();
         if (nextErrors.message) return messageRef.current?.focus();
 
         setStatus({ state: "sending" });
         const result = await sendContactMessage({
-            topic: activeTopic.label,
+            subject: subject.trim(),
             name: name.trim(),
             email: email.trim(),
             message: message.trim(),
@@ -136,6 +104,7 @@ export default function ContactSection() {
     const handleReset = () => {
         setName("");
         setEmail("");
+        setSubject("");
         setMessage("");
         setErrors({});
         setHasTriedSubmit(false);
@@ -154,7 +123,7 @@ export default function ContactSection() {
                 we&apos;ll get back to you.
             </p>
 
-            <div className="w-full max-w-[600px] mt-2 p-5 sm:p-8 rounded-card-lg border-2 border-stroke surface-wash shadow-raised">
+            <div className="w-full max-w-[720px] mt-2 p-5 sm:p-8 rounded-card-lg border-2 border-stroke surface-wash shadow-raised">
                 {status.state === "sent" ? (
                     <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3">
                         <div className="w-11 h-11 rounded-full bg-success-soft text-success flex items-center justify-center">
@@ -181,7 +150,7 @@ export default function ContactSection() {
                         </h3>
                         <p role="status" className="max-w-[420px] text-body-sm text-muted leading-relaxed">
                             Thanks{name.trim() ? `, ${name.trim()}` : ""}. We&apos;ve
-                            received your {activeTopic.label.toLowerCase()} and will reply
+                            received your message and will reply
                             to <span className="font-medium text-ink break-all">{email.trim()}</span>.
                         </p>
                         <button
@@ -194,58 +163,57 @@ export default function ContactSection() {
                     </div>
                 ) : (
                     <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-                        {/* Topic: segmented control built on native radios (arrow-key navigation) */}
-                        <fieldset disabled={isSending} className="min-w-0">
-                            <legend className="mb-2 text-sm font-medium text-ink">Topic</legend>
-                            <div className="grid grid-cols-4 gap-1 p-1 rounded-full bg-control-track">
-                                {CONTACT_TOPICS.map((topic) => (
-                                    <label key={topic.id} className="min-w-0 cursor-pointer select-none">
-                                        <input
-                                            type="radio"
-                                            name="contact-topic"
-                                            value={topic.id}
-                                            checked={selectedTopic === topic.id}
-                                            onChange={() => setSelectedTopic(topic.id)}
-                                            className="peer sr-only"
-                                        />
-                                        <span className="flex w-full items-center justify-center min-h-9 px-1 rounded-full text-caption font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] duration-150 hover:text-ink peer-checked:bg-white peer-checked:text-ink peer-checked:shadow-control peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
-                                            {topic.short}
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
-                        </fieldset>
+                        {/* Name and email side by side from sm up; stacked on phones */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <Field id="contact-name" label="Name" optional>
+                                <input
+                                    id="contact-name"
+                                    type="text"
+                                    name="name"
+                                    autoComplete="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    maxLength={100}
+                                    disabled={isSending}
+                                    className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                />
+                            </Field>
 
-                        <Field id="contact-name" label="Name" optional>
+                            <Field id="contact-email" label="Email" error={errors.email}>
+                                <input
+                                    ref={emailRef}
+                                    id="contact-email"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="email"
+                                    inputMode="email"
+                                    value={email}
+                                    onChange={(e) => updateEmail(e.target.value)}
+                                    placeholder="name@example.com"
+                                    maxLength={254}
+                                    disabled={isSending}
+                                    aria-required="true"
+                                    aria-invalid={errors.email ? true : undefined}
+                                    aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                    className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                />
+                            </Field>
+                        </div>
+
+                        <Field id="contact-subject" label="Subject" error={errors.subject}>
                             <input
-                                id="contact-name"
+                                ref={subjectRef}
+                                id="contact-subject"
                                 type="text"
-                                name="name"
-                                autoComplete="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                maxLength={100}
-                                disabled={isSending}
-                                className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                            />
-                        </Field>
-
-                        <Field id="contact-email" label="Email" error={errors.email}>
-                            <input
-                                ref={emailRef}
-                                id="contact-email"
-                                type="email"
-                                name="email"
-                                autoComplete="email"
-                                inputMode="email"
-                                value={email}
-                                onChange={(e) => updateEmail(e.target.value)}
-                                placeholder="name@example.com"
-                                maxLength={254}
+                                name="subject"
+                                value={subject}
+                                onChange={(e) => updateSubject(e.target.value)}
+                                placeholder="What's this about?"
+                                maxLength={150}
                                 disabled={isSending}
                                 aria-required="true"
-                                aria-invalid={errors.email ? true : undefined}
-                                aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                aria-invalid={errors.subject ? true : undefined}
+                                aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                                 className={`h-11 px-3.5 ${INPUT_CLASSES}`}
                             />
                         </Field>
@@ -258,7 +226,7 @@ export default function ContactSection() {
                                 rows={5}
                                 value={message}
                                 onChange={(e) => updateMessage(e.target.value)}
-                                placeholder={activeTopic.placeholder}
+                                placeholder="How can we help? For bugs, include what happened and your PAWSE version."
                                 maxLength={5000}
                                 disabled={isSending}
                                 aria-required="true"
