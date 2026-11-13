@@ -5,49 +5,62 @@ import Image from "next/image";
 import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
+import SpriteCat from "./sprite-cat";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
 const PARALLAX_SPEED = {
-    ginger: -0.09,
     showcase: -0.03,
 } as const;
 
-type CompanionCatId = "ginger" | "tuxedo" | "void";
+const SPRITES = "/sprites";
 
-const CAT_DIALOGUES: Record<CompanionCatId, string[]> = {
-    ginger: [
-        "Let's sprint! ⚡",
-        "Is it snack break yet? 🐟",
-        "5-min pawse, then back to work! 🐾",
-        "Zoomies incoming! 🚀",
-    ],
-    tuxedo: [
-        "Stay focused. You got this. 🐾",
-        "Purrfection takes patience. ✨",
-        "One task at a time. 🎩",
-        "Deep work in session. ☕",
-    ],
-    void: [
-        "Phase 1: Nap. Phase 2: World domination... 🌙",
-        "Do not tap me. You cannot handle my power. 👁️",
-        "Plotting world domination... 🐾",
-        "The shadows obey my command. ✨",
-    ],
-};
+/**
+ * Same size for all three cats. 64px frames at 1× on phones and 2× from lg up;
+ * 1.5× (96px) in between, where 128px would reach the headline (tablets are
+ * high-density, so 1.5× still lands on whole device pixels there).
+ */
+const CAT_SIZE = "w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32";
+
+/** Hero companions: idle loops on their own; hover / tap plays the break sheet once. */
+const HERO_CATS = {
+    ginger: {
+        label: "Play with Ginger",
+        idle: { src: `${SPRITES}/ginger-body-idle-sheet.png`, frames: 5 },
+        action: { src: `${SPRITES}/ginger-body-break-sheet.png`, frames: 9 },
+        idleHoldMs: 2400,
+    },
+    tux: {
+        label: "Play with Tux",
+        idle: { src: `${SPRITES}/tux-body-idle-sheet.png`, frames: 4 },
+        action: { src: `${SPRITES}/tux-body-break-sheet.png`, frames: 10 },
+        idleHoldMs: 3000,
+    },
+    // Void peeks over the preview, so only the head shows, from one sheet
+    // (frames: 0 look, 1 squint, 2 eyes closed, 3 side-eye). Idle is a slow blink;
+    // hover plays the whole look-around so the reaction reads as different from idle.
+    void: {
+        label: "Play with Void",
+        idle: { src: `${SPRITES}/void-head-peek-sheet.png`, frames: 4 },
+        action: { src: `${SPRITES}/void-head-peek-sheet.png`, frames: 4 },
+        idleSequence: [
+            { frame: 0, ms: 3400 },
+            { frame: 2, ms: 160 },
+        ],
+        actionSequence: [
+            { frame: 1, ms: 220 },
+            { frame: 2, ms: 160 },
+            { frame: 0, ms: 200 },
+            { frame: 3, ms: 700 },
+            { frame: 0, ms: 160 },
+        ],
+    },
+} as const;
 
 export default function HeroSection() {
-    const gingerParallaxRef = useRef<HTMLDivElement>(null);
     const showcaseParallaxRef = useRef<HTMLDivElement>(null);
     const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
-    const [activeDialogueCat, setActiveDialogueCat] = useState<CompanionCatId | null>(null);
-    const [dialogueIndices, setDialogueIndices] = useState<Record<CompanionCatId, number>>({
-        ginger: 0,
-        tuxedo: 0,
-        void: 0,
-    });
-    const [bouncingCat, setBouncingCat] = useState<CompanionCatId | null>(null);
     const popoverRef = useRef<HTMLDivElement>(null);
     const platformsTriggerRef = useRef<HTMLButtonElement>(null);
     const {
@@ -56,39 +69,6 @@ export default function HeroSection() {
         desktopPlatforms,
         isMobile,
     } = usePlatform();
-
-    const handleCatInteract = (cat: CompanionCatId) => {
-        setDialogueIndices((prev) => ({
-            ...prev,
-            [cat]: (prev[cat] + 1) % CAT_DIALOGUES[cat].length,
-        }));
-        setActiveDialogueCat(cat);
-        setBouncingCat(cat);
-        setTimeout(() => {
-            setBouncingCat((curr) => (curr === cat ? null : curr));
-        }, 400);
-    };
-
-    useEffect(() => {
-        if (!activeDialogueCat) return;
-
-        const timer = setTimeout(() => {
-            setActiveDialogueCat(null);
-        }, 4500);
-
-        const handleOutsideTap = (e: MouseEvent | TouchEvent) => {
-            const target = e.target as HTMLElement | null;
-            if (target && !target.closest("[data-companion-cat]")) {
-                setActiveDialogueCat(null);
-            }
-        };
-
-        document.addEventListener("pointerdown", handleOutsideTap);
-        return () => {
-            clearTimeout(timer);
-            document.removeEventListener("pointerdown", handleOutsideTap);
-        };
-    }, [activeDialogueCat, dialogueIndices]);
 
     useEffect(() => {
         if (!platformsOpen) return;
@@ -131,7 +111,6 @@ export default function HeroSection() {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
-            [gingerParallaxRef, PARALLAX_SPEED.ginger],
             [showcaseParallaxRef, PARALLAX_SPEED.showcase],
         ];
 
@@ -172,52 +151,10 @@ export default function HeroSection() {
 
     return (
         <section id="hero" className="relative w-full max-w-chrome mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-12 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
-            {/* Ginger Companion (Upper Left on all screen sizes, balanced position) */}
-            <div
-                ref={gingerParallaxRef}
-                className="absolute top-14 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-30 pointer-events-auto will-change-transform"
-            >
+            {/* Ginger: upper left. z-40 keeps her above the full-width headline row (z-30), which overlaps her feet. */}
+            <div className="absolute top-14 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-40">
                 <div className="animate-cat-intro-ginger">
-                    <div className="animate-cat-float-1">
-                        <button
-                            type="button"
-                            data-companion-cat="ginger"
-                            onClick={() => handleCatInteract("ginger")}
-                            aria-label="Interact with Ginger companion"
-                            aria-expanded={activeDialogueCat === "ginger"}
-                            className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] rotate-6 hover:rotate-0 hover:-translate-y-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
-                                bouncingCat === "ginger" ? "animate-cat-tap" : ""
-                            }`}
-                        >
-                            {/* Pixel Speech Bubble */}
-                            <div
-                                role="status"
-                                aria-live="polite"
-                                className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap select-none z-40 transition-all duration-200 ${
-                                    activeDialogueCat === "ginger"
-                                        ? "visible opacity-100 translate-y-0 scale-100"
-                                        : "invisible opacity-0 translate-y-2 scale-90"
-                                }`}
-                            >
-                                <span className="font-pixel text-micro sm:text-xs font-semibold text-ink">
-                                    {CAT_DIALOGUES.ginger[dialogueIndices.ginger]}
-                                </span>
-                                <span
-                                    aria-hidden="true"
-                                    className="absolute -bottom-[5px] left-5 sm:left-1/2 sm:-translate-x-1/2 w-2 h-2 bg-white border-r-2 border-b-2 border-ink rotate-45"
-                                />
-                            </div>
-                            <Image
-                                src="/images/orange-cat-56586a.png"
-                                alt="Ginger companion"
-                                width={175}
-                                height={175}
-                                unoptimized
-                                className="w-full h-full object-contain select-none [image-rendering:pixelated]"
-                                priority
-                            />
-                        </button>
-                    </div>
+                    <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
                 </div>
             </div>
 
@@ -404,54 +341,15 @@ export default function HeroSection() {
                             </a>
                         </div>
                         {/*
-                          Tux mirrors Ginger across the centre: same sizes, and the same distance from
+                          Tux mirrors Ginger across the centre: same size, and the same distance from
                           the right edge as Ginger has from the left (Ginger's offset minus this row's
                           24px / 40px inset). sm+: level with the button, below the description.
-                          Phones: a 104px cat beside the button would cover it, so Tux sits in the
-                          empty band between "Other platforms" and the preview instead.
+                          Phones: there's no room beside the button, so Tux sits centred in the empty
+                          band between "Other platforms" and the preview instead.
                         */}
-                        <div className="absolute z-20 pointer-events-auto top-[calc(100%+48px)] right-[-12px] sm:top-1/2 sm:-translate-y-1/2 sm:right-0 md:right-[-8px] lg:right-6 xl:right-14 w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px]">
-                            <div className="w-full h-full animate-cat-intro-tuxedo">
-                                <div className="w-full h-full animate-cat-float-3">
-                                    <button
-                                        type="button"
-                                        data-companion-cat="tuxedo"
-                                        onClick={() => handleCatInteract("tuxedo")}
-                                        aria-label="Interact with Tuxedo companion"
-                                        aria-expanded={activeDialogueCat === "tuxedo"}
-                                        className={`group relative w-full h-full -rotate-6 hover:rotate-0 hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
-                                            bouncingCat === "tuxedo" ? "animate-cat-tap" : ""
-                                        }`}
-                                    >
-                                        {/* Pixel Speech Bubble */}
-                                        <div
-                                            role="status"
-                                            aria-live="polite"
-                                            className={`pointer-events-none absolute -top-10 sm:-top-11 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap select-none z-40 transition-all duration-200 ${
-                                                activeDialogueCat === "tuxedo"
-                                                    ? "visible opacity-100 translate-y-0 scale-100"
-                                                    : "invisible opacity-0 translate-y-2 scale-90"
-                                            }`}
-                                        >
-                                            <span className="font-pixel text-micro sm:text-xs font-semibold text-ink">
-                                                {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
-                                            </span>
-                                            <span
-                                                aria-hidden="true"
-                                                className="absolute -bottom-[5px] right-5 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto w-2 h-2 bg-white border-r-2 border-b-2 border-ink rotate-45"
-                                            />
-                                        </div>
-                                        <Image
-                                            src="/images/tuxedo-cat.png"
-                                            alt="Tuxedo companion"
-                                            width={175}
-                                            height={175}
-                                            unoptimized
-                                            className="w-full h-full object-contain select-none [image-rendering:pixelated]"
-                                            priority
-                                        />
-                                    </button>
-                                </div>
+                        <div className="absolute z-20 top-[calc(100%+68px)] right-[-12px] sm:top-1/2 sm:-translate-y-1/2 sm:right-0 md:right-[-8px] lg:right-6 xl:right-14">
+                            <div className="animate-cat-intro-tuxedo">
+                                <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
                             </div>
                         </div>
                     </div>
@@ -600,53 +498,17 @@ export default function HeroSection() {
                 className="relative z-20 w-full max-w-[1040px] mt-32 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 will-change-transform"
             >
                 <div className="relative animate-hero-fade-up-4">
-                    {/* Void: perched on the app preview bezel (top-left) */}
-                    <div className="absolute -top-[80px] sm:-top-[96px] md:-top-[112px] lg:-top-[128px] xl:-top-[136px] left-6 sm:left-10 md:left-16 lg:left-24 z-30 pointer-events-auto">
+                    {/*
+                      Void: only the head, peeking over the preview's top-left edge. It sits behind
+                      the preview (z-0 vs z-10) with its flat bottom tucked 6px under the border.
+                    */}
+                    <div className="absolute bottom-[calc(100%-6px)] left-6 sm:left-10 md:left-16 lg:left-24 z-0">
                         <div className="animate-cat-intro-void">
-                            <div className="animate-cat-perch-3">
-                                <button
-                                    type="button"
-                                    data-companion-cat="void"
-                                    onClick={() => handleCatInteract("void")}
-                                    aria-label="Interact with Void companion"
-                                    aria-expanded={activeDialogueCat === "void"}
-                                    className={`group relative w-[104px] h-[104px] sm:w-[124px] sm:h-[124px] md:w-[145px] md:h-[145px] lg:w-[165px] lg:h-[165px] xl:w-[175px] xl:h-[175px] active:scale-95 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full ${
-                                        bouncingCat === "void" ? "animate-cat-tap" : ""
-                                    }`}
-                                >
-                                    {/* Pixel Speech Bubble */}
-                                    <div
-                                        role="status"
-                                        aria-live="polite"
-                                        className={`pointer-events-none absolute -top-10 sm:-top-11 left-0 sm:left-1/2 sm:-translate-x-1/2 px-2.5 sm:px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap select-none z-40 transition-all duration-200 ${
-                                            activeDialogueCat === "void"
-                                                ? "visible opacity-100 translate-y-0 scale-100"
-                                                : "invisible opacity-0 translate-y-2 scale-90"
-                                        }`}
-                                    >
-                                        <span className="font-pixel text-micro sm:text-xs font-semibold text-ink">
-                                            {CAT_DIALOGUES.void[dialogueIndices.void]}
-                                        </span>
-                                        <span
-                                            aria-hidden="true"
-                                            className="absolute -bottom-[5px] left-5 sm:left-1/2 sm:-translate-x-1/2 w-2 h-2 bg-white border-r-2 border-b-2 border-ink rotate-45"
-                                        />
-                                    </div>
-                                    <Image
-                                        src="/images/black-cat.png"
-                                        alt="Void companion"
-                                        width={175}
-                                        height={175}
-                                        unoptimized
-                                        className="w-full h-full object-contain select-none [image-rendering:pixelated]"
-                                        priority
-                                    />
-                                </button>
-                            </div>
+                            <SpriteCat {...HERO_CATS.void} className={CAT_SIZE} />
                         </div>
                     </div>
 
-                    <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-card-lg border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
+                    <div className="relative z-10 w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-card-lg border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
                         <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
                             App Visuals Preview
                         </span>
