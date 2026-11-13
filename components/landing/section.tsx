@@ -7,9 +7,9 @@ import type { ReactNode } from "react";
  *   so the gap between them is tighter than between unrelated sections
  */
 const SPACING = {
-    default: "py-16 md:py-24",
-    "pair-start": "pt-16 md:pt-24 pb-6 md:pb-8",
-    "pair-end": "pt-6 md:pt-8 pb-16 md:pb-24",
+    default: "py-12 md:py-24",
+    "pair-start": "pt-12 md:pt-24 pb-6 md:pb-8",
+    "pair-end": "pt-6 md:pt-8 pb-12 md:pb-24",
 } as const;
 
 interface SectionProps {

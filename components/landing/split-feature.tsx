@@ -26,11 +26,11 @@ export default function SplitFeature({
 }: SplitFeatureProps) {
     const copy = (
         <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
-            <SectionTitle className="text-left">
+            <SectionTitle className="text-center lg:text-left">
                 <span className="block">{titleLines[0]}</span>
                 <span className="block">{titleLines[1]}</span>
             </SectionTitle>
-            <p className="text-base md:text-lg text-muted text-left leading-relaxed">
+            <p className="max-w-[560px] mx-auto lg:mx-0 text-base md:text-lg text-muted text-center lg:text-left leading-relaxed text-pretty">
                 {children}
             </p>
         </div>

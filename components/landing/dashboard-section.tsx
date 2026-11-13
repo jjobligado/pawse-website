@@ -20,7 +20,7 @@ export default function DashboardSection() {
 
             <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 mt-2">
                 {/* Feature Checklist */}
-                <div className="w-full lg:w-[440px] flex flex-col items-stretch gap-4">
+                <div className="w-fit max-w-full lg:w-[440px] flex flex-col items-stretch gap-4">
                     <div className="w-full flex flex-col items-stretch gap-3.5">
                         {FEATURES.map((item) => (
                             <div key={item} className="w-full flex items-center gap-3.5">

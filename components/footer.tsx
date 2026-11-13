@@ -30,7 +30,7 @@ export default function Footer() {
     return (
         <FooterSpreadSection>
             {/* Brand */}
-            <div className="relative z-10 flex flex-col justify-center gap-4 max-w-[600px]">
+            <div className="relative z-10 flex flex-col items-center md:items-start justify-center gap-4 max-w-[600px] text-center md:text-left">
                 <Link href="/" className="flex items-center gap-3 group w-fit">
                     <Image
                         src="/images/logo.png"
@@ -43,7 +43,7 @@ export default function Footer() {
                         PAWSE
                     </span>
                 </Link>
-                <div className="flex flex-col gap-1 text-xs md:text-sm tracking-[0.02em] text-ink">
+                <div className="flex flex-col items-center md:items-start gap-1 text-xs md:text-sm tracking-[0.02em] text-ink">
                     <a
                         href={`mailto:${CONTACT_EMAIL}`}
                         className="w-fit hover:link-underline link-hover-weight"
@@ -55,7 +55,7 @@ export default function Footer() {
             </div>
 
             {/* Links */}
-            <nav aria-label="Footer" className="relative z-10 flex gap-12 sm:gap-16">
+            <nav aria-label="Footer" className="relative z-10 flex justify-center gap-12 sm:gap-16 text-center md:text-left">
                 {LINK_GROUPS.map((group) => (
                     <div key={group.heading} className="flex flex-col gap-2.5">
                         <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
