@@ -66,7 +66,7 @@ export default function Footer() {
                                 <li key={link.href}>
                                     <Link
                                         href={link.href}
-                                        className="text-[15px] text-ink hover:link-underline link-hover-weight"
+                                        className="text-body-sm text-ink hover:link-underline link-hover-weight"
                                     >
                                         {link.label}
                                     </Link>

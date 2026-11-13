@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
+import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -173,7 +174,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" className="relative w-full max-w-[1440px] mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
+        <section id="hero" className="relative w-full max-w-chrome mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
             {/* Ginger Companion (Upper Left on all screen sizes, balanced position) */}
             <div
                 ref={gingerParallaxRef}
@@ -201,7 +202,7 @@ export default function HeroSection() {
                                         : "invisible opacity-0 translate-y-2 scale-90 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                 }`}
                             >
-                                <span className="font-pixel text-[11px] sm:text-xs font-semibold text-ink">
+                                <span className="font-pixel text-micro sm:text-xs font-semibold text-ink">
                                     {CAT_DIALOGUES.ginger[dialogueIndices.ginger]}
                                 </span>
                                 <span
@@ -226,7 +227,7 @@ export default function HeroSection() {
             {/* Centered Hero Copy & Actions */}
             <div className="relative z-30 w-full flex flex-col items-center gap-6 px-6 md:px-10">
                 <div className="w-full flex justify-center items-center">
-                    <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-[clamp(2.35rem,4.5vw+1.1rem,5rem)] font-semibold text-ink text-center leading-[1.02]">
+                    <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
                             The Coziest Way
                         </span>
@@ -336,7 +337,7 @@ export default function HeroSection() {
                 {/* Download Options */}
                 <div id="hero-cta" className="sm:relative scroll-mt-24 w-full -mx-6 md:-mx-10 pt-2 flex flex-col justify-center items-center gap-4 animate-hero-fade-up-3">
                     {/* Centered CTA Row with Tuxedo Symmetrically Balanced to Ginger */}
-                    <div className="relative w-full max-w-[1440px] flex items-center justify-center">
+                    <div className="relative w-full max-w-chrome flex items-center justify-center">
                         <div className="relative inline-flex items-center justify-center -translate-x-3 sm:translate-x-0">
                             {/* Plain <a>, not next/link: Link prefetches its href as a page, but installers are files */}
                             <a
@@ -345,11 +346,10 @@ export default function HeroSection() {
                                 download={platformInfo.fileName}
                                 onClick={handleCTAClick}
                                 data-os={detectedPlatform}
-                                className={`group flex items-center justify-center gap-2 py-2.5 px-5 min-[360px]:px-7 rounded-[50px] whitespace-nowrap shadow-glow animate-cta-aura transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-glow-hover active:translate-y-0 active:scale-[0.97] active:shadow-glow-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
-                                    copied
-                                        ? "bg-success hover:bg-success-hover text-white"
-                                        : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white"
-                                }`}
+                                className={buttonClasses({
+                                    success: copied,
+                                    className: "group min-[360px]:px-7 animate-cta-aura",
+                                })}
                             >
                                 {copied ? (
                                     <svg
@@ -401,7 +401,7 @@ export default function HeroSection() {
                                         <path d="M12 15V3" />
                                     </svg>
                                 )}
-                                <span className="font-pixel text-base min-[360px]:text-lg md:text-xl font-semibold">
+                                <span className={buttonLabelClasses("lg")}>
                                     {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                                 </span>
                             </a>
@@ -456,7 +456,7 @@ export default function HeroSection() {
                                 {/* Floating Other Platforms list (disclosure pattern: plain links, Tab to move) */}
                                 <div
                                     id="other-platforms-list"
-                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[300px] sm:w-[320px] rounded-2xl bg-white border-2 border-stroke p-1.5 shadow-elevated z-50 origin-top transition-all duration-200 ease-out ${
+                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[300px] sm:w-[320px] rounded-card bg-white border-2 border-stroke p-1.5 shadow-elevated z-50 origin-top transition-all duration-200 ease-out ${
                                         platformsOpen
                                             ? "visible opacity-100 translate-y-0 scale-100 pointer-events-auto"
                                             : "invisible opacity-0 -translate-y-1.5 scale-95 pointer-events-none"
@@ -469,11 +469,11 @@ export default function HeroSection() {
                                                 href={item.href}
                                                 download={item.fileName}
                                                 onClick={() => setPlatformsOpen(false)}
-                                                className="group/item flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl hover:bg-sky-50 active:bg-sky-100 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                                                className="group/item flex items-center justify-between gap-3 px-3 py-2.5 rounded-control hover:bg-sky-50 active:bg-sky-100 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {/* Platform Icon Badge */}
-                                                    <div className="w-8 h-8 rounded-lg bg-control-track group-hover/item:bg-accent-strong text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
+                                                    <div className="w-8 h-8 rounded-chip bg-control-track group-hover/item:bg-accent-strong text-ink group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors">
                                                         {item.id === "windows" && (
                                                             <svg
                                                                 width="15"
@@ -513,7 +513,7 @@ export default function HeroSection() {
                                                         <span className="text-sm font-semibold text-ink-strong group-hover/item:text-black">
                                                             {item.name}
                                                         </span>
-                                                        <span className="text-[11px] text-muted whitespace-nowrap">
+                                                        <span className="text-micro text-muted whitespace-nowrap">
                                                             {item.subtitle}
                                                         </span>
                                                     </div>
@@ -569,7 +569,7 @@ export default function HeroSection() {
                                                     : "invisible opacity-0 translate-y-2 scale-90 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                             }`}
                                         >
-                                            <span className="font-pixel text-[11px] sm:text-xs font-semibold text-ink">
+                                            <span className="font-pixel text-micro sm:text-xs font-semibold text-ink">
                                                 {CAT_DIALOGUES.tuxedo[dialogueIndices.tuxedo]}
                                             </span>
                                             <span
@@ -624,7 +624,7 @@ export default function HeroSection() {
                                                 : "invisible opacity-0 translate-y-2 scale-90 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100"
                                         }`}
                                     >
-                                        <span className="font-pixel text-[11px] sm:text-xs font-semibold text-ink">
+                                        <span className="font-pixel text-micro sm:text-xs font-semibold text-ink">
                                             {CAT_DIALOGUES.void[dialogueIndices.void]}
                                         </span>
                                         <span
@@ -646,7 +646,7 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-3xl border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
+                    <div className="w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-card-lg border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
                         <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
                             App Visuals Preview
                         </span>

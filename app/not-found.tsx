@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 export const metadata: Metadata = {
     title: "Page Not Found",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 /** Branded 404: shown for any URL that doesn't exist (inside the normal header/footer). */
 export default function NotFound() {
     return (
-        <section className="w-full max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28 flex flex-col items-center text-center">
+        <section className="w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28 flex flex-col items-center text-center">
             {/* Void, napping on the job */}
             <div aria-hidden="true" className="relative mb-2">
                 <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-white border-2 border-ink shadow-pixel whitespace-nowrap">
@@ -30,7 +31,7 @@ export default function NotFound() {
 
             <p className="font-pixel text-5xl md:text-6xl font-semibold text-accent-strong leading-none">404</p>
 
-            <h1 className="mt-4 font-pixel text-[clamp(1.75rem,1.4rem+1.5vw,2.75rem)] font-semibold text-ink leading-[1.1] text-balance">
+            <h1 className="mt-4 font-pixel text-display-md font-semibold text-ink text-balance">
                 This Page Took a Pawse
             </h1>
             <p className="mt-4 max-w-[460px] text-base md:text-lg text-muted leading-relaxed text-balance">
@@ -41,9 +42,9 @@ export default function NotFound() {
             <div className="mt-8 flex flex-col items-center gap-4">
                 <Link
                     href="/"
-                    className="flex items-center justify-center gap-2 py-2.5 px-7 rounded-full bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white shadow-glow transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                    className={buttonClasses()}
                 >
-                    <span className="font-pixel text-lg font-semibold">Back to Home</span>
+                    <span className={buttonLabelClasses("md")}>Back to Home</span>
                 </Link>
                 <p className="text-sm text-muted">
                     Think something&apos;s broken?{" "}

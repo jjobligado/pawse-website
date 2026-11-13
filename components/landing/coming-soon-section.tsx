@@ -50,7 +50,7 @@ export default function ComingSoonSection() {
                                 {item.title}
                             </h3>
                         </div>
-                        <p className="relative z-10 w-full max-w-[34ch] text-sm sm:text-base lg:text-[15px] xl:text-base text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed text-balance">
+                        <p className="relative z-10 w-full max-w-[34ch] text-sm sm:text-base lg:text-body-sm xl:text-base text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed text-balance">
                             {item.body}
                         </p>
                     </FeatureCard>

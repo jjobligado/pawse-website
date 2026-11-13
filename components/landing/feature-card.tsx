@@ -9,7 +9,7 @@ interface FeatureCardProps {
 }
 
 const BASE =
-    "group relative overflow-hidden w-full mx-auto h-full flex flex-col justify-center items-center rounded-2xl border-2 border-stroke surface-sky transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-elevated";
+    "group relative overflow-hidden w-full mx-auto h-full flex flex-col justify-center items-center rounded-card border-2 border-stroke surface-sky transition-all duration-500 ease-out hover:-translate-y-2 hover:border-accent hover:shadow-elevated";
 
 /**
  * Sky-gradient card with a hover lift and a "liquid" fill that rises from the

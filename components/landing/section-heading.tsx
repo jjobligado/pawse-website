@@ -10,7 +10,7 @@ interface TextProps {
 export function SectionTitle({ children, className = "text-center" }: TextProps) {
     return (
         <h2
-            className={`font-pixel text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold text-ink leading-[1.1] ${className}`}
+            className={`font-pixel text-display-lg font-semibold text-ink ${className}`}
         >
             {children}
         </h2>

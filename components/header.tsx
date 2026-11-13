@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { usePlatform } from "@/hooks/use-platform";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
+import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
@@ -90,7 +91,7 @@ export default function Header() {
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-[1440px] mx-auto justify-between items-center">
+            <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
                     <Image
@@ -141,13 +142,9 @@ export default function Header() {
                             ? "Download PAWSE"
                             : platformInfo.label.replace("Download", "Download PAWSE")
                     }
-                    className={`h-[38px] sm:h-[40px] flex items-center justify-center px-4 sm:px-6 rounded-full text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 cursor-pointer shrink-0 select-none ${
-                        isDownloadPressed
-                            ? "bg-ink-active"
-                            : "bg-ink hover:bg-ink-hover active:bg-ink-active"
-                    }`}
+                    className={buttonClasses({ variant: "ink", pressed: isDownloadPressed })}
                 >
-                    <span className="font-pixel text-sm sm:text-[17px] font-semibold tracking-wide leading-none">
+                    <span className={buttonLabelClasses("header")}>
                         Download
                     </span>
                 </a>
