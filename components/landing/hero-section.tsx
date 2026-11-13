@@ -513,7 +513,7 @@ export default function HeroSection() {
                                                         <span className="text-sm font-semibold text-ink-strong group-hover/item:text-black">
                                                             {item.name}
                                                         </span>
-                                                        <span className="text-micro text-muted whitespace-nowrap">
+                                                        <span className="text-micro leading-[inherit] text-muted whitespace-nowrap">
                                                             {item.subtitle}
                                                         </span>
                                                     </div>
