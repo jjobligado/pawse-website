@@ -4,8 +4,10 @@ import {
     type ReactNode,
     useCallback,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
+    useState,
 } from "react";
 
 interface PixelDividerProps {
@@ -18,10 +20,18 @@ interface PixelDividerProps {
     className?: string;
 }
 
-const TOTAL_COLS = 76;
+/** Width of the Figma pattern below, in columns. */
+const PATTERN_COLS = 76;
 
-// Row 0: Full 76-column solid blue pixel row bridging the gradient/footer and the 2 scattered rows
-const SOLID_ROW_COLS = Array.from({ length: TOTAL_COLS }, (_, i) => i);
+/**
+ * Pixels keep a fixed on-screen size (the Figma design: 76 columns across 1440px
+ * ≈ 19px). Narrower or wider screens get fewer or more columns, with the pattern
+ * repeating, instead of shrinking or stretching every pixel.
+ */
+const TARGET_PIXEL_PX = 1440 / PATTERN_COLS;
+const MIN_COLS = 8;
+
+// Row 0 is solid across every column: the bridge between the gradient/footer and the 2 scattered rows
 
 // Row 1: Exact integer column indices (0..75) from the Figma grid for the dense middle row
 const BASE_ROW_COLS = [
@@ -36,9 +46,21 @@ const OUTER_ROW_COLS = [
     46, 48, 53, 54, 58, 59, 62, 65, 66, 68, 74, 75,
 ];
 
-const SOLID_ROW_SET = new Set(SOLID_ROW_COLS);
 const BASE_ROW_SET = new Set(BASE_ROW_COLS);
 const OUTER_ROW_SET = new Set(OUTER_ROW_COLS);
+
+/** Columns filled in a row of `totalCols`, repeating the 76-column pattern (`null` = solid). */
+function tileRow(patternSet: Set<number> | null, totalCols: number): number[] {
+    const cols: number[] = [];
+    for (let c = 0; c < totalCols; c++) {
+        if (!patternSet || patternSet.has(c % PATTERN_COLS)) cols.push(c);
+    }
+    return cols;
+}
+
+function colsForWidth(width: number): number {
+    return Math.max(MIN_COLS, Math.round(width / TARGET_PIXEL_PX));
+}
 
 interface PixelWindow {
     col: number;
@@ -64,7 +86,7 @@ function hashPixel(col: number, rowIndex: number, salt: number): number {
     return (h ^ (h >>> 16)) >>> 0;
 }
 
-function buildPixelWindows(): PixelWindow[] {
+function buildPixelWindows(totalCols: number): PixelWindow[] {
     const windows: PixelWindow[] = [];
 
     const addRow = (
@@ -115,9 +137,10 @@ function buildPixelWindows(): PixelWindow[] {
         }
     };
 
-    addRow(SOLID_ROW_COLS, SOLID_ROW_SET, 0);
-    addRow(BASE_ROW_COLS, BASE_ROW_SET, 1);
-    addRow(OUTER_ROW_COLS, OUTER_ROW_SET, 2);
+    [null, BASE_ROW_SET, OUTER_ROW_SET].forEach((pattern, rowIndex) => {
+        const cols = tileRow(pattern, totalCols);
+        addRow(cols, new Set(cols), rowIndex as 0 | 1 | 2);
+    });
     return windows;
 }
 
@@ -128,10 +151,24 @@ export default function PixelDivider({
 }: PixelDividerProps) {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const rectRefs = useRef<(SVGRectElement | null)[]>([]);
-    const pixelWindows = useMemo(() => buildPixelWindows(), []);
+    // Server render and first paint use the design's 76 columns; the real count follows the width.
+    const [totalCols, setTotalCols] = useState(PATTERN_COLS);
+    const pixelWindows = useMemo(() => buildPixelWindows(totalCols), [totalCols]);
+    const lastProgressRef = useRef(0);
+
+    useEffect(() => {
+        const el = svgRef.current;
+        if (!el) return;
+        const observer = new ResizeObserver(([entry]) => {
+            setTotalCols(colsForWidth(entry.contentRect.width));
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     const applyPixelProgress = useCallback(
         (progress: number) => {
+            lastProgressRef.current = progress;
             for (let i = 0; i < pixelWindows.length; i++) {
                 const el = rectRefs.current[i];
                 if (!el) continue;
@@ -186,6 +223,11 @@ export default function PixelDivider({
         [pixelWindows]
     );
 
+    // A new column count renders new rects: give them the current progress before paint.
+    useLayoutEffect(() => {
+        applyPixelProgress(lastProgressRef.current);
+    }, [applyPixelProgress]);
+
     useEffect(() => {
         if (onRegisterUpdater) {
             onRegisterUpdater(applyPixelProgress);
@@ -199,10 +241,12 @@ export default function PixelDivider({
             return;
         }
 
-        let targetP = 0;
-        let currentP = 0;
+        // Resume where it was if the column count changed mid-reveal (or after it finished).
+        let targetP = lastProgressRef.current;
+        let currentP = targetP;
         let rafId: number | null = null;
-        let isFinished = false;
+        let isFinished = targetP >= 1;
+        if (isFinished) return;
 
         const tick = () => {
             const delta = (targetP - currentP) * 0.055;
@@ -254,7 +298,7 @@ export default function PixelDivider({
             }
         };
 
-        applyPixelProgress(0);
+        applyPixelProgress(currentP);
         onScroll();
 
         if (targetP < 1) {
@@ -296,12 +340,13 @@ export default function PixelDivider({
     return (
         <svg
             ref={svgRef}
-            viewBox="0 0 76 3"
+            viewBox={`0 0 ${totalCols} 3`}
             preserveAspectRatio="none"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
-            className={`relative z-10 w-full aspect-[76/3] block select-none ${seamOverlapClass} ${className}`}
+            style={{ aspectRatio: `${totalCols} / 3` }}
+            className={`relative z-10 w-full block select-none ${seamOverlapClass} ${className}`}
         >
             {pixelWindows.map((pw, idx) => (
                 <rect
@@ -639,10 +684,10 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
                     <div className="w-full flex-1 bg-accent-highlight" />
                 </div>
 
-                {/* Spacer matching the 3-row PixelDivider aspect ratio */}
+                {/* Spacer matching the 3-row PixelDivider height (3 pixels of ~19px each) */}
                 <div
                     aria-hidden="true"
-                    className="w-full aspect-[76/3] shrink-0"
+                    className="w-full h-[calc(3*1440px/76)] shrink-0"
                 />
 
                 {/* Unmasked Foreground Footer Content (z-10) */}
