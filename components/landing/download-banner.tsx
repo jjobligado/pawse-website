@@ -5,6 +5,7 @@ import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import Section from "./section";
 import { SectionTitle } from "./section-heading";
+import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 const FACES = [
     { src: "/images/orange-cat-face.png", tilt: "-rotate-6" },
@@ -25,7 +26,7 @@ export default function DownloadBanner() {
 
     return (
         <Section id="download" className="flex flex-col items-stretch">
-            <div className="relative overflow-hidden w-full rounded-3xl border-2 border-stroke surface-sky px-6 py-12 sm:px-12 md:py-16 flex flex-col items-center text-center gap-5">
+            <div className="relative overflow-hidden w-full rounded-card-lg border-2 border-stroke surface-sky px-6 py-12 sm:px-12 md:py-16 flex flex-col items-center text-center gap-5">
                 {/* The three companions, saying goodbye */}
                 <div aria-hidden="true" className="flex items-end gap-3">
                     {FACES.map((face) => (
@@ -53,13 +54,9 @@ export default function DownloadBanner() {
                         <button
                             type="button"
                             onClick={() => void sendToDesktop()}
-                            className={`flex items-center justify-center gap-2 py-2.5 px-5 sm:px-7 rounded-full whitespace-nowrap text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer ${
-                                copied
-                                    ? "bg-success hover:bg-success-hover"
-                                    : "bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active"
-                            }`}
+                            className={buttonClasses({ success: copied })}
                         >
-                            <span className="font-pixel text-base sm:text-lg md:text-xl font-semibold">
+                            <span className={buttonLabelClasses("lg")}>
                                 {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
                             </span>
                         </button>
@@ -68,7 +65,7 @@ export default function DownloadBanner() {
                             href={platformInfo.href}
                             download={platformInfo.fileName}
                             suppressHydrationWarning
-                            className="flex items-center justify-center gap-2 py-2.5 px-5 sm:px-7 rounded-full whitespace-nowrap bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white shadow-glow transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                            className={buttonClasses()}
                         >
                             <svg
                                 width="20"
@@ -85,7 +82,7 @@ export default function DownloadBanner() {
                                 <path d="M7 10l5 5 5-5" />
                                 <path d="M12 15V3" />
                             </svg>
-                            <span className="font-pixel text-base sm:text-lg md:text-xl font-semibold">
+                            <span className={buttonLabelClasses("lg")}>
                                 {platformInfo.label}
                             </span>
                         </a>

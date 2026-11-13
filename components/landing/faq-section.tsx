@@ -121,11 +121,11 @@ export default function FaqSection() {
                 Everything you need to know before you download.
             </SectionSubtitle>
 
-            <div className="w-full max-w-[760px] mt-2 rounded-3xl border-2 border-stroke bg-white px-5 sm:px-8 divide-y divide-stroke">
+            <div className="w-full max-w-[760px] mt-2 rounded-card-lg border-2 border-stroke bg-white px-5 sm:px-8 divide-y divide-stroke">
                 {FAQS.map((faq) => (
                     <details key={faq.question} className="group py-1">
-                        <summary className="flex items-center justify-between gap-4 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
-                            <span className="text-base md:text-[17px] font-medium text-ink-strong leading-snug">
+                        <summary className="flex items-center justify-between gap-4 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden rounded-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
+                            <span className="text-base md:text-label font-medium text-ink-strong leading-snug">
                                 {faq.question}
                             </span>
                             {/* Plus that turns into a minus when open */}
@@ -137,7 +137,7 @@ export default function FaqSection() {
                                 <span className="absolute left-1/2 top-1/2 w-0.5 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink transition-transform duration-200 group-open:scale-y-0" />
                             </span>
                         </summary>
-                        <div className="pb-5 pr-11 text-[15px] md:text-base text-muted leading-relaxed">
+                        <div className="pb-5 pr-11 text-body-sm md:text-base text-muted leading-relaxed">
                             {faq.answer}
                         </div>
                     </details>

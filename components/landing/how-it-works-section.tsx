@@ -87,7 +87,7 @@ export default function HowItWorksSection() {
                                         <Lines lines={step.title} className="block whitespace-nowrap" />
                                     </h3>
                                 </div>
-                                <p className="w-full min-h-[2lh] xl:min-h-[3lh] text-sm sm:text-base md:text-[15px] text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed">
+                                <p className="w-full min-h-[2lh] xl:min-h-[3lh] text-sm sm:text-base md:text-body-sm text-ink-soft group-hover:text-ink transition-colors duration-300 text-center leading-relaxed">
                                     <Lines lines={step.wide} className="block xl:hidden" />
                                     <Lines lines={step.narrow} className="hidden xl:block" />
                                 </p>

@@ -272,7 +272,7 @@ export default function PixelDivider({
     }, [applyPixelProgress, onRegisterUpdater]);
 
     // Sub-pixel overlap bleed across all 3 rows prevents hairline gaps between adjacent pixels
-    // and between Row 0 and the adjacent #A8DCFF section at any screen size or zoom level.
+    // and between Row 0 and the adjacent accent-highlight section at any screen size or zoom level.
     const getRowY = (rowIndex: 0 | 1 | 2) => {
         if (direction === "down") {
             if (rowIndex === 0) return -0.06;
@@ -313,7 +313,7 @@ export default function PixelDivider({
                     y={getRowY(pw.rowIndex)}
                     width={pw.width}
                     height={getRowHeight(pw.rowIndex)}
-                    fill="#A8DCFF"
+                    fill="var(--color-accent-highlight)"
                     style={{
                         opacity: 0,
                     }}
@@ -621,7 +621,7 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
             >
                 {/*
                   Shared Masked Background Layer (z-0):
-                  Wraps BOTH the PixelDivider and the #A8DCFF Footer fill inside the exact same
+                  Wraps BOTH the PixelDivider and the accent-highlight footer fill inside the exact same
                   0deg bottom-to-top mask so they blend together as a single continuous wave!
                 */}
                 <div

@@ -5,6 +5,7 @@ import { usePlatform, type DetectedPlatform } from "@/hooks/use-platform";
 import { isContactFormConfigured, sendContactMessage } from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 import { SectionTitle } from "./section-heading";
+import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 type ContactTopicId = "general" | "feature" | "bug" | "feedback";
 
@@ -72,7 +73,7 @@ function validate(email: string, message: string): FieldErrors {
 }
 
 const INPUT_CLASSES =
-    "w-full rounded-xl bg-white border border-stroke text-[15px] text-ink placeholder:text-faint transition-[border-color,box-shadow] duration-150 hover:border-stroke-strong focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent-highlight/40 aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60 disabled:cursor-not-allowed";
+    "w-full rounded-control bg-white border border-stroke text-body-sm text-ink placeholder:text-faint transition-[border-color,box-shadow] duration-150 hover:border-stroke-strong focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent-highlight/40 aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60 disabled:cursor-not-allowed";
 
 type Status = { state: "idle" | "sending" | "sent" } | { state: "error"; reason: string };
 
@@ -144,7 +145,7 @@ export default function ContactSection() {
     return (
         <section
             id="contact"
-            className="scroll-mt-20 w-full max-w-[1280px] mx-auto py-16 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
+            className="scroll-mt-20 w-full max-w-content mx-auto py-16 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
         >
             <SectionTitle>Contact Us</SectionTitle>
 
@@ -153,7 +154,7 @@ export default function ContactSection() {
                 we&apos;ll get back to you.
             </p>
 
-            <div className="w-full max-w-[600px] mt-2 p-5 sm:p-8 rounded-3xl border-2 border-stroke surface-wash shadow-raised">
+            <div className="w-full max-w-[600px] mt-2 p-5 sm:p-8 rounded-card-lg border-2 border-stroke surface-wash shadow-raised">
                 {status.state === "sent" ? (
                     <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3">
                         <div className="w-11 h-11 rounded-full bg-success-soft text-success flex items-center justify-center">
@@ -178,7 +179,7 @@ export default function ContactSection() {
                         >
                             Message sent
                         </h3>
-                        <p role="status" className="max-w-[420px] text-[15px] text-muted leading-relaxed">
+                        <p role="status" className="max-w-[420px] text-body-sm text-muted leading-relaxed">
                             Thanks{name.trim() ? `, ${name.trim()}` : ""}. We&apos;ve
                             received your {activeTopic.label.toLowerCase()} and will reply
                             to <span className="font-medium text-ink break-all">{email.trim()}</span>.
@@ -207,7 +208,7 @@ export default function ContactSection() {
                                             onChange={() => setSelectedTopic(topic.id)}
                                             className="peer sr-only"
                                         />
-                                        <span className="flex w-full items-center justify-center min-h-9 px-1 rounded-full text-[13px] font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] duration-150 hover:text-ink peer-checked:bg-white peer-checked:text-ink peer-checked:shadow-control peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
+                                        <span className="flex w-full items-center justify-center min-h-9 px-1 rounded-full text-caption font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] duration-150 hover:text-ink peer-checked:bg-white peer-checked:text-ink peer-checked:shadow-control peer-focus-visible:ring-2 peer-focus-visible:ring-accent">
                                             {topic.short}
                                         </span>
                                     </label>
@@ -282,7 +283,7 @@ export default function ContactSection() {
                         {(status.state === "error" || !isContactFormConfigured) && (
                             <div
                                 role="alert"
-                                className="flex items-start gap-2.5 rounded-xl border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger leading-relaxed"
+                                className="flex items-start gap-2.5 rounded-control border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger leading-relaxed"
                             >
                                 <AlertIcon className="mt-0.5" />
                                 <p>
@@ -302,7 +303,7 @@ export default function ContactSection() {
                             type="submit"
                             disabled={isSending || !isContactFormConfigured}
                             aria-busy={isSending}
-                            className="w-full flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-strong-active text-white font-pixel text-lg font-semibold shadow-glow transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-accent-strong"
+                            className={buttonClasses({ className: `w-full h-12 ${buttonLabelClasses("md")}` })}
                         >
                             {isSending && (
                                 <span
@@ -343,7 +344,7 @@ function Field({
             </label>
             {children}
             {error && (
-                <p id={`${id}-error`} className="flex items-start gap-1.5 text-[13px] text-danger">
+                <p id={`${id}-error`} className="flex items-start gap-1.5 text-caption text-danger">
                     <AlertIcon className="mt-px" />
                     {error}
                 </p>

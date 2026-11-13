@@ -30,7 +30,7 @@ export default function Section({
     return (
         <section
             id={id}
-            className={`scroll-mt-20 w-full max-w-[1280px] mx-auto px-6 md:px-12 lg:px-20 bg-white ${SPACING[spacing]} ${className}`}
+            className={`scroll-mt-20 w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 bg-white ${SPACING[spacing]} ${className}`}
         >
             {children}
         </section>
