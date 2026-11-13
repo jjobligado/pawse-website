@@ -5,7 +5,7 @@ export default function CompanionsSection() {
     return (
         <section
             id="companions"
-            className="scroll-mt-20 relative w-full py-16 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
+            className="scroll-mt-20 relative w-full py-12 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
         >
             {/* Dynamic Multi-Core Liquid Blue Current (Stretches Full Section Height & Bleeds Horizontally) */}
             <div

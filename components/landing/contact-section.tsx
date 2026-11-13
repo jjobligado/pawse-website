@@ -145,7 +145,7 @@ export default function ContactSection() {
     return (
         <section
             id="contact"
-            className="scroll-mt-20 w-full max-w-content mx-auto py-16 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
+            className="scroll-mt-20 w-full max-w-content mx-auto py-12 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
         >
             <SectionTitle>Contact Us</SectionTitle>
 

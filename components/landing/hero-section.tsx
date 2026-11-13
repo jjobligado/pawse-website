@@ -174,7 +174,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" className="relative w-full max-w-chrome mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-16 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
+        <section id="hero" className="relative w-full max-w-chrome mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-12 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
             {/* Ginger Companion (Upper Left on all screen sizes, balanced position) */}
             <div
                 ref={gingerParallaxRef}
@@ -338,7 +338,7 @@ export default function HeroSection() {
                 <div id="hero-cta" className="sm:relative scroll-mt-24 w-full -mx-6 md:-mx-10 pt-2 flex flex-col justify-center items-center gap-4 animate-hero-fade-up-3">
                     {/* Centered CTA Row with Tuxedo Symmetrically Balanced to Ginger */}
                     <div className="relative w-full max-w-chrome flex items-center justify-center">
-                        <div className="relative inline-flex items-center justify-center -translate-x-3 sm:translate-x-0">
+                        <div className="relative inline-flex items-center justify-center">
                             {/* Plain <a>, not next/link: Link prefetches its href as a page, but installers are files */}
                             <a
                                 suppressHydrationWarning
@@ -545,7 +545,7 @@ export default function HeroSection() {
                     </div>
 
                     {/* Tuxedo Companion: placed AFTER the meta row so screen readers hear Download → Other platforms → cat. Visually: on phones it mirrors Ginger in the top-right corner (positioned against the hero copy wrapper: 88px = 144px hero padding - Ginger's 56px offset); from sm up it sits beside the button (top-8 = 8px padding + half of the 48px button). */}
-                    <div className="absolute top-[-88px] right-3 sm:top-8 sm:-translate-y-1/2 sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto">
+                    <div className="absolute top-[calc(100%+76px)] right-6 sm:top-8 sm:-translate-y-1/2 sm:right-6 md:right-8 lg:right-16 xl:right-24 z-20 pointer-events-auto">
                         <div ref={tuxParallaxRef} className="will-change-transform">
                             <div className="animate-cat-intro-tuxedo">
                                 <div className="animate-cat-float-3">

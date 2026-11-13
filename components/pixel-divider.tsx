@@ -498,7 +498,7 @@ export function DashboardSpreadSection({ id, children }: { id?: string; children
         <section id={id} className="scroll-mt-20 w-full flex flex-col">
             <div
                 ref={containerRef}
-                className="relative w-full pt-16 pb-24 md:pt-24 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
+                className="relative w-full pt-12 pb-16 md:pt-24 md:pb-32 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white overflow-hidden"
             >
                 {/* Unified Inertia Sky-Blue Gradient Layer */}
                 <div
@@ -523,7 +523,7 @@ export function DashboardSpreadSection({ id, children }: { id?: string; children
             />
 
             {/* Extra Padding */}
-            <div className="w-full h-16 md:h-24 bg-white" />
+            <div className="w-full h-8 md:h-24 bg-white" />
         </section>
     );
 }
@@ -658,7 +658,7 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
     return (
         <div className="w-full flex flex-col bg-white">
             {/* Extra Padding */}
-            <div className="w-full h-16 bg-white" />
+            <div className="w-full h-8 md:h-16 bg-white" />
 
             <div
                 ref={containerRef}
@@ -691,7 +691,7 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
                 />
 
                 {/* Unmasked Foreground Footer Content (z-10) */}
-                <footer className="relative z-10 w-full flex flex-col md:flex-row py-12 md:py-16 px-6 md:px-16 lg:px-[120px] justify-between items-start md:items-end gap-8">
+                <footer className="relative z-10 w-full flex flex-col md:flex-row py-12 md:py-16 px-6 md:px-16 lg:px-[120px] justify-between items-center md:items-end gap-8">
                     {children}
                 </footer>
             </div>
