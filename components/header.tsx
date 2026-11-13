@@ -54,9 +54,9 @@ export default function Header() {
     // "/#id" so the links also work from About / Privacy / Terms (they go back to the homepage).
     const navLinks = [
         { label: "How It Works", id: "how-it-works" },
-        { label: "Companions", id: "companions" },
+        { label: "Features", id: "companions" },
         { label: "FAQ", id: "faq" },
-        { label: "Contact", id: "contact" },
+        { label: "Contact Us", id: "contact" },
     ];
 
     const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
