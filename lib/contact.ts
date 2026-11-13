@@ -15,8 +15,8 @@ const ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY ?? "";
 export const isContactFormConfigured = ACCESS_KEY.length > 0;
 
 export interface ContactMessage {
-    /** Full topic label, e.g. "Bug Report". */
-    topic: string;
+    /** Visitor's subject line; becomes the email subject. */
+    subject: string;
     name: string;
     email: string;
     message: string;
@@ -42,12 +42,11 @@ export async function sendContactMessage(input: ContactMessage): Promise<SendRes
             },
             body: JSON.stringify({
                 access_key: ACCESS_KEY,
-                subject: `[PAWSE] ${input.topic}`,
+                subject: `[PAWSE] ${input.subject}`,
                 from_name: "PAWSE Website",
                 // Web3Forms uses `email` as the reply-to, so "Reply" in Gmail reaches the visitor.
                 email: input.email,
                 name: input.name || "(not provided)",
-                topic: input.topic,
                 os: input.os || "(not detected)",
                 message: input.message,
                 botcheck: input.botcheck,
