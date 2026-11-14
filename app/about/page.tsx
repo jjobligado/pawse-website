@@ -17,7 +17,7 @@ export default function AboutPage() {
                 <div className="mx-auto flex max-w-[1200px] flex-col items-center text-center">
                     <h1
                         id="about-title"
-                        className="font-pixel text-[36px] font-semibold text-accent sm:text-[48px] lg:text-[80px]"
+                        className="font-pixel text-[36px] font-semibold text-accent sm:text-[48px] lg:text-[64px]"
                     >
                         About PAWSE
                     </h1>
@@ -28,7 +28,7 @@ export default function AboutPage() {
 
                     <div className="mt-8 flex w-full max-w-[448px] items-center justify-center gap-4 sm:gap-6">
                         <Image
-                            src="/images/orange-cat-56586a.png"
+                            src="/sprites/orange-cat-56586a.png"
                             alt=""
                             width={120}
                             height={120}
@@ -63,7 +63,7 @@ export default function AboutPage() {
                 <div className="mx-auto w-full max-w-[1120px]">
                     <h2
                         id="overview-title"
-                        className="text-center font-pixel text-[28px] font-semibold text-[#232323] sm:text-[36px] lg:text-[56px]"
+                        className="text-center font-pixel text-[28px] font-semibold text-[#232323] sm:text-[32px] lg:text-[40px]"
                     >
                         Overview
                     </h2>
@@ -71,7 +71,7 @@ export default function AboutPage() {
                     <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
                         <article
                             style={overviewStyle}
-                            className="flex min-w-0 flex-col items-center justify-center gap-6 rounded-xl border border-stroke p-6 text-center text-[#141414] sm:p-8 lg:p-10"
+                            className="flex min-w-0 flex-col items-center justify-center gap-6 rounded-xl border border-stroke p-6 text-center text-[#141414] sm:p-8"
                         >
                             <Image
                                 src="/images/check-account.png"
@@ -82,7 +82,7 @@ export default function AboutPage() {
                                 className="h-18 w-18"
                             />
 
-                            <p className="max-w-[400px] font-sans text-base leading-relaxed sm:text-lg lg:text-xl">
+                            <p className="mt-3 font-sans text-base leading-relaxed sm:text-lg lg:text-xl">
                                 PAWSE is a desktop productivity app that combines
                                 a focus timer with a virtual pet. Built for
                                 students, professionals, and fellow cat lovers,
@@ -93,7 +93,7 @@ export default function AboutPage() {
 
                         <div className="grid min-w-0 gap-4">
                             <article className="min-w-0 rounded-xl border border-stroke bg-linear-to-b from-white to-[#E8F6FF] p-6 text-center text-[#141414] sm:p-8">
-                                <h3 className="font-sans text-xl font-semibold lg:text-2xl">
+                                <h3 className="font-sans text-lg font-semibold lg:text-xl">
                                     A Three-Person Indie Team
                                 </h3>
 
@@ -107,7 +107,7 @@ export default function AboutPage() {
                             </article>
 
                             <article className="min-w-0 rounded-xl border border-stroke bg-linear-to-b from-white to-[#E8F6FF] p-6 text-center text-[#141414] sm:p-8">
-                                <h3 className="font-sans text-xl font-semibold lg:text-2xl">
+                                <h3 className="font-sans text-lg font-semibold lg:text-xl">
                                     Born from HackTheKitty
                                 </h3>
 
@@ -143,19 +143,19 @@ export default function AboutPage() {
                 <div className="mx-auto w-full max-w-[1120px]">
                     <h2
                         id="team-title"
-                        className="text-center font-pixel text-[28px] font-semibold text-[#232323] sm:text-[36px] lg:text-[56px]"
+                        className="text-center font-pixel text-[28px] font-semibold text-[#232323] sm:text-[32px] lg:text-[40px]"
                     >
                         Meet the Team
                     </h2>
 
                     <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                        <article className="flex min-w-0 flex-col justify-between rounded-xl border border-stroke bg-white px-6 py-6 text-[#141414] sm:px-8 lg:px-10 lg:py-8">
+                        <article className="flex min-w-0 flex-col justify-between rounded-xl border border-stroke bg-white px-6 py-6 text-[#141414] sm:px-8">
                             <div>
-                                <h3 className="font-sans text-xl font-semibold lg:text-2xl">
+                                <h3 className="font-sans text-lg font-semibold lg:text-xl">
                                     Jasmin Joyce Obligado
                                 </h3>
 
-                                <p className="mt-3 font-sans text-base leading-relaxed sm:text-lg lg:text-xl">
+                                <p className="mt-3 font-sans text-sm leading-relaxed sm:text-base">
                                     Co-Founder / Frontend Developer / UI/UX
                                     Designer / Technical Writer
                                 </p>
@@ -194,13 +194,13 @@ export default function AboutPage() {
                             </div>
                         </article>
 
-                        <article className="flex min-w-0 flex-col justify-between rounded-xl border border-stroke bg-white px-6 py-6 text-[#141414] sm:px-8 lg:px-10 lg:py-8">
+                        <article className="flex min-w-0 flex-col justify-between rounded-xl border border-stroke bg-white px-6 py-6 text-[#141414] sm:px-8">
                             <div>
-                                <h3 className="font-sans text-xl font-semibold lg:text-2xl">
+                                <h3 className="font-sans text-lg font-semibold lg:text-xl">
                                     Jude Keith Escritor
                                 </h3>
 
-                                <p className="mt-3 font-sans text-base leading-relaxed sm:text-lg lg:text-xl">
+                                <p className="mt-3 font-sans text-sm leading-relaxed sm:text-base">
                                     Co-Founder / Full-stack Developer / Pixel
                                     Artist / QA Engineer
                                 </p>
@@ -239,13 +239,13 @@ export default function AboutPage() {
                             </div>
                         </article>
 
-                        <article className="flex min-w-0 flex-col justify-between rounded-xl border border-stroke bg-white px-6 py-6 text-[#141414] sm:px-8 lg:px-10 lg:py-8">
+                        <article className="flex min-w-0 flex-col justify-between rounded-xl border border-stroke bg-white px-6 py-6 text-[#141414] sm:px-8">
                             <div>
-                                <h3 className="font-sans text-xl font-semibold lg:text-2xl">
+                                <h3 className="font-sans text-lg font-semibold lg:text-xl">
                                     Ysabel Delos Santos
                                 </h3>
 
-                                <p className="mt-3 font-sans text-base leading-relaxed sm:text-lg lg:text-xl">
+                                <p className="mt-3 font-sans text-sm leading-relaxed sm:text-base">
                                     Lead Front-end Developer / QA Tester
                                 </p>
                             </div>
