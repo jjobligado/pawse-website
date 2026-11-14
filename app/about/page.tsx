@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -6,9 +9,98 @@ const overviewStyle = {
         "linear-gradient(180deg, #FFFFFF 0%, #D3EDFF 80%, var(--color-accent-highlight) 100%)",
 };
 
+function IdleCat({
+    src,
+    frames,
+}: {
+    src: string;
+    frames: number;
+}) {
+    const [playing, setPlaying] = useState(false);
+    const duration = frames * 180;
+
+    useEffect(() => {
+        const motion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        );
+
+        let timer: ReturnType<typeof setTimeout>;
+
+        function scheduleNext() {
+            // Pick a fresh pause between 1 and 5 seconds.
+            const pause = 3000 + Math.random() * 5000;
+
+            timer = setTimeout(() => {
+                setPlaying(true);
+
+                timer = setTimeout(() => {
+                    setPlaying(false);
+                    scheduleNext();
+                }, duration);
+            }, pause);
+        }
+
+        function restart() {
+            clearTimeout(timer);
+            setPlaying(false);
+
+            if (!motion.matches) {
+                scheduleNext();
+            }
+        }
+
+        restart();
+        motion.addEventListener("change", restart);
+
+        return () => {
+            clearTimeout(timer);
+            motion.removeEventListener("change", restart);
+        };
+    }, [duration]);
+
+    return (
+        <div
+            aria-hidden="true"
+            className="h-16 w-16 shrink-0 overflow-hidden sm:h-32 sm:w-32"
+        >
+            <div
+                className="about-idle-strip h-full"
+                style={{
+                    width: `${frames * 100}%`,
+                    backgroundImage: `url("${src}")`,
+                    backgroundSize: "100% 100%",
+                    backgroundRepeat: "no-repeat",
+                    imageRendering: "pixelated",
+                    animation: playing
+                        ? `about-cat-idle ${duration}ms steps(${frames}) 1`
+                        : "none",
+                }}
+            />
+        </div>
+    );
+}
+
 export default function AboutPage() {
     return (
         <div className="bg-white text-black">
+            <style>{`
+                @keyframes about-cat-idle {
+                    from { transform: translateX(0); }
+                    to { transform: translateX(-100%); }
+                }
+
+                .about-idle-strip {
+                    transform: translateX(0);
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .about-idle-strip {
+                        animation: none !important;
+                        transform: translateX(0);
+                    }
+                }
+            `}</style>
+            
             {/* About introduction */}
             <section
                 aria-labelledby="about-title"
@@ -27,29 +119,17 @@ export default function AboutPage() {
                     </p>
 
                     <div className="mt-8 flex w-full max-w-[448px] items-center justify-center gap-4 sm:gap-6">
-                        <Image
-                            src="/sprites/orange-cat-56586a.png"
-                            alt=""
-                            width={120}
-                            height={120}
-                            aria-hidden="true"
-                            className="h-auto w-24 min-w-0 object-contain [image-rendering:pixelated] sm:w-[120px]"
+                        <IdleCat
+                            src="/sprites/ginger-body-idle-sheet.png"
+                            frames={5}
                         />
-                        <Image
-                            src="/images/tuxedo-cat.png"
-                            alt=""
-                            width={120}
-                            height={120}
-                            aria-hidden="true"
-                            className="h-auto w-24 min-w-0 object-contain [image-rendering:pixelated] sm:w-[120px]"
+                        <IdleCat
+                            src="/sprites/tux-body-idle-sheet.png"
+                            frames={4}
                         />
-                        <Image
-                            src="/images/black-cat.png"
-                            alt=""
-                            width={120}
-                            height={120}
-                            aria-hidden="true"
-                            className="h-auto w-24 min-w-0 object-contain [image-rendering:pixelated] sm:w-[120px]"
+                        <IdleCat
+                            src="/sprites/void-body-idle-sheet.png"
+                            frames={5}
                         />
                     </div>
                 </div>
