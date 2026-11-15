@@ -303,7 +303,8 @@ function Celestial({ phase }: { phase: SkyPhase }) {
                 {STARS.map((s, i) => (
                     <span
                         key={i}
-                        className="absolute animate-twinkle"
+                        // Phones: only the stars near the edges, so none land on the headline.
+                        className={`absolute animate-twinkle ${s.x > 14 && s.x < 86 ? "hidden sm:block" : ""}`}
                         style={{ left: `${s.x}%`, top: `${s.y}%`, animationDelay: `${s.d}s` }}
                     >
                         <PixelArt rows={STAR} palette={{ S: "#FFFBEA" }} className={i % 3 === 0 ? "w-[9px] h-auto" : "w-[6px] h-auto"} />

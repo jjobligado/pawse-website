@@ -168,17 +168,23 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full mx-auto pt-3 sm:pt-5 pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
-            {/* The window: a frame around the sky, with the copy inside it */}
-            <div className="relative w-full max-w-chrome px-3 sm:px-6 lg:px-10">
-                <div className="relative rounded-[26px] sm:rounded-[32px] bg-white p-2 sm:p-3 lg:p-3.5 ring-1 ring-stroke shadow-[0_28px_50px_-30px_rgb(20_40_70/0.4)]">
-                    <div className="relative overflow-hidden rounded-[19px] sm:rounded-[22px]">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
+            {/*
+              The whole hero is the window: the sky runs edge to edge, with no frame
+              around it. The sill below and (on large screens) two mullions are the
+              only window cues, so phones get one clean layer instead of nested boxes.
+            */}
+            <div className="relative w-full">
+                    <div className="relative overflow-hidden">
                         <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
-                        <GlassPawPrints />
 
-                        {/* Mullions: a wide centre pane with two side panes (only where they clear the headline) */}
-                        <div aria-hidden="true" className="hidden xl:block absolute inset-y-0 left-[13%] w-3 -ml-1.5 bg-white z-10 shadow-[2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
-                        <div aria-hidden="true" className="hidden xl:block absolute inset-y-0 right-[13%] w-3 -mr-1.5 bg-white z-10 shadow-[-2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
+                        {/* Glass details follow the content width, so very wide screens keep the same composition */}
+                        <div aria-hidden="true" className="absolute inset-0 mx-auto max-w-chrome pointer-events-none">
+                            <GlassPawPrints />
+                            {/* Mullions: a wide centre pane with two side panes (only where they clear the headline) */}
+                            <div className="hidden xl:block absolute inset-y-0 left-[13%] w-3 -ml-1.5 bg-white z-10 shadow-[2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
+                            <div className="hidden xl:block absolute inset-y-0 right-[13%] w-3 -mr-1.5 bg-white z-10 shadow-[-2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
+                        </div>
 
             {/* Centered Hero Copy & Actions */}
             <div className="relative z-30 w-full flex flex-col items-center gap-6 px-5 md:px-10 pt-14 sm:pt-16 lg:pt-20 pb-32 sm:pb-40 xl:pb-60">
@@ -504,10 +510,10 @@ export default function HeroSection() {
             </div>
 
                     </div>
-                </div>
 
-                {/* The sill, where Ginger naps and Tux has his coffee */}
-                <div className="relative z-30 -mt-1 -mx-1.5 sm:-mx-3 h-4 sm:h-5 lg:h-6 rounded-[8px] sm:rounded-[10px] bg-[linear-gradient(180deg,#FFFFFF_0%,#FFFFFF_45%,#EEF2F6_100%)] ring-1 ring-stroke shadow-[0_16px_26px_-14px_rgb(20_40_70/0.35)]">
+                {/* The sill, edge to edge, where Ginger naps and Tux has his coffee */}
+                <div className="relative z-30 h-5 sm:h-6 lg:h-7 bg-[linear-gradient(180deg,#FFFFFF_0%,#FFFFFF_40%,#EDF1F5_100%)] border-y border-stroke shadow-[0_18px_28px_-16px_rgb(20_40_70/0.35)]">
+                  <div className="relative h-full mx-auto max-w-chrome">
                     <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[4%] lg:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
                         <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
                     </div>
@@ -515,6 +521,7 @@ export default function HeroSection() {
                     <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[14%] sm:right-[10%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                         <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
                     </div>
+                  </div>
                 </div>
             </div>
 
