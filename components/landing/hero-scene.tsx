@@ -457,7 +457,7 @@ function CasementPanel({ side }: { side: "left" | "right" }) {
     const left = side === "left";
     return (
         <div
-            className={`absolute inset-y-0 ${left ? "left-[9px] sm:left-3 lg:left-4 xl:left-5 origin-left" : "right-[9px] sm:right-3 lg:right-4 xl:right-5 origin-right"} w-[80px] sm:w-[150px] lg:w-[230px] xl:w-[290px] [--p:500px] sm:[--p:800px] lg:[--p:1100px] xl:[--p:1300px] [--a:64deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
+            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] [--a:62deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
             {/* Glass: a cool tint, one broad glint and one thin one */}
@@ -509,7 +509,7 @@ function Hinge({ side, at }: { side: "left" | "right"; at: "top" | "bottom" }) {
     return (
         <div
             className={`absolute ${at === "top" ? "top-[13%]" : "bottom-[13%]"} ${
-                side === "left" ? "left-[6px] sm:left-[9px] lg:left-3 xl:left-4" : "right-[6px] sm:right-[9px] lg:right-3 xl:right-4"
+                side === "left" ? "left-[calc(clamp(9px,1.45vw,20px)_-_4px)]" : "right-[calc(clamp(9px,1.45vw,20px)_-_4px)]"
             } w-[5px] sm:w-1.5 lg:w-2 xl:w-2.5 h-4 sm:h-6 lg:h-8 xl:h-9 rounded-[2px] bg-[linear-gradient(90deg,#2B2623,#5C544E_45%,#2B2623)] shadow-[0_1px_2px_rgb(0_0_0/0.45)]`}
         >
             {/* Knuckle joints */}
@@ -526,7 +526,7 @@ function Hinge({ side, at }: { side: "left" | "right"; at: "top" | "bottom" }) {
  * crosses the copy. The sill is drawn by the hero, since the cats sit on it.
  */
 export function WindowFrame() {
-    const jamb = "absolute inset-y-0 w-[9px] sm:w-3 lg:w-4 xl:w-5 wood-v";
+    const jamb = "absolute inset-y-0 w-[clamp(9px,1.45vw,20px)] wood-v";
     return (
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
             {/* Panels hang outside, behind the frame */}
@@ -543,7 +543,7 @@ export function WindowFrame() {
             <div
                 className={`${jamb} right-0 shadow-[inset_-1px_0_0_rgb(255_232_205/0.2),inset_3px_0_0_var(--color-window-frame-shade),inset_4px_0_0_var(--color-window-frame-edge),-5px_0_9px_-4px_rgb(40_20_10/0.5)]`}
             />
-            <div className="absolute inset-x-0 top-0 h-[9px] sm:h-3 lg:h-4 xl:h-5 wood-h shadow-[inset_0_-3px_0_var(--color-window-frame-shade),inset_0_-4px_0_var(--color-window-frame-edge),0_5px_9px_-4px_rgb(40_20_10/0.5)]" />
+            <div className="absolute inset-x-0 top-0 h-[clamp(9px,1.45vw,20px)] wood-h shadow-[inset_0_-3px_0_var(--color-window-frame-shade),inset_0_-4px_0_var(--color-window-frame-edge),0_5px_9px_-4px_rgb(40_20_10/0.5)]" />
             <div className="absolute inset-x-0 bottom-0 h-1.5 sm:h-2 lg:h-2.5 xl:h-3 wood-h shadow-[inset_0_3px_0_var(--color-window-frame-shade),inset_0_4px_0_var(--color-window-frame-edge),0_-4px_8px_-4px_rgb(40_20_10/0.4)]" />
 
             <Hinge side="left" at="top" />

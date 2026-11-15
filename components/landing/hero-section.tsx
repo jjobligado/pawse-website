@@ -174,7 +174,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--lw:88vw] md:[--lw:min(940px,calc(100vw_-_2*clamp(140px,17vw,250px)))] [--ov:0.17] lg:short:[--ov:0.13]">
             {/*
               The whole hero is the window: a walnut French casement, opened out, with
               the sky running edge to edge inside the frame. The middle is open air, so
@@ -187,7 +187,7 @@ export default function HeroSection() {
                         <WindowFrame />
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 pb-32 sm:pb-40 lg:pb-52 lg:short:pt-20 lg:short:pb-40`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 lg:short:pt-20 pb-[calc(var(--lw)*var(--ov)_+_48px)]`}>
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
@@ -528,12 +528,12 @@ export default function HeroSection() {
                     <div aria-hidden="true" className="absolute inset-x-0 top-full h-6 bg-[linear-gradient(180deg,rgb(40_20_10/0.2),transparent)] pointer-events-none" />
 
                     <div className="absolute inset-0 mx-auto max-w-chrome">
-                        <div className="absolute bottom-[calc(100%-11px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[2%] lg:left-[3%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
+                        <div className="hidden md:block absolute bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[2%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
                             <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
                             <SpriteCat {...HERO_CATS.ginger} className={GINGER_SIZE} />
                         </div>
                         <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[2.5%] w-[64px] h-auto" />
-                        <div className="absolute bottom-[calc(100%-11px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                        <div className="hidden md:block absolute bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                             <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
                             <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
                         </div>
@@ -547,7 +547,7 @@ export default function HeroSection() {
             */}
             <div
                 ref={laptopParallaxRef}
-                className="relative z-40 w-[60%] sm:w-[64%] lg:w-[62%] xl:w-[60%] max-w-[940px] -mt-[72px] sm:-mt-28 lg:-mt-36 lg:short:-mt-28 will-change-transform"
+                className="relative z-40 w-[var(--lw)] mt-[calc(var(--lw)*var(--ov)*-1)] will-change-transform"
             >
                 <div className="relative animate-hero-laptop">
                     <div className="relative z-10">
