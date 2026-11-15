@@ -106,7 +106,7 @@ export default function Header() {
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 wood-h shadow-[inset_0_1px_0_rgb(255_232_205/0.16),inset_0_-3px_0_var(--color-window-frame-shade),inset_0_-4px_0_var(--color-window-frame-edge)] pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
+            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 bg-window-frame pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
             <div className="relative w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
@@ -161,8 +161,9 @@ export default function Header() {
                     className={buttonClasses({
                         variant: "ink",
                         pressed: isDownloadPressed,
-                        // On the wood, a faint light ring keeps the charcoal button's edge visible
-                        className: "group-data-[frame=on]/hdr:ring-1 group-data-[frame=on]/hdr:ring-[#F6E7D6]/35",
+                        // On the walnut band: a cream button with walnut text (charcoal would sink into the wood)
+                        className:
+                            "transition-colors duration-300 group-data-[frame=on]/hdr:bg-[#FFF3E2] group-data-[frame=on]/hdr:text-[#4A2E1F] group-data-[frame=on]/hdr:hover:bg-white group-data-[frame=on]/hdr:active:bg-[#F3E3CE]",
                     })}
                 >
                     <span className={buttonLabelClasses("header")}>

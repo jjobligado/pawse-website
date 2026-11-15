@@ -38,6 +38,12 @@ const DONE_COLOR = {
 const CAT_SIZE = "w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32";
 
 /**
+ * Ginger curls up small when napping, so she gets a slightly bigger box than Tux
+ * (about 1.1-1.25x his size). Sized to still clear the laptop on every screen.
+ */
+const GINGER_SIZE = "w-[72px] h-[72px] sm:w-[104px] sm:h-[104px] lg:w-36 lg:h-36 xl:w-40 xl:h-40";
+
+/**
  * Hero companions. On the sill, Ginger naps and Tux sips his coffee (their focus
  * routines, looping); hover / tap plays their break sheet once. Void is the
  * companion inside the app on the laptop screen (laptop-desktop.tsx).
@@ -182,6 +188,10 @@ export default function HeroSection() {
 
             {/* Centered Hero Copy & Actions */}
             <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 pb-32 sm:pb-40 lg:pb-52 lg:short:pt-20 lg:short:pb-40`}>
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
+                />
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
@@ -284,7 +294,7 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 group-data-[sky=dusk]/sky:text-ink-soft group-data-[sky=night]/sky:text-ink">
+                    <p className="max-w-[620px] text-base md:text-lg font-medium text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 group-data-[sky=night]/sky:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -368,7 +378,7 @@ export default function HeroSection() {
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 group-data-[sky=dusk]/sky:text-ink-soft group-data-[sky=night]/sky:text-ink"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 group-data-[sky=night]/sky:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
@@ -520,7 +530,7 @@ export default function HeroSection() {
                     <div className="absolute inset-0 mx-auto max-w-chrome">
                         <div className="absolute bottom-[calc(100%-11px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[2%] lg:left-[3%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
                             <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
-                            <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
+                            <SpriteCat {...HERO_CATS.ginger} className={GINGER_SIZE} />
                         </div>
                         <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[2.5%] w-[64px] h-auto" />
                         <div className="absolute bottom-[calc(100%-11px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
