@@ -6,37 +6,57 @@ import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
+import { Laptop, SillPlant, WindowSky } from "./hero-scene";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
+// Positive = lags behind the page (reads as far away); negative = moves ahead (near).
 const PARALLAX_SPEED = {
-    showcase: -0.03,
+    laptop: -0.07,
+    skyFar: 0.16,
+    skyNear: 0.08,
 } as const;
 
 const SPRITES = "/sprites";
 
 /**
- * Same size for all three cats. 64px frames at 1× on phones and 2× from lg up;
- * 1.5× (96px) in between, where 128px would reach the headline (tablets are
- * high-density, so 1.5× still lands on whole device pixels there).
+ * Cat boxes: 64px frames at whole-number scales so pixels stay crisp
+ * (1x phones, 1.5x tablets, 2x from lg).
  */
 const CAT_SIZE = "w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32";
 
-/** Hero companions: idle loops on their own; hover / tap plays the break sheet once. */
+/**
+ * Hero companions. On the sill, Ginger naps and Tux sips his coffee (their focus
+ * routines, looping); hover / tap plays their break sheet once. Void peeks over
+ * the laptop lid.
+ */
 const HERO_CATS = {
     ginger: {
-        label: "Play with Ginger",
-        idle: { src: `${SPRITES}/ginger-body-idle-sheet.png`, frames: 5 },
+        label: "Wake Ginger for a break",
+        idle: { src: `${SPRITES}/ginger-body-focus-sheet.png`, frames: 3 },
         action: { src: `${SPRITES}/ginger-body-break-sheet.png`, frames: 9 },
-        idleHoldMs: 2400,
+        // Slow breathing: z, zz, zzz
+        idleSequence: [
+            { frame: 0, ms: 900 },
+            { frame: 1, ms: 900 },
+            { frame: 2, ms: 1100 },
+        ],
     },
     tux: {
-        label: "Play with Tux",
-        idle: { src: `${SPRITES}/tux-body-idle-sheet.png`, frames: 4 },
+        label: "Give Tux a break",
+        idle: { src: `${SPRITES}/tux-body-focus-sheet.png`, frames: 5 },
         action: { src: `${SPRITES}/tux-body-break-sheet.png`, frames: 10 },
-        idleHoldMs: 3000,
+        // Holds the mug, lifts it, sips, lowers it
+        idleSequence: [
+            { frame: 0, ms: 2600 },
+            { frame: 1, ms: 160 },
+            { frame: 2, ms: 220 },
+            { frame: 3, ms: 900 },
+            { frame: 2, ms: 220 },
+            { frame: 1, ms: 160 },
+        ],
     },
-    // Void peeks over the preview, so only the head shows, from one sheet
+    // Void peeks over the laptop lid, so only the head shows, from one sheet
     // (frames: 0 look, 1 squint, 2 eyes closed, 3 side-eye). Idle is a slow blink;
     // hover plays the whole look-around so the reaction reads as different from idle.
     void: {
@@ -58,7 +78,9 @@ const HERO_CATS = {
 } as const;
 
 export default function HeroSection() {
-    const showcaseParallaxRef = useRef<HTMLDivElement>(null);
+    const laptopParallaxRef = useRef<HTMLDivElement>(null);
+    const skyFarRef = useRef<HTMLDivElement>(null);
+    const skyNearRef = useRef<HTMLDivElement>(null);
     const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const popoverRef = useRef<HTMLDivElement>(null);
@@ -111,7 +133,9 @@ export default function HeroSection() {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
-            [showcaseParallaxRef, PARALLAX_SPEED.showcase],
+            [laptopParallaxRef, PARALLAX_SPEED.laptop],
+            [skyFarRef, PARALLAX_SPEED.skyFar],
+            [skyNearRef, PARALLAX_SPEED.skyNear],
         ];
 
         let frame = 0;
@@ -150,16 +174,19 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" className="relative w-full max-w-chrome mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-12 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
-            {/* Ginger: upper left. z-40 keeps her above the full-width headline row (z-30), which overlaps her feet. */}
-            <div className="absolute top-14 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-40">
-                <div className="animate-cat-intro-ginger">
-                    <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
-                </div>
-            </div>
+        <section id="hero" className="relative w-full mx-auto pt-3 sm:pt-5 pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
+            {/* The window: a frame around the sky, with the copy inside it */}
+            <div className="relative w-full max-w-chrome px-3 sm:px-6 lg:px-10">
+                <div className="relative rounded-[26px] sm:rounded-[32px] bg-white p-2 sm:p-3 lg:p-3.5 ring-1 ring-stroke shadow-[0_28px_50px_-30px_rgb(20_40_70/0.4)]">
+                    <div className="relative overflow-hidden rounded-[19px] sm:rounded-[22px]">
+                        <WindowSky farRef={skyFarRef} nearRef={skyNearRef} />
+
+                        {/* Mullions: a wide centre pane with two side panes (only where they clear the headline) */}
+                        <div aria-hidden="true" className="hidden xl:block absolute inset-y-0 left-[13%] w-3 -ml-1.5 bg-white z-10 shadow-[2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
+                        <div aria-hidden="true" className="hidden xl:block absolute inset-y-0 right-[13%] w-3 -mr-1.5 bg-white z-10 shadow-[-2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
 
             {/* Centered Hero Copy & Actions */}
-            <div className="relative z-30 w-full flex flex-col items-center gap-6 px-6 md:px-10">
+            <div className="relative z-30 w-full flex flex-col items-center gap-6 px-5 md:px-10 pt-14 sm:pt-16 lg:pt-20 pb-32 sm:pb-40 xl:pb-60">
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
@@ -340,18 +367,7 @@ export default function HeroSection() {
                                 </span>
                             </a>
                         </div>
-                        {/*
-                          Tux mirrors Ginger across the centre: same size, and the same distance from
-                          the right edge as Ginger has from the left (Ginger's offset minus this row's
-                          24px / 40px inset). sm+: level with the button, below the description.
-                          Phones: there's no room beside the button, so Tux sits centred in the empty
-                          band between "Other platforms" and the preview instead.
-                        */}
-                        <div className="absolute z-20 top-[calc(100%+68px)] right-[-12px] sm:top-1/2 sm:-translate-y-1/2 sm:right-0 md:right-[-8px] lg:right-6 xl:right-14">
-                            <div className="animate-cat-intro-tuxedo">
-                                <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
-                            </div>
-                        </div>
+
                     </div>
 
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
@@ -492,26 +508,41 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* App Visuals Showcase Container (Peeking at the bottom of the Hero) */}
+                    </div>
+                </div>
+
+                {/* The sill, where Ginger naps and Tux has his coffee */}
+                <div className="relative z-30 -mt-1 -mx-1.5 sm:-mx-3 h-4 sm:h-5 lg:h-6 rounded-[8px] sm:rounded-[10px] bg-[linear-gradient(180deg,#FFFFFF_0%,#FFFFFF_45%,#EEF2F6_100%)] ring-1 ring-stroke shadow-[0_16px_26px_-14px_rgb(20_40_70/0.35)]">
+                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[4%] lg:left-[3.5%] animate-cat-hop">
+                        <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
+                    </div>
+                    <SillPlant className="absolute bottom-[calc(100%-1px)] right-[3%] lg:right-[2.5%] w-[34px] sm:w-[48px] lg:w-[64px] h-auto animate-cat-hop [animation-delay:0.75s]" />
+                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[14%] sm:right-[10%] xl:right-[6.5%] animate-cat-hop [animation-delay:0.9s]">
+                        <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
+                    </div>
+                </div>
+            </div>
+
+            {/* The visitor's laptop, in the foreground: on desktops it overlaps the bottom of the window, as seen from the chair */}
             <div
-                ref={showcaseParallaxRef}
-                className="relative z-20 w-full max-w-[1040px] mt-32 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 will-change-transform"
+                ref={laptopParallaxRef}
+                className="relative z-40 w-[90%] sm:w-[80%] lg:w-[72%] xl:w-[60%] max-w-[940px] mt-12 sm:mt-14 xl:-mt-44 will-change-transform"
             >
-                <div className="relative animate-hero-fade-up-4">
-                    {/*
-                      Void: only the head, peeking over the preview's top-left edge. It sits behind
-                      the preview (z-0 vs z-10) with its flat bottom tucked 6px under the border.
-                    */}
-                    <div className="absolute bottom-[calc(100%-6px)] left-6 sm:left-10 md:left-16 lg:left-24 z-0">
+                <div className="relative animate-hero-laptop">
+                    {/* Void: only the head, peeking over the lid, behind it */}
+                    <div className="absolute bottom-[calc(100%-6px)] left-[7%] sm:left-[9%] z-0">
                         <div className="animate-cat-intro-void">
                             <SpriteCat {...HERO_CATS.void} className={CAT_SIZE} />
                         </div>
                     </div>
-
-                    <div className="relative z-10 w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-card-lg border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
-                        <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
-                            App Visuals Preview
-                        </span>
+                    <div className="relative z-10">
+                        <Laptop>
+                            <div className="absolute inset-0 surface-wash flex items-center justify-center">
+                                <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
+                                    App Visuals Preview
+                                </span>
+                            </div>
+                        </Laptop>
                     </div>
                 </div>
             </div>

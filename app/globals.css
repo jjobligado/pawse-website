@@ -169,6 +169,10 @@ html {
     opacity: 1 !important;
     transform: none !important;
   }
+  /* Birds: show one wing pose, not both frames on top of each other. */
+  .animate-wing-down {
+    display: none;
+  }
   /* The CTA aura is purely decorative; hide it instead of freezing it on. */
   .animate-cta-aura::after {
     opacity: 0 !important;
@@ -196,50 +200,113 @@ body {
   }
 }
 
-@keyframes cat-intro-ginger {
+/*
+ * Hero scene (window, sill, laptop). One authored entrance: the sky settles,
+ * the cats hop onto the sill, the laptop rises. Then only slow ambient drift.
+ * All of it is transform/opacity, and every class starts with `animate-` so the
+ * reduced-motion rule above freezes it in its final, visible state.
+ */
+@keyframes hero-sky-settle {
+  from {
+    opacity: 0.35;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-hero-sky {
+  animation: hero-sky-settle 1.1s var(--ease-emphasized) both;
+}
+
+/* A small hop: up, land with a squash, settle. Starts already near its spot. */
+@keyframes cat-hop {
   0% {
     opacity: 0;
-    transform: translateY(-55px) scale(0.65) rotate(-14deg);
+    transform: translateY(-18px) scale(0.96);
   }
-  60% {
+  55% {
     opacity: 1;
-    transform: translateY(8px) scale(1.08, 0.92) rotate(4deg);
+    transform: translateY(2px) scale(1.04, 0.96);
   }
   80% {
-    transform: translateY(-3px) scale(0.97, 1.02) rotate(-1deg);
+    transform: translateY(-1px) scale(0.99, 1.01);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: translateY(0) scale(1);
   }
 }
 
-.animate-cat-intro-ginger {
-  opacity: 0;
-  animation: cat-intro-ginger 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+.animate-cat-hop {
+  transform-origin: bottom center;
+  animation: cat-hop 0.6s var(--ease-emphasized) 0.6s both;
 }
 
-@keyframes cat-intro-tuxedo {
-  0% {
+@keyframes hero-laptop-rise {
+  from {
     opacity: 0;
-    transform: translateX(65px) translateY(18px) scale(0.65) rotate(12deg);
+    transform: translateY(56px);
   }
-  65% {
+  to {
     opacity: 1;
-    transform: translateX(-6px) translateY(-4px) scale(1.07, 0.93) rotate(-3deg);
-  }
-  85% {
-    transform: translateX(2px) translateY(1px) scale(0.98, 1.02) rotate(1deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+    transform: translateY(0);
   }
 }
 
-.animate-cat-intro-tuxedo {
-  opacity: 0;
-  animation: cat-intro-tuxedo 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+.animate-hero-laptop {
+  animation: hero-laptop-rise 1s var(--ease-emphasized) 0.35s both;
+}
+
+/* Clouds and birds cross the whole window; negative delays spread them out. */
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-260px);
+  }
+  to {
+    transform: translateX(min(100vw, 1440px));
+  }
+}
+
+.animate-cloud-drift {
+  animation: cloud-drift 140s linear infinite;
+}
+
+.animate-cloud-drift-slow {
+  animation: cloud-drift 220s linear infinite;
+}
+
+.animate-bird-flight {
+  animation: cloud-drift 60s linear -25s infinite;
+}
+
+/* Two-frame wing flap: one frame shows while the other hides. */
+@keyframes wing-up {
+  0%, 49.9% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes wing-down {
+  0%, 49.9% {
+    opacity: 0;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+
+.animate-wing-up {
+  animation: wing-up 0.5s steps(1) infinite;
+}
+
+.animate-wing-down {
+  animation: wing-down 0.5s steps(1) infinite;
 }
 
 @keyframes cat-intro-void {
