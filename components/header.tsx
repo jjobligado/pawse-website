@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { usePlatform } from "@/hooks/use-platform";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
-
-const FRAME_FADE_PX = 240;
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
@@ -20,27 +18,15 @@ export default function Header() {
     const router = useRouter();
     const isHome = pathname === "/";
 
-    // On the homepage the header starts as the walnut head of the hero's window and
-    // fades back to white over the first stretch of scrolling (written straight to
-    // the style, so scrolling doesn't re-render the header).
-    const frameTintRef = useRef<HTMLDivElement>(null);
-    // Text flips to light while the wood is mostly showing (past halfway it's mostly white again).
-    const [onFrame, setOnFrame] = useState(isHome);
-
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 10);
-            if (frameTintRef.current) {
-                const tint = isHome ? 1 - Math.min(window.scrollY / FRAME_FADE_PX, 1) : 0;
-                frameTintRef.current.style.opacity = tint.toFixed(3);
-                setOnFrame(tint > 0.5);
-            }
         };
 
         handleScroll();
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [isHome]);
+    }, []);
 
     // Scrollspy: watch EVERY homepage section (not only the linked ones) so the
     // highlight clears while reading sections that have no nav link (Focus, Break,
@@ -101,13 +87,11 @@ export default function Header() {
 
     return (
         <header
-            data-frame={onFrame ? "on" : "off"}
-            className={`group/hdr sticky top-0 z-50 w-full h-[64px] bg-white/85 backdrop-blur-md border-b transition-colors duration-300 ${
+            className={`sticky top-0 z-50 w-full h-[64px] bg-white/85 backdrop-blur-md border-b transition-colors duration-300 ${
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 bg-window-frame pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
-            <div className="relative w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
+            <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
                     <Image
@@ -118,7 +102,7 @@ export default function Header() {
                         className="h-[22px] sm:h-[28px] w-auto object-contain group-hover:scale-110 transition-transform duration-300 ease-in-out"
                         priority
                     />
-                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center transition-colors duration-300 group-data-[frame=on]/hdr:text-[#FFF3E2]">
+                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
                         PAWSE
                     </span>
                 </Link>
@@ -135,8 +119,8 @@ export default function Header() {
                                 aria-current={isActive ? "location" : undefined}
                                 className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
                                     isActive
-                                        ? "text-black group-data-[frame=on]/hdr:text-white [-webkit-text-stroke:0.35px_currentColor]"
-                                        : "text-muted hover:text-black group-data-[frame=on]/hdr:text-[#EBD9C5] group-data-[frame=on]/hdr:hover:text-white hover:[-webkit-text-stroke:0.35px_currentColor]"
+                                        ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
+                                        : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
                                 }`}
                             >
                                 {link.label}
@@ -158,13 +142,7 @@ export default function Header() {
                             ? "Download PAWSE"
                             : platformInfo.label.replace("Download", "Download PAWSE")
                     }
-                    className={buttonClasses({
-                        variant: "ink",
-                        pressed: isDownloadPressed,
-                        // On the walnut band: a cream button with walnut text (charcoal would sink into the wood)
-                        className:
-                            "transition-colors duration-300 group-data-[frame=on]/hdr:bg-[#FFF3E2] group-data-[frame=on]/hdr:text-[#4A2E1F] group-data-[frame=on]/hdr:hover:bg-white group-data-[frame=on]/hdr:active:bg-[#F3E3CE]",
-                    })}
+                    className={buttonClasses({ variant: "ink", pressed: isDownloadPressed })}
                 >
                     <span className={buttonLabelClasses("header")}>
                         Download

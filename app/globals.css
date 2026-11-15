@@ -121,7 +121,7 @@
   --container-content: 80rem; /* 1280px */
   --container-chrome: 90rem; /* 1440px */
 
-  /* Hero window: walnut casement frame (the header starts as its head on the homepage) */
+  /* Hero window: walnut casement frame, set in the white wall (the header) above it */
   --color-window-frame: #7A4E35;
   --color-window-frame-shade: #5E3B27;
   --color-window-frame-edge: #432918;

@@ -423,7 +423,7 @@ const PAW = [
 /* The window: a walnut French casement, opened out                    */
 /* ------------------------------------------------------------------ */
 
-/** Walnut frame colours (tokens in globals.css, shared with the sill and header). */
+/** Walnut frame colours (tokens in globals.css, shared with the sill). */
 export const FRAME = {
     face: "var(--color-window-frame)",
     shade: "var(--color-window-frame-shade)",
