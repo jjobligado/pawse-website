@@ -121,11 +121,10 @@
   --container-content: 80rem; /* 1280px */
   --container-chrome: 90rem; /* 1440px */
 
-  /* Hero window: walnut casement frame, set in a linen wall (the header starts as that wall) */
+  /* Hero window: walnut casement frame (the header starts as its head on the homepage) */
   --color-window-frame: #7A4E35;
   --color-window-frame-shade: #5E3B27;
   --color-window-frame-edge: #432918;
-  --color-window-wall: #F6F1EA;
 
   /* Radius scale: `rounded-pill`, `rounded-card-lg`, `rounded-card`, `rounded-control`, `rounded-chip` */
   --radius-pill: 9999px; /* buttons, segmented control, step numbers */
@@ -560,6 +559,26 @@ body {
  * Footer links use `hover:link-underline` (underline only appears on hover)
  * together with `link-hover-weight`.
  */
+/*
+  Walnut with a soft grain: fine lines, a few wider streaks, and a light-to-dark
+  falloff across the piece. wood-h runs along horizontal pieces, wood-v along
+  vertical ones. Base colour is --wood (defaults to the frame colour).
+*/
+@utility wood-h {
+  background-color: var(--wood, var(--color-window-frame));
+  background-image:
+    linear-gradient(180deg, rgb(255 236 214 / 0.12), transparent 45%, rgb(30 14 4 / 0.16)),
+    repeating-linear-gradient(179.4deg, rgb(30 14 4 / 0.09) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(180.6deg, rgb(255 228 196 / 0.07) 0 2px, transparent 2px 13px);
+}
+@utility wood-v {
+  background-color: var(--wood, var(--color-window-frame));
+  background-image:
+    linear-gradient(90deg, rgb(255 236 214 / 0.12), transparent 45%, rgb(30 14 4 / 0.16)),
+    repeating-linear-gradient(89.4deg, rgb(30 14 4 / 0.09) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90.6deg, rgb(255 228 196 / 0.07) 0 2px, transparent 2px 13px);
+}
+
 @utility link-underline {
   text-decoration-line: underline;
   text-decoration-color: currentColor;

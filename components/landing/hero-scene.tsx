@@ -441,75 +441,115 @@ const PANEL_PRINTS = [
     { x: 36, y: 63, rot: -6, big: false, delay: 2.0 },
 ] as const;
 
+// Bevels: a lit edge and a dark edge on every wooden piece, so nothing reads flat.
+// (Written out in full: Tailwind only generates classes it can read literally.)
+const STILE = "absolute wood-v shadow-[inset_1px_0_0_rgb(255_232_205/0.22),inset_-1px_0_0_rgb(30_14_4/0.5)]";
+const RAIL = "absolute wood-h shadow-[inset_0_1px_0_rgb(255_232_205/0.22),inset_0_-1px_0_rgb(30_14_4/0.5)]";
+
 /**
  * One casement panel, hinged on the jamb and swung outward (away from the
- * visitor), so it recedes behind the frame. Real 3D: the perspective and
- * width step up with the screen so the panel always reads as half the window,
- * opened about 60 degrees. Clear glass: the sky shows through, only the walnut
- * stiles, rails and glazing bars (2 x 3 panes) are drawn.
+ * visitor), so it recedes behind the frame. Real 3D: perspective and width step
+ * up with the screen so the panel always reads as half the window, opened about
+ * 60 degrees. Built like a real sash: two stiles, a top rail, a deeper bottom
+ * rail, and glazing bars (2 x 3 panes) over clear, faintly tinted glass.
  */
 function CasementPanel({ side }: { side: "left" | "right" }) {
     const left = side === "left";
-    const bar = "absolute bg-window-frame shadow-[inset_0_0_0_1px_var(--color-window-frame-edge)]";
     return (
         <div
-            className={`absolute inset-y-0 ${left ? "left-[7px] sm:left-2.5 lg:left-3.5 xl:left-4 origin-left" : "right-[7px] sm:right-2.5 lg:right-3.5 xl:right-4 origin-right"} w-[80px] sm:w-[150px] lg:w-[230px] xl:w-[290px] [--p:500px] sm:[--p:800px] lg:[--p:1100px] xl:[--p:1300px] [--a:64deg] sm:[--a:60deg] lg:[--a:58deg]`}
+            className={`absolute inset-y-0 ${left ? "left-[9px] sm:left-3 lg:left-4 xl:left-5 origin-left" : "right-[9px] sm:right-3 lg:right-4 xl:right-5 origin-right"} w-[80px] sm:w-[150px] lg:w-[230px] xl:w-[290px] [--p:500px] sm:[--p:800px] lg:[--p:1100px] xl:[--p:1300px] [--a:64deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
-            {/* Sash: stiles and rails */}
-            <div className="absolute inset-0 border-[4px] sm:border-[6px] lg:border-[8px] xl:border-[10px] border-window-frame shadow-[inset_0_0_0_1px_var(--color-window-frame-edge),0_0_0_1px_var(--color-window-frame-edge)]">
-                {/* Clear glass: one faint glint across the panes */}
-                <div className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.22)_0%,rgb(255_255_255/0.06)_30%,transparent_31%,transparent_58%,rgb(255_255_255/0.1)_59%,transparent_70%)]" />
+            {/* Glass: a cool tint, one broad glint and one thin one */}
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(205_232_255/0.16),rgb(255_255_255/0.05))]" />
+            <div className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.26)_0%,rgb(255_255_255/0.07)_30%,transparent_31%,transparent_58%,rgb(255_255_255/0.14)_59%,transparent_66%)]" />
 
-                {/* Paw prints on the glass */}
-                <div aria-hidden="true" className="hidden lg:block absolute inset-0">
-                    {PANEL_PRINTS.map((p, i) => (
-                        <span
-                            key={i}
-                            className="absolute animate-paw-fade"
-                            style={{ left: `${p.x}%`, top: `${p.y}%`, transform: `rotate(${p.rot}deg)`, animationDelay: `${p.delay}s` }}
-                        >
-                            <PixelArt
-                                rows={PAW}
-                                palette={{ T: "rgb(255 255 255 / 0.6)", P: "rgb(255 255 255 / 0.55)" }}
-                                className={`${p.big ? "w-[24px] xl:w-[28px]" : "w-[18px] xl:w-[22px]"} h-auto`}
-                            />
-                        </span>
-                    ))}
-                </div>
-
-                {/* Glazing bars: one upright, two across */}
-                <div className={`${bar} inset-y-0 left-1/2 -translate-x-1/2 w-[3px] sm:w-1 lg:w-1.5 xl:w-2`} />
-                <div className={`${bar} inset-x-0 top-1/3 -translate-y-1/2 h-[3px] sm:h-1 lg:h-1.5 xl:h-2`} />
-                <div className={`${bar} inset-x-0 top-2/3 -translate-y-1/2 h-[3px] sm:h-1 lg:h-1.5 xl:h-2`} />
+            {/* Paw prints on the glass */}
+            <div aria-hidden="true" className="hidden lg:block absolute inset-0">
+                {PANEL_PRINTS.map((p, i) => (
+                    <span
+                        key={i}
+                        className="absolute animate-paw-fade"
+                        style={{ left: `${p.x}%`, top: `${p.y}%`, transform: `rotate(${p.rot}deg)`, animationDelay: `${p.delay}s` }}
+                    >
+                        <PixelArt
+                            rows={PAW}
+                            palette={{ T: "rgb(255 255 255 / 0.6)", P: "rgb(255 255 255 / 0.55)" }}
+                            className={`${p.big ? "w-[24px] xl:w-[28px]" : "w-[18px] xl:w-[22px]"} h-auto`}
+                        />
+                    </span>
+                ))}
             </div>
 
-            {/* Copper handle on the free edge */}
+            {/* Glazing bars: one upright, two across */}
+            <div className={`${STILE} inset-y-0 left-1/2 -translate-x-1/2 w-[2px] sm:w-[3px] lg:w-1 xl:w-[5px]`} />
+            <div className={`${RAIL} inset-x-0 top-1/3 -translate-y-1/2 h-[2px] sm:h-[3px] lg:h-1 xl:h-[5px]`} />
+            <div className={`${RAIL} inset-x-0 top-2/3 -translate-y-1/2 h-[2px] sm:h-[3px] lg:h-1 xl:h-[5px]`} />
+
+            {/* Sash: stiles, top rail, deeper bottom rail */}
+            <div className={`${STILE} inset-y-0 left-0 w-1 sm:w-1.5 lg:w-2 xl:w-2.5`} />
+            <div className={`${STILE} inset-y-0 right-0 w-1 sm:w-1.5 lg:w-2 xl:w-2.5`} />
+            <div className={`${RAIL} inset-x-0 top-0 h-1 sm:h-1.5 lg:h-2 xl:h-2.5`} />
+            <div className={`${RAIL} inset-x-0 bottom-0 h-1.5 sm:h-2 lg:h-3 xl:h-3.5`} />
+
+            {/* Copper handle on its backplate, on the free edge */}
             <div
-                className={`absolute top-[52%] ${left ? "-right-[3px] sm:-right-1 lg:-right-1.5" : "-left-[3px] sm:-left-1 lg:-left-1.5"} w-[3px] sm:w-1 lg:w-1.5 xl:w-2 h-3 sm:h-5 lg:h-7 xl:h-8 rounded-full bg-[linear-gradient(90deg,#E09A6B,#B5653A)] shadow-[0_1px_2px_rgb(60_30_10/0.4)]`}
-            />
+                className={`absolute top-[50%] ${left ? "right-0" : "left-0"} w-1 sm:w-1.5 lg:w-2 xl:w-2.5 h-5 sm:h-7 lg:h-10 xl:h-12 rounded-[2px] bg-[#3B2A20]`}
+            >
+                <div
+                    className={`absolute top-1/2 -translate-y-1/2 ${left ? "-right-[2px] sm:-right-[3px] lg:-right-1" : "-left-[2px] sm:-left-[3px] lg:-left-1"} w-[3px] sm:w-1 lg:w-1.5 xl:w-2 h-3/4 rounded-full bg-[linear-gradient(90deg,#F0B184,#C27245_55%,#8E4C2A)] shadow-[0_1px_2px_rgb(40_20_10/0.5)]`}
+                />
+            </div>
+        </div>
+    );
+}
+
+/** An iron butt hinge on the jamb's inner edge. */
+function Hinge({ side, at }: { side: "left" | "right"; at: "top" | "bottom" }) {
+    return (
+        <div
+            className={`absolute ${at === "top" ? "top-[13%]" : "bottom-[13%]"} ${
+                side === "left" ? "left-[6px] sm:left-[9px] lg:left-3 xl:left-4" : "right-[6px] sm:right-[9px] lg:right-3 xl:right-4"
+            } w-[5px] sm:w-1.5 lg:w-2 xl:w-2.5 h-4 sm:h-6 lg:h-8 xl:h-9 rounded-[2px] bg-[linear-gradient(90deg,#2B2623,#5C544E_45%,#2B2623)] shadow-[0_1px_2px_rgb(0_0_0/0.45)]`}
+        >
+            {/* Knuckle joints */}
+            <span className="absolute inset-x-0 top-1/3 h-px bg-black/50" />
+            <span className="absolute inset-x-0 top-2/3 h-px bg-black/50" />
         </div>
     );
 }
 
 /**
  * The window, at every screen size: a walnut frame around the whole sky (head
- * under the header, jambs at the edges) with its two casement panels opened out.
- * The middle is open air, so nothing crosses the copy. The sill is drawn by the
- * hero, since the cats sit on it.
+ * under the header, jambs at the edges, a bottom rail on the sill) with its two
+ * casement panels opened out on iron hinges. The middle is open air, so nothing
+ * crosses the copy. The sill is drawn by the hero, since the cats sit on it.
  */
 export function WindowFrame() {
-    const jamb = "absolute inset-y-0 w-[7px] sm:w-2.5 lg:w-3.5 xl:w-4 bg-window-frame";
+    const jamb = "absolute inset-y-0 w-[9px] sm:w-3 lg:w-4 xl:w-5 wood-v";
     return (
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
             {/* Panels hang outside, behind the frame */}
             <CasementPanel side="left" />
             <CasementPanel side="right" />
 
-            {/* Frame: jambs and head, with a darker inner edge where the wall turns into the opening */}
-            <div className={`${jamb} left-0 shadow-[inset_-2px_0_0_var(--color-window-frame-edge),3px_0_6px_-2px_rgb(40_20_10/0.35)]`} />
-            <div className={`${jamb} right-0 shadow-[inset_2px_0_0_var(--color-window-frame-edge),-3px_0_6px_-2px_rgb(40_20_10/0.35)]`} />
-            <div className="absolute inset-x-0 top-0 h-[7px] sm:h-2.5 lg:h-3.5 xl:h-4 bg-window-frame shadow-[inset_0_-2px_0_var(--color-window-frame-edge),0_3px_6px_-2px_rgb(40_20_10/0.35)]" />
+            {/* Depth: the frame shades the edges of the opening */}
+            <div className="absolute inset-0 shadow-[inset_0_0_32px_rgb(40_20_10/0.22)]" />
+
+            {/* Frame: casing with an inner stop moulding (the two-step edge facing the opening) */}
+            <div
+                className={`${jamb} left-0 shadow-[inset_1px_0_0_rgb(255_232_205/0.2),inset_-3px_0_0_var(--color-window-frame-shade),inset_-4px_0_0_var(--color-window-frame-edge),5px_0_9px_-4px_rgb(40_20_10/0.5)]`}
+            />
+            <div
+                className={`${jamb} right-0 shadow-[inset_-1px_0_0_rgb(255_232_205/0.2),inset_3px_0_0_var(--color-window-frame-shade),inset_4px_0_0_var(--color-window-frame-edge),-5px_0_9px_-4px_rgb(40_20_10/0.5)]`}
+            />
+            <div className="absolute inset-x-0 top-0 h-[9px] sm:h-3 lg:h-4 xl:h-5 wood-h shadow-[inset_0_-3px_0_var(--color-window-frame-shade),inset_0_-4px_0_var(--color-window-frame-edge),0_5px_9px_-4px_rgb(40_20_10/0.5)]" />
+            <div className="absolute inset-x-0 bottom-0 h-1.5 sm:h-2 lg:h-2.5 xl:h-3 wood-h shadow-[inset_0_3px_0_var(--color-window-frame-shade),inset_0_4px_0_var(--color-window-frame-edge),0_-4px_8px_-4px_rgb(40_20_10/0.4)]" />
+
+            <Hinge side="left" at="top" />
+            <Hinge side="left" at="bottom" />
+            <Hinge side="right" at="top" />
+            <Hinge side="right" at="bottom" />
         </div>
     );
 }

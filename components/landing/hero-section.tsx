@@ -6,7 +6,7 @@ import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
-import { FRAME, Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
+import { Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
 import LaptopDesktop from "./laptop-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
@@ -175,7 +175,7 @@ export default function HeroSection() {
               the copy never sits on bars. The laptop overlaps the sill at every size.
             */}
             <div className="relative w-full">
-                    <div className="relative overflow-hidden flex flex-col min-h-[calc(100svh-86px)] sm:min-h-[calc(100svh-90px)] lg:min-h-[calc(100svh-94px)]">
+                    <div className="relative overflow-hidden flex flex-col min-h-[calc(100svh-86px)] sm:min-h-[calc(100svh-92px)] lg:min-h-[calc(100svh-100px)] xl:min-h-[calc(100svh-106px)]">
                         <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
 
                         <WindowFrame />
@@ -505,20 +505,29 @@ export default function HeroSection() {
 
                     </div>
 
-                {/* The sill, edge to edge, where Ginger naps and Tux has his coffee */}
-                <div
-                    className="relative z-30 h-5 sm:h-6 lg:h-7 border-y shadow-[0_18px_28px_-16px_rgb(20_40_70/0.35)]"
-                    style={{ background: `linear-gradient(180deg, #9A6A4B 0%, ${FRAME.face} 30%, ${FRAME.face} 55%, ${FRAME.shade} 100%)`, borderColor: FRAME.edge }}
-                >
-                  <div className="relative h-full mx-auto max-w-chrome">
-                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[2%] lg:left-[3%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
-                        <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
+                {/*
+                  The sill, edge to edge, where Ginger naps and Tux has his coffee: a deep
+                  walnut board seen a little from above (its top, lit by the window, then
+                  its rounded front edge), casting a shadow on the wall below.
+                */}
+                <div className="relative z-30">
+                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
                     </div>
-                    <SillPlant className="hidden xl:block absolute bottom-[calc(100%-1px)] right-[2.5%] w-[64px] h-auto" />
-                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
-                        <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
+                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
+                    <div aria-hidden="true" className="absolute inset-x-0 top-full h-6 bg-[linear-gradient(180deg,rgb(40_20_10/0.2),transparent)] pointer-events-none" />
+
+                    <div className="absolute inset-0 mx-auto max-w-chrome">
+                        <div className="absolute bottom-[calc(100%-11px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[2%] lg:left-[3%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
+                            <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
+                            <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
+                        </div>
+                        <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[2.5%] w-[64px] h-auto" />
+                        <div className="absolute bottom-[calc(100%-11px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                            <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
+                            <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
+                        </div>
                     </div>
-                  </div>
                 </div>
             </div>
 

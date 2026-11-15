@@ -20,10 +20,12 @@ export default function Header() {
     const router = useRouter();
     const isHome = pathname === "/";
 
-    // On the homepage the header starts as the wall above the hero's window and
+    // On the homepage the header starts as the walnut head of the hero's window and
     // fades back to white over the first stretch of scrolling (written straight to
     // the style, so scrolling doesn't re-render the header).
     const frameTintRef = useRef<HTMLDivElement>(null);
+    // Text flips to light while the wood is mostly showing (past halfway it's mostly white again).
+    const [onFrame, setOnFrame] = useState(isHome);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -31,6 +33,7 @@ export default function Header() {
             if (frameTintRef.current) {
                 const tint = isHome ? 1 - Math.min(window.scrollY / FRAME_FADE_PX, 1) : 0;
                 frameTintRef.current.style.opacity = tint.toFixed(3);
+                setOnFrame(tint > 0.5);
             }
         };
 
@@ -98,11 +101,12 @@ export default function Header() {
 
     return (
         <header
-            className={`sticky top-0 z-50 w-full h-[64px] bg-white/85 backdrop-blur-md border-b transition-colors duration-300 ${
+            data-frame={onFrame ? "on" : "off"}
+            className={`group/hdr sticky top-0 z-50 w-full h-[64px] bg-white/85 backdrop-blur-md border-b transition-colors duration-300 ${
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 bg-window-wall pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
+            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 wood-h shadow-[inset_0_1px_0_rgb(255_232_205/0.16),inset_0_-3px_0_var(--color-window-frame-shade),inset_0_-4px_0_var(--color-window-frame-edge)] pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
             <div className="relative w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
@@ -114,7 +118,7 @@ export default function Header() {
                         className="h-[22px] sm:h-[28px] w-auto object-contain group-hover:scale-110 transition-transform duration-300 ease-in-out"
                         priority
                     />
-                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
+                    <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center transition-colors duration-300 group-data-[frame=on]/hdr:text-[#FFF3E2]">
                         PAWSE
                     </span>
                 </Link>
@@ -131,8 +135,8 @@ export default function Header() {
                                 aria-current={isActive ? "location" : undefined}
                                 className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
                                     isActive
-                                        ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
-                                        : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
+                                        ? "text-black group-data-[frame=on]/hdr:text-white [-webkit-text-stroke:0.35px_currentColor]"
+                                        : "text-muted hover:text-black group-data-[frame=on]/hdr:text-[#EBD9C5] group-data-[frame=on]/hdr:hover:text-white hover:[-webkit-text-stroke:0.35px_currentColor]"
                                 }`}
                             >
                                 {link.label}
@@ -154,7 +158,12 @@ export default function Header() {
                             ? "Download PAWSE"
                             : platformInfo.label.replace("Download", "Download PAWSE")
                     }
-                    className={buttonClasses({ variant: "ink", pressed: isDownloadPressed })}
+                    className={buttonClasses({
+                        variant: "ink",
+                        pressed: isDownloadPressed,
+                        // On the wood, a faint light ring keeps the charcoal button's edge visible
+                        className: "group-data-[frame=on]/hdr:ring-1 group-data-[frame=on]/hdr:ring-[#F6E7D6]/35",
+                    })}
                 >
                     <span className={buttonLabelClasses("header")}>
                         Download
