@@ -6,7 +6,7 @@ import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
-import { GlassPawPrints, Laptop, SillPlant, WindowSky, useSkyPhase } from "./hero-scene";
+import { FRAME, GlassPawPrints, Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
 import LaptopDesktop from "./laptop-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
@@ -170,24 +170,22 @@ export default function HeroSection() {
     return (
         <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
             {/*
-              The whole hero is the window: the sky runs edge to edge, with no frame
-              around it. The sill below and (on large screens) two mullions are the
-              only window cues, so phones get one clean layer instead of nested boxes.
+              The whole hero is the window: the sky runs edge to edge, with the frame
+              drawn on it (rod, curtains, transom, mullions from lg) instead of a box
+              around it, so phones get one layer. The laptop overlaps the sill at every size.
             */}
             <div className="relative w-full">
                     <div className="relative overflow-hidden">
                         <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
 
-                        {/* Glass details follow the content width, so very wide screens keep the same composition */}
+                        {/* Paw prints follow the content width, so very wide screens keep the same composition */}
                         <div aria-hidden="true" className="absolute inset-0 mx-auto max-w-chrome pointer-events-none">
                             <GlassPawPrints />
-                            {/* Mullions: a wide centre pane with two side panes (only where they clear the headline) */}
-                            <div className="hidden xl:block absolute inset-y-0 left-[13%] w-3 -ml-1.5 bg-white z-10 shadow-[2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
-                            <div className="hidden xl:block absolute inset-y-0 right-[13%] w-3 -mr-1.5 bg-white z-10 shadow-[-2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
                         </div>
+                        <WindowFrame />
 
             {/* Centered Hero Copy & Actions */}
-            <div className="relative z-30 w-full flex flex-col items-center gap-6 px-5 md:px-10 pt-14 sm:pt-16 lg:pt-20 pb-32 sm:pb-40 xl:pb-60">
+            <div className={`relative ${platformsOpen ? "z-50" : "z-30"} w-full flex flex-col items-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 lg:pt-28 pb-32 sm:pb-40 lg:pb-52 xl:pb-60`}>
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
@@ -512,23 +510,29 @@ export default function HeroSection() {
                     </div>
 
                 {/* The sill, edge to edge, where Ginger naps and Tux has his coffee */}
-                <div className="relative z-30 h-5 sm:h-6 lg:h-7 bg-[linear-gradient(180deg,#FFFFFF_0%,#FFFFFF_40%,#EDF1F5_100%)] border-y border-stroke shadow-[0_18px_28px_-16px_rgb(20_40_70/0.35)]">
+                <div
+                    className="relative z-30 h-5 sm:h-6 lg:h-7 border-y shadow-[0_18px_28px_-16px_rgb(20_40_70/0.35)]"
+                    style={{ background: `linear-gradient(180deg, ${FRAME.face} 0%, ${FRAME.face} 40%, ${FRAME.shade} 100%)`, borderColor: FRAME.edge }}
+                >
                   <div className="relative h-full mx-auto max-w-chrome">
-                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[4%] lg:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
+                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[2%] lg:left-[3%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
                         <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
                     </div>
-                    <SillPlant className="absolute bottom-[calc(100%-1px)] right-[3%] lg:right-[2.5%] w-[34px] sm:w-[48px] lg:w-[64px] h-auto" />
-                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[14%] sm:right-[10%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                    <SillPlant className="hidden xl:block absolute bottom-[calc(100%-1px)] right-[2.5%] w-[64px] h-auto" />
+                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                         <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
                     </div>
                   </div>
                 </div>
             </div>
 
-            {/* The visitor's laptop, in the foreground: on desktops it overlaps the bottom of the window, as seen from the chair */}
+            {/*
+              The visitor's laptop, in the foreground, overlapping the bottom of the window
+              as seen from the chair. Narrower on small screens so the cats keep their spots beside it.
+            */}
             <div
                 ref={laptopParallaxRef}
-                className="relative z-40 w-[90%] sm:w-[80%] lg:w-[72%] xl:w-[60%] max-w-[940px] mt-12 sm:mt-14 xl:-mt-44 will-change-transform"
+                className="relative z-40 w-[60%] sm:w-[64%] lg:w-[62%] xl:w-[60%] max-w-[940px] -mt-[72px] sm:-mt-28 lg:-mt-36 xl:-mt-44 will-change-transform"
             >
                 <div className="relative animate-hero-laptop">
                     <div className="relative z-10">

@@ -280,17 +280,17 @@ function Celestial({ phase }: { phase: SkyPhase }) {
             <PixelArt
                 rows={SUN}
                 palette={{ Y: "#FFE59A", H: "#FFF6D6", O: "#FFD27A" }}
-                className={`hidden sm:block absolute top-8 right-[4%] w-[65px] lg:w-[78px] h-auto ${fade} ${show("day")}`}
+                className={`hidden sm:block absolute top-20 lg:top-28 right-[7%] lg:right-[5.5%] w-[65px] xl:w-[78px] h-auto ${fade} ${show("day")}`}
             />
             <PixelArt
                 rows={SUN}
                 palette={{ Y: "#FFD69C", H: "#FFF1D9", O: "#FFBC80" }}
-                className={`hidden sm:block absolute top-[24%] right-[5%] w-[65px] lg:w-[78px] h-auto ${fade} ${show("morning")}`}
+                className={`hidden sm:block absolute top-[26%] right-[7%] lg:right-[5.5%] w-[65px] xl:w-[78px] h-auto ${fade} ${show("morning")}`}
             />
             <PixelArt
                 rows={SUN}
                 palette={{ Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" }}
-                className={`hidden sm:block absolute top-[44%] right-[6%] w-[70px] lg:w-[84px] h-auto ${fade} ${show("dusk")}`}
+                className={`hidden sm:block absolute top-[44%] right-[7%] lg:right-[5.5%] w-[65px] xl:w-[78px] h-auto ${fade} ${show("dusk")}`}
             />
 
             {/* Night: moon and twinkling stars */}
@@ -298,7 +298,7 @@ function Celestial({ phase }: { phase: SkyPhase }) {
                 <PixelArt
                     rows={MOON}
                     palette={{ M: "#FFF3C9", S: "#EBD99E" }}
-                    className="hidden sm:block absolute top-8 right-[5%] w-[46px] lg:w-[56px] h-auto"
+                    className="hidden sm:block absolute top-20 lg:top-28 right-[8%] lg:right-[6.5%] w-[46px] lg:w-[56px] h-auto"
                 />
                 {STARS.map((s, i) => (
                     <span
@@ -407,6 +407,120 @@ export function WindowSky({
 }
 
 /* ------------------------------------------------------------------ */
+/* The window frame                                                    */
+/* ------------------------------------------------------------------ */
+
+/** Painted window frame: warm cream, so it reads as wood against the sky. */
+export const FRAME = {
+    face: "#FFFBF3",
+    shade: "#EFE5D5",
+    edge: "#DDCDB6",
+} as const;
+
+/**
+ * Tied-back curtain outline, as a clip-path. Full width under the rod, pinched
+ * at the tieback (58% down), loosening towards the sill. `w` is the width at a
+ * height `y` (both 0..1), measured from the wall side.
+ */
+function curtainClip(side: "left" | "right") {
+    const TIE = 0.58;
+    const w = (y: number) => {
+        if (y <= 0.05) return 1;
+        if (y <= TIE) {
+            const t = (y - 0.05) / (TIE - 0.05);
+            return 1 - 0.5 * (1 - (1 - t) * (1 - t)); // eases into the tie
+        }
+        const t = (y - TIE) / (1 - TIE);
+        return 0.5 + 0.34 * t * t; // falls loose below it
+    };
+    const pts: string[] = [];
+    const STEPS = 24;
+    for (let i = 0; i <= STEPS; i++) {
+        const y = i / STEPS;
+        const x = side === "left" ? w(y) : 1 - w(y);
+        pts.push(`${(x * 100).toFixed(2)}% ${(y * 100).toFixed(2)}%`);
+    }
+    const wall = side === "left" ? "0%" : "100%";
+    return `polygon(${wall} 0%, ${pts.join(", ")}, ${wall} 100%)`;
+}
+
+const CURTAIN_CLIP = { left: curtainClip("left"), right: curtainClip("right") } as const;
+
+function Curtain({ side }: { side: "left" | "right" }) {
+    const left = side === "left";
+    return (
+        <div
+            className={`absolute top-1 bottom-0 ${left ? "left-0" : "right-0"} w-[22px] sm:w-9 lg:w-12 xl:w-[60px] ${
+                left ? "drop-shadow-[3px_0_4px_rgb(120_60_30/0.2)]" : "drop-shadow-[-3px_0_4px_rgb(120_60_30/0.2)]"
+            }`}
+        >
+            <div
+                className="absolute inset-0"
+                style={{
+                    clipPath: CURTAIN_CLIP[side],
+                    // Soft vertical folds, a little darker towards the wall
+                    background: `linear-gradient(${left ? "90deg" : "270deg"}, rgb(150 70 40 / 0.16), transparent 55%), repeating-linear-gradient(90deg, #F8CDB0 0 7px, #F2B595 7px 10px, #FBDDC8 10px 13px)`,
+                }}
+            />
+            {/* Tieback, in PAWSE blue */}
+            <div
+                className={`absolute top-[56%] ${left ? "left-0 rounded-r-full" : "right-0 rounded-l-full"} w-[58%] h-2 sm:h-2.5 bg-accent border-b-2 border-accent-strong`}
+            />
+        </div>
+    );
+}
+
+/**
+ * Everything that makes the sky a window, at every screen size: the curtain
+ * rod and tied-back curtains at the edges, a transom of small panes along the
+ * top, and (from lg, where they clear the headline) two mullions that line up
+ * with the outer transom bars. The sill is drawn by the hero, since the cats sit on it.
+ */
+export function WindowFrame() {
+    const bar = {
+        background: FRAME.face,
+        boxShadow: `inset -1px 0 0 ${FRAME.shade}, 0 2px 6px -2px rgb(16 60 100 / 0.3)`,
+    };
+    return (
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+            {/* Transom glass: a touch brighter than the main pane, so it reads as its own row */}
+            <div className="absolute inset-x-0 top-0 h-9 sm:h-11 lg:h-14 bg-white/10" />
+
+            {/* Bars, aligned to each other inside the content width */}
+            <div className="absolute inset-0 mx-auto max-w-chrome">
+                {[1, 2, 3, 4, 5, 6, 7].map((k) => (
+                    <div
+                        key={k}
+                        className={`absolute top-0 h-9 sm:h-11 lg:h-14 w-1.5 lg:w-2 -translate-x-1/2 ${k % 2 ? "hidden lg:block" : ""}`}
+                        style={{ left: `${k * 12.5}%`, ...bar }}
+                    />
+                ))}
+                {/* Mullions, continuing the outer transom bars down to the sill */}
+                <div className="hidden lg:block absolute inset-y-0 left-[12.5%] w-2.5 xl:w-3 -translate-x-1/2" style={bar} />
+                <div className="hidden lg:block absolute inset-y-0 left-[87.5%] w-2.5 xl:w-3 -translate-x-1/2" style={bar} />
+            </div>
+
+            {/* Transom rail */}
+            <div
+                className="absolute inset-x-0 top-9 sm:top-11 lg:top-14 h-1.5 sm:h-2 lg:h-2.5"
+                style={{
+                    background: FRAME.face,
+                    boxShadow: `inset 0 -1px 0 ${FRAME.shade}, 0 3px 8px -3px rgb(16 60 100 / 0.35)`,
+                }}
+            />
+
+            {/* Curtains hang in the room, in front of the frame */}
+            <div className="absolute inset-0 z-20">
+                <Curtain side="left" />
+                <Curtain side="right" />
+                {/* Rod */}
+                <div className="absolute inset-x-0 top-0 h-1.5 sm:h-2 bg-[#B07F5E] border-b-2 border-[#8C5E41]" />
+            </div>
+        </div>
+    );
+}
+
+/* ------------------------------------------------------------------ */
 /* Paw prints on the glass                                             */
 /* ------------------------------------------------------------------ */
 
@@ -423,20 +537,20 @@ const PAW = [
 
 /** Where a cat pressed against the window: [left|right, %, bottom %, rotation, size, delay s] */
 const PAW_PRINTS = [
-    { side: "left", x: 2.6, y: 30, rot: -16, big: true, delay: 1.7 },
-    { side: "left", x: 6.4, y: 38, rot: 10, big: true, delay: 1.85 },
-    { side: "left", x: 3.4, y: 47, rot: -6, big: false, delay: 2.0 },
-    { side: "right", x: 3.6, y: 34, rot: 12, big: true, delay: 2.15 },
-    { side: "right", x: 7.2, y: 41, rot: -9, big: false, delay: 2.3 },
+    { side: "left", x: 5.8, y: 30, rot: -16, big: true, delay: 1.7 },
+    { side: "left", x: 8.8, y: 38, rot: 10, big: true, delay: 1.85 },
+    { side: "left", x: 6.4, y: 47, rot: -6, big: false, delay: 2.0 },
+    { side: "right", x: 6.2, y: 30, rot: 12, big: true, delay: 2.15 },
+    { side: "right", x: 9.0, y: 37, rot: -9, big: false, delay: 2.3 },
 ] as const;
 
 /**
- * Soft paw prints left on the glass (from sm up, beside the copy, never on it).
+ * Soft paw prints left on the glass (from lg up, in the outer panes, never on the copy).
  * Decoration: they only fade in, after the cats have landed on the sill.
  */
 export function GlassPawPrints() {
     return (
-        <div aria-hidden="true" className="hidden sm:block absolute inset-0 z-[5] pointer-events-none">
+        <div aria-hidden="true" className="hidden lg:block absolute inset-0 z-[5] pointer-events-none">
             {PAW_PRINTS.map((p, i) => (
                 <span
                     key={i}
