@@ -20,7 +20,7 @@ export default function Header() {
     const router = useRouter();
     const isHome = pathname === "/";
 
-    // On the homepage the header starts as the top of the hero's window frame and
+    // On the homepage the header starts as the wall above the hero's window and
     // fades back to white over the first stretch of scrolling (written straight to
     // the style, so scrolling doesn't re-render the header).
     const frameTintRef = useRef<HTMLDivElement>(null);
@@ -102,7 +102,7 @@ export default function Header() {
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 bg-window-frame pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
+            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 bg-window-wall pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
             <div className="relative w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">

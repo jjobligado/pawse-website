@@ -121,10 +121,11 @@
   --container-content: 80rem; /* 1280px */
   --container-chrome: 90rem; /* 1440px */
 
-  /* Hero window frame (painted wood); the header blends into it at the top of the homepage */
-  --color-window-frame: #FFFBF3;
-  --color-window-frame-shade: #EFE5D5;
-  --color-window-frame-edge: #DDCDB6;
+  /* Hero window: walnut casement frame, set in a linen wall (the header starts as that wall) */
+  --color-window-frame: #7A4E35;
+  --color-window-frame-shade: #5E3B27;
+  --color-window-frame-edge: #432918;
+  --color-window-wall: #F6F1EA;
 
   /* Radius scale: `rounded-pill`, `rounded-card-lg`, `rounded-card`, `rounded-control`, `rounded-chip` */
   --radius-pill: 9999px; /* buttons, segmented control, step numbers */

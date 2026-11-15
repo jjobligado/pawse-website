@@ -398,124 +398,8 @@ export function WindowSky({
 
             <Skyline phase={phase} className="absolute inset-x-0 bottom-0 w-full h-[72px] sm:h-[88px] lg:h-[104px]" />
 
-            {/* Glass: soft inner shade at the top and two faint reflections */}
+            {/* Soft shade under the head of the frame */}
             <div className="absolute inset-0 shadow-[inset_0_14px_28px_-16px_rgb(16_60_100/0.35)]" />
-            <div className="absolute -inset-y-10 left-[8%] w-24 rotate-[18deg] bg-white/15" />
-            <div className="absolute -inset-y-10 left-[15%] w-8 rotate-[18deg] bg-white/10" />
-        </div>
-    );
-}
-
-/* ------------------------------------------------------------------ */
-/* The window frame                                                    */
-/* ------------------------------------------------------------------ */
-
-/** Painted window frame: warm cream, so it reads as wood against the sky. */
-export const FRAME = {
-    face: "var(--color-window-frame)",
-    shade: "var(--color-window-frame-shade)",
-    edge: "var(--color-window-frame-edge)",
-} as const;
-
-/**
- * Tied-back curtain outline, as a clip-path. Full width under the rod, pinched
- * at the tieback (58% down), loosening towards the sill. `w` is the width at a
- * height `y` (both 0..1), measured from the wall side.
- */
-function curtainClip(side: "left" | "right") {
-    const TIE = 0.58;
-    const w = (y: number) => {
-        if (y <= 0.05) return 1;
-        if (y <= TIE) {
-            const t = (y - 0.05) / (TIE - 0.05);
-            return 1 - 0.5 * (1 - (1 - t) * (1 - t)); // eases into the tie
-        }
-        const t = (y - TIE) / (1 - TIE);
-        return 0.5 + 0.34 * t * t; // falls loose below it
-    };
-    const pts: string[] = [];
-    const STEPS = 24;
-    for (let i = 0; i <= STEPS; i++) {
-        const y = i / STEPS;
-        const x = side === "left" ? w(y) : 1 - w(y);
-        pts.push(`${(x * 100).toFixed(2)}% ${(y * 100).toFixed(2)}%`);
-    }
-    const wall = side === "left" ? "0%" : "100%";
-    return `polygon(${wall} 0%, ${pts.join(", ")}, ${wall} 100%)`;
-}
-
-const CURTAIN_CLIP = { left: curtainClip("left"), right: curtainClip("right") } as const;
-
-function Curtain({ side }: { side: "left" | "right" }) {
-    const left = side === "left";
-    return (
-        <div
-            className={`absolute top-1 bottom-0 ${left ? "left-0" : "right-0"} w-[22px] sm:w-9 lg:w-12 xl:w-[60px] ${
-                left ? "drop-shadow-[3px_0_4px_rgb(120_60_30/0.2)]" : "drop-shadow-[-3px_0_4px_rgb(120_60_30/0.2)]"
-            }`}
-        >
-            <div
-                className="absolute inset-0"
-                style={{
-                    clipPath: CURTAIN_CLIP[side],
-                    // Soft vertical folds, a little darker towards the wall
-                    background: `linear-gradient(${left ? "90deg" : "270deg"}, rgb(150 70 40 / 0.16), transparent 55%), repeating-linear-gradient(90deg, #F8CDB0 0 7px, #F2B595 7px 10px, #FBDDC8 10px 13px)`,
-                }}
-            />
-            {/* Tieback, in PAWSE blue */}
-            <div
-                className={`absolute top-[56%] ${left ? "left-0 rounded-r-full" : "right-0 rounded-l-full"} w-[58%] h-2 sm:h-2.5 bg-accent border-b-2 border-accent-strong`}
-            />
-        </div>
-    );
-}
-
-/**
- * Everything that makes the sky a window, at every screen size: the curtain
- * rod and tied-back curtains at the edges, a transom of small panes along the
- * top, and (from lg, where they clear the headline) two mullions that line up
- * with the outer transom bars. The sill is drawn by the hero, since the cats sit on it.
- */
-export function WindowFrame() {
-    const bar = {
-        background: FRAME.face,
-        boxShadow: `inset -1px 0 0 ${FRAME.shade}, 0 2px 6px -2px rgb(16 60 100 / 0.3)`,
-    };
-    return (
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-            {/* Transom glass: a touch brighter than the main pane, so it reads as its own row */}
-            <div className="absolute inset-x-0 top-0 h-9 sm:h-11 lg:h-14 bg-white/10" />
-
-            {/* Bars, aligned to each other inside the content width */}
-            <div className="absolute inset-0 mx-auto max-w-chrome">
-                {[1, 2, 3, 4, 5, 6, 7].map((k) => (
-                    <div
-                        key={k}
-                        className={`absolute top-0 h-9 sm:h-11 lg:h-14 w-1.5 lg:w-2 -translate-x-1/2 ${k % 2 ? "hidden lg:block" : ""}`}
-                        style={{ left: `${k * 12.5}%`, ...bar }}
-                    />
-                ))}
-                {/* Mullions, continuing the outer transom bars down to the sill */}
-                <div className="hidden lg:block absolute inset-y-0 left-[12.5%] w-2.5 xl:w-3 -translate-x-1/2" style={bar} />
-                <div className="hidden lg:block absolute inset-y-0 left-[87.5%] w-2.5 xl:w-3 -translate-x-1/2" style={bar} />
-            </div>
-
-            {/* Transom rail */}
-            <div
-                className="absolute inset-x-0 top-9 sm:top-11 lg:top-14 h-1.5 sm:h-2 lg:h-2.5"
-                style={{
-                    background: FRAME.face,
-                    boxShadow: `inset 0 -1px 0 ${FRAME.shade}, 0 3px 8px -3px rgb(16 60 100 / 0.35)`,
-                }}
-            />
-
-            {/* Curtains hang in the room, in front of the frame */}
-            <div className="absolute inset-0 z-20">
-                <Curtain side="left" />
-                <Curtain side="right" />
-                {/* Rod */}
-                <div className="absolute inset-x-0 top-0 h-1.5 sm:h-2 bg-[#B07F5E] border-b-2 border-[#8C5E41]" />
-            </div>
         </div>
     );
 }
@@ -535,43 +419,101 @@ const PAW = [
     "..PP.PP.",
 ] as const;
 
-/** Where a cat pressed against the window: [left|right, %, bottom %, rotation, size, delay s] */
-const PAW_PRINTS = [
-    { side: "left", x: 5.8, y: 30, rot: -16, big: true, delay: 1.7 },
-    { side: "left", x: 8.8, y: 38, rot: 10, big: true, delay: 1.85 },
-    { side: "left", x: 6.4, y: 47, rot: -6, big: false, delay: 2.0 },
-    { side: "right", x: 6.2, y: 30, rot: 12, big: true, delay: 2.15 },
-    { side: "right", x: 9.0, y: 37, rot: -9, big: false, delay: 2.3 },
+/* ------------------------------------------------------------------ */
+/* The window: a walnut French casement, opened out                    */
+/* ------------------------------------------------------------------ */
+
+/** Walnut frame colours (tokens in globals.css, shared with the sill and header). */
+export const FRAME = {
+    face: "var(--color-window-frame)",
+    shade: "var(--color-window-frame-shade)",
+    edge: "var(--color-window-frame-edge)",
+} as const;
+
+/**
+ * Soft paw prints left on the glass of the open panels (from lg up). They sit in
+ * the panel's own plane, so they swing with it. Decoration: they only fade in,
+ * after the cats have landed on the sill.
+ */
+const PANEL_PRINTS = [
+    { x: 30, y: 46, rot: -14, big: true, delay: 1.7 },
+    { x: 58, y: 54, rot: 12, big: true, delay: 1.85 },
+    { x: 36, y: 63, rot: -6, big: false, delay: 2.0 },
 ] as const;
 
 /**
- * Soft paw prints left on the glass (from lg up, in the outer panes, never on the copy).
- * Decoration: they only fade in, after the cats have landed on the sill.
+ * One casement panel, hinged on the jamb and swung outward (away from the
+ * visitor), so it recedes behind the frame. Real 3D: the perspective and
+ * width step up with the screen so the panel always reads as half the window,
+ * opened about 60 degrees. Clear glass: the sky shows through, only the walnut
+ * stiles, rails and glazing bars (2 x 3 panes) are drawn.
  */
-export function GlassPawPrints() {
+function CasementPanel({ side }: { side: "left" | "right" }) {
+    const left = side === "left";
+    const bar = "absolute bg-window-frame shadow-[inset_0_0_0_1px_var(--color-window-frame-edge)]";
     return (
-        <div aria-hidden="true" className="hidden lg:block absolute inset-0 z-[5] pointer-events-none">
-            {PAW_PRINTS.map((p, i) => (
-                <span
-                    key={i}
-                    className="absolute animate-paw-fade"
-                    style={{
-                        [p.side]: `${p.x}%`,
-                        bottom: `${p.y}%`,
-                        transform: `rotate(${p.rot}deg)`,
-                        animationDelay: `${p.delay}s`,
-                    }}
-                >
-                    <PixelArt
-                        rows={PAW}
-                        palette={{ T: "rgb(255 255 255 / 0.55)", P: "rgb(255 255 255 / 0.5)" }}
-                        className={`${p.big ? "w-[22px] lg:w-[26px]" : "w-[17px] lg:w-[20px]"} h-auto drop-shadow-[0_0_3px_rgb(255_255_255/0.6)]`}
-                    />
-                </span>
-            ))}
+        <div
+            className={`absolute inset-y-0 ${left ? "left-[7px] sm:left-2.5 lg:left-3.5 xl:left-4 origin-left" : "right-[7px] sm:right-2.5 lg:right-3.5 xl:right-4 origin-right"} w-[80px] sm:w-[150px] lg:w-[230px] xl:w-[290px] [--p:500px] sm:[--p:800px] lg:[--p:1100px] xl:[--p:1300px] [--a:64deg] sm:[--a:60deg] lg:[--a:58deg]`}
+            style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
+        >
+            {/* Sash: stiles and rails */}
+            <div className="absolute inset-0 border-[4px] sm:border-[6px] lg:border-[8px] xl:border-[10px] border-window-frame shadow-[inset_0_0_0_1px_var(--color-window-frame-edge),0_0_0_1px_var(--color-window-frame-edge)]">
+                {/* Clear glass: one faint glint across the panes */}
+                <div className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.22)_0%,rgb(255_255_255/0.06)_30%,transparent_31%,transparent_58%,rgb(255_255_255/0.1)_59%,transparent_70%)]" />
+
+                {/* Paw prints on the glass */}
+                <div aria-hidden="true" className="hidden lg:block absolute inset-0">
+                    {PANEL_PRINTS.map((p, i) => (
+                        <span
+                            key={i}
+                            className="absolute animate-paw-fade"
+                            style={{ left: `${p.x}%`, top: `${p.y}%`, transform: `rotate(${p.rot}deg)`, animationDelay: `${p.delay}s` }}
+                        >
+                            <PixelArt
+                                rows={PAW}
+                                palette={{ T: "rgb(255 255 255 / 0.6)", P: "rgb(255 255 255 / 0.55)" }}
+                                className={`${p.big ? "w-[24px] xl:w-[28px]" : "w-[18px] xl:w-[22px]"} h-auto`}
+                            />
+                        </span>
+                    ))}
+                </div>
+
+                {/* Glazing bars: one upright, two across */}
+                <div className={`${bar} inset-y-0 left-1/2 -translate-x-1/2 w-[3px] sm:w-1 lg:w-1.5 xl:w-2`} />
+                <div className={`${bar} inset-x-0 top-1/3 -translate-y-1/2 h-[3px] sm:h-1 lg:h-1.5 xl:h-2`} />
+                <div className={`${bar} inset-x-0 top-2/3 -translate-y-1/2 h-[3px] sm:h-1 lg:h-1.5 xl:h-2`} />
+            </div>
+
+            {/* Copper handle on the free edge */}
+            <div
+                className={`absolute top-[52%] ${left ? "-right-[3px] sm:-right-1 lg:-right-1.5" : "-left-[3px] sm:-left-1 lg:-left-1.5"} w-[3px] sm:w-1 lg:w-1.5 xl:w-2 h-3 sm:h-5 lg:h-7 xl:h-8 rounded-full bg-[linear-gradient(90deg,#E09A6B,#B5653A)] shadow-[0_1px_2px_rgb(60_30_10/0.4)]`}
+            />
         </div>
     );
 }
+
+/**
+ * The window, at every screen size: a walnut frame around the whole sky (head
+ * under the header, jambs at the edges) with its two casement panels opened out.
+ * The middle is open air, so nothing crosses the copy. The sill is drawn by the
+ * hero, since the cats sit on it.
+ */
+export function WindowFrame() {
+    const jamb = "absolute inset-y-0 w-[7px] sm:w-2.5 lg:w-3.5 xl:w-4 bg-window-frame";
+    return (
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+            {/* Panels hang outside, behind the frame */}
+            <CasementPanel side="left" />
+            <CasementPanel side="right" />
+
+            {/* Frame: jambs and head, with a darker inner edge where the wall turns into the opening */}
+            <div className={`${jamb} left-0 shadow-[inset_-2px_0_0_var(--color-window-frame-edge),3px_0_6px_-2px_rgb(40_20_10/0.35)]`} />
+            <div className={`${jamb} right-0 shadow-[inset_2px_0_0_var(--color-window-frame-edge),-3px_0_6px_-2px_rgb(40_20_10/0.35)]`} />
+            <div className="absolute inset-x-0 top-0 h-[7px] sm:h-2.5 lg:h-3.5 xl:h-4 bg-window-frame shadow-[inset_0_-2px_0_var(--color-window-frame-edge),0_3px_6px_-2px_rgb(40_20_10/0.35)]" />
+        </div>
+    );
+}
+
 
 function Bird({ className = "" }: { className?: string }) {
     const palette = { B: "#5B7FA3" };

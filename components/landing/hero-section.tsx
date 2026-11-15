@@ -6,7 +6,7 @@ import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
-import { FRAME, GlassPawPrints, Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
+import { FRAME, Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
 import LaptopDesktop from "./laptop-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
@@ -170,18 +170,14 @@ export default function HeroSection() {
     return (
         <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
             {/*
-              The whole hero is the window: the sky runs edge to edge, with the frame
-              drawn on it (rod, curtains, transom, mullions from lg) instead of a box
-              around it, so phones get one layer. The laptop overlaps the sill at every size.
+              The whole hero is the window: a walnut French casement, opened out, with
+              the sky running edge to edge inside the frame. The middle is open air, so
+              the copy never sits on bars. The laptop overlaps the sill at every size.
             */}
             <div className="relative w-full">
                     <div className="relative overflow-hidden flex flex-col min-h-[calc(100svh-86px)] sm:min-h-[calc(100svh-90px)] lg:min-h-[calc(100svh-94px)]">
                         <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
 
-                        {/* Paw prints follow the content width, so very wide screens keep the same composition */}
-                        <div aria-hidden="true" className="absolute inset-0 mx-auto max-w-chrome pointer-events-none">
-                            <GlassPawPrints />
-                        </div>
                         <WindowFrame />
 
             {/* Centered Hero Copy & Actions */}
@@ -512,7 +508,7 @@ export default function HeroSection() {
                 {/* The sill, edge to edge, where Ginger naps and Tux has his coffee */}
                 <div
                     className="relative z-30 h-5 sm:h-6 lg:h-7 border-y shadow-[0_18px_28px_-16px_rgb(20_40_70/0.35)]"
-                    style={{ background: `linear-gradient(180deg, ${FRAME.face} 0%, ${FRAME.face} 40%, ${FRAME.shade} 100%)`, borderColor: FRAME.edge }}
+                    style={{ background: `linear-gradient(180deg, #9A6A4B 0%, ${FRAME.face} 30%, ${FRAME.face} 55%, ${FRAME.shade} 100%)`, borderColor: FRAME.edge }}
                 >
                   <div className="relative h-full mx-auto max-w-chrome">
                     <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[2%] lg:left-[3%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
