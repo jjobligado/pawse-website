@@ -7,6 +7,7 @@ import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
 import { Laptop, SillPlant, WindowSky } from "./hero-scene";
+import LaptopDesktop from "./laptop-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -27,8 +28,8 @@ const CAT_SIZE = "w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32";
 
 /**
  * Hero companions. On the sill, Ginger naps and Tux sips his coffee (their focus
- * routines, looping); hover / tap plays their break sheet once. Void peeks over
- * the laptop lid.
+ * routines, looping); hover / tap plays their break sheet once. Void is the
+ * companion inside the app on the laptop screen (laptop-desktop.tsx).
  */
 const HERO_CATS = {
     ginger: {
@@ -54,25 +55,6 @@ const HERO_CATS = {
             { frame: 3, ms: 900 },
             { frame: 2, ms: 220 },
             { frame: 1, ms: 160 },
-        ],
-    },
-    // Void peeks over the laptop lid, so only the head shows, from one sheet
-    // (frames: 0 look, 1 squint, 2 eyes closed, 3 side-eye). Idle is a slow blink;
-    // hover plays the whole look-around so the reaction reads as different from idle.
-    void: {
-        label: "Play with Void",
-        idle: { src: `${SPRITES}/void-head-peek-sheet.png`, frames: 4 },
-        action: { src: `${SPRITES}/void-head-peek-sheet.png`, frames: 4 },
-        idleSequence: [
-            { frame: 0, ms: 3400 },
-            { frame: 2, ms: 160 },
-        ],
-        actionSequence: [
-            { frame: 1, ms: 220 },
-            { frame: 2, ms: 160 },
-            { frame: 0, ms: 200 },
-            { frame: 3, ms: 700 },
-            { frame: 0, ms: 160 },
         ],
     },
 } as const;
@@ -513,11 +495,11 @@ export default function HeroSection() {
 
                 {/* The sill, where Ginger naps and Tux has his coffee */}
                 <div className="relative z-30 -mt-1 -mx-1.5 sm:-mx-3 h-4 sm:h-5 lg:h-6 rounded-[8px] sm:rounded-[10px] bg-[linear-gradient(180deg,#FFFFFF_0%,#FFFFFF_45%,#EEF2F6_100%)] ring-1 ring-stroke shadow-[0_16px_26px_-14px_rgb(20_40_70/0.35)]">
-                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[4%] lg:left-[3.5%] animate-cat-hop">
+                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] left-[4%] lg:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
                         <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
                     </div>
-                    <SillPlant className="absolute bottom-[calc(100%-1px)] right-[3%] lg:right-[2.5%] w-[34px] sm:w-[48px] lg:w-[64px] h-auto animate-cat-hop [animation-delay:0.75s]" />
-                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[14%] sm:right-[10%] xl:right-[6.5%] animate-cat-hop [animation-delay:0.9s]">
+                    <SillPlant className="absolute bottom-[calc(100%-1px)] right-[3%] lg:right-[2.5%] w-[34px] sm:w-[48px] lg:w-[64px] h-auto" />
+                    <div className="absolute bottom-[calc(100%-4px)] sm:bottom-[calc(100%-6px)] right-[14%] sm:right-[10%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                         <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
                     </div>
                 </div>
@@ -529,19 +511,9 @@ export default function HeroSection() {
                 className="relative z-40 w-[90%] sm:w-[80%] lg:w-[72%] xl:w-[60%] max-w-[940px] mt-12 sm:mt-14 xl:-mt-44 will-change-transform"
             >
                 <div className="relative animate-hero-laptop">
-                    {/* Void: only the head, peeking over the lid, behind it */}
-                    <div className="absolute bottom-[calc(100%-6px)] left-[7%] sm:left-[9%] z-0">
-                        <div className="animate-cat-intro-void">
-                            <SpriteCat {...HERO_CATS.void} className={CAT_SIZE} />
-                        </div>
-                    </div>
                     <div className="relative z-10">
                         <Laptop>
-                            <div className="absolute inset-0 surface-wash flex items-center justify-center">
-                                <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
-                                    App Visuals Preview
-                                </span>
-                            </div>
+                            <LaptopDesktop />
                         </Laptop>
                     </div>
                 </div>
