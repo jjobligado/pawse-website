@@ -175,7 +175,7 @@ export default function HeroSection() {
               around it, so phones get one layer. The laptop overlaps the sill at every size.
             */}
             <div className="relative w-full">
-                    <div className="relative overflow-hidden">
+                    <div className="relative overflow-hidden flex flex-col min-h-[calc(100svh-86px)] sm:min-h-[calc(100svh-90px)] lg:min-h-[calc(100svh-94px)]">
                         <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
 
                         {/* Paw prints follow the content width, so very wide screens keep the same composition */}
@@ -185,7 +185,7 @@ export default function HeroSection() {
                         <WindowFrame />
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-50" : "z-30"} w-full flex flex-col items-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 lg:pt-28 pb-32 sm:pb-40 lg:pb-52 xl:pb-60`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 pb-32 sm:pb-40 lg:pb-52 lg:short:pt-20 lg:short:pb-40`}>
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
@@ -532,7 +532,7 @@ export default function HeroSection() {
             */}
             <div
                 ref={laptopParallaxRef}
-                className="relative z-40 w-[60%] sm:w-[64%] lg:w-[62%] xl:w-[60%] max-w-[940px] -mt-[72px] sm:-mt-28 lg:-mt-36 xl:-mt-44 will-change-transform"
+                className="relative z-40 w-[60%] sm:w-[64%] lg:w-[62%] xl:w-[60%] max-w-[940px] -mt-[72px] sm:-mt-28 lg:-mt-36 lg:short:-mt-28 will-change-transform"
             >
                 <div className="relative animate-hero-laptop">
                     <div className="relative z-10">

@@ -412,9 +412,9 @@ export function WindowSky({
 
 /** Painted window frame: warm cream, so it reads as wood against the sky. */
 export const FRAME = {
-    face: "#FFFBF3",
-    shade: "#EFE5D5",
-    edge: "#DDCDB6",
+    face: "var(--color-window-frame)",
+    shade: "var(--color-window-frame-shade)",
+    edge: "var(--color-window-frame-edge)",
 } as const;
 
 /**

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Short viewports (laptops at 768px tall and less): the hero tightens so the sill stays above the fold */
+@custom-variant short (@media (max-height: 780px));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -117,6 +120,11 @@
   /* Layout containers: `max-w-content` for sections, `max-w-chrome` for header/hero */
   --container-content: 80rem; /* 1280px */
   --container-chrome: 90rem; /* 1440px */
+
+  /* Hero window frame (painted wood); the header blends into it at the top of the homepage */
+  --color-window-frame: #FFFBF3;
+  --color-window-frame-shade: #EFE5D5;
+  --color-window-frame-edge: #DDCDB6;
 
   /* Radius scale: `rounded-pill`, `rounded-card-lg`, `rounded-card`, `rounded-control`, `rounded-chip` */
   --radius-pill: 9999px; /* buttons, segmented control, step numbers */

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { usePlatform } from "@/hooks/use-platform";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
+
+const FRAME_FADE_PX = 240;
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
@@ -18,15 +20,24 @@ export default function Header() {
     const router = useRouter();
     const isHome = pathname === "/";
 
+    // On the homepage the header starts as the top of the hero's window frame and
+    // fades back to white over the first stretch of scrolling (written straight to
+    // the style, so scrolling doesn't re-render the header).
+    const frameTintRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 10);
+            if (frameTintRef.current) {
+                const tint = isHome ? 1 - Math.min(window.scrollY / FRAME_FADE_PX, 1) : 0;
+                frameTintRef.current.style.opacity = tint.toFixed(3);
+            }
         };
 
         handleScroll();
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    }, [isHome]);
 
     // Scrollspy: watch EVERY homepage section (not only the linked ones) so the
     // highlight clears while reading sections that have no nav link (Focus, Break,
@@ -91,7 +102,8 @@ export default function Header() {
                 scrolled ? "border-stroke" : "border-transparent"
             }`}
         >
-            <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
+            <div ref={frameTintRef} aria-hidden="true" className={`absolute inset-0 bg-window-frame pointer-events-none ${isHome ? "opacity-100" : "opacity-0"}`} />
+            <div className="relative w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
                 <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
                     <Image
