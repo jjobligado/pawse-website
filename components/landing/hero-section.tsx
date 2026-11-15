@@ -187,19 +187,19 @@ export default function HeroSection() {
                         <WindowFrame />
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-7 sm:px-12 md:px-14 pt-20 sm:pt-24 lg:short:pt-20 pb-[calc(var(--lw)*var(--ov)_+_48px)]`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-4 sm:px-12 md:px-14 pt-20 sm:pt-24 lg:short:pt-20 pb-[calc(var(--lw)*var(--ov)_+_48px)]`}>
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
                 />
                 <div className="w-full flex justify-center items-center">
-                    <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
+                    <h1 className="font-pixel text-[clamp(1.8rem,calc(10.7vw_-_5px),2.9rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
                             The Coziest Way
                         </span>
                         <span className="block whitespace-nowrap animate-hero-headline-2">
                             to Get Things{" "}
-                            <span className="group/done relative inline-block pr-6 md:pr-8 animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5 before:absolute before:-inset-y-8 before:-inset-x-6 before:content-['']">
+                            <span className="group/done relative inline-block pr-4 sm:pr-6 md:pr-8 animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5 before:absolute before:-inset-y-8 before:-inset-x-6 before:content-['']">
                                 <span className="relative inline-block">
                                     Done
                                     <span
