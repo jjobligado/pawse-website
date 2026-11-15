@@ -3,6 +3,7 @@ import { Inter, Pixelify_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import ScrollToTop from "@/components/scroll-to-top";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site-config";
 
 const inter = Inter({
@@ -58,6 +59,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // Next.js switches smooth scrolling off while changing pages, so a new page doesn't glide from the old position
+      data-scroll-behavior="smooth"
       suppressHydrationWarning // This is to prevent hydration mismatch errors when using server-side rendering with Next.js
       className={`${inter.variable} ${pixelifySans.variable} h-full antialiased scroll-smooth`}
     >
@@ -69,6 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        <ScrollToTop />
         <Header />
         <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
           {children}

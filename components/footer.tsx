@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HomeLink from "@/components/home-link";
 import { FooterSpreadSection } from "@/components/pixel-divider";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 
@@ -31,7 +32,7 @@ export default function Footer() {
         <FooterSpreadSection>
             {/* Brand */}
             <div className="relative z-10 flex flex-col items-center md:items-start justify-center gap-4 max-w-[600px] text-center md:text-left">
-                <Link href="/" className="flex items-center gap-3 group w-fit">
+                <HomeLink className="flex items-center gap-3 group w-fit">
                     <Image
                         src="/images/logo.png"
                         alt="PAWSE home"
@@ -42,7 +43,7 @@ export default function Footer() {
                     <span className="font-pixel text-2xl md:text-3xl font-bold text-ink">
                         PAWSE
                     </span>
-                </Link>
+                </HomeLink>
                 <div className="flex flex-col items-center md:items-start gap-1 text-xs md:text-sm tracking-[0.02em] text-ink">
                     <a
                         href={`mailto:${CONTACT_EMAIL}`}
