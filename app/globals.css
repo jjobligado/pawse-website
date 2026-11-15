@@ -179,7 +179,7 @@ html {
   }
   /* Final state of the "Done" reveal (accent color + full underline). */
   .animate-hero-done {
-    color: var(--color-accent-strong) !important;
+    color: var(--hero-done, var(--color-accent-strong)) !important;
   }
 }
 
@@ -294,6 +294,34 @@ body {
   animation: cloud-drift 60s linear -25s infinite;
 }
 
+/* Night stars: a slow, uneven twinkle (delays vary per star). */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 3.6s ease-in-out infinite;
+}
+
+/* Paw prints on the glass: decoration, so they only fade in (no movement). */
+@keyframes paw-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-paw-fade {
+  animation: paw-fade 0.8s ease-out both;
+}
+
 /* Two-frame wing flap: one frame shows while the other hides. */
 @keyframes wing-up {
   0%, 49.9% {
@@ -326,7 +354,7 @@ body {
     color: var(--color-ink);
   }
   100% {
-    color: var(--color-accent-strong);
+    color: var(--hero-done, var(--color-accent-strong));
   }
 }
 

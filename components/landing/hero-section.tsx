@@ -6,7 +6,7 @@ import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
-import { Laptop, SillPlant, WindowSky } from "./hero-scene";
+import { GlassPawPrints, Laptop, SillPlant, WindowSky, useSkyPhase } from "./hero-scene";
 import LaptopDesktop from "./laptop-desktop";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
@@ -19,6 +19,17 @@ const PARALLAX_SPEED = {
 } as const;
 
 const SPRITES = "/sprites";
+
+/**
+ * "Done" sits on the sky, not on white, so it takes a deeper blue per time of
+ * day to keep large-text contrast (≥3:1) against the gradient behind it.
+ */
+const DONE_COLOR = {
+    morning: "#1A74AE",
+    day: "#1A74AE",
+    dusk: "#17679C",
+    night: "#1C3F8F",
+} as const;
 
 /**
  * Cat boxes: 64px frames at whole-number scales so pixels stay crisp
@@ -60,6 +71,7 @@ const HERO_CATS = {
 } as const;
 
 export default function HeroSection() {
+    const skyPhase = useSkyPhase();
     const laptopParallaxRef = useRef<HTMLDivElement>(null);
     const skyFarRef = useRef<HTMLDivElement>(null);
     const skyNearRef = useRef<HTMLDivElement>(null);
@@ -156,12 +168,13 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" className="relative w-full mx-auto pt-3 sm:pt-5 pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full mx-auto pt-3 sm:pt-5 pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip">
             {/* The window: a frame around the sky, with the copy inside it */}
             <div className="relative w-full max-w-chrome px-3 sm:px-6 lg:px-10">
                 <div className="relative rounded-[26px] sm:rounded-[32px] bg-white p-2 sm:p-3 lg:p-3.5 ring-1 ring-stroke shadow-[0_28px_50px_-30px_rgb(20_40_70/0.4)]">
                     <div className="relative overflow-hidden rounded-[19px] sm:rounded-[22px]">
-                        <WindowSky farRef={skyFarRef} nearRef={skyNearRef} />
+                        <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
+                        <GlassPawPrints />
 
                         {/* Mullions: a wide centre pane with two side panes (only where they clear the headline) */}
                         <div aria-hidden="true" className="hidden xl:block absolute inset-y-0 left-[13%] w-3 -ml-1.5 bg-white z-10 shadow-[2px_0_6px_-2px_rgb(16_60_100/0.25)]" />
@@ -271,7 +284,7 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 group-data-[sky=dusk]/sky:text-ink-soft group-data-[sky=night]/sky:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -355,7 +368,7 @@ export default function HeroSection() {
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 group-data-[sky=dusk]/sky:text-ink-soft group-data-[sky=night]/sky:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
