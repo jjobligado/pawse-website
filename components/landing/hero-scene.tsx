@@ -13,7 +13,7 @@ import { useSyncExternalStore } from "react";
 type Palette = Record<string, string>;
 
 /** Renders a character grid as pixel-perfect SVG. "." is transparent. */
-function PixelArt({
+export function PixelArt({
     rows,
     palette,
     className,
@@ -408,7 +408,7 @@ export function WindowSky({
 /* Paw prints on the glass                                             */
 /* ------------------------------------------------------------------ */
 
-const PAW = [
+export const PAW = [
     "..T..T..",
     ".TT..TT.",
     "T......T",

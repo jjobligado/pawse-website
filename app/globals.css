@@ -567,57 +567,6 @@ body {
  * under a 30-56px blur forced a full re-blur every frame, and the corner shape
  * is invisible under that much blur anyway. Slow cycles keep the section calm.
  */
-@keyframes fluid-flow-left {
-  0% {
-    transform: translate3d(0px, 0px, 0) scale(0.96) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(150px, 50px, 0) scale(1.14) rotate(14deg);
-  }
-  100% {
-    transform: translate3d(35px, -45px, 0) scale(1.02) rotate(-10deg);
-  }
-}
-
-@keyframes fluid-flow-right {
-  0% {
-    transform: translate3d(0px, 0px, 0) scale(1) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(-160px, -50px, 0) scale(1.15) rotate(-16deg);
-  }
-  100% {
-    transform: translate3d(-50px, 45px, 0) scale(0.95) rotate(12deg);
-  }
-}
-
-@keyframes fluid-flow-bottom {
-  0% {
-    transform: translate3d(0px, 0px, 0) scale(0.94);
-    opacity: 0.88;
-  }
-  50% {
-    transform: translate3d(45px, -110px, 0) scale(1.16);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(-35px, -50px, 0) scale(1.02);
-    opacity: 0.92;
-  }
-}
-
-.animate-fluid-left {
-  animation: fluid-flow-left 14s ease-in-out infinite alternate;
-}
-
-.animate-fluid-right {
-  animation: fluid-flow-right 16s ease-in-out 0.8s infinite alternate;
-}
-
-.animate-fluid-bottom {
-  animation: fluid-flow-bottom 12s ease-in-out 1.2s infinite alternate;
-}
-
 /*
  * Text links. One source of truth so every link behaves the same:
  * - underline follows the text color (ink on the page, red inside error alerts;
@@ -811,4 +760,36 @@ body {
 }
 @keyframes app-peek {
   to { background-position: -512px 0; }
+}
+
+/* ==================================================================
+   Paw-print trail down the feature tour (components/landing/paw-trail.tsx).
+   Each print appears once (fade + a small step down along the walk) and
+   stays. --paw-edge: distance from the screen edge, inside the side margin.
+   --paw-lane: the sideways step between left and right paws.
+   ================================================================== */
+.paw-trail {
+  --paw-edge: clamp(4px, 2vw, 40px);
+  --paw-lane: clamp(6px, 0.9vw, 12px);
+  --paw-size: 10px;
+  z-index: 20;
+}
+@media (min-width: 768px) { .paw-trail { --paw-size: 13px; } }
+@media (min-width: 1280px) { .paw-trail { --paw-size: 16px; } }
+.paw-print {
+  position: absolute;
+  width: var(--paw-size);
+  line-height: 0;
+  opacity: 0;
+  transform: translateY(-6px) rotate(var(--paw-tilt));
+  transition:
+    opacity 420ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 420ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.paw-print[data-shown] {
+  opacity: 1;
+  transform: translateY(0) rotate(var(--paw-tilt));
+}
+@media (prefers-reduced-motion: reduce) {
+  .paw-print { transition: none; }
 }
