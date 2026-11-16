@@ -156,7 +156,7 @@ function SectionLink({ href, children }: { href: string; children: React.ReactNo
             {children}
             <span
                 aria-hidden="true"
-                className="w-6 h-6 rounded-full bg-white text-[#1A6CA3] flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-[#DCEAF5] group-active/link:bg-[#CCDFEE]"
+                className="w-6 h-6 rounded-full bg-white text-[#1A6CA3] flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-[#F1F6FB] group-active/link:bg-[#E7EFF7]"
             >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14" />
