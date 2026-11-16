@@ -66,7 +66,7 @@ export default function Polaroid({
 
     return (
         <figure
-            className={`relative flex flex-col bg-white rounded-[4px] p-2.5 sm:p-3 pb-4 shadow-[0_1px_2px_rgb(30_30_40/0.1),0_6px_12px_-6px_rgb(30_30_40/0.16),0_22px_36px_-22px_rgb(30_30_40/0.4)] ${className}`}
+            className={`relative flex flex-col bg-white rounded-[4px] p-3 pb-4 shadow-[0_1px_2px_rgb(30_30_40/0.1),0_6px_12px_-6px_rgb(30_30_40/0.16),0_22px_36px_-22px_rgb(30_30_40/0.4)] ${className}`}
         >
             <div ref={ref} className={`relative overflow-hidden rounded-[2px] ${TINT[tint]}`}>
                 {photo}
@@ -83,7 +83,7 @@ export default function Polaroid({
                     />
                 )}
             </div>
-            <figcaption className="pt-3 sm:pt-3.5 flex flex-col">{children}</figcaption>
+            <figcaption className="flex-1 pt-3.5 pb-1 flex flex-col">{children}</figcaption>
         </figure>
     );
 }

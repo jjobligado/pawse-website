@@ -14,13 +14,12 @@ import { SectionSubtitle, SectionTitle } from "./section-heading";
  *
  * The tint runs morning → night across the four, one working day.
  *
- * Every caption shows the SAME number of lines at every screen size, so line
- * breaks are placed by hand per layout:
- * - title: always 2 lines
- * - wide:   description in 2 lines (1 column on phones, 2×2 grid on tablets/small laptops)
- * - narrow: description in 3 lines (4 in a row, xl and up)
- * When editing copy, keep each line short enough for the narrowest card
- * and keep the line counts.
+ * Layout is only ever a straight line, so the flow reads at a glance: one row
+ * of four from xl, one column below it (arrows point down). All four polaroids
+ * are the same size in both: the column uses a fixed card width, the row equal
+ * columns, and every caption has the same line counts (title 2 lines,
+ * description 3 lines, broken by hand). When editing copy, keep each line short
+ * enough for ~200px of text at 15px and keep the line counts.
  */
 
 const SPRITES = "/sprites";
@@ -41,14 +40,13 @@ function Frame({ src, frames, frame, className }: { src: string; frames: number;
     );
 }
 
-// Phones show the photo small beside the caption (1x); from md the photo sits on top (1.5x / 2x).
-const CAT = "w-16 h-16 md:w-24 md:h-24 xl:w-32 xl:h-32";
-const GROUP_CAT = "w-16 h-16 md:w-[72px] md:h-[72px] xl:w-24 xl:h-24";
+// Moderate, crisp sizes in every layout: single cats at 1.5x, the group at 1x.
+const CAT = "w-24 h-24";
+const GROUP_CAT = "w-16 h-16";
 const PHOTO = "flex items-end justify-center aspect-[4/3] pt-2";
 
 const STEPS: {
     title: string[];
-    wide: string[];
     narrow: string[];
     href: string;
     link: string;
@@ -60,17 +58,16 @@ const STEPS: {
 }[] = [
     {
         title: ["Pick Your", "Companion"],
-        wide: ["Three cats, three paces.", "Pick who focuses with you."],
         narrow: ["Three cats, three paces.", "Pick who focuses", "with you."],
         href: "#companions",
         link: "Meet the cats",
         tint: "morning",
-        tilt: "md:-rotate-[1.5deg]",
+        tilt: "xl:-rotate-[1.2deg]",
         developDelayMs: 0,
         photo: (
             // A group photo: Ginger, Tux and Void sitting together
             <div className={PHOTO}>
-                <div className="flex items-end -space-x-3 md:-space-x-4">
+                <div className="flex items-end -space-x-3">
                     <Frame src={`${SPRITES}/ginger-body-idle-sheet.png`} frames={5} frame={0} className={GROUP_CAT} />
                     <Frame src={`${SPRITES}/tux-body-idle-sheet.png`} frames={4} frame={0} className={GROUP_CAT} />
                     <Frame src={`${SPRITES}/void-body-idle-sheet.png`} frames={5} frame={0} className={GROUP_CAT} />
@@ -81,12 +78,11 @@ const STEPS: {
     },
     {
         title: ["Focus with Your", "Companion"],
-        wide: ["Work alongside your cat's routine.", "Zero distractions."],
         narrow: ["Work alongside your", "cat's routine. Zero", "distractions."],
         href: "#focus",
         link: "See Focus",
         tint: "day",
-        tilt: "md:rotate-[1deg]",
+        tilt: "xl:rotate-[0.8deg]",
         developDelayMs: 180,
         // Tux mid-sip, steam rising from the mug
         photo: (
@@ -98,12 +94,11 @@ const STEPS: {
     },
     {
         title: ["Time to Play", "and Recharge"],
-        wide: ["Take a breather, play, and", "see what they have to say."],
         narrow: ["Take a breather, play,", "and see what they", "have to say."],
         href: "#break",
         link: "See Break",
         tint: "dusk",
-        tilt: "md:-rotate-[0.8deg]",
+        tilt: "xl:-rotate-[0.6deg]",
         developDelayMs: 90,
         // Ginger, tail up, mid-play
         photo: (
@@ -115,17 +110,16 @@ const STEPS: {
     },
     {
         title: ["Watch Your", "Progress Build"],
-        wide: ["Every session gets logged.", "Small sessions, big streaks."],
         narrow: ["Every session gets", "logged. Small sessions,", "big streaks."],
         href: "#progress",
         link: "See Progress",
         tint: "night",
-        tilt: "md:rotate-[1.4deg]",
+        tilt: "xl:rotate-[1deg]",
         developDelayMs: 260,
         // A souvenir snapshot: the day's completed sessions, as fish
         photo: (
             <div className="flex items-center justify-center aspect-[4/3]">
-                <div className="flex items-center gap-1 md:gap-1.5">
+                <div className="flex items-center gap-1.5">
                     {["orange", "tuxedo", "black", "orange"].map((fish, i) => (
                         <Image
                             key={i}
@@ -133,7 +127,7 @@ const STEPS: {
                             alt=""
                             width={32}
                             height={32}
-                            className={`w-6 h-6 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_3px_rgba(0,0,0,0.12)] ${i % 2 ? "-scale-x-100" : ""}`}
+                            className={`w-8 h-8 [image-rendering:pixelated] drop-shadow-[0_2px_3px_rgba(0,0,0,0.12)] ${i % 2 ? "-scale-x-100" : ""}`}
                         />
                     ))}
                 </div>
@@ -141,6 +135,33 @@ const STEPS: {
         ),
     },
 ];
+
+/**
+ * "See Focus ↓": a small, clearly-a-link pill at the foot of the caption.
+ * Darker blue text for AA contrast; on hover (Tailwind's hover variant only
+ * applies on devices that can hover) the wash deepens and the arrow chip nudges
+ * down toward the section it jumps to; pressing scales it to 0.97. Strong
+ * ease-out, exact properties only.
+ */
+function SectionLink({ href, children }: { href: string; children: React.ReactNode }) {
+    return (
+        <a
+            href={href}
+            className="group/link mt-auto inline-flex items-center gap-2 rounded-full pl-3.5 pr-1 py-1 text-sm font-medium text-[#1A6CA3] bg-[#EAF5FD] ring-1 ring-inset ring-[#CFE6F8] transition-[background-color,box-shadow,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#DDEFFC] hover:ring-[#B9DCF6] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:ring-offset-2"
+        >
+            {children}
+            <span
+                aria-hidden="true"
+                className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:translate-y-0.5"
+            >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14" />
+                    <path d="m19 12-7 7-7-7" />
+                </svg>
+            </span>
+        </a>
+    );
+}
 
 function Lines({ lines, className }: { lines: string[]; className: string }) {
     return (
@@ -162,40 +183,29 @@ export default function HowItWorksSection() {
                 From choosing your companion to seeing your progress grow.
             </SectionSubtitle>
 
-            {/* 1 column → 2×2 grid (md) → 4 in a row with connectors (xl) */}
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] auto-rows-auto items-stretch gap-4 md:gap-x-8 md:gap-y-10 xl:gap-x-4 mt-4">
+            {/* A straight column (arrows down) → a straight row of four from xl */}
+            <ol className="w-full flex flex-col items-center gap-3 xl:grid xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] xl:items-stretch xl:gap-4 mt-4">
                 {STEPS.map((step) => (
-                    <div key={step.href} className="contents">
+                    <li key={step.href} className="contents">
                         <Polaroid
                             tint={step.tint}
                             developDelayMs={step.developDelayMs}
                             photo={step.photo}
-                            className={`w-full max-w-[420px] md:max-w-none mx-auto h-full ${step.tilt}`}
+                            className={`w-[264px] xl:w-full h-full ${step.tilt}`}
                         >
-                            <div className="flex flex-col items-center gap-2 text-center">
-                                {/* Always 2 lines; min-height keeps captions aligned even if a font renders wider */}
-                                <h3 className="min-h-[2lh] font-pixel text-lg md:text-xl font-semibold text-ink-strong leading-snug">
+                            <div className="flex flex-1 flex-col items-center gap-2 text-center">
+                                {/* Always 2 / 3 lines; min-heights keep all four the same size even if a font renders wider */}
+                                <h3 className="min-h-[2lh] text-lg font-semibold text-ink-strong leading-snug tracking-[0.005em]">
                                     <Lines lines={step.title} className="block whitespace-nowrap" />
                                 </h3>
-                                <p className="w-full min-h-[2lh] xl:min-h-[3lh] text-sm sm:text-base md:text-body-sm text-ink-soft leading-relaxed">
-                                    <Lines lines={step.wide} className="block xl:hidden" />
-                                    <Lines lines={step.narrow} className="hidden xl:block" />
+                                <p className="w-full min-h-[3lh] text-body-sm text-ink-soft leading-relaxed">
+                                    <Lines lines={step.narrow} className="block" />
                                 </p>
-                                <a
-                                    href={step.href}
-                                    className="mt-1 text-sm font-medium text-accent-strong underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:ring-offset-2 rounded-chip"
-                                >
-                                    {step.link}
-                                    <span aria-hidden="true"> ↓</span>
-                                </a>
+                                <SectionLink href={step.href}>{step.link}</SectionLink>
                             </div>
                         </Polaroid>
                         {step.connector && (
-                            // Shown when stacked (pointing down) and in the 4-across row; hidden in the 2×2 grid
-                            <div
-                                aria-hidden="true"
-                                className="flex md:hidden xl:flex justify-center items-center shrink-0"
-                            >
+                            <div aria-hidden="true" className="flex justify-center items-center shrink-0 py-1 xl:py-0">
                                 <Image
                                     src={step.connector}
                                     alt=""
@@ -205,9 +215,9 @@ export default function HowItWorksSection() {
                                 />
                             </div>
                         )}
-                    </div>
+                    </li>
                 ))}
-            </div>
+            </ol>
         </Section>
     );
 }
