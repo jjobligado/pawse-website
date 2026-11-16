@@ -5,7 +5,11 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 /**
  * An instant photo pinned to the wall: a white print with a deep bottom border,
  * a small sky-tinted "photo" and a caption. Informational, never a control: no
- * hover lift, no pointer, no fill. Anything clickable goes in the caption.
+ * pointer, no fill, no colour change. Anything clickable goes in the caption.
+ * Hovering picks the photo up: it lifts a little toward you (translate + a 2%
+ * scale, the shadow grows and softens) while its tilt changes (set by the
+ * parent). Hover only on devices that can hover (Tailwind's hover variant) and
+ * only without reduced motion; strong ease-out on exact properties.
  *
  * The photo develops once the first time it scrolls into view (a grey-blue
  * film fades off the picture), like a real instant photo. Only photos that are
@@ -66,7 +70,7 @@ export default function Polaroid({
 
     return (
         <figure
-            className={`relative flex flex-col bg-white rounded-[4px] p-3 pb-4 shadow-[0_1px_2px_rgb(30_30_40/0.1),0_6px_12px_-6px_rgb(30_30_40/0.16),0_22px_36px_-22px_rgb(30_30_40/0.4)] ${className}`}
+            className={`relative flex flex-col bg-white rounded-[4px] p-3 pb-4 shadow-[0_1px_2px_rgb(30_30_40/0.1),0_6px_12px_-6px_rgb(30_30_40/0.16),0_22px_36px_-22px_rgb(30_30_40/0.4)] transition-[translate,rotate,scale,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:z-10 motion-safe:hover:-translate-y-1.5 motion-safe:hover:scale-[1.02] hover:shadow-[0_2px_4px_rgb(30_30_40/0.08),0_14px_24px_-10px_rgb(30_30_40/0.2),0_36px_56px_-28px_rgb(30_30_40/0.42)] ${className}`}
         >
             <div ref={ref} className={`relative overflow-hidden rounded-[2px] ${TINT[tint]}`}>
                 {photo}

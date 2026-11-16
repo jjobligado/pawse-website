@@ -62,7 +62,7 @@ const STEPS: {
         href: "#companions",
         link: "Meet the cats",
         tint: "morning",
-        tilt: "xl:-rotate-[1.2deg]",
+        tilt: "xl:-rotate-[1.2deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
         developDelayMs: 0,
         photo: (
             // A group photo: Ginger, Tux and Void sitting together
@@ -82,7 +82,7 @@ const STEPS: {
         href: "#focus",
         link: "See Focus",
         tint: "day",
-        tilt: "xl:rotate-[0.8deg]",
+        tilt: "xl:rotate-[0.8deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
         developDelayMs: 180,
         // Tux mid-sip, steam rising from the mug
         photo: (
@@ -98,7 +98,7 @@ const STEPS: {
         href: "#break",
         link: "See Break",
         tint: "dusk",
-        tilt: "xl:-rotate-[0.6deg]",
+        tilt: "xl:-rotate-[0.6deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
         developDelayMs: 90,
         // Ginger, tail up, mid-play
         photo: (
@@ -114,7 +114,7 @@ const STEPS: {
         href: "#progress",
         link: "See Progress",
         tint: "night",
-        tilt: "xl:rotate-[1deg]",
+        tilt: "xl:rotate-[1deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
         developDelayMs: 260,
         // A souvenir snapshot: the day's completed sessions, as fish
         photo: (
