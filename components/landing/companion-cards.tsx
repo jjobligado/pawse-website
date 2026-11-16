@@ -7,6 +7,8 @@ interface CardData {
     companion: AppCompanion;
     /** First pose (1-4), distinct per cat so server and client agree */
     initialPose: number;
+    /** When the cat peeks up after the cards start spreading (ms) */
+    revealDelayMs: number;
     defaultRotation: number;
     zIndexStacked: number;
 }
@@ -16,18 +18,21 @@ const CARDS: CardData[] = [
     {
         companion: { id: "tux", name: "Tux", mode: "Classic", theme: "classic", focusMin: 25, breakMin: 5 },
         initialPose: 1,
+        revealDelayMs: 760,
         defaultRotation: -6.5,
         zIndexStacked: 10,
     },
     {
         companion: { id: "ginger", name: "Ginger", mode: "Sprint", theme: "sprint", focusMin: 15, breakMin: 3 },
         initialPose: 2,
+        revealDelayMs: 620,
         defaultRotation: 0,
         zIndexStacked: 30,
     },
     {
         companion: { id: "void", name: "Void", mode: "Focused", theme: "focused", focusMin: 50, breakMin: 10 },
         initialPose: 3,
+        revealDelayMs: 900,
         defaultRotation: 6.5,
         zIndexStacked: 20,
     },
@@ -40,8 +45,6 @@ export default function CompanionCards() {
     const voidSlotRef = useRef<HTMLDivElement>(null);
 
     const [isTriggered, setIsTriggered] = useState(false);
-    // Like the app: pick a companion and its button stays selected
-    const [selectedId, setSelectedId] = useState<AppCompanion["id"] | null>(null);
     const [isMounted, setIsMounted] = useState(false);
 
     // Initial estimate before measurement: ~330px card + 16px gap
@@ -180,14 +183,15 @@ export default function CompanionCards() {
 
         const rotation = card.defaultRotation * factor;
         const zIndex = card.zIndexStacked;
-        const delay = index === 0 ? "0.05s" : index === 2 ? "0.10s" : "0s";
+        // Uneven stagger: Ginger stays put, Tux leaves first, Void a beat later
+        const delay = index === 0 ? "0.04s" : index === 2 ? "0.11s" : "0s";
 
         return {
             transform: `translate3d(${deltaX.toFixed(2)}px, ${deltaY.toFixed(2)}px, 0) rotate(${rotation.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
             zIndex,
             willChange: "transform",
             transition: isMounted
-                ? `transform 1.15s cubic-bezier(0.2, 1.24, 0.35, 1) ${delay}`
+                ? `transform 0.85s cubic-bezier(0.22, 1.1, 0.36, 1) ${delay}`
                 : "none",
         };
     };
@@ -195,7 +199,7 @@ export default function CompanionCards() {
     return (
         <div
             ref={containerRef}
-            className="relative w-full max-w-[1050px] min-h-[190px] flex flex-col lg:flex-row justify-center items-center gap-3 lg:gap-3.5 py-2"
+            className="relative w-full max-w-[1110px] min-h-[190px] flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 xl:gap-10 py-2"
         >
             {CARDS.map((card, index) => {
                 const slotRef =
@@ -209,13 +213,17 @@ export default function CompanionCards() {
                     >
                         {/* Smooth animated fan-out container */}
                         <div style={getCardStyle(index)} className="w-full">
-                            {/* The app's companion button (interactive once the cards have spread out) */}
+                            {/*
+                              The app's companion button, as a display. Its cat stays tucked
+                              below the edge until the cards have spread out, then peeks up
+                              (Ginger first, then Tux, then Void, unevenly spaced).
+                            */}
                             <div className={`w-full select-none ${isTriggered ? "" : "pointer-events-none"}`}>
                                 <CompanionButton
                                     companion={card.companion}
                                     initialPose={card.initialPose}
-                                    selected={selectedId === card.companion.id}
-                                    onSelect={() => setSelectedId(card.companion.id)}
+                                    hidden={isMounted && !isTriggered}
+                                    revealDelayMs={card.revealDelayMs}
                                 />
                             </div>
                         </div>

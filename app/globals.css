@@ -711,7 +711,7 @@ body {
   border-radius: 12px;
   overflow: hidden;
   text-align: left;
-  cursor: pointer;
+  cursor: default;
   background-image: linear-gradient(180deg, #FFF 0%, var(--cat-light) 50%, var(--cat-light) 100%);
   background-origin: border-box;
   background-size: 1% 200%;
@@ -739,24 +739,6 @@ body {
     box-shadow: 0 6px 15px 0 rgb(0 0 0 / 0.15);
   }
 }
-.app-cat-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 6px 0 rgb(0 0 0 / 0.15);
-}
-.app-cat-btn[aria-pressed="true"] {
-  background-position: bottom;
-  transform: translateY(0);
-  box-shadow: inset 0 0 0 4px var(--cat-solid), 0 3px 9px 0 rgb(0 0 0 / 0.2);
-}
-@media (hover: hover) {
-  .app-cat-btn[aria-pressed="true"]:hover {
-    box-shadow: inset 0 0 0 4px var(--cat-solid), 0 6px 15px 0 rgb(0 0 0 / 0.15);
-  }
-}
-.app-cat-btn:focus-visible {
-  outline: 2px solid var(--color-accent-strong);
-  outline-offset: 3px;
-}
 
 .app-cat-info {
   display: flex;
@@ -783,11 +765,6 @@ body {
     border-color: var(--cat-solid);
     color: var(--cat-dark);
   }
-}
-.app-cat-btn[aria-pressed="true"] .app-cat-label {
-  background: var(--color-app-bg-main);
-  border-color: var(--cat-solid);
-  color: var(--cat-dark);
 }
 .app-cat-name {
   margin-top: 2px;
@@ -817,6 +794,16 @@ body {
   background-position: 0 0;
   image-rendering: pixelated;
   pointer-events: none;
+  /* Peek-in: rises from below the card's bottom edge, strong ease-out */
+  transition: translate 520ms cubic-bezier(0.23, 1, 0.32, 1) var(--reveal-delay, 0ms);
+}
+.app-cat-btn[data-peek="hidden"] .app-cat-sprite {
+  translate: 0 108%;
+  transition-duration: 0s;
+  transition-delay: 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-cat-sprite { transition: none; }
 }
 /* 4 frames x 128px; 1s, like the app's 1.0s steps(4) */
 .animate-app-peek {
