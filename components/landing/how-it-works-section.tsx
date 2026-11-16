@@ -148,9 +148,9 @@ const STEPS: {
 /**
  * "See Focus ↓": a small, clearly-a-link pill at the foot of the caption.
  * Darker blue text for AA contrast; on hover (Tailwind's hover variant only
- * applies on devices that can hover) the wash deepens and the arrow chip nudges
- * down toward the section it jumps to; pressing scales it to 0.97. Strong
- * ease-out, exact properties only.
+ * applies on devices that can hover) the wash deepens and the arrow chip fills
+ * with PAWSE blue (the arrow turns white) without moving; pressing scales the
+ * pill to 0.97. Strong ease-out, exact properties only.
  */
 function SectionLink({ href, children }: { href: string; children: React.ReactNode }) {
     return (
@@ -161,7 +161,7 @@ function SectionLink({ href, children }: { href: string; children: React.ReactNo
             {children}
             <span
                 aria-hidden="true"
-                className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:translate-y-0.5"
+                className="w-6 h-6 rounded-full bg-white text-[#1A6CA3] flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-[background-color,color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-accent-strong group-hover/link:text-white"
             >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14" />
