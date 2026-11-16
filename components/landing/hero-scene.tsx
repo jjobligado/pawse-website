@@ -533,8 +533,8 @@ export function WindowFrame() {
             <CasementPanel side="left" />
             <CasementPanel side="right" />
 
-            {/* Depth: the frame shades the edges of the opening */}
-            <div className="absolute inset-0 shadow-[inset_0_0_32px_rgb(40_20_10/0.22)]" />
+            {/* Depth: light comes from above, so the head shades the top of the opening, the jambs a little, the bottom not at all */}
+            <div className="absolute inset-0 shadow-[inset_0_22px_28px_-20px_rgb(40_20_10/0.3),inset_14px_0_22px_-18px_rgb(40_20_10/0.2),inset_-14px_0_22px_-18px_rgb(40_20_10/0.2)]" />
 
             {/* Frame: casing with an inner stop moulding (the two-step edge facing the opening) */}
             <div
@@ -544,7 +544,7 @@ export function WindowFrame() {
                 className={`${jamb} right-0 shadow-[inset_-1px_0_0_rgb(255_232_205/0.2),inset_3px_0_0_var(--color-window-frame-shade),inset_4px_0_0_var(--color-window-frame-edge),-5px_0_9px_-4px_rgb(40_20_10/0.5)]`}
             />
             <div className="absolute inset-x-0 top-0 h-[clamp(9px,1.45vw,20px)] wood-h shadow-[inset_0_-3px_0_var(--color-window-frame-shade),inset_0_-4px_0_var(--color-window-frame-edge),0_5px_9px_-4px_rgb(40_20_10/0.5)]" />
-            <div className="absolute inset-x-0 bottom-0 h-1.5 sm:h-2 lg:h-2.5 xl:h-3 wood-h shadow-[inset_0_3px_0_var(--color-window-frame-shade),inset_0_4px_0_var(--color-window-frame-edge),0_-4px_8px_-4px_rgb(40_20_10/0.4)]" />
+            <div className="absolute inset-x-0 bottom-0 h-1.5 sm:h-2 lg:h-2.5 xl:h-3 wood-h shadow-[inset_0_1px_0_rgb(255_232_205/0.28),inset_0_-1px_0_rgb(30_14_4/0.4)]" />
 
             <Hinge side="left" at="top" />
             <Hinge side="left" at="bottom" />

@@ -174,7 +174,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(12px,2.5cqw,36px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:0px]">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -442,11 +442,11 @@ export default function HeroSection() {
                   the window, then its rounded front edge), casting a shadow on the wall.
                 */}
                 <div className="relative z-30 w-[calc(100%_+_2*var(--so))]">
-                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
+                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_1px_0_rgb(40_20_10/0.25),inset_0_4px_6px_-3px_rgb(40_20_10/0.28)]">
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
                     </div>
-                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
-                    <div aria-hidden="true" className="absolute inset-x-0 top-full h-6 bg-[linear-gradient(180deg,rgb(40_20_10/0.2),transparent)] pointer-events-none" />
+                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55),0_1px_2px_rgb(40_20_10/0.3)]" />
+                    <div aria-hidden="true" className="absolute left-[3%] right-[3%] top-[calc(100%_-_4px)] h-3 sm:h-4 lg:h-5 -z-10 rounded-[50%] bg-[rgb(40_20_10/0.22)] blur-[6px] sm:blur-[8px] pointer-events-none" />
 
                     {/* Cats from lg, where there's room beside the laptop; smaller screens give the laptop the space */}
                     <div className="absolute inset-0">
