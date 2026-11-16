@@ -1,35 +1,33 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import CompanionButton, { type AppCompanion } from "@/components/app-ui/companion-button";
 
 interface CardData {
-    name: string;
-    alt: string;
-    src: string;
+    companion: AppCompanion;
+    /** First pose (1-4), distinct per cat so server and client agree */
+    initialPose: number;
     defaultRotation: number;
     zIndexStacked: number;
 }
 
+// Same companions, modes and session lengths as the app's picker
 const CARDS: CardData[] = [
     {
-        name: "Tux",
-        alt: "Tux - Classic 25-minute session",
-        src: "/images/card-tux.png",
+        companion: { id: "tux", name: "Tux", mode: "Classic", theme: "classic", focusMin: 25, breakMin: 5 },
+        initialPose: 1,
         defaultRotation: -6.5,
         zIndexStacked: 10,
     },
     {
-        name: "Ginger",
-        alt: "Ginger - Sprint 15-minute session",
-        src: "/images/card-ginger.png",
+        companion: { id: "ginger", name: "Ginger", mode: "Sprint", theme: "sprint", focusMin: 15, breakMin: 3 },
+        initialPose: 2,
         defaultRotation: 0,
         zIndexStacked: 30,
     },
     {
-        name: "Void",
-        alt: "Void - Focused 50-minute session",
-        src: "/images/card-void.png",
+        companion: { id: "void", name: "Void", mode: "Focused", theme: "focused", focusMin: 50, breakMin: 10 },
+        initialPose: 3,
         defaultRotation: 6.5,
         zIndexStacked: 20,
     },
@@ -42,6 +40,8 @@ export default function CompanionCards() {
     const voidSlotRef = useRef<HTMLDivElement>(null);
 
     const [isTriggered, setIsTriggered] = useState(false);
+    // Like the app: pick a companion and its button stays selected
+    const [selectedId, setSelectedId] = useState<AppCompanion["id"] | null>(null);
     const [isMounted, setIsMounted] = useState(false);
 
     // Initial estimate before measurement: ~330px card + 16px gap
@@ -203,27 +203,19 @@ export default function CompanionCards() {
 
                 return (
                     <div
-                        key={card.name}
+                        key={card.companion.id}
                         ref={slotRef}
                         className="relative flex justify-center items-center w-[280px] sm:w-[310px] lg:w-[270px] xl:w-[330px] shrink-0 hover:z-40"
                     >
                         {/* Smooth animated fan-out container */}
                         <div style={getCardStyle(index)} className="w-full">
-                            {/* Hover-interactive card */}
-                            <div
-                                className={`w-full select-none transition-transform duration-300 ${
-                                    isTriggered
-                                        ? "hover:scale-105 hover:-translate-y-1.5 cursor-pointer"
-                                        : "pointer-events-none"
-                                }`}
-                            >
-                                <Image
-                                    src={card.src}
-                                    alt={card.alt}
-                                    width={330}
-                                    height={125}
-                                    className="w-full h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.12)]"
-                                    priority={index === 1}
+                            {/* The app's companion button (interactive once the cards have spread out) */}
+                            <div className={`w-full select-none ${isTriggered ? "" : "pointer-events-none"}`}>
+                                <CompanionButton
+                                    companion={card.companion}
+                                    initialPose={card.initialPose}
+                                    selected={selectedId === card.companion.id}
+                                    onSelect={() => setSelectedId(card.companion.id)}
                                 />
                             </div>
                         </div>
