@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import HomeLink from "@/components/home-link";
 import { usePathname, useRouter } from "next/navigation";
 import { usePlatform } from "@/hooks/use-platform";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
@@ -93,7 +94,7 @@ export default function Header() {
         >
             <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
-                <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+                <HomeLink className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
                     <Image
                         src="/images/logo.png"
                         alt="Pawse Logo"
@@ -105,7 +106,7 @@ export default function Header() {
                     <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
                         PAWSE
                     </span>
-                </Link>
+                </HomeLink>
 
                 {/* Nav Links (Visible on laptops & desktops where space permits) */}
                 <nav aria-label="Main" className="hidden lg:flex items-center gap-7 xl:gap-9">
