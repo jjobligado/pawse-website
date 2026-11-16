@@ -1,64 +1,86 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
+import { Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
+import LaptopDesktop from "./laptop-desktop";
+import DoneWord from "./done-word";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
+// Positive = lags behind the page (reads as far away); negative = moves ahead (near).
 const PARALLAX_SPEED = {
-    showcase: -0.03,
+    laptop: -0.07,
+    skyFar: 0.16,
+    skyNear: 0.08,
 } as const;
 
 const SPRITES = "/sprites";
 
 /**
- * Same size for all three cats. 64px frames at 1× on phones and 2× from lg up;
- * 1.5× (96px) in between, where 128px would reach the headline (tablets are
- * high-density, so 1.5× still lands on whole device pixels there).
+ * "Done" sits on the sky, not on white, so it takes a deeper blue per time of
+ * day to keep large-text contrast (≥3:1) against the gradient behind it.
+ */
+const DONE_COLOR = {
+    morning: "#1A74AE",
+    day: "#1A74AE",
+    dusk: "#17679C",
+    night: "#1C3F8F",
+} as const;
+
+/**
+ * Cat boxes: 64px frames at whole-number scales so pixels stay crisp
+ * (1x phones, 1.5x tablets, 2x from lg).
  */
 const CAT_SIZE = "w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32";
 
-/** Hero companions: idle loops on their own; hover / tap plays the break sheet once. */
+/**
+ * Ginger curls up small when napping, so she gets a slightly bigger box than Tux
+ * (about 1.1-1.25x his size). Sized to still clear the laptop on every screen.
+ */
+const GINGER_SIZE = "w-[72px] h-[72px] sm:w-[104px] sm:h-[104px] lg:w-36 lg:h-36 xl:w-40 xl:h-40";
+
+/**
+ * Hero companions. On the sill, Ginger naps and Tux sips his coffee (their focus
+ * routines, looping); hover / tap plays their break sheet once. Void is the
+ * companion inside the app on the laptop screen (laptop-desktop.tsx).
+ */
 const HERO_CATS = {
     ginger: {
-        label: "Play with Ginger",
-        idle: { src: `${SPRITES}/ginger-body-idle-sheet.png`, frames: 5 },
+        label: "Wake Ginger for a break",
+        idle: { src: `${SPRITES}/ginger-body-focus-sheet.png`, frames: 3 },
         action: { src: `${SPRITES}/ginger-body-break-sheet.png`, frames: 9 },
-        idleHoldMs: 2400,
+        // Slow breathing: z, zz, zzz
+        idleSequence: [
+            { frame: 0, ms: 900 },
+            { frame: 1, ms: 900 },
+            { frame: 2, ms: 1100 },
+        ],
     },
     tux: {
-        label: "Play with Tux",
-        idle: { src: `${SPRITES}/tux-body-idle-sheet.png`, frames: 4 },
+        label: "Give Tux a break",
+        idle: { src: `${SPRITES}/tux-body-focus-sheet.png`, frames: 5 },
         action: { src: `${SPRITES}/tux-body-break-sheet.png`, frames: 10 },
-        idleHoldMs: 3000,
-    },
-    // Void peeks over the preview, so only the head shows, from one sheet
-    // (frames: 0 look, 1 squint, 2 eyes closed, 3 side-eye). Idle is a slow blink;
-    // hover plays the whole look-around so the reaction reads as different from idle.
-    void: {
-        label: "Play with Void",
-        idle: { src: `${SPRITES}/void-head-peek-sheet.png`, frames: 4 },
-        action: { src: `${SPRITES}/void-head-peek-sheet.png`, frames: 4 },
+        // Holds the mug, lifts it, sips, lowers it
         idleSequence: [
-            { frame: 0, ms: 3400 },
-            { frame: 2, ms: 160 },
-        ],
-        actionSequence: [
-            { frame: 1, ms: 220 },
-            { frame: 2, ms: 160 },
-            { frame: 0, ms: 200 },
-            { frame: 3, ms: 700 },
-            { frame: 0, ms: 160 },
+            { frame: 0, ms: 2600 },
+            { frame: 1, ms: 160 },
+            { frame: 2, ms: 220 },
+            { frame: 3, ms: 900 },
+            { frame: 2, ms: 220 },
+            { frame: 1, ms: 160 },
         ],
     },
 } as const;
 
 export default function HeroSection() {
-    const showcaseParallaxRef = useRef<HTMLDivElement>(null);
+    const skyPhase = useSkyPhase();
+    const laptopParallaxRef = useRef<HTMLDivElement>(null);
+    const skyFarRef = useRef<HTMLDivElement>(null);
+    const skyNearRef = useRef<HTMLDivElement>(null);
     const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const popoverRef = useRef<HTMLDivElement>(null);
@@ -111,7 +133,9 @@ export default function HeroSection() {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
-            [showcaseParallaxRef, PARALLAX_SPEED.showcase],
+            [laptopParallaxRef, PARALLAX_SPEED.laptop],
+            [skyFarRef, PARALLAX_SPEED.skyFar],
+            [skyNearRef, PARALLAX_SPEED.skyNear],
         ];
 
         let frame = 0;
@@ -150,119 +174,48 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" className="relative w-full max-w-chrome mx-auto pt-36 sm:pt-32 md:pt-24 lg:pt-28 pb-12 md:pb-28 flex flex-col items-center bg-white overflow-x-clip">
-            {/* Ginger: upper left. z-40 keeps her above the full-width headline row (z-30), which overlaps her feet. */}
-            <div className="absolute top-14 sm:top-6 md:top-5 lg:top-7 left-3 sm:left-6 md:left-8 lg:left-16 xl:left-24 z-40">
-                <div className="animate-cat-intro-ginger">
-                    <SpriteCat {...HERO_CATS.ginger} className={CAT_SIZE} />
-                </div>
-            </div>
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)]">
+            {/*
+              The window hangs on the white wall (the page): a walnut French casement with
+              wall space either side, a sill that sticks out past it, and the laptop in
+              front, overlapping the window's bottom edge at every size.
+              From sm the copy sits inside the glass (both in one grid cell). On phones
+              the copy moves out onto the wall above, and the window (panels nearly
+              closed) becomes the picture under it, so the text gets full contrast and width.
+            */}
+            <div className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
+                    <div className="relative w-full grid grid-cols-1 grid-rows-[auto_minmax(170px,1fr)] min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))] sm:grid-rows-1 sm:min-h-0">
+                        {/*
+                          The window: softened corners and layered shadows (a tight contact
+                          shadow, a mid one, and a long soft one falling down the wall), so
+                          it sits on the wall instead of looking pasted on.
+                        */}
+                        <div className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
+                            <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
+                            <WindowFrame />
+                        </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className="relative z-30 w-full flex flex-col items-center gap-6 px-6 md:px-10">
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_48px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
+                <div
+                    aria-hidden="true"
+                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
+                />
                 <div className="w-full flex justify-center items-center">
-                    <h1 className="font-pixel text-[clamp(1.75rem,8vw,2.35rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
+                    <h1 className="font-pixel text-[clamp(1.8rem,calc(10.7vw_-_5px),2.9rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
                         <span className="block whitespace-nowrap animate-hero-headline-1">
                             The Coziest Way
                         </span>
                         <span className="block whitespace-nowrap animate-hero-headline-2">
                             to Get Things{" "}
-                            <span className="group/done relative inline-block pr-6 md:pr-8 animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5 before:absolute before:-inset-y-8 before:-inset-x-6 before:content-['']">
-                                <span className="relative inline-block">
-                                    Done
-                                    <span
-                                        aria-hidden="true"
-                                        className="absolute left-1 right-1 bottom-[calc(0.06em-5px)] h-[3px] md:h-[5px] bg-accent animate-hero-done-line"
-                                    />
-                                </span>
-
-                                {/* Fish 1: Orange - Directly over 'D' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[1%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-20 group-active/done:scale-110 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-1 block">
-                                        <Image
-                                            src="/images/completed-orange-fish.png"
-                                            alt=""
-                                            width={32}
-                                            height={32}
-                                            className="w-6 h-6 md:w-7 md:h-7 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 2: Tuxedo - Directly over 'o' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[32%] left-[24%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:rotate-15 group-active/done:scale-110 transition-all duration-300 delay-[50ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-2 block">
-                                        <Image
-                                            src="/images/completed-tuxedo-fish.png"
-                                            alt=""
-                                            width={36}
-                                            height={36}
-                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 3: Black - Right in the center seam between 'o' and 'n' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[42%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[98%] group-hover/done:rotate-[24deg] group-active/done:scale-110 transition-all duration-300 delay-[25ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-3 block">
-                                        <Image
-                                            src="/images/completed-black-fish.png"
-                                            alt=""
-                                            width={32}
-                                            height={32}
-                                            className="w-6 h-6 md:w-7 md:h-7 [image-rendering:pixelated] drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 4: Orange - Directly over 'n' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[34%] left-[60%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-12 group-active/done:scale-110 transition-all duration-300 delay-[80ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-4 block">
-                                        <Image
-                                            src="/images/completed-orange-fish.png"
-                                            alt=""
-                                            width={36}
-                                            height={36}
-                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 5: Tuxedo - Directly over 'e' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[22%] left-[82%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[80%] group-hover/done:rotate-8 group-active/done:scale-110 transition-all duration-300 delay-[110ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-5 block">
-                                        <Image
-                                            src="/images/completed-tuxedo-fish.png"
-                                            alt=""
-                                            width={36}
-                                            height={36}
-                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
-                                        />
-                                    </span>
-                                </span>
-                            </span>
+                            <DoneWord />
                         </span>
                     </h1>
                 </div>
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-muted text-center tracking-[0.01em] leading-relaxed">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:group-data-[sky=night]/sky:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -340,24 +293,13 @@ export default function HeroSection() {
                                 </span>
                             </a>
                         </div>
-                        {/*
-                          Tux mirrors Ginger across the centre: same size, and the same distance from
-                          the right edge as Ginger has from the left (Ginger's offset minus this row's
-                          24px / 40px inset). sm+: level with the button, below the description.
-                          Phones: there's no room beside the button, so Tux sits centred in the empty
-                          band between "Other platforms" and the preview instead.
-                        */}
-                        <div className="absolute z-20 top-[calc(100%+68px)] right-[-12px] sm:top-1/2 sm:-translate-y-1/2 sm:right-0 md:right-[-8px] lg:right-6 xl:right-14">
-                            <div className="animate-cat-intro-tuxedo">
-                                <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
-                            </div>
-                        </div>
+
                     </div>
 
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted tracking-[0.02em] animate-hero-fade-up-3b"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:group-data-[sky=night]/sky:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
@@ -492,26 +434,48 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* App Visuals Showcase Container (Peeking at the bottom of the Hero) */}
-            <div
-                ref={showcaseParallaxRef}
-                className="relative z-20 w-full max-w-[1040px] mt-32 sm:mt-28 md:mt-28 lg:mt-32 px-6 md:px-10 will-change-transform"
-            >
-                <div className="relative animate-hero-fade-up-4">
-                    {/*
-                      Void: only the head, peeking over the preview's top-left edge. It sits behind
-                      the preview (z-0 vs z-10) with its flat bottom tucked 6px under the border.
-                    */}
-                    <div className="absolute bottom-[calc(100%-6px)] left-6 sm:left-10 md:left-16 lg:left-24 z-0">
-                        <div className="animate-cat-intro-void">
-                            <SpriteCat {...HERO_CATS.void} className={CAT_SIZE} />
-                        </div>
                     </div>
 
-                    <div className="relative z-10 w-full h-[340px] sm:h-[460px] md:h-[540px] rounded-card-lg border-2 border-stroke surface-wash shadow-raised flex items-center justify-center p-6">
-                        <span className="font-pixel text-lg md:text-xl text-muted/60 select-none">
-                            App Visuals Preview
-                        </span>
+                {/*
+                  The sill, where Ginger naps and Tux has his coffee: a deep walnut board,
+                  a little wider than the window, seen slightly from above (its top, lit by
+                  the window, then its rounded front edge), casting a shadow on the wall.
+                */}
+                <div className="relative z-30 w-[calc(100%_+_2*var(--so))]">
+                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_1px_0_rgb(40_20_10/0.25),inset_0_4px_6px_-3px_rgb(40_20_10/0.28)]">
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
+                    </div>
+                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55),0_1px_2px_rgb(40_20_10/0.3)]" />
+                    <div aria-hidden="true" className="absolute left-[3%] right-[3%] top-[calc(100%_-_4px)] h-3 sm:h-4 lg:h-5 -z-10 rounded-[50%] bg-[rgb(40_20_10/0.22)] blur-[6px] sm:blur-[8px] pointer-events-none" />
+
+                    {/* Cats from lg, where there's room beside the laptop; smaller screens give the laptop the space */}
+                    <div className="absolute inset-0">
+                        <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
+                            <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
+                            <SpriteCat {...HERO_CATS.ginger} className={GINGER_SIZE} />
+                        </div>
+                        <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
+                        <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                            <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
+                            <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/*
+              The visitor's laptop, in the foreground, overlapping the bottom of the window
+              and the sill at every size, as seen from the chair.
+            */}
+            <div
+                ref={laptopParallaxRef}
+                className="relative z-40 w-[var(--lw)] mt-[calc(var(--lw)*var(--ov)*-1)] will-change-transform"
+            >
+                <div className="relative animate-hero-laptop">
+                    <div className="relative z-10">
+                        <Laptop>
+                            <LaptopDesktop />
+                        </Laptop>
                     </div>
                 </div>
             </div>
