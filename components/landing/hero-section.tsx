@@ -31,14 +31,6 @@ const DONE_COLOR = {
     night: "#1C3F8F",
 } as const;
 
-/** Daylight the window throws onto the wall around it, per sky phase. */
-const SPILL_COLOR = {
-    morning: "rgb(255 214 176 / 0.55)",
-    day: "rgb(190 226 255 / 0.6)",
-    dusk: "rgb(246 186 160 / 0.55)",
-    night: "rgb(170 182 232 / 0.5)",
-} as const;
-
 /**
  * Cat boxes: 64px frames at whole-number scales so pixels stay crisp
  * (1x phones, 1.5x tablets, 2x from lg).
@@ -182,7 +174,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase], "--hero-spill": SPILL_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(12px,2.5cqw,36px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px]">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(12px,2.5cqw,36px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:0px]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -192,30 +184,19 @@ export default function HeroSection() {
               closed) becomes the picture under it, so the text gets full contrast and width.
             */}
             <div className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
-                    <div className="relative w-full grid grid-cols-1">
+                    <div className="relative w-full grid grid-cols-1 grid-rows-[auto_minmax(170px,1fr)] min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))] sm:grid-rows-1 sm:min-h-0">
                         {/*
-                          Seated in the wall, not stuck on it: daylight from the window
-                          washes the wall around it (tinted by the sky phase), a light
-                          painted trim steps from the white wall to the walnut, and the
-                          frame has softened corners and a layered shadow.
+                          The window: softened corners and layered shadows (a tight contact
+                          shadow, a mid one, and a long soft one falling down the wall), so
+                          it sits on the wall instead of looking pasted on.
                         */}
-                        <div className="relative isolate col-start-1 row-start-2 sm:row-start-1">
-                            <div
-                                aria-hidden="true"
-                                className="absolute -inset-[clamp(28px,7cqw,110px)] -z-20 rounded-[50%] bg-[radial-gradient(closest-side,var(--hero-spill),transparent)] opacity-70 blur-2xl transition-[background] duration-1000"
-                            />
-                            <div
-                                aria-hidden="true"
-                                className="absolute -inset-[clamp(6px,1.1cqw,14px)] -z-10 rounded-[10px] sm:rounded-[14px] bg-[linear-gradient(180deg,#F3EFEA,#FAF8F5_55%,#F1ECE6)] shadow-[inset_0_1px_0_#FFFFFF,inset_0_-1px_0_rgb(120_90_60/0.08),0_1px_2px_rgb(40_20_10/0.06),0_18px_36px_-22px_rgb(40_20_10/0.35)]"
-                            />
-                            <div className="relative h-[clamp(200px,62cqw,340px)] sm:h-full overflow-hidden rounded-[5px] sm:rounded-[7px] shadow-[0_0_0_1px_rgb(67_41_24/0.35),0_2px_3px_rgb(40_20_10/0.12),0_24px_40px_-26px_rgb(40_20_10/0.5)]">
-                                <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
-                                <WindowFrame />
-                            </div>
+                        <div className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
+                            <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
+                            <WindowFrame />
                         </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_48px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill))]`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_48px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
                 <div
                     aria-hidden="true"
                     className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
@@ -461,10 +442,10 @@ export default function HeroSection() {
                   the window, then its rounded front edge), casting a shadow on the wall.
                 */}
                 <div className="relative z-30 w-[calc(100%_+_2*var(--so))]">
-                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 rounded-t-[2px] wood-h [--wood:#94634A] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
+                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
                     </div>
-                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[3px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
+                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
                     <div aria-hidden="true" className="absolute inset-x-0 top-full h-6 bg-[linear-gradient(180deg,rgb(40_20_10/0.2),transparent)] pointer-events-none" />
 
                     {/* Cats from lg, where there's room beside the laptop; smaller screens give the laptop the space */}
