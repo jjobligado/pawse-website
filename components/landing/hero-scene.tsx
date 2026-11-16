@@ -457,7 +457,7 @@ function CasementPanel({ side }: { side: "left" | "right" }) {
     const left = side === "left";
     return (
         <div
-            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] [--a:62deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
+            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} w-[calc(50%_-_clamp(9px,1.45vw,20px))] sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] [--a:14deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
             {/* Glass: a cool tint, one broad glint and one thin one */}

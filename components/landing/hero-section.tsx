@@ -174,23 +174,27 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--lw:88vw] md:[--lw:min(940px,calc(100vw_-_2*clamp(140px,17vw,250px)))] [--ov:0.17] lg:short:[--ov:0.13]">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(12px,2.5cqw,36px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px]">
             {/*
-              The whole hero is the window: a walnut French casement, opened out, with
-              the sky running edge to edge inside the frame. The middle is open air, so
-              the copy never sits on bars. The laptop overlaps the sill at every size.
+              The window hangs on the white wall (the page): a walnut French casement with
+              wall space either side, a sill that sticks out past it, and the laptop in
+              front, overlapping the window's bottom edge at every size.
+              From sm the copy sits inside the glass (both in one grid cell). On phones
+              the copy moves out onto the wall above, and the window (panels nearly
+              closed) becomes the picture under it, so the text gets full contrast and width.
             */}
-            <div className="relative w-full">
-                    <div className="relative overflow-hidden flex flex-col min-h-[calc(100svh-86px)] sm:min-h-[calc(100svh-92px)] lg:min-h-[calc(100svh-100px)] xl:min-h-[calc(100svh-106px)]">
-                        <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
-
-                        <WindowFrame />
+            <div className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
+                    <div className="relative w-full grid grid-cols-1">
+                        <div className="relative overflow-hidden col-start-1 row-start-2 sm:row-start-1 h-[clamp(200px,62cqw,340px)] sm:h-auto shadow-[0_30px_50px_-30px_rgb(40_20_10/0.55),0_2px_4px_rgb(40_20_10/0.08)]">
+                            <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
+                            <WindowFrame />
+                        </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} flex-1 w-full flex flex-col items-center justify-center gap-6 px-4 sm:px-12 md:px-14 pt-20 sm:pt-24 lg:short:pt-20 pb-[calc(var(--lw)*var(--ov)_+_48px)]`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_48px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill))]`}>
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
+                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
                 />
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.8rem,calc(10.7vw_-_5px),2.9rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
@@ -516,24 +520,25 @@ export default function HeroSection() {
                     </div>
 
                 {/*
-                  The sill, edge to edge, where Ginger naps and Tux has his coffee: a deep
-                  walnut board seen a little from above (its top, lit by the window, then
-                  its rounded front edge), casting a shadow on the wall below.
+                  The sill, where Ginger naps and Tux has his coffee: a deep walnut board,
+                  a little wider than the window, seen slightly from above (its top, lit by
+                  the window, then its rounded front edge), casting a shadow on the wall.
                 */}
-                <div className="relative z-30">
+                <div className="relative z-30 w-[calc(100%_+_2*var(--so))]">
                     <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
                     </div>
                     <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
                     <div aria-hidden="true" className="absolute inset-x-0 top-full h-6 bg-[linear-gradient(180deg,rgb(40_20_10/0.2),transparent)] pointer-events-none" />
 
-                    <div className="absolute inset-0 mx-auto max-w-chrome">
-                        <div className="hidden md:block absolute bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[2%] xl:left-[3.5%] animate-cat-hop [animation-delay:0.95s]">
+                    {/* Cats from lg, where there's room beside the laptop; smaller screens give the laptop the space */}
+                    <div className="absolute inset-0">
+                        <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
                             <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
                             <SpriteCat {...HERO_CATS.ginger} className={GINGER_SIZE} />
                         </div>
-                        <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[2.5%] w-[64px] h-auto" />
-                        <div className="hidden md:block absolute bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[2%] lg:right-[3%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                        <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
+                        <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                             <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
                             <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
                         </div>
@@ -543,7 +548,7 @@ export default function HeroSection() {
 
             {/*
               The visitor's laptop, in the foreground, overlapping the bottom of the window
-              as seen from the chair. Narrower on small screens so the cats keep their spots beside it.
+              and the sill at every size, as seen from the chair.
             */}
             <div
                 ref={laptopParallaxRef}
