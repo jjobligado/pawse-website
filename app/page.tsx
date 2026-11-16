@@ -33,14 +33,14 @@ export default function HomePage() {
             <StructuredData />
             <HeroSection />
             <HowItWorksSection />
-            {/* The feature tour: a paw-print trail walks down the sides and into Progress' blue */}
+            {/* The feature tour: a paw-print trail walks down the sides, past the middle of Progress, and fades into its blue */}
             <div className="relative">
-                <PawTrail className="top-0 -bottom-48 [mask-image:linear-gradient(180deg,#000_calc(100%_-_320px),transparent)]" />
+                <PawTrail endSelector="#progress" endFraction={0.6} className="[mask-image:linear-gradient(180deg,#000_calc(100%_-_280px),transparent)]" />
                 <CompanionsSection />
                 <FocusSection />
                 <BreakSection />
+                <DashboardSection />
             </div>
-            <DashboardSection />
             <ComingSoonSection />
             <FaqSection />
             <DownloadBanner />

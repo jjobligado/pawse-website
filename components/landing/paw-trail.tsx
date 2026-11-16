@@ -23,7 +23,9 @@ import { PAW, PixelArt } from "./hero-scene";
  * once (grey); with reduced motion the whole trail is simply there.
  *
  * Margins only, pointer-events none, aria-hidden. The layer is absolutely
- * positioned over its parent; the parent decides the span (see app/page.tsx).
+ * positioned at the top of its parent and runs to `endFraction` of the way into
+ * the `endSelector` element (see app/page.tsx). Prints land as they reach the
+ * middle of the screen, so the newest one is always around the centre.
  */
 
 type Side = "left" | "right";
@@ -103,18 +105,38 @@ function walk(side: Side, height: number): Print[] {
     return prints;
 }
 
-export default function PawTrail({ className = "" }: { className?: string }) {
+export default function PawTrail({
+    endSelector,
+    endFraction = 0.6,
+    className = "",
+}: {
+    /** The trail ends partway into this element (e.g. "#progress")... */
+    endSelector: string;
+    /** ...at this fraction of its height (0.6 = just past its middle). */
+    endFraction?: number;
+    className?: string;
+}) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [height, setHeight] = useState(0);
 
-    // Lay the trail out for the tour's real height (and again if it changes)
+    // The trail runs from the top of its parent to partway into the end element;
+    // re-measured whenever either changes size.
     useEffect(() => {
         const el = rootRef.current;
-        if (!el) return;
-        const ro = new ResizeObserver(([entry]) => setHeight(Math.round(entry.contentRect.height)));
-        ro.observe(el);
+        const parent = el?.parentElement;
+        const end = document.querySelector<HTMLElement>(endSelector);
+        if (!el || !parent || !end) return;
+        const measure = () => {
+            const p = parent.getBoundingClientRect();
+            const e = end.getBoundingClientRect();
+            setHeight(Math.max(0, Math.round(e.top - p.top + e.height * endFraction)));
+        };
+        measure();
+        const ro = new ResizeObserver(measure);
+        ro.observe(parent);
+        ro.observe(end);
         return () => ro.disconnect();
-    }, []);
+    }, [endSelector, endFraction]);
 
     useEffect(() => {
         const el = rootRef.current;
@@ -155,8 +177,9 @@ export default function PawTrail({ className = "" }: { className?: string }) {
                     markFresh(p);
                 });
             },
-            // A print appears a little after it crosses the bottom edge, so you see it land
-            { rootMargin: "0px 0px -12% 0px" }
+            // A print lands as it reaches the middle of the screen, so the newest
+            // (blue) print is always around the centre of the view
+            { rootMargin: "0px 0px -50% 0px" }
         );
         for (const p of prints) {
             if (p.dataset.shown !== undefined) continue;
@@ -170,7 +193,12 @@ export default function PawTrail({ className = "" }: { className?: string }) {
     const prints = height > 0 ? [...walk("left", height), ...walk("right", height)] : [];
 
     return (
-        <div ref={rootRef} aria-hidden="true" className={`paw-trail pointer-events-none absolute inset-x-0 ${className}`}>
+        <div
+            ref={rootRef}
+            aria-hidden="true"
+            className={`paw-trail pointer-events-none absolute inset-x-0 top-0 ${className}`}
+            style={{ height: height || undefined }}
+        >
             {prints.map((p, i) => (
                 <span
                     key={i}
