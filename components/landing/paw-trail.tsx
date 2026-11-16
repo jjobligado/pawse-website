@@ -25,7 +25,10 @@ import { PAW, PixelArt } from "./hero-scene";
  * Margins only, pointer-events none, aria-hidden. The layer is absolutely
  * positioned at the top of its parent and runs to `endFraction` of the way into
  * the `endSelector` element (see app/page.tsx). Prints land as they reach the
- * middle of the screen, so the newest one is always around the centre.
+ * middle of the screen, so the newest one is always around the centre. Prints
+ * inside the end element (Progress, with its sky-blue background) take a blue
+ * tint close to it, so the last steps sink into the blue before fading out.
+ * Shown from lg only: below that the side margins are too narrow.
  */
 
 type Side = "left" | "right";
@@ -118,6 +121,8 @@ export default function PawTrail({
 }) {
     const rootRef = useRef<HTMLDivElement>(null);
     const [height, setHeight] = useState(0);
+    // Where the end element starts (the blue): prints from here on take the blue tint
+    const [blueFrom, setBlueFrom] = useState(Infinity);
 
     // The trail runs from the top of its parent to partway into the end element;
     // re-measured whenever either changes size.
@@ -130,6 +135,7 @@ export default function PawTrail({
             const p = parent.getBoundingClientRect();
             const e = end.getBoundingClientRect();
             setHeight(Math.max(0, Math.round(e.top - p.top + e.height * endFraction)));
+            setBlueFrom(Math.round(e.top - p.top + e.height * 0.12));
         };
         measure();
         const ro = new ResizeObserver(measure);
@@ -205,6 +211,7 @@ export default function PawTrail({
                     data-paw=""
                     data-side={p.side}
                     data-top={p.top}
+                    data-blue={p.top >= blueFrom ? "" : undefined}
                     className="paw-print"
                     style={
                         {

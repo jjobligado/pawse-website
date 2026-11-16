@@ -773,18 +773,25 @@ body {
    empty space on wide screens and stays out of the content on narrow ones.
    ================================================================== */
 .paw-trail {
+  display: none;
   /* The side margin: the sections' own padding, plus the space outside the
      1280px content column on wide screens. The walk lives inside it. */
   --pad: 24px;
   --gutter: max(var(--pad), calc((100vw - 80rem) / 2 + var(--pad)));
   --paw-size: 12px;
   --paw-edge: calc(var(--gutter) * 0.18);
-  --paw-wander: max(2px, calc(var(--gutter) * 0.42 - var(--paw-size) / 2));
+  /* Drift range: the walk's furthest reach is 75% of the margin, so a quarter stays clear of the content */
+  --paw-wander: max(2px, calc(var(--gutter) * 0.75 - var(--paw-edge) - var(--paw-size) - var(--paw-lane)));
   --paw-lane: clamp(3px, calc(var(--gutter) * 0.07), 12px);
   --paw-grey: rgb(140 148 160 / 0.38);
   --paw-blue: rgb(35 148 223 / 0.78);
+  /* Inside Progress' blue: tints of that blue, so the prints sink into it */
+  --paw-in-blue: rgb(96 170 226 / 0.34);
+  --paw-in-blue-fresh: rgb(53 150 222 / 0.55);
   z-index: 20;
 }
+/* Only where the side margins have room (lg+); on narrower screens it would crowd the content */
+@media (min-width: 1024px) { .paw-trail { display: block; } }
 @media (min-width: 768px) { .paw-trail { --pad: 48px; --paw-size: 16px; --paw-edge: calc(var(--gutter) * 0.25); } }
 @media (min-width: 1024px) { .paw-trail { --pad: 80px; } }
 @media (min-width: 1280px) { .paw-trail { --paw-size: 22px; } }
@@ -806,6 +813,12 @@ body {
 }
 .paw-print[data-fresh] {
   color: var(--paw-blue);
+}
+.paw-print[data-blue] {
+  color: var(--paw-in-blue);
+}
+.paw-print[data-blue][data-fresh] {
+  color: var(--paw-in-blue-fresh);
 }
 @media (prefers-reduced-motion: reduce) {
   .paw-print { transition: none; }
