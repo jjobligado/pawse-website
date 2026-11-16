@@ -6,8 +6,8 @@ import { SectionSubtitle, SectionTitle } from "./section-heading";
 /**
  * The PAWSE loop as four instant photos pinned to the wall. The photos show
  * the cat's moment (what it feels like); the sections below show the app (how
- * it works), so nothing here spoils them. Photos are static: animation lives
- * in the detailed sections. Each caption ends with a small link to its section,
+ * it works), so nothing here spoils them. Photos are static, with no entrance
+ * motion: animation lives in the detailed sections. Each caption ends with a small link to its section,
  * which keeps the in-page navigation (useful on mobile, where the header has no
  * nav links) without making the whole card look like a button. Connectors show
  * the flow: steps 2 ↔ 3 cycle.
@@ -53,7 +53,6 @@ const STEPS: {
     tint: PolaroidTint;
     tape: WashiTape;
     tilt: string;
-    developDelayMs: number;
     photo: React.ReactNode;
     connector?: string;
 }[] = [
@@ -66,7 +65,6 @@ const STEPS: {
         // Sage green diagonal stripes (on a peach photo)
         tape: { width: "112px", rotate: "-4deg", offset: "-14px", pattern: "repeating-linear-gradient(45deg,#A9D3A0 0 7px,#CDE8C5 7px 14px)" },
         tilt: "xl:-rotate-[1.2deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
-        developDelayMs: 0,
         photo: (
             // A group photo: Ginger, Tux and Void sitting together
             <div className={PHOTO}>
@@ -88,7 +86,6 @@ const STEPS: {
         // Coral with white polka dots (on a blue photo)
         tape: { width: "84px", rotate: "3deg", offset: "18px", pattern: "radial-gradient(circle,#FFFFFF 1.8px,transparent 2.3px) 0 0/10px 10px,#F4AD96" },
         tilt: "xl:rotate-[0.8deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
-        developDelayMs: 180,
         // Tux mid-sip, steam rising from the mug
         photo: (
             <div className={PHOTO}>
@@ -106,7 +103,6 @@ const STEPS: {
         // Sky blue gingham (on a rose photo)
         tape: { width: "122px", rotate: "-2deg", offset: "4px", pattern: "linear-gradient(90deg,rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/12px 12px,linear-gradient(rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/12px 12px,#A7D2F1" },
         tilt: "xl:-rotate-[0.6deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
-        developDelayMs: 90,
         // Ginger, tail up, mid-play
         photo: (
             <div className={PHOTO}>
@@ -124,7 +120,6 @@ const STEPS: {
         // Butter yellow pinstripes (on a lavender photo)
         tape: { width: "74px", rotate: "5deg", offset: "-20px", pattern: "repeating-linear-gradient(90deg,#F2D27A 0 4px,#FAE7B4 4px 9px)" },
         tilt: "xl:rotate-[1deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
-        developDelayMs: 260,
         // A souvenir snapshot: the day's completed sessions, as fish
         photo: (
             <div className="flex items-center justify-center aspect-[4/3]">
@@ -148,8 +143,8 @@ const STEPS: {
 /**
  * "See Focus ↓": a small, clearly-a-link pill at the foot of the caption.
  * Darker blue text for AA contrast; on hover (Tailwind's hover variant only
- * applies on devices that can hover) the wash deepens and the arrow chip fills
- * with PAWSE blue (the arrow turns white) without moving; pressing scales the
+ * applies on devices that can hover) the wash deepens and the arrow chip darkens
+ * a shade (a little more when pressed) without moving; pressing scales the
  * pill to 0.97. Strong ease-out, exact properties only.
  */
 function SectionLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -161,7 +156,7 @@ function SectionLink({ href, children }: { href: string; children: React.ReactNo
             {children}
             <span
                 aria-hidden="true"
-                className="w-6 h-6 rounded-full bg-white text-[#1A6CA3] flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-[background-color,color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-accent-strong group-hover/link:text-white"
+                className="w-6 h-6 rounded-full bg-white text-[#1A6CA3] flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-[#DCEAF5] group-active/link:bg-[#CCDFEE]"
             >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14" />
@@ -198,7 +193,6 @@ export default function HowItWorksSection() {
                     <li key={step.href} className="contents">
                         <Polaroid
                             tint={step.tint}
-                            developDelayMs={step.developDelayMs}
                             photo={step.photo}
                             tape={step.tape}
                             className={`w-[264px] xl:w-full h-full ${step.tilt}`}
