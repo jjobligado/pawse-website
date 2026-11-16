@@ -7,11 +7,13 @@ import { PAW, PixelArt } from "./hero-scene";
  * A cat's paw prints walking down both sides of the feature tour (Companions →
  * Focus → Break), ending as they step into the Progress section's blue.
  *
- * The walk is messy on purpose: each side is its own seeded random walk (steps
- * of different lengths, a path that drifts in and out, paws that turn with it,
- * the odd longer gap where the cat paused), and the two sides use different
- * seeds and rhythms, so they never mirror. Seeded, so the trail is the same on
- * every visit and on server and client.
+ * The walk is messy on purpose. Each side is its own seeded walk that switches
+ * between moods: a stroll (uneven steps, a path that drifts), a zigzag (cutting
+ * back and forth, paws turned into each cut), and a pause (a long gap) followed
+ * by a hurry (short quick steps, catching up). The two sides have different
+ * seeds, rhythms and habits, so they never mirror. Seeded, so the trail is the
+ * same on every visit. It walks in the real side margin: its distance from the
+ * edge and how far it wanders scale with the margin (see .paw-trail in globals.css).
  *
  * Tracks stay: each print appears once, the first time it comes into view, and
  * is never hidden again. The newest print on each side is blue (where the cat
@@ -39,29 +41,63 @@ function rng(seed: number) {
     };
 }
 
-// Each side walks differently: its own seed, start, step length, wobble and pauses.
-const WALKS: Record<Side, { seed: number; start: number; stride: number; jitter: number; pause: number }> = {
-    left: { seed: 7, start: 120, stride: 94, jitter: 30, pause: 0.12 },
-    right: { seed: 23, start: 205, stride: 82, jitter: 38, pause: 0.18 },
+type Mood = "stroll" | "zigzag" | "pause" | "hurry";
+
+// Each side walks differently: its own seed, start, step length and habits.
+// The left cat zigzags more; the right one dawdles, then hurries to catch up.
+const WALKS: Record<Side, { seed: number; start: number; stride: number; moods: [Mood, number][] }> = {
+    left: { seed: 7, start: 120, stride: 96, moods: [["stroll", 0.5], ["zigzag", 0.36], ["pause", 0.14]] },
+    right: { seed: 23, start: 210, stride: 88, moods: [["stroll", 0.46], ["zigzag", 0.16], ["pause", 0.38]] },
 };
 
 function walk(side: Side, height: number): Print[] {
     const w = WALKS[side];
     const r = rng(w.seed);
+    const between = (min: number, max: number) => min + r() * (max - min);
+    const pickMood = (): Mood => {
+        let x = r();
+        for (const [mood, p] of w.moods) if ((x -= p) <= 0) return mood;
+        return "stroll";
+    };
+
     const prints: Print[] = [];
     let top = w.start;
     let drift = r(); // 0..1 across the side margin's wander range
+    let mood: Mood = "stroll";
+    let left = 3; // steps left in the current mood
     let i = 0;
+
     while (top < height - 40) {
+        if (left <= 0) {
+            // After a pause, the cat hurries to catch up
+            mood = mood === "pause" ? "hurry" : pickMood();
+            left = mood === "pause" ? 1 : mood === "hurry" ? Math.round(between(3, 5)) : Math.round(between(3, 6));
+        }
         const lane = (i % 2) as 0 | 1;
         const prev = drift;
-        // The path wanders: a small random step, pulled back in at the edges
-        drift = Math.min(1, Math.max(0, drift + (r() - 0.5) * 0.45));
-        // Paws turn a little with the direction of travel, plus their own wobble
-        const tilt = (lane ? 9 : -9) + (drift - prev) * (side === "left" ? -40 : 40) + (r() - 0.5) * 10;
+
+        if (mood === "zigzag") {
+            // Cuts back and forth across the margin
+            drift = (i % 2 ? 0.82 : 0.18) + (r() - 0.5) * 0.12;
+        } else {
+            // Wanders a little, pulled back in at the edges
+            drift = Math.min(1, Math.max(0, drift + (r() - 0.5) * (mood === "hurry" ? 0.2 : 0.4)));
+        }
+
+        // Paws turn into the direction of travel (strongly in a zigzag), plus their own wobble
+        const turn = (drift - prev) * (mood === "zigzag" ? 70 : 40) * (side === "left" ? -1 : 1);
+        const tilt = (lane ? 9 : -9) + turn + (r() - 0.5) * 10;
         prints.push({ side, top: Math.round(top), lane, drift, tilt });
-        // Uneven steps; now and then a longer gap where the cat paused or hopped
-        top += w.stride + (r() - 0.5) * 2 * w.jitter + (r() < w.pause ? 40 + r() * 50 : 0);
+
+        // Step length by mood; a pause leaves a long gap before the next print
+        top +=
+            mood === "hurry"
+                ? w.stride * 0.55 + (r() - 0.5) * 14
+                : mood === "zigzag"
+                  ? w.stride * 0.85 + (r() - 0.5) * 24
+                  : w.stride + (r() - 0.5) * 50;
+        if (mood === "pause") top += between(110, 190);
+        left--;
         i++;
     }
     return prints;

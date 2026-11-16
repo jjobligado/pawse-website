@@ -768,20 +768,26 @@ body {
    scale (never 0), strong ease-out, with --paw-delay so a batch lands one by
    one. The newest print per side is blue ([data-fresh]); older ones cool to
    grey over 1.4s (slow on purpose: decoration shouldn't compete).
-   --paw-edge: distance from the screen edge; --paw-wander: how far the path
-   drifts inward; --paw-lane: the step between left and right paws.
+   --gutter: the side margin; --paw-edge / --paw-wander / --paw-lane are
+   shares of it (start, drift range, step between paws), so the walk uses the
+   empty space on wide screens and stays out of the content on narrow ones.
    ================================================================== */
 .paw-trail {
-  --paw-edge: clamp(3px, 1.6vw, 32px);
-  --paw-wander: clamp(3px, 1.2vw, 16px);
-  --paw-lane: clamp(5px, 0.8vw, 11px);
-  --paw-size: 10px;
+  /* The side margin: the sections' own padding, plus the space outside the
+     1280px content column on wide screens. The walk lives inside it. */
+  --pad: 24px;
+  --gutter: max(var(--pad), calc((100vw - 80rem) / 2 + var(--pad)));
+  --paw-size: 12px;
+  --paw-edge: calc(var(--gutter) * 0.18);
+  --paw-wander: max(2px, calc(var(--gutter) * 0.42 - var(--paw-size) / 2));
+  --paw-lane: clamp(3px, calc(var(--gutter) * 0.07), 12px);
   --paw-grey: rgb(140 148 160 / 0.38);
   --paw-blue: rgb(35 148 223 / 0.78);
   z-index: 20;
 }
-@media (min-width: 768px) { .paw-trail { --paw-size: 13px; } }
-@media (min-width: 1280px) { .paw-trail { --paw-size: 16px; } }
+@media (min-width: 768px) { .paw-trail { --pad: 48px; --paw-size: 16px; --paw-edge: calc(var(--gutter) * 0.25); } }
+@media (min-width: 1024px) { .paw-trail { --pad: 80px; } }
+@media (min-width: 1280px) { .paw-trail { --paw-size: 22px; } }
 .paw-print {
   position: absolute;
   width: var(--paw-size);
