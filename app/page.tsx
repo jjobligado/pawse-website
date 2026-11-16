@@ -1,3 +1,4 @@
+import PawTrail from "@/components/landing/paw-trail";
 import type { Metadata } from "next";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site-config";
 import HeroSection from "@/components/landing/hero-section";
@@ -32,10 +33,14 @@ export default function HomePage() {
             <StructuredData />
             <HeroSection />
             <HowItWorksSection />
-            <CompanionsSection />
-            <FocusSection />
-            <BreakSection />
-            <DashboardSection />
+            {/* The feature tour: a paw-print trail walks down the sides, past the middle of Progress, and fades into its blue */}
+            <div className="relative">
+                <PawTrail endSelector="#progress" endFraction={0.6} className="[mask-image:linear-gradient(180deg,#000_calc(100%_-_280px),transparent)]" />
+                <CompanionsSection />
+                <FocusSection />
+                <BreakSection />
+                <DashboardSection />
+            </div>
             <ComingSoonSection />
             <FaqSection />
             <DownloadBanner />
