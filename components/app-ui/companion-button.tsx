@@ -22,9 +22,9 @@ import { useEffect, useRef, useState } from "react";
  * *-head-peek-*). The loop pauses off screen and doesn't run with reduced
  * motion (the cat just holds its first pose).
  *
- * `hidden` keeps the cat tucked below the card's bottom edge; when it turns
- * false the cat peeks up (after `revealDelayMs`), so a row can bring its cats
- * in one by one once the cards have landed.
+ * No flicker: all five images (4 poses + the look-around strip) are stacked
+ * and painted from the start, and only their opacity switches, so nothing has
+ * to load or decode at the moment the cat changes.
  */
 
 export type AppCompanion = {
@@ -64,10 +64,6 @@ function usePeekRoutine(id: AppCompanion["id"], initialPose: number, rootRef: Re
     useEffect(() => {
         currentPose[id] = initialPose;
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-        // Warm the cache so the first pose change doesn't flash
-        for (const p of POSES) new window.Image().src = `${SPRITES}/${id}-head-peek-${p}.png`;
-        new window.Image().src = `${SPRITES}/${id}-head-peek-sheet.png`;
 
         let timer: number | undefined;
         let isStatic = true;
@@ -138,16 +134,11 @@ function useHoverLook() {
 export default function CompanionButton({
     companion,
     initialPose,
-    hidden = false,
-    revealDelayMs = 0,
     className = "",
 }: {
     companion: AppCompanion;
     /** Distinct per cat, so server and client render the same first frame. */
     initialPose: number;
-    /** Keep the cat tucked below the bottom edge (it peeks up when this turns false). */
-    hidden?: boolean;
-    revealDelayMs?: number;
     className?: string;
 }) {
     const ref = useRef<HTMLDivElement>(null);
@@ -159,10 +150,8 @@ export default function CompanionButton({
         <div
             ref={ref}
             data-theme={companion.theme}
-            data-peek={hidden ? "hidden" : "shown"}
             onPointerEnter={onPointerEnter}
             className={`app-cat-btn ${className}`}
-            style={{ "--reveal-delay": `${revealDelayMs}ms` } as React.CSSProperties}
         >
             <span className="app-cat-info">
                 <span className="app-cat-label">{companion.mode}</span>
@@ -172,15 +161,26 @@ export default function CompanionButton({
                 </span>
             </span>
             <span className="app-cat-image" aria-hidden="true">
-                <span
-                    className={`app-cat-sprite ${playing ? "animate-app-peek" : ""}`}
-                    style={{
-                        backgroundImage: playing
-                            ? `url(${SPRITES}/${companion.id}-head-peek-sheet.png)`
-                            : `url(${SPRITES}/${companion.id}-head-peek-${pose}.png)`,
-                        backgroundSize: playing ? "400% 100%" : "100% 100%",
-                    }}
-                />
+                <span className="app-cat-sprite">
+                    {POSES.map((p) => (
+                        <span
+                            key={p}
+                            className="app-cat-layer"
+                            style={{
+                                backgroundImage: `url(${SPRITES}/${companion.id}-head-peek-${p}.png)`,
+                                opacity: !playing && pose === p ? 1 : 0,
+                            }}
+                        />
+                    ))}
+                    {/* The look-around strip: restarts from its first frame each time it's shown */}
+                    <span
+                        className={`app-cat-layer app-cat-strip ${playing ? "animate-app-peek" : ""}`}
+                        style={{
+                            backgroundImage: `url(${SPRITES}/${companion.id}-head-peek-sheet.png)`,
+                            opacity: playing ? 1 : 0,
+                        }}
+                    />
+                </span>
             </span>
         </div>
     );

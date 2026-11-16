@@ -7,8 +7,6 @@ interface CardData {
     companion: AppCompanion;
     /** First pose (1-4), distinct per cat so server and client agree */
     initialPose: number;
-    /** When the cat peeks up after the cards start spreading (ms) */
-    revealDelayMs: number;
     defaultRotation: number;
     zIndexStacked: number;
 }
@@ -18,21 +16,18 @@ const CARDS: CardData[] = [
     {
         companion: { id: "tux", name: "Tux", mode: "Classic", theme: "classic", focusMin: 25, breakMin: 5 },
         initialPose: 1,
-        revealDelayMs: 760,
         defaultRotation: -6.5,
         zIndexStacked: 10,
     },
     {
         companion: { id: "ginger", name: "Ginger", mode: "Sprint", theme: "sprint", focusMin: 15, breakMin: 3 },
         initialPose: 2,
-        revealDelayMs: 620,
         defaultRotation: 0,
         zIndexStacked: 30,
     },
     {
         companion: { id: "void", name: "Void", mode: "Focused", theme: "focused", focusMin: 50, breakMin: 10 },
         initialPose: 3,
-        revealDelayMs: 900,
         defaultRotation: 6.5,
         zIndexStacked: 20,
     },
@@ -213,17 +208,11 @@ export default function CompanionCards() {
                     >
                         {/* Smooth animated fan-out container */}
                         <div style={getCardStyle(index)} className="w-full">
-                            {/*
-                              The app's companion button, as a display. Its cat stays tucked
-                              below the edge until the cards have spread out, then peeks up
-                              (Ginger first, then Tux, then Void, unevenly spaced).
-                            */}
+                            {/* The app's companion button, as a display (cats already on the cards) */}
                             <div className={`w-full select-none ${isTriggered ? "" : "pointer-events-none"}`}>
                                 <CompanionButton
                                     companion={card.companion}
                                     initialPose={card.initialPose}
-                                    hidden={isMounted && !isTriggered}
-                                    revealDelayMs={card.revealDelayMs}
                                 />
                             </div>
                         </div>

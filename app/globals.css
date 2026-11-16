@@ -786,24 +786,24 @@ body {
   margin-bottom: -10px;
 }
 .app-cat-sprite {
+  position: relative;
   display: block;
   width: 128px;
   height: 128px;
   flex-shrink: 0;
+  pointer-events: none;
+}
+/* All pose layers stay painted; only opacity switches (no load or decode on change) */
+.app-cat-layer {
+  position: absolute;
+  inset: 0;
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: 100% 100%;
   image-rendering: pixelated;
-  pointer-events: none;
-  /* Peek-in: rises from below the card's bottom edge, strong ease-out */
-  transition: translate 520ms cubic-bezier(0.23, 1, 0.32, 1) var(--reveal-delay, 0ms);
 }
-.app-cat-btn[data-peek="hidden"] .app-cat-sprite {
-  translate: 0 108%;
-  transition-duration: 0s;
-  transition-delay: 0s;
-}
-@media (prefers-reduced-motion: reduce) {
-  .app-cat-sprite { transition: none; }
+.app-cat-strip {
+  background-size: 400% 100%;
 }
 /* 4 frames x 128px; 1s, like the app's 1.0s steps(4) */
 .animate-app-peek {
