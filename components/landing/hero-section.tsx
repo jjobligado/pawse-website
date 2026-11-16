@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
 import { Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
 import LaptopDesktop from "./laptop-desktop";
+import DoneWord from "./done-word";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -29,6 +29,14 @@ const DONE_COLOR = {
     day: "#1A74AE",
     dusk: "#17679C",
     night: "#1C3F8F",
+} as const;
+
+/** Daylight the window throws onto the wall around it, per sky phase. */
+const SPILL_COLOR = {
+    morning: "rgb(255 214 176 / 0.55)",
+    day: "rgb(190 226 255 / 0.6)",
+    dusk: "rgb(246 186 160 / 0.55)",
+    night: "rgb(170 182 232 / 0.5)",
 } as const;
 
 /**
@@ -174,7 +182,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section id="hero" data-sky={skyPhase} style={{ "--hero-done": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(12px,2.5cqw,36px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px]">
+        <section id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase], "--hero-spill": SPILL_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(12px,2.5cqw,36px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -185,9 +193,25 @@ export default function HeroSection() {
             */}
             <div className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
                     <div className="relative w-full grid grid-cols-1">
-                        <div className="relative overflow-hidden col-start-1 row-start-2 sm:row-start-1 h-[clamp(200px,62cqw,340px)] sm:h-auto shadow-[0_30px_50px_-30px_rgb(40_20_10/0.55),0_2px_4px_rgb(40_20_10/0.08)]">
-                            <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
-                            <WindowFrame />
+                        {/*
+                          Seated in the wall, not stuck on it: daylight from the window
+                          washes the wall around it (tinted by the sky phase), a light
+                          painted trim steps from the white wall to the walnut, and the
+                          frame has softened corners and a layered shadow.
+                        */}
+                        <div className="relative isolate col-start-1 row-start-2 sm:row-start-1">
+                            <div
+                                aria-hidden="true"
+                                className="absolute -inset-[clamp(28px,7cqw,110px)] -z-20 rounded-[50%] bg-[radial-gradient(closest-side,var(--hero-spill),transparent)] opacity-70 blur-2xl transition-[background] duration-1000"
+                            />
+                            <div
+                                aria-hidden="true"
+                                className="absolute -inset-[clamp(6px,1.1cqw,14px)] -z-10 rounded-[10px] sm:rounded-[14px] bg-[linear-gradient(180deg,#F3EFEA,#FAF8F5_55%,#F1ECE6)] shadow-[inset_0_1px_0_#FFFFFF,inset_0_-1px_0_rgb(120_90_60/0.08),0_1px_2px_rgb(40_20_10/0.06),0_18px_36px_-22px_rgb(40_20_10/0.35)]"
+                            />
+                            <div className="relative h-[clamp(200px,62cqw,340px)] sm:h-full overflow-hidden rounded-[5px] sm:rounded-[7px] shadow-[0_0_0_1px_rgb(67_41_24/0.35),0_2px_3px_rgb(40_20_10/0.12),0_24px_40px_-26px_rgb(40_20_10/0.5)]">
+                                <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
+                                <WindowFrame />
+                            </div>
                         </div>
 
             {/* Centered Hero Copy & Actions */}
@@ -203,102 +227,14 @@ export default function HeroSection() {
                         </span>
                         <span className="block whitespace-nowrap animate-hero-headline-2">
                             to Get Things{" "}
-                            <span className="group/done relative inline-block pr-4 sm:pr-6 md:pr-8 animate-hero-done cursor-pointer select-none transition-transform duration-200 ease-out hover:-translate-y-0.5 before:absolute before:-inset-y-8 before:-inset-x-6 before:content-['']">
-                                <span className="relative inline-block">
-                                    Done
-                                    <span
-                                        aria-hidden="true"
-                                        className="absolute left-1 right-1 bottom-[calc(0.06em-5px)] h-[3px] md:h-[5px] bg-accent animate-hero-done-line"
-                                    />
-                                </span>
-
-                                {/* Fish 1: Orange - Directly over 'D' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[1%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-20 group-active/done:scale-110 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-1 block">
-                                        <Image
-                                            src="/images/completed-orange-fish.png"
-                                            alt=""
-                                            width={32}
-                                            height={32}
-                                            className="w-6 h-6 md:w-7 md:h-7 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 2: Tuxedo - Directly over 'o' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[32%] left-[24%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:rotate-15 group-active/done:scale-110 transition-all duration-300 delay-[50ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-2 block">
-                                        <Image
-                                            src="/images/completed-tuxedo-fish.png"
-                                            alt=""
-                                            width={36}
-                                            height={36}
-                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 3: Black - Right in the center seam between 'o' and 'n' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[20%] left-[42%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[98%] group-hover/done:rotate-[24deg] group-active/done:scale-110 transition-all duration-300 delay-[25ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-3 block">
-                                        <Image
-                                            src="/images/completed-black-fish.png"
-                                            alt=""
-                                            width={32}
-                                            height={32}
-                                            className="w-6 h-6 md:w-7 md:h-7 [image-rendering:pixelated] drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 4: Orange - Directly over 'n' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[34%] left-[60%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[95%] group-hover/done:-rotate-12 group-active/done:scale-110 transition-all duration-300 delay-[80ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-4 block">
-                                        <Image
-                                            src="/images/completed-orange-fish.png"
-                                            alt=""
-                                            width={36}
-                                            height={36}
-                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] -scale-x-100 block"
-                                        />
-                                    </span>
-                                </span>
-
-                                {/* Fish 5: Tuxedo - Directly over 'e' */}
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none select-none absolute z-20 leading-none top-[22%] left-[82%] -translate-x-1/2 -translate-y-[70%] opacity-0 scale-0 group-hover/done:opacity-100 group-hover/done:scale-100 group-hover/done:-translate-y-[80%] group-hover/done:rotate-8 group-active/done:scale-110 transition-all duration-300 delay-[110ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                >
-                                    <span className="animate-fish-swim-5 block">
-                                        <Image
-                                            src="/images/completed-tuxedo-fish.png"
-                                            alt=""
-                                            width={36}
-                                            height={36}
-                                            className="w-7 h-7 md:w-8 md:h-8 [image-rendering:pixelated] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] block"
-                                        />
-                                    </span>
-                                </span>
-                            </span>
+                            <DoneWord />
                         </span>
                     </h1>
                 </div>
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg font-medium text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 group-data-[sky=night]/sky:text-ink">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:group-data-[sky=night]/sky:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -382,7 +318,7 @@ export default function HeroSection() {
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 group-data-[sky=night]/sky:text-ink"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:group-data-[sky=night]/sky:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
@@ -525,10 +461,10 @@ export default function HeroSection() {
                   the window, then its rounded front edge), casting a shadow on the wall.
                 */}
                 <div className="relative z-30 w-[calc(100%_+_2*var(--so))]">
-                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
+                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 rounded-t-[2px] wood-h [--wood:#94634A] shadow-[inset_0_2px_0_rgb(40_20_10/0.35),inset_0_5px_8px_-3px_rgb(40_20_10/0.45)]">
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
                     </div>
-                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
+                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[3px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55)]" />
                     <div aria-hidden="true" className="absolute inset-x-0 top-full h-6 bg-[linear-gradient(180deg,rgb(40_20_10/0.2),transparent)] pointer-events-none" />
 
                     {/* Cats from lg, where there's room beside the laptop; smaller screens give the laptop the space */}
