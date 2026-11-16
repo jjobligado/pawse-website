@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Polaroid, { type PolaroidTint } from "./polaroid";
+import Polaroid, { type PolaroidTint, type WashiTape } from "./polaroid";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 
@@ -51,6 +51,7 @@ const STEPS: {
     href: string;
     link: string;
     tint: PolaroidTint;
+    tape: WashiTape;
     tilt: string;
     developDelayMs: number;
     photo: React.ReactNode;
@@ -62,6 +63,8 @@ const STEPS: {
         href: "#companions",
         link: "Meet the cats",
         tint: "morning",
+        // Peach diagonal stripes
+        tape: { width: "88px", rotate: "-4deg", offset: "-12px", pattern: "repeating-linear-gradient(45deg,#F7C4A2 0 6px,#FBDDC8 6px 12px)" },
         tilt: "xl:-rotate-[1.2deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
         developDelayMs: 0,
         photo: (
@@ -82,6 +85,8 @@ const STEPS: {
         href: "#focus",
         link: "See Focus",
         tint: "day",
+        // Sky blue with white polka dots
+        tape: { width: "64px", rotate: "3deg", offset: "16px", pattern: "radial-gradient(circle,#FFFFFF 1.5px,transparent 2px) 0 0/8px 8px,#B5DAF6" },
         tilt: "xl:rotate-[0.8deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
         developDelayMs: 180,
         // Tux mid-sip, steam rising from the mug
@@ -98,6 +103,8 @@ const STEPS: {
         href: "#break",
         link: "See Break",
         tint: "dusk",
+        // Rose gingham
+        tape: { width: "96px", rotate: "-2deg", offset: "4px", pattern: "linear-gradient(90deg,rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/10px 10px,linear-gradient(rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/10px 10px,#F2B2BE" },
         tilt: "xl:-rotate-[0.6deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
         developDelayMs: 90,
         // Ginger, tail up, mid-play
@@ -114,6 +121,8 @@ const STEPS: {
         href: "#progress",
         link: "See Progress",
         tint: "night",
+        // Lavender pinstripes
+        tape: { width: "56px", rotate: "5deg", offset: "-18px", pattern: "repeating-linear-gradient(90deg,#C9BEEC 0 3px,#DED8F6 3px 7px)" },
         tilt: "xl:rotate-[1deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
         developDelayMs: 260,
         // A souvenir snapshot: the day's completed sessions, as fish
@@ -191,6 +200,7 @@ export default function HowItWorksSection() {
                             tint={step.tint}
                             developDelayMs={step.developDelayMs}
                             photo={step.photo}
+                            tape={step.tape}
                             className={`w-[264px] xl:w-full h-full ${step.tilt}`}
                         >
                             <div className="flex flex-1 flex-col items-center gap-2 text-center">
