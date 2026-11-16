@@ -94,7 +94,7 @@ export default function Polaroid({
             {tape && (
                 <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute z-10 -top-2.5 left-1/2 h-[22px] opacity-[0.88] shadow-[0_1px_1px_rgb(30_30_40/0.08)]"
+                    className="pointer-events-none absolute z-10 -top-3.5 left-1/2 h-[28px] opacity-[0.88] shadow-[0_1px_1px_rgb(30_30_40/0.08)]"
                     style={{
                         width: tape.width,
                         background: tape.pattern,

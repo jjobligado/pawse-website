@@ -63,8 +63,8 @@ const STEPS: {
         href: "#companions",
         link: "Meet the cats",
         tint: "morning",
-        // Peach diagonal stripes
-        tape: { width: "88px", rotate: "-4deg", offset: "-12px", pattern: "repeating-linear-gradient(45deg,#F7C4A2 0 6px,#FBDDC8 6px 12px)" },
+        // Sage green diagonal stripes (on a peach photo)
+        tape: { width: "112px", rotate: "-4deg", offset: "-14px", pattern: "repeating-linear-gradient(45deg,#A9D3A0 0 7px,#CDE8C5 7px 14px)" },
         tilt: "xl:-rotate-[1.2deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
         developDelayMs: 0,
         photo: (
@@ -85,8 +85,8 @@ const STEPS: {
         href: "#focus",
         link: "See Focus",
         tint: "day",
-        // Sky blue with white polka dots
-        tape: { width: "64px", rotate: "3deg", offset: "16px", pattern: "radial-gradient(circle,#FFFFFF 1.5px,transparent 2px) 0 0/8px 8px,#B5DAF6" },
+        // Coral with white polka dots (on a blue photo)
+        tape: { width: "84px", rotate: "3deg", offset: "18px", pattern: "radial-gradient(circle,#FFFFFF 1.8px,transparent 2.3px) 0 0/10px 10px,#F4AD96" },
         tilt: "xl:rotate-[0.8deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
         developDelayMs: 180,
         // Tux mid-sip, steam rising from the mug
@@ -103,8 +103,8 @@ const STEPS: {
         href: "#break",
         link: "See Break",
         tint: "dusk",
-        // Rose gingham
-        tape: { width: "96px", rotate: "-2deg", offset: "4px", pattern: "linear-gradient(90deg,rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/10px 10px,linear-gradient(rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/10px 10px,#F2B2BE" },
+        // Sky blue gingham (on a rose photo)
+        tape: { width: "122px", rotate: "-2deg", offset: "4px", pattern: "linear-gradient(90deg,rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/12px 12px,linear-gradient(rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/12px 12px,#A7D2F1" },
         tilt: "xl:-rotate-[0.6deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
         developDelayMs: 90,
         // Ginger, tail up, mid-play
@@ -121,8 +121,8 @@ const STEPS: {
         href: "#progress",
         link: "See Progress",
         tint: "night",
-        // Lavender pinstripes
-        tape: { width: "56px", rotate: "5deg", offset: "-18px", pattern: "repeating-linear-gradient(90deg,#C9BEEC 0 3px,#DED8F6 3px 7px)" },
+        // Butter yellow pinstripes (on a lavender photo)
+        tape: { width: "74px", rotate: "5deg", offset: "-20px", pattern: "repeating-linear-gradient(90deg,#F2D27A 0 4px,#FAE7B4 4px 9px)" },
         tilt: "xl:rotate-[1deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
         developDelayMs: 260,
         // A souvenir snapshot: the day's completed sessions, as fish
