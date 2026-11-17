@@ -6,14 +6,14 @@ export type DetectedPlatform = "windows" | "mac" | "linux" | "mobile" | "other";
 
 export type DesktopOs = "windows" | "mac" | "linux";
 
-export type DownloadId = "windows" | "mac-arm" | "mac-intel" | "linux-appimage" | "linux-deb";
+export type DownloadId = "windows" | "mac" | "linux-appimage" | "linux-deb";
 
 export interface DesktopDownload {
     id: DownloadId;
     os: DesktopOs;
     name: string;
     subtitle: string;
-    /** Tells builds of one OS apart in running text ("Mac (Apple Silicon, Intel)"). */
+    /** Tells builds of one OS apart in running text ("Linux (AppImage, .deb)"). */
     short: string;
     extension: string;
     fileName: string;
@@ -21,12 +21,11 @@ export interface DesktopDownload {
 }
 
 /**
- * Where the installers live. PLACEHOLDER: local paths for now. The backend dev
- * is renaming the release files to version-less names; once they're published
- * on GitHub Releases (educ-jkescritor/Pawse-Releases), point these at
- * `https://github.com/educ-jkescritor/Pawse-Releases/releases/latest/download/<file>`.
+ * Where the installers live: the latest GitHub release of the public
+ * educ-jkescritor/Pawse-Releases repo. File names carry no version, so these
+ * links always serve the newest release without changes here.
  */
-const DOWNLOAD_BASE = "/downloads";
+const DOWNLOAD_BASE = "https://github.com/educ-jkescritor/Pawse-Releases/releases/latest/download";
 
 function download(d: Omit<DesktopDownload, "href">): DesktopDownload {
     return { ...d, href: `${DOWNLOAD_BASE}/${d.fileName}` };
@@ -34,11 +33,10 @@ function download(d: Omit<DesktopDownload, "href">): DesktopDownload {
 
 /** Every installer, in the order the "Other platforms" list shows them. */
 export const DESKTOP_DOWNLOADS: DesktopDownload[] = [
-    download({ id: "windows", short: "Windows", os: "windows", name: "Windows", subtitle: "Windows 10 & 11 (64-bit)", extension: ".exe", fileName: "Pawse-Setup.exe" }),
-    download({ id: "mac-arm", short: "Apple Silicon", os: "mac", name: "macOS", subtitle: "Apple Silicon (M1 – M4)", extension: ".dmg", fileName: "Pawse-arm64.dmg" }),
-    download({ id: "mac-intel", short: "Intel", os: "mac", name: "macOS", subtitle: "Intel Macs", extension: ".dmg", fileName: "Pawse.dmg" }),
+    download({ id: "windows", short: "Windows", os: "windows", name: "Windows", subtitle: "Windows 10 & 11 (64-bit)", extension: ".exe", fileName: "PawseSetup.exe" }),
+    download({ id: "mac", short: "Mac", os: "mac", name: "macOS", subtitle: "Apple Silicon & Intel", extension: ".dmg", fileName: "Pawse.dmg" }),
     download({ id: "linux-appimage", short: "AppImage", os: "linux", name: "Linux", subtitle: "Any distro, updates itself", extension: ".AppImage", fileName: "Pawse.AppImage" }),
-    download({ id: "linux-deb", short: ".deb", os: "linux", name: "Linux", subtitle: "Ubuntu, Debian & Mint", extension: ".deb", fileName: "pawse_amd64.deb" }),
+    download({ id: "linux-deb", short: ".deb", os: "linux", name: "Linux", subtitle: "Ubuntu, Debian & Mint", extension: ".deb", fileName: "Pawse.deb" }),
 ];
 
 export const OS_LABELS: Record<DesktopOs, string> = { windows: "Windows", mac: "Mac", linux: "Linux" };
@@ -57,7 +55,7 @@ export interface PlatformDownloadInfo {
     iconType: "download" | "share";
     /** Desktop: the build the main button gives. */
     downloadId?: DownloadId;
-    /** Desktop OSes with more than one build: names the one the button gives ("Apple Silicon"). */
+    /** Desktop OSes with more than one build: names the one the button gives ("AppImage"). */
     buildLabel?: string;
 }
 
@@ -77,7 +75,7 @@ function desktopConfig(label: string, id: DownloadId, buildLabel?: string): Plat
 
 /**
  * Every build except the one the main button gives: the same OS's other build
- * first (Intel Mac, .deb), then the other OSes in list order.
+ * first (.deb), then the other OSes in list order.
  */
 export function otherDownloads(primary: DownloadId): DesktopDownload[] {
     const os = getDownload(primary).os;
@@ -86,13 +84,12 @@ export function otherDownloads(primary: DownloadId): DesktopDownload[] {
 }
 
 /**
- * Macs default to Apple Silicon (most Macs since 2020): browsers can't reliably
- * tell the chip (Safari reports every Mac as Intel), so Intel comes first in
- * Other platforms. Linux defaults to the AppImage, which runs anywhere.
+ * Macs get the single .dmg. Linux defaults to the AppImage, which runs
+ * anywhere; the .deb comes first in Other platforms.
  */
 export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
     windows: desktopConfig("Download for Windows", "windows"),
-    mac: desktopConfig("Download for Mac", "mac-arm", "Apple Silicon"),
+    mac: desktopConfig("Download for Mac", "mac"),
     linux: desktopConfig("Download for Linux", "linux-appimage", "AppImage"),
     mobile: {
         label: "Send to My Desktop",
