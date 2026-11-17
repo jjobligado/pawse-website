@@ -1054,22 +1054,28 @@ body {
 }
 .fd-slot { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
-/* The cursor, and a ring where it clicks */
+/* The cursor, and a ring where it clicks. X and Y move on separate layers with
+   different easings, so every move bends into a soft arc like a real hand. */
 .fd-cursor {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 20;
-  width: 22px;
-  height: 22px;
   pointer-events: none;
   opacity: 0;
-  transition: transform 900ms cubic-bezier(0.4, 0, 0.2, 1), opacity 400ms ease;
+  transition: transform var(--fd-ms, 900ms) cubic-bezier(0.45, 0, 0.2, 1), opacity 450ms ease;
 }
 .fd-cursor.is-on { opacity: 1; }
+.fd-cursor-y {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 22px;
+  transition: transform var(--fd-ms, 900ms) cubic-bezier(0.2, 0.4, 0.2, 1);
+}
 .fd-cursor svg { display: block; width: 22px; height: 22px; filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.3)); transition: transform 160ms ease; transform-origin: 4px 3px; }
 .fd-cursor.is-down svg { transform: scale(0.86); }
-.fd-cursor::before {
+.fd-cursor-y::before {
   content: "";
   position: absolute;
   left: -9px;
@@ -1081,7 +1087,7 @@ body {
   opacity: 0;
   transform: scale(0.4);
 }
-.fd-cursor.is-down::before { animation: fd-ring 600ms ease-out; }
+.fd-cursor.is-down .fd-cursor-y::before { animation: fd-ring 600ms ease-out; }
 @keyframes fd-ring {
   0% { opacity: 1; transform: scale(0.4); }
   100% { opacity: 0; transform: scale(1.3); }
