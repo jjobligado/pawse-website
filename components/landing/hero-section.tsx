@@ -281,7 +281,7 @@ export default function HeroSection() {
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         aria-hidden="true"
-                                        className="transition-transform duration-200 ease-out group-hover:translate-y-0.5"
+                                       
                                     >
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                         <path d="M7 10l5 5 5-5" />
