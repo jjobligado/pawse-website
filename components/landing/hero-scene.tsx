@@ -456,11 +456,14 @@ const RAIL = "absolute wood-h shadow-[inset_0_1px_0_rgb(255_232_205/0.22),inset_
  * 60 degrees. Built like a real sash: two stiles, a top rail, a deeper bottom
  * rail, and glazing bars (2 x 3 panes) over clear, faintly tinted glass.
  */
-function CasementPanel({ side }: { side: "left" | "right" }) {
+function CasementPanel({ side, alwaysOpen }: { side: "left" | "right"; alwaysOpen?: boolean }) {
     const left = side === "left";
+    // Phones: panels nearly closed (the hero's copy sits above the window there),
+    // unless the copy sits on the glass at every size.
+    const phone = alwaysOpen ? "w-[clamp(72px,20vw,290px)] [--a:60deg]" : "w-[calc(50%_-_clamp(9px,1.45vw,20px))] [--a:14deg]";
     return (
         <div
-            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} w-[calc(50%_-_clamp(9px,1.45vw,20px))] sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] [--a:14deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
+            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} ${phone} sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
             {/* Glass: a cool tint, one broad glint and one thin one */}
@@ -528,13 +531,13 @@ function Hinge({ side, at }: { side: "left" | "right"; at: "top" | "bottom" }) {
  * casement panels opened out on iron hinges. The middle is open air, so nothing
  * crosses the copy. The sill is drawn by the hero, since the cats sit on it.
  */
-export function WindowFrame() {
+export function WindowFrame({ alwaysOpen = false }: { alwaysOpen?: boolean } = {}) {
     const jamb = "absolute inset-y-0 w-[clamp(9px,1.45vw,20px)] wood-v";
     return (
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
             {/* Panels hang outside, behind the frame */}
-            <CasementPanel side="left" />
-            <CasementPanel side="right" />
+            <CasementPanel side="left" alwaysOpen={alwaysOpen} />
+            <CasementPanel side="right" alwaysOpen={alwaysOpen} />
 
             {/* Depth: light comes from above, so the head shades the top of the opening, the jambs a little, the bottom not at all */}
             <div className="absolute inset-0 shadow-[inset_0_22px_28px_-20px_rgb(40_20_10/0.3),inset_14px_0_22px_-18px_rgb(40_20_10/0.2),inset_-14px_0_22px_-18px_rgb(40_20_10/0.2)]" />
