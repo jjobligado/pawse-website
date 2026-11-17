@@ -2,13 +2,6 @@ import type { ReactNode } from "react";
 import { OsIcon } from "./download-options";
 
 export type FaqCategory = "basics" | "setup" | "sessions";
-export type FaqFilter = FaqCategory | "all";
-export type ContactTopic = "general" | "bug" | "feature";
-
-export interface FaqAction {
-    label: string;
-    topic: ContactTopic;
-}
 
 export interface FaqItem {
     id: string;
@@ -17,14 +10,12 @@ export interface FaqItem {
     /** Plain-text answer mirrored into FAQPage JSON-LD structured data. */
     plain: string;
     answer: ReactNode;
-    actions?: readonly FaqAction[];
 }
 
-export const FAQ_CATEGORIES: readonly { id: FaqFilter; label: string }[] = [
+export const FAQ_GROUPS: readonly { id: FaqCategory; label: string }[] = [
     { id: "basics", label: "Basics" },
-    { id: "setup", label: "Setup" },
-    { id: "sessions", label: "Sessions" },
-    { id: "all", label: "All" },
+    { id: "setup", label: "Setup & Safety" },
+    { id: "sessions", label: "Using PAWSE" },
 ];
 
 const PLATFORM_WARNINGS = [
@@ -207,16 +198,18 @@ export const FAQS: readonly FaqItem[] = [
         id: "feedback",
         category: "sessions",
         question: "How do I report a bug or suggest a feature?",
-        plain: "Send us a message through the contact form on the PAWSE website and choose Bug or Feature.",
+        plain: "Send us a message through the contact form below and mention Bug or Feature in the subject line.",
         answer: (
             <>
-                Send us a message through the contact form below and pick{" "}
-                <em>Bug</em> or <em>Feature</em> so it lands with the right context.
+                Send us a message through the{" "}
+                <a
+                    href="#contact"
+                    className="font-medium text-ink link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
+                >
+                    contact form below
+                </a>{" "}
+                and mention <em>Bug</em> or <em>Feature</em> in the subject line.
             </>
         ),
-        actions: [
-            { label: "Report a Bug", topic: "bug" },
-            { label: "Suggest a Feature", topic: "feature" },
-        ],
     },
 ];
