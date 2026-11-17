@@ -5,7 +5,8 @@ import { otherDownloads, usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
-import { Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
+import { Laptop, SillPlant, SillShadow, WindowFrame, WindowSill, WindowSky, useSkyPhase } from "./hero-scene";
+import { CATS, CAT_SIZE, GINGER_SIZE } from "./cats";
 import LaptopDesktop from "./laptop-desktop";
 import DoneWord from "./done-word";
 import { OsIcon } from "./download-options";
@@ -19,8 +20,6 @@ const PARALLAX_SPEED = {
     skyNear: 0.08,
 } as const;
 
-const SPRITES = "/sprites";
-
 /**
  * "Done" sits on the sky, not on white, so it takes a deeper blue per time of
  * day to keep large-text contrast (≥3:1) against the gradient behind it.
@@ -30,51 +29,6 @@ const DONE_COLOR = {
     day: "#1A74AE",
     dusk: "#17679C",
     night: "#1C3F8F",
-} as const;
-
-/**
- * Cat boxes: 64px frames at whole-number scales so pixels stay crisp
- * (1x phones, 1.5x tablets, 2x from lg).
- */
-const CAT_SIZE = "w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32";
-
-/**
- * Ginger curls up small when napping, so she gets a slightly bigger box than Tux
- * (about 1.1-1.25x his size). Sized to still clear the laptop on every screen.
- */
-const GINGER_SIZE = "w-[72px] h-[72px] sm:w-[104px] sm:h-[104px] lg:w-36 lg:h-36 xl:w-40 xl:h-40";
-
-/**
- * Hero companions. On the sill, Ginger naps and Tux sips his coffee (their focus
- * routines, looping); hover / tap plays their break sheet once. Void is the
- * companion inside the app on the laptop screen (laptop-desktop.tsx).
- */
-const HERO_CATS = {
-    ginger: {
-        label: "Wake Ginger for a break",
-        idle: { src: `${SPRITES}/ginger-body-focus-sheet.png`, frames: 3 },
-        action: { src: `${SPRITES}/ginger-body-break-sheet.png`, frames: 9 },
-        // Slow breathing: z, zz, zzz
-        idleSequence: [
-            { frame: 0, ms: 900 },
-            { frame: 1, ms: 900 },
-            { frame: 2, ms: 1100 },
-        ],
-    },
-    tux: {
-        label: "Give Tux a break",
-        idle: { src: `${SPRITES}/tux-body-focus-sheet.png`, frames: 5 },
-        action: { src: `${SPRITES}/tux-body-break-sheet.png`, frames: 10 },
-        // Holds the mug, lifts it, sips, lowers it
-        idleSequence: [
-            { frame: 0, ms: 2600 },
-            { frame: 1, ms: 160 },
-            { frame: 2, ms: 220 },
-            { frame: 3, ms: 900 },
-            { frame: 2, ms: 220 },
-            { frame: 1, ms: 160 },
-        ],
-    },
 } as const;
 
 export default function HeroSection() {
@@ -412,31 +366,19 @@ export default function HeroSection() {
 
                     </div>
 
-                {/*
-                  The sill, where Ginger naps and Tux has his coffee: a deep walnut board,
-                  a little wider than the window, seen slightly from above (its top, lit by
-                  the window, then its rounded front edge), casting a shadow on the wall.
-                */}
-                <div className="relative z-30 w-[calc(100%_+_2*var(--so))]">
-                    <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_1px_0_rgb(40_20_10/0.25),inset_0_4px_6px_-3px_rgb(40_20_10/0.28)]">
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
-                    </div>
-                    <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55),0_1px_2px_rgb(40_20_10/0.3)]" />
-                    <div aria-hidden="true" className="absolute left-[3%] right-[3%] top-[calc(100%_-_4px)] h-3 sm:h-4 lg:h-5 -z-10 rounded-[50%] bg-[rgb(40_20_10/0.22)] blur-[6px] sm:blur-[8px] pointer-events-none" />
-
+                {/* The sill, where Ginger naps and Tux has his coffee */}
+                <WindowSill className="z-30">
                     {/* Cats from lg, where there's room beside the laptop; smaller screens give the laptop the space */}
-                    <div className="absolute inset-0">
-                        <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
-                            <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
-                            <SpriteCat {...HERO_CATS.ginger} className={GINGER_SIZE} />
-                        </div>
-                        <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
-                        <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
-                            <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
-                            <SpriteCat {...HERO_CATS.tux} className={CAT_SIZE} />
-                        </div>
+                    <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
+                        <SillShadow />
+                        <SpriteCat {...CATS.ginger} className={GINGER_SIZE} />
                     </div>
-                </div>
+                    <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
+                    <div className="hidden lg:block absolute bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                        <SillShadow />
+                        <SpriteCat {...CATS.tux} className={CAT_SIZE} />
+                    </div>
+                </WindowSill>
             </div>
 
             {/*

@@ -349,14 +349,17 @@ export function WindowSky({
     phase,
     farRef,
     nearRef,
+    entrance = true,
 }: {
     phase: SkyPhase;
     farRef?: React.Ref<HTMLDivElement>;
     nearRef?: React.Ref<HTMLDivElement>;
+    /** Play the load-in settle (hero only; scenes further down skip it). */
+    entrance?: boolean;
 }) {
     const theme = THEMES[phase];
     return (
-        <div aria-hidden="true" className="absolute inset-0 overflow-hidden animate-hero-sky">
+        <div aria-hidden="true" className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}>
             {/* Sky gradients, crossfaded when the phase changes */}
             {SKY_PHASES.map((p) => (
                 <div
@@ -562,6 +565,36 @@ function Bird({ className = "" }: { className?: string }) {
             <PixelArt rows={BIRD_UP} palette={palette} className="absolute inset-0 w-full h-full animate-wing-up" />
             <PixelArt rows={BIRD_DOWN} palette={palette} className="absolute inset-0 w-full h-full animate-wing-down" />
         </span>
+    );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sill                                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The window sill: a deep walnut board, a little wider than the window, seen
+ * slightly from above (its top, lit by the window, then its rounded front edge),
+ * casting a shadow on the wall. `children` sit on it (cats, plant), positioned
+ * against the board.
+ */
+export function WindowSill({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+    return (
+        <div className={`relative w-[calc(100%_+_2*var(--so))] ${className}`}>
+            <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_1px_0_rgb(40_20_10/0.25),inset_0_4px_6px_-3px_rgb(40_20_10/0.28)]">
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
+            </div>
+            <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55),0_1px_2px_rgb(40_20_10/0.3)]" />
+            <div aria-hidden="true" className="absolute left-[3%] right-[3%] top-[calc(100%_-_4px)] h-3 sm:h-4 lg:h-5 -z-10 rounded-[50%] bg-[rgb(40_20_10/0.22)] blur-[6px] sm:blur-[8px] pointer-events-none" />
+            {children && <div className="absolute inset-0">{children}</div>}
+        </div>
+    );
+}
+
+/** Soft contact shadow under a cat sitting on the sill. */
+export function SillShadow() {
+    return (
+        <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
     );
 }
 
