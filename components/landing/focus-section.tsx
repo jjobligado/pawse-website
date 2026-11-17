@@ -1,12 +1,12 @@
 import SplitFeature from "./split-feature";
-import TimerMockup from "./timer-mockup";
+import FocusDemo from "./focus-demo";
 
 export default function FocusSection() {
     return (
         <SplitFeature
             id="focus"
             titleLines={["Your Quiet", "Co-Working Space"]}
-            media={<TimerMockup />}
+            media={<FocusDemo />}
             spacing="pair-start"
         >
             No jarring alarms. No visual clutter. While your timer counts down, your
