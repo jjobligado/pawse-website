@@ -55,18 +55,13 @@ export interface PlatformDownloadInfo {
     isMobileShare?: boolean;
     altPlatformText?: string;
     iconType: "download" | "share";
-    /** Desktop: which build the main button gives, said under it. */
-    note?: string;
-    /** Desktop: the other build for this OS, offered as a small link next to the note. */
-    alt?: { prompt: string; link: string; id: DownloadId };
+    /** Desktop: the build the main button gives. */
+    downloadId?: DownloadId;
+    /** Desktop OSes with more than one build: names the one the button gives ("Apple Silicon"). */
+    buildLabel?: string;
 }
 
-function desktopConfig(
-    label: string,
-    id: DownloadId,
-    note: string,
-    alt?: PlatformDownloadInfo["alt"],
-): PlatformDownloadInfo {
+function desktopConfig(label: string, id: DownloadId, buildLabel?: string): PlatformDownloadInfo {
     const d = getDownload(id);
     return {
         label,
@@ -75,28 +70,30 @@ function desktopConfig(
         isDownload: true,
         altPlatformText: "Other platforms",
         iconType: "download",
-        note,
-        alt,
+        downloadId: id,
+        buildLabel,
     };
 }
 
 /**
+ * Every build except the one the main button gives: the same OS's other build
+ * first (Intel Mac, .deb), then the other OSes in list order.
+ */
+export function otherDownloads(primary: DownloadId): DesktopDownload[] {
+    const os = getDownload(primary).os;
+    const rest = DESKTOP_DOWNLOADS.filter((d) => d.id !== primary);
+    return [...rest.filter((d) => d.os === os), ...rest.filter((d) => d.os !== os)];
+}
+
+/**
  * Macs default to Apple Silicon (most Macs since 2020): browsers can't reliably
- * tell the chip (Safari reports every Mac as Intel), so Intel gets its own link
- * right under the button. Linux defaults to the AppImage, which runs anywhere.
+ * tell the chip (Safari reports every Mac as Intel), so Intel comes first in
+ * Other platforms. Linux defaults to the AppImage, which runs anywhere.
  */
 export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
-    windows: desktopConfig("Download for Windows", "windows", "Windows 10 & 11, 64-bit"),
-    mac: desktopConfig("Download for Mac", "mac-arm", "For Apple Silicon (M1 – M4)", {
-        prompt: "Intel Mac?",
-        link: "Download here",
-        id: "mac-intel",
-    }),
-    linux: desktopConfig("Download for Linux", "linux-appimage", "AppImage, runs on any distro", {
-        prompt: "Ubuntu or Debian?",
-        link: "Get the .deb",
-        id: "linux-deb",
-    }),
+    windows: desktopConfig("Download for Windows", "windows"),
+    mac: desktopConfig("Download for Mac", "mac-arm", "Apple Silicon"),
+    linux: desktopConfig("Download for Linux", "linux-appimage", "AppImage"),
     mobile: {
         label: "Send to My Desktop",
         href: "#",
@@ -106,7 +103,7 @@ export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
         iconType: "share",
     },
     // Unknown desktop OS: offer Windows, the most likely.
-    other: desktopConfig("Download for Windows", "windows", "Windows 10 & 11, 64-bit"),
+    other: desktopConfig("Download for Windows", "windows"),
 };
 
 function getClientPlatform(): DetectedPlatform {

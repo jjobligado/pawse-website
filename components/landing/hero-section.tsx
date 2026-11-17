@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePlatform } from "@/hooks/use-platform";
+import { otherDownloads, usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
 import { Laptop, SillPlant, WindowFrame, WindowSky, useSkyPhase } from "./hero-scene";
 import LaptopDesktop from "./laptop-desktop";
 import DoneWord from "./done-word";
-import { DownloadNote, OsIcon } from "./download-options";
+import { OsIcon } from "./download-options";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -89,7 +89,6 @@ export default function HeroSection() {
     const {
         platform: detectedPlatform,
         config: platformInfo,
-        downloads,
         isMobile,
     } = usePlatform();
 
@@ -305,9 +304,14 @@ export default function HeroSection() {
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
                         ) : (
-                            <div className="flex flex-col items-center gap-1.5">
-                            <DownloadNote info={platformInfo} />
-                            <div ref={popoverRef} className="relative inline-flex items-center">
+                            <div className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
+                            {platformInfo.buildLabel && (
+                                <>
+                                    <span>{platformInfo.buildLabel}</span>
+                                    <span aria-hidden="true">·</span>
+                                </>
+                            )}
+                            <div ref={popoverRef} className="inline-flex items-center">
                                 {/* Other Platforms Popover Trigger */}
                                 <button
                                     ref={platformsTriggerRef}
@@ -347,14 +351,14 @@ export default function HeroSection() {
                                 {/* Floating Other Platforms list (disclosure pattern: plain links, Tab to move) */}
                                 <div
                                     id="other-platforms-list"
-                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[310px] sm:w-[340px] rounded-card bg-white border-2 border-stroke p-1.5 shadow-elevated z-50 origin-top transition-all duration-200 ease-out ${
+                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[min(340px,calc(100vw_-_32px))] rounded-card bg-white border-2 border-stroke p-1.5 shadow-elevated z-50 origin-top transition-all duration-200 ease-out ${
                                         platformsOpen
                                             ? "visible opacity-100 translate-y-0 scale-100 pointer-events-auto"
                                             : "invisible opacity-0 -translate-y-1.5 scale-95 pointer-events-none"
                                     }`}
                                 >
                                     <div className="flex flex-col gap-0.5">
-                                        {downloads.map((item) => (
+                                        {otherDownloads(platformInfo.downloadId ?? "windows").map((item) => (
                                             <a
                                                 key={item.id}
                                                 href={item.href}
@@ -372,7 +376,7 @@ export default function HeroSection() {
                                                         <span className="text-sm font-semibold text-ink-strong group-hover/item:text-black">
                                                             {item.name}
                                                         </span>
-                                                        <span className="text-micro leading-[inherit] text-muted whitespace-nowrap">
+                                                        <span className="text-micro leading-snug text-muted">
                                                             {item.subtitle}
                                                         </span>
                                                     </div>

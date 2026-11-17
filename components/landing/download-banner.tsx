@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { OS_LABELS, usePlatform, type DesktopOs } from "@/hooks/use-platform";
-import { DownloadNote } from "./download-options";
+import { OS_LABELS, otherDownloads, usePlatform, type DesktopOs } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import Section from "./section";
 import { SectionTitle } from "./section-heading";
@@ -19,11 +18,11 @@ const FACES = [
  * page can download without going back to the hero.
  */
 export default function DownloadBanner() {
-    const { platform, config: platformInfo, downloads, isMobile } = usePlatform();
+    const { config: platformInfo, isMobile } = usePlatform();
     const { copied, sendToDesktop } = useSendToDesktop();
-    // Unknown desktop OSes get the Windows button (see PLATFORM_CONFIG.other), so exclude it here too.
-    const primaryOs: DesktopOs = platform === "mac" || platform === "linux" ? platform : "windows";
-    const otherOses = (Object.keys(OS_LABELS) as DesktopOs[]).filter((os) => os !== primaryOs);
+    // Everything but the button's build, grouped by OS (same OS's other build first).
+    const others = otherDownloads(platformInfo.downloadId ?? "windows");
+    const otherOses = [...new Set(others.map((d) => d.os))] as DesktopOs[];
 
     return (
         <Section id="download" className="flex flex-col items-stretch">
@@ -89,25 +88,19 @@ export default function DownloadBanner() {
                         </a>
                     )}
 
-                    {!isMobile && (
-                        <p className="text-xs md:text-sm text-muted">
-                            <DownloadNote info={platformInfo} />
-                        </p>
-                    )}
-
                     {/* Other platforms as plain links (no popover needed this far down) */}
-                    <p suppressHydrationWarning className="text-xs md:text-sm text-muted">
+                    <p suppressHydrationWarning className="text-xs md:text-sm text-muted text-balance">
                         {isMobile ? (
                             platformInfo.altPlatformText
                         ) : (
                             <>
                                 Also available for{" "}
                                 {otherOses.map((os, i) => {
-                                    const builds = downloads.filter((d) => d.os === os);
+                                    const builds = others.filter((d) => d.os === os);
                                     return (
                                         <span key={os}>
                                             {i > 0 && (i === otherOses.length - 1 ? " and " : ", ")}
-                                            {builds.length === 1 ? (
+                                            {builds.length === 1 && builds[0].short === OS_LABELS[os] ? (
                                                 <a href={builds[0].href} download={builds[0].fileName} className="font-medium text-ink link-underline">
                                                     {OS_LABELS[os]}
                                                 </a>

@@ -1,4 +1,4 @@
-import { getDownload, type DesktopOs, type PlatformDownloadInfo } from "@/hooks/use-platform";
+import type { DesktopOs } from "@/hooks/use-platform";
 
 /** Filled OS marks, sized by the caller's box; colour follows currentColor. */
 export function OsIcon({ os }: { os: DesktopOs }) {
@@ -20,30 +20,5 @@ export function OsIcon({ os }: { os: DesktopOs }) {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2C9.5 2 8 3.9 8 6.5c0 1.3.4 2.4.9 3.3C7.2 11.4 6 13.7 6 16.2c0 1.4.4 2.6 1.1 3.5-.4.3-.6.7-.6 1.1 0 .7.8 1.2 2 1.2.9 0 1.7-.3 2.1-.8.4.1.9.1 1.4.1s1-.1 1.4-.1c.4.5 1.2.8 2.1.8 1.2 0 2-.5 2-1.2 0-.4-.2-.8-.6-1.1.7-.9 1.1-2.1 1.1-3.5 0-2.5-1.2-4.8-2.9-6.4.5-.9.9-2 .9-3.3C16 3.9 14.5 2 12 2zm-1.5 4a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm3 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-1.5 2.3c1.1 0 2 .5 2 1.1s-.9 1.1-2 1.1-2-.5-2-1.1.9-1.1 2-1.1zm0 3.7c2 0 3.5 1.9 3.5 4.2 0 1.8-1.5 3.3-3.5 3.3s-3.5-1.5-3.5-3.3c0-2.3 1.5-4.2 3.5-4.2z" />
         </svg>
-    );
-}
-
-/**
- * The line under a desktop download button: which build the button gives, and
- * for Mac / Linux a quiet link to the other build ("Intel Mac? Download here").
- */
-export function DownloadNote({ info }: { info: PlatformDownloadInfo }) {
-    if (!info.note) return null;
-    const alt = info.alt && getDownload(info.alt.id);
-    return (
-        <span suppressHydrationWarning className="inline-flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-center">
-            <span>{info.note}</span>
-            {info.alt && alt && (
-                <>
-                    <span aria-hidden="true">·</span>
-                    <span>
-                        {info.alt.prompt}{" "}
-                        <a href={alt.href} download={alt.fileName} className="font-medium text-ink link-underline">
-                            {info.alt.link}
-                        </a>
-                    </span>
-                </>
-            )}
-        </span>
     );
 }
