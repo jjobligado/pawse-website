@@ -4,19 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/components/app-ui/timer-window";
 
 /**
- * Focus section media: the app's timer window at its real size, looping (~15s).
+ * Focus section media: the app's timer window at its real size, looping (~16s).
  * Each cat holds 1s between 0.6s slides.
  *
  *    0.0  Tux (Classic)                 slides right to left on its own
  *    1.0  → Ginger (Sprint)
  *    2.6  → Void (Focused)
  *    3.5  the cursor comes in from the right: Resize → Select Mode → Timer
- *         Only; it steps off while the window shrinks, comes back in (hover)
- *         and clicks Restore → full window
- *    8.2  Resize → Cat Only; it steps off, the window shrinks, it comes back
+ *         Only; it steps off while the window shrinks, the bar holds on its
+ *         own (~1.8s), then it comes back in (hover) and clicks Restore
+ *    9.2  Resize → Cat Only; it steps off, the window shrinks, it comes back
  *         in (hover), then Restore → full window
- *   13.7  the cursor leaves to the right
- *   14.2  Void slides on, right to left, to a second Tux at the end of the
+ *   14.7  the cursor leaves to the right
+ *   15.2  Void slides on, right to left, to a second Tux at the end of the
  *         track; when the loop restarts the track jumps back to the first
  *         Tux unseen (they look identical), so it reads as one endless loop
  *
@@ -39,7 +39,7 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
     { id: "void", start: 37 * 60 + 5, fish: 1 },
 ];
 
-const LOOP_MS = 14_850;
+const LOOP_MS = 15_850;
 const SLIDE_MS = 600;
 const STAGE_H = 480;
 
@@ -135,36 +135,37 @@ export default function FocusDemo() {
             // Shrinks only once the cursor is clear of it
             [6350, () => set({ mode: "timer" })],
 
-            // Back in to Restore (hover starts as it crosses the edge) → full window
-            [6750, () => move(target("restore", "timer"), 650)],
-            [7150, () => set({ hover: true })],
-            [7500, () => set({ hot: "restore" })],
-            [7700, () => press("restore")],
-            [7850, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
+            // The Timer Only bar holds on its own for a moment, then the cursor comes
+            // back in to Restore (hover starts as it crosses the edge) → full window
+            [7750, () => move(target("restore", "timer"), 650)],
+            [8150, () => set({ hover: true })],
+            [8500, () => set({ hot: "restore" })],
+            [8700, () => press("restore")],
+            [8850, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
 
             // Resize → Select Mode → Cat Only
-            [8200, () => move(target("resize"), 500)],
-            [8750, () => set({ hot: "resize" })],
-            [8950, () => press("resize")],
-            [9100, () => { release(); set({ hot: null, modal: true }); }],
-            [9400, () => move(target("cat-only"), 500)],
-            [9950, () => set({ hot: "cat-only" })],
-            [10150, () => press("cat-only")],
-            [10300, () => { release(); set({ hot: null, modal: false }); move(beside("cat", 40), 500); }],
-            [10750, () => set({ mode: "cat" })],
+            [9200, () => move(target("resize"), 500)],
+            [9750, () => set({ hot: "resize" })],
+            [9950, () => press("resize")],
+            [10100, () => { release(); set({ hot: null, modal: true }); }],
+            [10400, () => move(target("cat-only"), 500)],
+            [10950, () => set({ hot: "cat-only" })],
+            [11150, () => press("cat-only")],
+            [11300, () => { release(); set({ hot: null, modal: false }); move(beside("cat", 40), 500); }],
+            [11750, () => set({ mode: "cat" })],
             // Back over the mini window: hover shows its controls
-            [11300, () => move(onWindow("cat", 132, 100), 550)],
-            [11550, () => set({ hover: true })],
+            [12300, () => move(onWindow("cat", 132, 100), 550)],
+            [12550, () => set({ hover: true })],
 
             // Restore → full window
-            [12600, () => move(target("restore", "cat"), 450)],
-            [13100, () => set({ hot: "restore" })],
-            [13300, () => press("restore")],
-            [13450, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
+            [13600, () => move(target("restore", "cat"), 450)],
+            [14100, () => set({ hot: "restore" })],
+            [14300, () => press("restore")],
+            [14450, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
 
             // Away, and on to Tux
-            [13700, () => move(offStage(380), 700, false)],
-            [14200, () => set({ index: 3, glide: SLIDE_MS })],
+            [14700, () => move(offStage(380), 700, false)],
+            [15200, () => set({ index: 3, glide: SLIDE_MS })],
         ];
 
         const stop = () => {
