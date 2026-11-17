@@ -4,22 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/components/app-ui/timer-window";
 
 /**
- * Focus section media: the app's timer window at its real size, looping at an
- * unhurried pace (about 23s).
+ * Focus section media: the app's timer window at its real size, looping (17s).
  *
  *    0.0  Tux (Classic)                 slides right to left on its own
- *    3.0  → Ginger (Sprint)
- *    6.5  → Void (Focused)
- *    8.8  the cursor drifts in from the right edge to Resize, clicks;
- *         Select Mode opens; it picks Cat Only
- *   13.0  the cursor steps off the window while it shrinks to Cat Only,
- *         then comes back in: the hover controls show only once it's over it
- *   16.6  it steps off again (hover ends as it leaves); the window settles
- *         into Timer Only; it comes back in to Restore and clicks
- *   20.5  the cursor drifts off the right edge
- *   21.3  Void slides on, right to left, to a second Tux at the end of the
+ *    1.8  → Ginger (Sprint)
+ *    3.6  → Void (Focused)
+ *    4.7  the cursor comes in from the right: Resize → Select Mode → Cat Only;
+ *         it steps off while the window shrinks, then comes back in (hover)
+ *    9.4  Restore → full window; Resize → Timer Only; it steps off, the
+ *         window shrinks, it comes back in to Restore → full window
+ *   14.9  the cursor leaves to the right
+ *   15.4  Void slides on, right to left, to a second Tux at the end of the
  *         track; when the loop restarts the track jumps back to the first
  *         Tux unseen (they look identical), so it reads as one endless loop
+ *
+ * Every mode change has a visible cause, as in the app (a mini window only
+ * returns to full size through Restore).
  *
  * Cursor targets are fixed points on the window's final layout (not measured
  * mid-animation), so clicks always land on the button. X and Y move on two
@@ -37,8 +37,8 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
     { id: "void", start: 37 * 60 + 5, fish: 1 },
 ];
 
-const LOOP_MS = 22_800;
-const SLIDE_MS = 1000;
+const LOOP_MS = 17_000;
+const SLIDE_MS = 800;
 const STAGE_H = 480;
 
 // The window's size per mode (timer-window: .at-win, .is-cat, .is-timer)
@@ -49,11 +49,11 @@ const SIZE: Record<TimerMode, { w: number; h: number }> = {
 };
 
 // Click targets, from the window's top-left in its final layout
-const TARGET: Record<TimerPart, { x: number; y: number; mode: TimerMode }> = {
-    resize: { x: 237, y: 20, mode: "default" }, // title bar, between Minimize and Home
-    "cat-only": { x: 147, y: 247, mode: "default" }, // Select Mode's second button
-    "timer-only": { x: 147, y: 205, mode: "default" },
-    restore: { x: 205, y: 19, mode: "timer" }, // top-right corner of the mini window
+const TARGET: Record<TimerPart, { x: number; y: number }> = {
+    resize: { x: 237, y: 20 }, // title bar, between Minimize and Home
+    "timer-only": { x: 147, y: 205 }, // Select Mode's first button
+    "cat-only": { x: 147, y: 247 }, // and its second
+    restore: { x: 205, y: 19 }, // top-right corner of a mini window
 };
 
 type Cursor = { x: number; y: number; on: boolean; down: boolean; ms: number };
@@ -104,7 +104,7 @@ export default function FocusDemo() {
             const { w, h } = SIZE[mode];
             return { x: (stage.offsetWidth - w) / 2 + x, y: (STAGE_H - h) / 2 + y };
         };
-        const target = (part: TimerPart) => onWindow(TARGET[part].mode, TARGET[part].x, TARGET[part].y);
+        const target = (part: TimerPart, mode: TimerMode = "default") => onWindow(mode, TARGET[part].x, TARGET[part].y);
         // Just past the right edge of the stage, where the cursor comes from and goes to
         const offStage = (y: number) => ({ x: stage.offsetWidth + 24, y });
         // Beside the window (outside it) in a given mode
@@ -118,41 +118,51 @@ export default function FocusDemo() {
         const steps: [number, () => void][] = [
             // Back on the first Tux, instantly; the cursor waits off the right edge
             [0, () => set((p) => ({ index: 0, glide: 0, cursor: { ...p.cursor, ...offStage(330), ms: 0, on: false } }))],
-            [3000, () => set({ index: 1, glide: SLIDE_MS })],
-            [6500, () => set({ index: 2 })],
+            [1800, () => set({ index: 1, glide: SLIDE_MS })],
+            [3600, () => set({ index: 2 })],
 
-            // Resize → Select Mode
-            [8800, () => move(target("resize"), 1300)],
-            [10300, () => set({ hot: "resize" })],
-            [10650, () => press("resize")],
-            [10850, () => { release(); set({ hot: null, modal: true }); }],
-
-            // Cat Only
-            [11400, () => move(target("cat-only"), 850)],
-            [12450, () => set({ hot: "cat-only" })],
-            [12750, () => press("cat-only")],
-            [12950, () => { release(); set({ hot: null, modal: false }); move(beside("cat", 40), 700); }],
+            // Resize → Select Mode → Cat Only
+            [4700, () => move(target("resize"), 800)],
+            [5550, () => set({ hot: "resize" })],
+            [5750, () => press("resize")],
+            [5900, () => { release(); set({ hot: null, modal: true }); }],
+            [6200, () => move(target("cat-only"), 500)],
+            [6750, () => set({ hot: "cat-only" })],
+            [6950, () => press("cat-only")],
+            [7100, () => { release(); set({ hot: null, modal: false }); move(beside("cat", 40), 500); }],
             // Shrinks only once the cursor is clear of it
-            [13650, () => set({ mode: "cat" })],
+            [7550, () => set({ mode: "cat" })],
             // Back over the mini window: hover starts as it crosses the edge
-            [14300, () => move(onWindow("cat", 132, 100), 900)],
-            [14750, () => set({ hover: true })],
+            [8100, () => move(onWindow("cat", 132, 100), 550)],
+            [8350, () => set({ hover: true })],
 
-            // Off again (hover ends as it leaves), then Timer Only
-            [16600, () => move(beside("cat", 110), 800)],
-            [17000, () => set({ hover: false })],
-            [17400, () => set({ mode: "timer" })],
+            // Restore (the app's way out of a mini mode) → full window
+            [9400, () => move(target("restore", "cat"), 450)],
+            [9900, () => set({ hot: "restore" })],
+            [10100, () => press("restore")],
+            [10250, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
 
-            // Back in to Restore
-            [18300, () => move(target("restore"), 1000)],
-            [18900, () => set({ hover: true })],
-            [19600, () => set({ hot: "restore" })],
-            [19900, () => press("restore")],
-            [20100, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
+            // Resize → Select Mode → Timer Only
+            [10600, () => move(target("resize"), 500)],
+            [11150, () => set({ hot: "resize" })],
+            [11350, () => press("resize")],
+            [11500, () => { release(); set({ hot: null, modal: true }); }],
+            [11800, () => move(target("timer-only"), 450)],
+            [12300, () => set({ hot: "timer-only" })],
+            [12500, () => press("timer-only")],
+            [12650, () => { release(); set({ hot: null, modal: false }); move(beside("timer", 60), 500); }],
+            [13100, () => set({ mode: "timer" })],
+
+            // Back in to Restore → full window
+            [13500, () => move(target("restore", "timer"), 650)],
+            [13900, () => set({ hover: true })],
+            [14250, () => set({ hot: "restore" })],
+            [14450, () => press("restore")],
+            [14600, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
 
             // Away, and on to Tux
-            [20500, () => move(offStage(380), 1000, false)],
-            [21300, () => set({ index: 3, glide: SLIDE_MS })],
+            [14900, () => move(offStage(380), 700, false)],
+            [15400, () => set({ index: 3, glide: SLIDE_MS })],
         ];
 
         const stop = () => {

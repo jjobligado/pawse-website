@@ -71,7 +71,8 @@ export default function TimerWindow({
 
     return (
         <div className={`at-win${mode === "cat" ? " is-cat" : mode === "timer" ? " is-timer" : ""}${hover ? " is-hover" : ""}`}>
-            <div className="at-titlebar">
+            {/* Keyed by mode: they remount on a mode change and fade in (.at-settle) */}
+            <div key={`bar-${mode}`} className="at-titlebar">
                 <div className="at-title">
                     <img src="/images/logo.png" alt="" className="at-logo" />
                     <span className="at-name">PAWSE</span>
@@ -85,7 +86,7 @@ export default function TimerWindow({
                 </div>
             </div>
 
-            <div className="at-main">
+            <div key={`main-${mode}`} className="at-main">
                 <div className="at-time">
                     <span className="at-digits">{format(seconds)}</span>
                 </div>

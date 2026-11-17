@@ -1119,11 +1119,17 @@ body {
   text-align: left;
   -webkit-font-smoothing: antialiased;
   user-select: none;
-  transition: width 600ms cubic-bezier(0.45, 0.05, 0.25, 1), height 600ms cubic-bezier(0.45, 0.05, 0.25, 1);
+  transition: width 350ms cubic-bezier(0.2, 0.8, 0.2, 1), height 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .at-win img { display: block; max-width: none; }
 .at-win.is-cat { width: 224px; height: 232px; }
 .at-win.is-timer { width: 224px; height: 92px; }
+
+/* On a mode change the window resizes quickly and its new layout fades in as it
+   arrives, instead of popping in clipped (the parts remount, replaying this). */
+.at-titlebar,
+.at-main { animation: at-settle 220ms ease-out 160ms both; }
+@keyframes at-settle { from { opacity: 0; } }
 
 /* Title bar */
 .at-titlebar {
