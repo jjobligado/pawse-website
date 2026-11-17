@@ -28,8 +28,9 @@ import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/co
  * layers with different easings, so every move is a soft arc.
  *
  * The clocks tick for real and keep going across loops, so the two Tux windows
- * always match; the cats play their idle loop. The loop runs only while on
- * screen and the tab is visible; with reduced motion it shows Tux, still.
+ * always match; the cats play their idle loop. It starts when half the panel
+ * is in view and resets to Tux after it has been fully off screen (see sync);
+ * it stops in a hidden tab; with reduced motion it shows Tux, still.
  * Styles: .fd-* and .at-* in globals.css.
  */
 
@@ -95,7 +96,6 @@ export default function FocusDemo() {
         const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
         let timers: number[] = [];
         let ticker: number | undefined;
-        let visible = false;
         let running = false;
 
         const set = (patch: Partial<DemoState> | ((p: DemoState) => Partial<DemoState>)) =>
@@ -184,25 +184,47 @@ export default function FocusDemo() {
             };
             loop();
         };
+        // Starts once half the panel is in view; keeps running while any of it
+        // shows; resets to Tux only after it has been fully off screen for a
+        // moment (so small scrolls at the edge don't restart it). A hidden tab
+        // or reduced motion stops it right away.
+        let ratio = 0;
+        let resetTimer: number | undefined;
+        const reset = () => {
+            stop();
+            setS(START);
+        };
         const sync = () => {
-            const go = visible && !document.hidden && !mq.matches;
             setReduced(mq.matches);
-            if (go) start();
-            else {
-                stop();
-                setS(START);
+            if (document.hidden || mq.matches) {
+                window.clearTimeout(resetTimer);
+                reset();
+                return;
+            }
+            if (ratio >= 0.5) {
+                window.clearTimeout(resetTimer);
+                start();
+            } else if (ratio === 0 && running) {
+                window.clearTimeout(resetTimer);
+                resetTimer = window.setTimeout(reset, 600);
+            } else if (ratio > 0) {
+                window.clearTimeout(resetTimer);
             }
         };
 
-        const io = new IntersectionObserver(([entry]) => {
-            visible = entry.isIntersecting;
-            sync();
-        });
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                ratio = entry.isIntersecting ? entry.intersectionRatio : 0;
+                sync();
+            },
+            { threshold: [0, 0.5] },
+        );
         io.observe(stage);
         document.addEventListener("visibilitychange", sync);
         mq.addEventListener("change", sync);
         return () => {
             stop();
+            window.clearTimeout(resetTimer);
             io.disconnect();
             document.removeEventListener("visibilitychange", sync);
             mq.removeEventListener("change", sync);
