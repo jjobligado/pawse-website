@@ -10,7 +10,7 @@ export default function TimerMockup({
     label?: string;
 }) {
     return (
-        <div className="w-full lg:w-[56%] p-8 sm:py-12 sm:px-20 rounded-3xl border border-stroke surface-sky flex items-center justify-center shrink-0">
+        <div className="w-full p-8 sm:py-12 sm:px-20 rounded-3xl border border-stroke surface-sky flex items-center justify-center">
             <div role="img" aria-label={label} className="relative w-[292px] h-[430px] bg-mockup-surface rounded-lg shadow-screenshot">
                 {/* Timer Text */}
                 <div className="absolute left-[61px] top-[34px] w-[171px] h-[77px] flex items-start justify-center">

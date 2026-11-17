@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
+import SmoothScrollProvider from "@/components/smooth-scroll-provider";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site-config";
 
 const inter = Inter({
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        <SmoothScrollProvider />
         <ScrollToTop />
         <Header />
         <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">

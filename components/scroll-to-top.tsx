@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { jumpToTop } from "@/lib/smooth-scroll";
 
 /**
  * Every page change starts at the very top. Next.js on its own scrolls the
@@ -19,7 +20,7 @@ export default function ScrollToTop() {
             return;
         }
         if (window.location.hash) return;
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        jumpToTop();
     }, [pathname]);
 
     return null;

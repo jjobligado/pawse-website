@@ -235,7 +235,7 @@ export default function FocusDemo() {
         <div
             role="img"
             aria-label="The PAWSE timer window cycling through Tux, Ginger and Void mid-session, then switching to the Cat Only and Timer Only mini windows and back"
-            className="fd-panel w-full lg:w-[56%] overflow-hidden rounded-3xl border border-stroke surface-sky shrink-0"
+            className="fd-panel w-full overflow-hidden rounded-3xl border border-stroke surface-sky"
         >
             <div className="fd-frame" aria-hidden="true">
                 <div ref={stageRef} className="fd-stage">

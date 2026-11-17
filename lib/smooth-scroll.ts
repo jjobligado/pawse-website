@@ -1,5 +1,21 @@
+import type Lenis from "lenis";
+
 let activeAnimationId: number | null = null;
 let activeCleanup: (() => void) | null = null;
+
+// The site-wide Lenis instance (set by SmoothScrollProvider). Scripted scrolls go
+// through it while it runs; writing window.scrollTo underneath it would fight its easing.
+let lenis: Lenis | null = null;
+
+export function setLenis(instance: Lenis | null) {
+    lenis = instance;
+}
+
+/** Jump to the very top with no animation (used on page changes). */
+export function jumpToTop() {
+    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+    else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
 
 export interface SmoothScrollOptions {
     duration?: number;
@@ -80,6 +96,16 @@ export function smoothScrollTo(
     const scrollMarginTop = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
     const offset = scrollMarginTop > 0 ? scrollMarginTop : (options?.offset ?? 74);
     const targetY = Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset);
+
+    if (lenis) {
+        const distance = Math.abs(targetY - window.scrollY);
+        lenis.scrollTo(targetY, {
+            duration: (options?.duration ?? Math.min(Math.max(650, Math.pow(distance, 0.42) * 55), 980)) / 1000,
+            easing: strategicDecelEase,
+            onComplete: () => options?.onComplete?.(),
+        });
+        return;
+    }
 
     const startY = window.scrollY;
     const difference = targetY - startY;

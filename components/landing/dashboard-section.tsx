@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Parallax from "@/components/parallax";
 import { DashboardSpreadSection } from "@/components/pixel-divider";
 import DashboardWindow from "@/components/app-ui/dashboard-window";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
@@ -43,9 +44,9 @@ export default function DashboardSection() {
                 </div>
 
                 {/* The app's Dashboard, rebuilt from the desktop app and scaled as one piece */}
-                <div className="w-full max-w-[600px] lg:flex-1 shrink-0">
+                <Parallax depth={0.05} className="w-full max-w-[600px] lg:flex-1 shrink-0">
                     <DashboardWindow />
-                </div>
+                </Parallax>
             </div>
         </DashboardSpreadSection>
     );
