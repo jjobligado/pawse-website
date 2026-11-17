@@ -5,12 +5,9 @@ import { SectionSubtitle, SectionTitle } from "./section-heading";
 
 /**
  * What's next, as three more instant photos on the same wall as How It Works,
- * except these haven't developed yet: the picture is blurred behind frosted
- * glass with a lock on it. Hovering the print (Polaroid's pick-up) lets the
- * blur ease off a touch, a peek, but never enough to reveal it.
- *
- * Informational only: no links. Each caption ends with a small "In the works"
- * tag where How It Works has its section link, so the two rows feel related.
+ * except these are still developing: like a fresh instant print, the picture is
+ * a soft blur under a milky haze. It stays that way (no hover reveal); the
+ * Polaroid's usual pick-up is the only motion. Informational only: no links.
  */
 
 const ITEMS: {
@@ -50,28 +47,16 @@ const ITEMS: {
     },
 ];
 
-/** The undeveloped picture: the feature's icon, blurred under frosted glass, with a lock. */
-function LockedPhoto({ icon }: { icon: string }) {
+/** The still-developing picture: the feature's icon, blurred under a milky haze. */
+function DevelopingPhoto({ icon }: { icon: string }) {
     return (
         <div className="relative flex items-center justify-center aspect-[4/3]">
-            <Image
-                src={icon}
-                alt=""
-                width={96}
-                height={96}
-                className="w-24 h-24 object-contain blur-[5px] opacity-35 transition-[filter] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-hover:blur-[3px]"
-            />
-            {/* Frosted glass over the print */}
-            <div aria-hidden="true" className="absolute inset-0 bg-white/25 backdrop-blur-[2px]" />
-            <span
+            <Image src={icon} alt="" width={96} height={96} className="w-24 h-24 object-contain blur-[6px] opacity-50" />
+            {/* The milky film of a print that hasn't come through yet */}
+            <div
                 aria-hidden="true"
-                className="absolute w-11 h-11 rounded-full bg-white/90 text-ink-strong flex items-center justify-center shadow-[0_1px_2px_rgb(30_30_40/0.12),0_6px_14px_-6px_rgb(30_30_40/0.3)]"
-            >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="4" y="11" width="16" height="10" rx="2" />
-                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                </svg>
-            </span>
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgb(255_255_255/0.15)_0%,rgb(255_255_255/0.5)_100%)] backdrop-blur-[2px]"
+            />
         </div>
     );
 }
@@ -91,8 +76,8 @@ export default function ComingSoonSection() {
                         <Polaroid
                             tint={item.tint}
                             tape={item.tape}
-                            photo={<LockedPhoto icon={item.icon} />}
-                            className={`group w-[280px] md:w-full md:max-w-[320px] md:mx-auto h-full ${item.tilt}`}
+                            photo={<DevelopingPhoto icon={item.icon} />}
+                            className={`w-[280px] md:w-full md:max-w-[320px] md:mx-auto h-full ${item.tilt}`}
                         >
                             <div className="flex flex-1 flex-col items-center gap-2 text-center">
                                 <h3 className="text-lg font-semibold text-ink-strong leading-snug tracking-[0.005em]">
@@ -101,9 +86,6 @@ export default function ComingSoonSection() {
                                 <p className="w-full text-body-sm text-ink-soft leading-relaxed text-balance">
                                     {item.body}
                                 </p>
-                                <span className="mt-auto inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-ink-soft bg-[#F2F4F7] ring-1 ring-inset ring-[#E3E7EC]">
-                                    In the works
-                                </span>
                             </div>
                         </Polaroid>
                     </li>
