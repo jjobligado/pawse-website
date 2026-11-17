@@ -1140,6 +1140,16 @@ body {
 .at-ctl.is-hot { background: rgb(0 0 0 / 0.05); }
 .at-divider { width: 2px; height: 24px; margin: 0 4px; background: var(--at-stroke); }
 
+/* The app's clock style (.font-pixel-num-*: Pixeloid Sans at weight 500, which
+   the app maps to PixeloidSans-Bold, plus a faint same-colour glow). Size is
+   set by the caller; the glow scales with it (1.2px at 48px). */
+.app-clock {
+  font-family: "Pixeloid Sans", var(--font-pixelify), monospace;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 0.025em currentColor;
+}
+
 /* Main content */
 /* The app's index.css .main-content (flex column, space-between) with timer.css's padding */
 .at-main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 20px 22px; overflow: hidden; }

@@ -97,7 +97,7 @@ export default function LaptopDesktop() {
                     </span>
                 </div>
                 <div className="flex-1 flex flex-col items-center pt-[2.4cqw]">
-                    <span className="font-pixel font-bold text-[5.2cqw] leading-none text-ink-strong tabular-nums">{time}</span>
+                    <span className="app-clock text-[5.2cqw] leading-none text-ink-strong">{time}</span>
                     <span className="mt-[0.9cqw] flex gap-[0.35cqw]">
                         {[0, 1, 2, 3].map((i) => (
                             <Image
