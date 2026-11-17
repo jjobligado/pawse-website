@@ -13,10 +13,11 @@ import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/co
  *   5.6  hovering Cat Only shows its controls
  *   6.6  the window becomes Timer Only (no click, to keep the loop short)
  *   8.0  hover, Restore: back to the full window
- *   8.6  one glide back to Tux, cursor fades; loops at 10.0
+ *   8.7  slides on to a second Tux at the end of the track; at 10.0 the
+ *        track jumps (unseen) back to the first Tux, so it reads as a loop
  *
- * The clocks tick for real, the cats play their idle loop. The stage is laid
- * out at 400x470 and scaled as one piece (.fd-* in globals.css). The loop
+ * The clocks tick for real across loops (so the two Tux windows always match),
+ * the cats play their idle loop. The stage is laid out at 360x460 and scaled as one piece (.fd-* in globals.css). The loop
  * runs only while on screen and the tab is visible; with reduced motion it
  * shows Tux's window, still.
  */
@@ -28,9 +29,11 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
 ];
 
 const LOOP_MS = 10_000;
-const STAGE_W = 400;
+const STAGE_W = 360;
+// Slot width + gap (.fd-track): one carousel step
+const STEP = 334;
 // Where the cursor waits, off the window, before it fades in
-const CURSOR_HOME = { x: 330, y: 440 };
+const CURSOR_HOME = { x: 310, y: 440 };
 
 type Cursor = { x: number; y: number; on: boolean; down: boolean; ms: number };
 
@@ -99,7 +102,8 @@ export default function FocusDemo() {
         const release = () => set((p) => ({ down: null, cursor: { ...p.cursor, down: false } }));
 
         const steps: [number, () => void][] = [
-            [0, () => setS(START)],
+            // Back on the first Tux, instantly: it looks exactly like the copy we ended on
+            [0, () => set({ index: 0, glide: 0 })],
             [1600, () => set({ index: 1, glide: 450 })],
             [3200, () => set({ index: 2 })],
             [4000, () => move(point("resize"), 550)],
@@ -118,9 +122,10 @@ export default function FocusDemo() {
             [8300, () => set({ hot: "restore" })],
             [8380, () => press("restore")],
             [8500, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
-            [8600, () => { set({ index: 0, glide: 900 }); move(CURSOR_HOME, 600, false); }],
+            [8600, () => move(CURSOR_HOME, 600, false)],
+            [8700, () => set({ index: 3, glide: 450 })],
         ];
-        for (let t = 1000; t < LOOP_MS; t += 1000) steps.push([t, () => set({ sec: t / 1000 })]);
+        for (let t = 1000; t <= LOOP_MS; t += 1000) steps.push([t === LOOP_MS ? t - 1 : t, () => set((p) => ({ sec: p.sec + 1 }))]);
 
         const stop = () => {
             timers.forEach((id) => window.clearTimeout(id));
@@ -165,18 +170,18 @@ export default function FocusDemo() {
         <div
             role="img"
             aria-label="The PAWSE timer window cycling through Tux, Ginger and Void mid-session, then switching to the Cat Only and Timer Only mini windows and back"
-            className="w-full lg:w-[56%] px-4 py-6 sm:px-12 sm:py-8 rounded-3xl border border-stroke surface-sky shrink-0"
+            className="w-full max-w-[440px] lg:max-w-none lg:w-[42%] mx-auto lg:mx-0 overflow-hidden rounded-3xl border border-stroke surface-sky shrink-0"
         >
             <div className="fd-frame" aria-hidden="true">
                 <div ref={stageRef} className="fd-stage">
                     <div
                         className="fd-track"
-                        style={{ transform: `translateX(-${s.index * 360}px)`, ["--fd-glide" as string]: `${s.glide}ms` }}
+                        style={{ transform: `translateX(-${s.index * STEP}px)`, ["--fd-glide" as string]: `${s.glide}ms` }}
                     >
-                        {CATS.map((cat) => {
+                        {[...CATS, CATS[0]].map((cat, i) => {
                             const isVoid = cat.id === "void";
                             return (
-                                <div key={cat.id} data-cat={cat.id} className="fd-slot">
+                                <div key={i} data-cat={i < CATS.length ? cat.id : undefined} className="fd-slot">
                                     <TimerWindow
                                         cat={cat.id}
                                         seconds={cat.start - s.sec}

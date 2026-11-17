@@ -839,7 +839,7 @@ body {
    ================================================================== */
 @font-face {
   font-family: "Pixeloid Sans";
-  src: url("/fonts/pixeloid-sans-digits.woff") format("woff");
+  src: url("/fonts/pixeloid-sans-digits.woff") format("woff"); /* the app maps weight 500 to PixeloidSans-Bold.ttf */
   font-weight: 500;
   font-display: swap;
   unicode-range: U+0030-003A; /* digits and the colon */
@@ -1023,34 +1023,32 @@ body {
 /* ==================================================================
    App timer replica + Focus demo (components/app-ui/timer-window.tsx,
    components/landing/focus-demo.tsx). Values from the app's timer.css /
-   index.css (test-branch). The demo stage is laid out at 400x470 and
+   index.css (test-branch). The demo stage is laid out at 360x460 and
    scaled as one piece to its frame, like the Dashboard.
    ================================================================== */
 .fd-frame {
   container-type: inline-size;
   position: relative;
   width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  aspect-ratio: 400 / 470;
+  aspect-ratio: 360 / 460;
 }
 .fd-stage {
   position: absolute;
   top: 0;
   left: 0;
-  width: 400px;
-  height: 470px;
-  transform: scale(tan(atan2(100cqw, 400px)));
+  width: 360px;
+  height: 460px;
+  transform: scale(tan(atan2(100cqw, 360px)));
   transform-origin: 0 0;
   overflow: hidden;
 }
-/* The carousel: one 294px slot per cat, 360px apart, so neighbours sit off stage */
+/* The carousel: one 294px slot per cat, 334px apart, so neighbours sit off stage */
 .fd-track {
   position: absolute;
-  top: 24px;
-  left: 53px;
+  top: 19px;
+  left: 33px;
   display: flex;
-  gap: 66px;
+  gap: 40px;
   transition: transform var(--fd-glide, 450ms) cubic-bezier(0.65, 0, 0.35, 1);
 }
 .fd-slot { width: 294px; height: 422px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1142,7 +1140,8 @@ body {
 .at-divider { width: 2px; height: 24px; margin: 0 4px; background: var(--at-stroke); }
 
 /* Main content */
-.at-main { padding: 10px 20px 22px; }
+/* The app's index.css .main-content (flex column, space-between) with timer.css's padding */
+.at-main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 20px 22px; overflow: hidden; }
 .at-time { width: 100%; padding-top: 8px; text-align: center; line-height: 1; }
 .at-digits { font: 500 48px/1 var(--at-num); font-variant-numeric: tabular-nums; text-shadow: 0 0 1.2px currentColor; }
 .at-fish { display: flex; justify-content: center; gap: 8px; }
