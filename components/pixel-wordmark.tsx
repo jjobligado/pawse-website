@@ -24,7 +24,7 @@ const COLOR_ACCENT: RGB = [211, 237, 255]; // #D3EDFF (soft sky highlight for en
 
 const ENTRANCE_TOTAL_MS = 1550;
 const RIPPLE_DURATION_MS = 1400;
-const BLEED_RATIO = 0.24;
+const BLEED_RATIO = 0.12;
 const LETTERS = ["P", "A", "W", "S", "E"] as const;
 
 interface RawGlyph {
@@ -141,6 +141,7 @@ export default function PixelWordmark() {
         let width = 0;
         let height = 0;
         let bleedY = 0;
+        let yOffset = 0;
         let step = 0;
         let box = 0;
         let cols = 82;
@@ -275,7 +276,7 @@ export default function PixelWordmark() {
             step = width / cols;
             box = step * 0.88;
             height = rect.height;
-            const yOffset = Math.max(0, (height - rows * step) / 2);
+            yOffset = Math.max(0, (height - rows * step) / 2);
             bleedY = Math.round(height * BLEED_RATIO);
             haloRadius = Math.max(76, Math.min(145, width * 0.11));
 
@@ -318,17 +319,19 @@ export default function PixelWordmark() {
 
             const radius = box * 0.15;
 
-            // 1. Faint background grid around pointer (uniform box size, faded by opacity)
+            // 1. Faint background grid around pointer (aligned to PAWSE grid, uniform box size)
             if (!isReduced && hoverStrength > 0.01 && pointerX > -1e3) {
                 const cMin = Math.max(0, Math.floor((pointerX - haloRadius) / step));
                 const cMax = Math.min(cols - 1, Math.ceil((pointerX + haloRadius) / step));
-                const rMin = Math.max(0, Math.floor((pointerY - bleedY - haloRadius) / step));
-                const rMax = Math.min(rows - 1, Math.ceil((pointerY - bleedY + haloRadius) / step));
+                const gridOriginY = bleedY + yOffset;
+                const rMin = Math.floor((pointerY - gridOriginY - haloRadius) / step);
+                const rMax = Math.ceil((pointerY - gridOriginY + haloRadius) / step);
 
                 for (let r = rMin; r <= rMax; r++) {
+                    const gy = gridOriginY + r * step + step / 2;
+                    if (gy < box / 2 || gy > canvasHeight - box / 2) continue;
                     for (let c = cMin; c <= cMax; c++) {
                         const gx = c * step + step / 2;
-                        const gy = bleedY + r * step + step / 2;
                         const dist = Math.hypot(gx - pointerX, gy - pointerY);
                         if (dist > haloRadius) continue;
                         const alpha = 0.2 * (1 - dist / haloRadius) * hoverStrength;
@@ -453,12 +456,14 @@ export default function PixelWordmark() {
             if (!glyphData || reducedMq.matches || !finePointerMq.matches) return;
             const rect = wrap.getBoundingClientRect();
             const lx = e.clientX - rect.left;
-            const ly = e.clientY - rect.top + bleedY;
+            const lyLocal = e.clientY - rect.top;
+            const ly = lyLocal + bleedY;
+            const vPad = haloRadius * 0.45;
             const inside =
-                lx > -haloRadius &&
-                lx < width + haloRadius &&
-                e.clientY - rect.top > -haloRadius &&
-                e.clientY - rect.top < height + haloRadius;
+                lx > -haloRadius * 0.5 &&
+                lx < width + haloRadius * 0.5 &&
+                lyLocal > -vPad &&
+                lyLocal < height + vPad;
 
             if (inside) {
                 pointerX = lx;

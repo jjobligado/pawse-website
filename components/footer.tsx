@@ -99,12 +99,12 @@ export default function Footer() {
                 </div>
 
                 {/* Interactive symmetrical pixel PAWSE wordmark */}
-                <div className="mt-16 md:mt-24 mb-8 md:mb-10">
+                <div className="mt-16 md:mt-24 mb-5 md:mb-7">
                     <PixelWordmark />
                 </div>
 
                 {/* Bottom sub-footer bar */}
-                <div className="pt-5 border-t border-ink/14 flex justify-center text-center">
+                <div className="pt-4 border-t border-ink/14 flex justify-center text-center">
                     <p className="text-caption text-ink-soft">
                         © 2026 PAWSE · Built by meowskrrt. All rights reserved.
                     </p>

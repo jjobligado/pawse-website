@@ -691,7 +691,7 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
                 />
 
                 {/* Unmasked Foreground Footer Content (z-10) */}
-                <footer className="relative z-10 w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 pt-12 pb-8 md:pt-16 md:pb-10">
+                <footer className="relative z-10 w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 pt-12 pb-5 md:pt-16 md:pb-6">
                     {children}
                 </footer>
             </div>
