@@ -402,11 +402,6 @@ export default function HeroSection() {
                                             </a>
                                         ))}
                                     </div>
-                                    {/* Mac buyers often don't know their chip; tell them where to look */}
-                                    <p className="mt-1 mx-1.5 px-1.5 pt-2.5 pb-1.5 border-t border-stroke text-micro leading-snug text-muted text-left">
-                                        <span className="font-semibold text-ink">Which Mac do I have?</span>{" "}
-                                        Apple menu → About This Mac. &ldquo;Chip: Apple M&hellip;&rdquo; is Apple Silicon; &ldquo;Processor: Intel&rdquo; is Intel.
-                                    </p>
                                 </div>
                             </div>
                             </div>
