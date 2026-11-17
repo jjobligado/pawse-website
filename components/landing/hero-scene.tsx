@@ -349,14 +349,17 @@ export function WindowSky({
     phase,
     farRef,
     nearRef,
+    entrance = true,
 }: {
     phase: SkyPhase;
     farRef?: React.Ref<HTMLDivElement>;
     nearRef?: React.Ref<HTMLDivElement>;
+    /** Play the load-in settle (hero only; scenes further down skip it). */
+    entrance?: boolean;
 }) {
     const theme = THEMES[phase];
     return (
-        <div aria-hidden="true" className="absolute inset-0 overflow-hidden animate-hero-sky">
+        <div aria-hidden="true" className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}>
             {/* Sky gradients, crossfaded when the phase changes */}
             {SKY_PHASES.map((p) => (
                 <div
@@ -453,11 +456,14 @@ const RAIL = "absolute wood-h shadow-[inset_0_1px_0_rgb(255_232_205/0.22),inset_
  * 60 degrees. Built like a real sash: two stiles, a top rail, a deeper bottom
  * rail, and glazing bars (2 x 3 panes) over clear, faintly tinted glass.
  */
-function CasementPanel({ side }: { side: "left" | "right" }) {
+function CasementPanel({ side, alwaysOpen }: { side: "left" | "right"; alwaysOpen?: boolean }) {
     const left = side === "left";
+    // Phones: panels nearly closed (the hero's copy sits above the window there),
+    // unless the copy sits on the glass at every size.
+    const phone = alwaysOpen ? "w-[clamp(72px,20vw,290px)] [--a:60deg]" : "w-[calc(50%_-_clamp(9px,1.45vw,20px))] [--a:14deg]";
     return (
         <div
-            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} w-[calc(50%_-_clamp(9px,1.45vw,20px))] sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] [--a:14deg] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
+            className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} ${phone} sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
             {/* Glass: a cool tint, one broad glint and one thin one */}
@@ -525,13 +531,13 @@ function Hinge({ side, at }: { side: "left" | "right"; at: "top" | "bottom" }) {
  * casement panels opened out on iron hinges. The middle is open air, so nothing
  * crosses the copy. The sill is drawn by the hero, since the cats sit on it.
  */
-export function WindowFrame() {
+export function WindowFrame({ alwaysOpen = false }: { alwaysOpen?: boolean } = {}) {
     const jamb = "absolute inset-y-0 w-[clamp(9px,1.45vw,20px)] wood-v";
     return (
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
             {/* Panels hang outside, behind the frame */}
-            <CasementPanel side="left" />
-            <CasementPanel side="right" />
+            <CasementPanel side="left" alwaysOpen={alwaysOpen} />
+            <CasementPanel side="right" alwaysOpen={alwaysOpen} />
 
             {/* Depth: light comes from above, so the head shades the top of the opening, the jambs a little, the bottom not at all */}
             <div className="absolute inset-0 shadow-[inset_0_22px_28px_-20px_rgb(40_20_10/0.3),inset_14px_0_22px_-18px_rgb(40_20_10/0.2),inset_-14px_0_22px_-18px_rgb(40_20_10/0.2)]" />
@@ -562,6 +568,36 @@ function Bird({ className = "" }: { className?: string }) {
             <PixelArt rows={BIRD_UP} palette={palette} className="absolute inset-0 w-full h-full animate-wing-up" />
             <PixelArt rows={BIRD_DOWN} palette={palette} className="absolute inset-0 w-full h-full animate-wing-down" />
         </span>
+    );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sill                                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The window sill: a deep walnut board, a little wider than the window, seen
+ * slightly from above (its top, lit by the window, then its rounded front edge),
+ * casting a shadow on the wall. `children` sit on it (cats, plant), positioned
+ * against the board.
+ */
+export function WindowSill({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+    return (
+        <div className={`relative w-[calc(100%_+_2*var(--so))] ${className}`}>
+            <div className="relative h-3.5 sm:h-[18px] lg:h-6 xl:h-7 wood-h [--wood:#94634A] [--si:calc(var(--so)*0.85)] [clip-path:polygon(var(--si)_0,calc(100%_-_var(--si))_0,100%_100%,0_100%)] shadow-[inset_0_1px_0_rgb(40_20_10/0.25),inset_0_4px_6px_-3px_rgb(40_20_10/0.28)]">
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,rgb(255_236_210/0.2))]" />
+            </div>
+            <div className="h-2 sm:h-2.5 lg:h-3 xl:h-3.5 rounded-b-[4px] wood-h [--wood:#6A422C] shadow-[inset_0_1px_0_rgb(255_226_196/0.4),inset_0_-1px_0_rgb(30_14_4/0.55),0_1px_2px_rgb(40_20_10/0.3)]" />
+            <div aria-hidden="true" className="absolute left-[3%] right-[3%] top-[calc(100%_-_4px)] h-3 sm:h-4 lg:h-5 -z-10 rounded-[50%] bg-[rgb(40_20_10/0.22)] blur-[6px] sm:blur-[8px] pointer-events-none" />
+            {children && <div className="absolute inset-0">{children}</div>}
+        </div>
+    );
+}
+
+/** Soft contact shadow under a cat sitting on the sill. */
+export function SillShadow() {
+    return (
+        <span aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[3px] sm:bottom-1 lg:bottom-1.5 w-3/4 h-2 sm:h-2.5 lg:h-3 rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[2px]" />
     );
 }
 
