@@ -2,7 +2,9 @@ import CompanionButton, { type AppCompanion } from "@/components/app-ui/companio
 
 /**
  * The three companions as the app's own picker buttons, in a row (stacked on
- * phones). Static: no entrance motion. The life comes from the cats' idle
+ * phones). Each card scales as one piece with its width (see .app-cat-scale
+ * in globals.css): fluid up to 330px, and in the row the three share the space.
+ * Static: no entrance motion. The life comes from the cats' idle
  * routine and the app's hover.
  */
 
@@ -32,7 +34,7 @@ export default function CompanionCards() {
     return (
         <ul className="relative w-full max-w-[1110px] flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 xl:gap-10 py-2">
             {CARDS.map((card) => (
-                <li key={card.companion.id} className="w-[280px] sm:w-[310px] lg:w-[270px] xl:w-[330px] shrink-0">
+                <li key={card.companion.id} className="app-cat-scale w-full max-w-[330px] lg:flex-1 lg:min-w-0">
                     <CompanionButton companion={card.companion} initialPose={card.initialPose} />
                 </li>
             ))}
