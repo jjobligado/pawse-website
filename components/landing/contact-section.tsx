@@ -6,7 +6,7 @@ import { usePlatform, type DetectedPlatform } from "@/hooks/use-platform";
 import { isContactFormConfigured, sendContactMessage } from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 import { SectionTitle } from "./section-heading";
-import SpriteCat from "./sprite-cat";
+import SpriteCat, { type FrameStep } from "./sprite-cat";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 const OS_NAMES: Partial<Record<DetectedPlatform, string>> = {
@@ -17,6 +17,21 @@ const OS_NAMES: Partial<Record<DetectedPlatform, string>> = {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;
+
+const GINGER_IDLE: readonly FrameStep[] = [
+    { frame: 0, ms: 2400 },
+    { frame: 1, ms: 220 },
+    { frame: 2, ms: 750 },
+    { frame: 1, ms: 180 },
+];
+
+const GINGER_ACTION: readonly FrameStep[] = [
+    { frame: 1, ms: 150 },
+    { frame: 2, ms: 320 },
+    { frame: 1, ms: 150 },
+    { frame: 2, ms: 420 },
+    { frame: 0, ms: 150 },
+];
 
 type FieldErrors = Partial<Record<"email" | "subject" | "message", string>>;
 
@@ -118,201 +133,197 @@ export default function ContactSection() {
             id="contact"
             className="scroll-mt-20 w-full max-w-content mx-auto py-12 md:py-24 px-6 md:px-12 lg:px-20 bg-white"
         >
-            <div className="w-full flex flex-col lg:flex-row lg:items-center justify-between gap-10 lg:gap-14">
-                {/* Left column: section heading and subtext centered vertically beside the form */}
-                <div className="w-full lg:w-[40%] flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
-                    <SectionTitle className="text-center lg:text-left">
+            <div className="w-full rounded-card-lg border-2 border-stroke bg-white shadow-raised overflow-hidden flex flex-col lg:flex-row">
+                {/* Left pane: sky intro + Ginger resting in the lower-left corner */}
+                <div className="relative overflow-hidden lg:w-[42%] surface-sky p-6 sm:p-8 lg:p-10 pb-20 sm:pb-36 lg:pb-40 flex flex-col items-start text-left gap-3.5">
+                    <SectionTitle className="text-left">
                         Contact Us
                     </SectionTitle>
-                    <p className="max-w-[440px] lg:max-w-[460px] text-base md:text-lg text-muted leading-relaxed text-pretty">
+                    <p className="max-w-[420px] text-base md:text-lg text-ink-soft leading-relaxed text-pretty">
                         Have questions, feedback, or need support? Reach out and our
                         team will get back to you.
                     </p>
+
+                    {/* Ginger portrait sits flush in the bottom-left corner (mirrored to face the form) */}
+                    <div className="absolute bottom-0 left-0 -scale-x-100">
+                        <SpriteCat
+                            idle={{
+                                src: "/sprites/ginger-portrait-idle-sheet.png",
+                                frames: 3,
+                            }}
+                            action={{
+                                src: "/sprites/ginger-portrait-idle-sheet.png",
+                                frames: 3,
+                            }}
+                            idleSequence={GINGER_IDLE}
+                            actionSequence={GINGER_ACTION}
+                            label="Say hi to Ginger"
+                            className="w-16 h-16 sm:w-32 sm:h-32"
+                        />
+                    </div>
                 </div>
 
-                {/* Right column: Tux peeking above the form card */}
-                <div className="w-full lg:w-[56%] max-w-[640px] lg:max-w-none mx-auto lg:mx-0 pt-4 sm:pt-14 lg:pt-8">
-                    <div className="relative">
-                        {/* Tux peeking over the card's top border */}
-                        <div className="pointer-events-auto absolute bottom-full right-6 sm:right-9 z-10 translate-y-[2px]">
-                            <SpriteCat
-                                idle={{
-                                    src: "/sprites/tux-head-peek-sheet.png",
-                                    frames: 4,
-                                }}
-                                action={{
-                                    src: "/sprites/tux-head-peek-sheet.png",
-                                    frames: 4,
-                                }}
-                                label="Say hi to Tux"
-                                idleHoldMs={2800}
-                                frameMs={160}
-                                className="w-16 h-16 sm:w-32 sm:h-32"
-                            />
-                        </div>
-
-                        <div className="relative w-full p-5 sm:p-8 rounded-card-lg border-2 border-stroke surface-wash shadow-raised">
-                            {status.state === "sent" ? (
-                                <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3.5">
-                                    <div aria-hidden="true" className="flex items-center gap-2">
-                                        {["orange", "tuxedo", "black"].map((fish, i) => (
-                                            <Image
-                                                key={fish}
-                                                src={`/images/completed-${fish}-fish.png`}
-                                                alt=""
-                                                width={32}
-                                                height={32}
-                                                className={`w-8 h-8 [image-rendering:pixelated] drop-shadow-[0_2px_3px_rgba(0,0,0,0.12)] ${i === 1 ? "-scale-x-100" : ""}`}
-                                            />
-                                        ))}
-                                    </div>
-                                    <h3
-                                        ref={successHeadingRef}
-                                        tabIndex={-1}
-                                        className="font-pixel text-2xl font-semibold text-ink focus:outline-none"
-                                    >
-                                        Message sent
-                                    </h3>
-                                    <p role="status" className="max-w-[420px] text-body-sm text-muted leading-relaxed">
-                                        Thanks{name.trim() ? `, ${name.trim()}` : ""}. We&apos;ve
-                                        received your message and will reply
-                                        to <span className="font-medium text-ink break-all">{email.trim()}</span>.
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={handleReset}
-                                        className="mt-2 rounded-pill bg-[#EAF5FD] px-4 py-1.5 text-sm font-medium text-[#1A6CA3] ring-1 ring-inset ring-[#CFE6F8] transition-colors duration-150 hover:bg-[#DDEFFC] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
-                                    >
-                                        Send another message
-                                    </button>
-                                </div>
-                            ) : (
-                                <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-                                    {/* Name and email side by side from sm up; stacked on phones */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                        <Field id="contact-name" label="Name" optional>
-                                            <input
-                                                id="contact-name"
-                                                type="text"
-                                                name="name"
-                                                autoComplete="name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                maxLength={100}
-                                                disabled={isSending}
-                                                className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                                            />
-                                        </Field>
-
-                                        <Field id="contact-email" label="Email" error={errors.email}>
-                                            <input
-                                                ref={emailRef}
-                                                id="contact-email"
-                                                type="email"
-                                                name="email"
-                                                autoComplete="email"
-                                                inputMode="email"
-                                                value={email}
-                                                onChange={(e) => updateEmail(e.target.value)}
-                                                placeholder="name@example.com"
-                                                maxLength={254}
-                                                disabled={isSending}
-                                                aria-required="true"
-                                                aria-invalid={errors.email ? true : undefined}
-                                                aria-describedby={errors.email ? "contact-email-error" : undefined}
-                                                className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                                            />
-                                        </Field>
-                                    </div>
-
-                                    <Field id="contact-subject" label="Subject" error={errors.subject}>
-                                        <input
-                                            ref={subjectRef}
-                                            id="contact-subject"
-                                            type="text"
-                                            name="subject"
-                                            value={subject}
-                                            onChange={(e) => updateSubject(e.target.value)}
-                                            placeholder="What's this about?"
-                                            maxLength={150}
-                                            disabled={isSending}
-                                            aria-required="true"
-                                            aria-invalid={errors.subject ? true : undefined}
-                                            aria-describedby={errors.subject ? "contact-subject-error" : undefined}
-                                            className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                                        />
-                                    </Field>
-
-                                    <Field id="contact-message" label="Message" error={errors.message}>
-                                        <textarea
-                                            ref={messageRef}
-                                            id="contact-message"
-                                            name="message"
-                                            rows={5}
-                                            value={message}
-                                            onChange={(e) => updateMessage(e.target.value)}
-                                            placeholder="How can we help? For bugs, include what happened and your PAWSE version."
-                                            maxLength={5000}
-                                            disabled={isSending}
-                                            aria-required="true"
-                                            aria-invalid={errors.message ? true : undefined}
-                                            aria-describedby={errors.message ? "contact-message-error" : undefined}
-                                            className={`px-3.5 py-3 resize-y min-h-[132px] leading-relaxed ${INPUT_CLASSES}`}
-                                        />
-                                    </Field>
-
-                                    {/* Honeypot: hidden from people and assistive tech; bots tend to tick it */}
-                                    <input
-                                        type="checkbox"
-                                        name="botcheck"
-                                        checked={botcheck}
-                                        onChange={(e) => setBotcheck(e.target.checked)}
-                                        tabIndex={-1}
-                                        aria-hidden="true"
-                                        className="hidden"
+                {/* Right pane: message form */}
+                <div className="lg:w-[58%] border-t-2 lg:border-t-0 lg:border-l-2 border-stroke surface-wash p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
+                    {status.state === "sent" ? (
+                        <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3.5">
+                            <div aria-hidden="true" className="flex items-center gap-2">
+                                {["orange", "tuxedo", "black"].map((fish, i) => (
+                                    <Image
+                                        key={fish}
+                                        src={`/images/completed-${fish}-fish.png`}
+                                        alt=""
+                                        width={32}
+                                        height={32}
+                                        className={`w-8 h-8 [image-rendering:pixelated] drop-shadow-[0_2px_3px_rgba(0,0,0,0.12)] ${i === 1 ? "-scale-x-100" : ""}`}
                                     />
-
-                                    {/* Delivery problems (not field errors), always with the email fallback */}
-                                    {(status.state === "error" || !isContactFormConfigured) && (
-                                        <div
-                                            role="alert"
-                                            className="flex items-start gap-2.5 rounded-control border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger leading-relaxed"
-                                        >
-                                            <AlertIcon className="mt-0.5" />
-                                            <p>
-                                                {status.state === "error"
-                                                    ? status.reason
-                                                    : "The contact form is unavailable right now."}{" "}
-                                                Please email us at{" "}
-                                                <a
-                                                    href={`mailto:${CONTACT_EMAIL}`}
-                                                    className="font-medium link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                                                >
-                                                    {CONTACT_EMAIL}
-                                                </a>
-                                                .
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    <button
-                                        type="submit"
-                                        disabled={isSending || !isContactFormConfigured}
-                                        aria-busy={isSending}
-                                        className={buttonClasses({ className: `w-full h-12 ${buttonLabelClasses("md")}` })}
-                                    >
-                                        {isSending && (
-                                            <span
-                                                aria-hidden="true"
-                                                className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
-                                            />
-                                        )}
-                                        {isSending ? "Sending..." : "Send Message"}
-                                    </button>
-                                </form>
-                            )}
+                                ))}
+                            </div>
+                            <h3
+                                ref={successHeadingRef}
+                                tabIndex={-1}
+                                className="font-pixel text-2xl font-semibold text-ink focus:outline-none"
+                            >
+                                Message sent
+                            </h3>
+                            <p role="status" className="max-w-[420px] text-body-sm text-muted leading-relaxed">
+                                Thanks{name.trim() ? `, ${name.trim()}` : ""}. We&apos;ve
+                                received your message and will reply
+                                to <span className="font-medium text-ink break-all">{email.trim()}</span>.
+                            </p>
+                            <button
+                                type="button"
+                                onClick={handleReset}
+                                className="mt-2 rounded-pill bg-[#EAF5FD] px-4 py-1.5 text-sm font-medium text-[#1A6CA3] ring-1 ring-inset ring-[#CFE6F8] transition-colors duration-150 hover:bg-[#DDEFFC] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
+                            >
+                                Send another message
+                            </button>
                         </div>
-                    </div>
+                    ) : (
+                        <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+                            {/* Name and email side by side from sm up; stacked on phones */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <Field id="contact-name" label="Name" optional>
+                                    <input
+                                        id="contact-name"
+                                        type="text"
+                                        name="name"
+                                        autoComplete="name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        maxLength={100}
+                                        disabled={isSending}
+                                        className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                    />
+                                </Field>
+
+                                <Field id="contact-email" label="Email" error={errors.email}>
+                                    <input
+                                        ref={emailRef}
+                                        id="contact-email"
+                                        type="email"
+                                        name="email"
+                                        autoComplete="email"
+                                        inputMode="email"
+                                        value={email}
+                                        onChange={(e) => updateEmail(e.target.value)}
+                                        placeholder="name@example.com"
+                                        maxLength={254}
+                                        disabled={isSending}
+                                        aria-required="true"
+                                        aria-invalid={errors.email ? true : undefined}
+                                        aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                        className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                    />
+                                </Field>
+                            </div>
+
+                            <Field id="contact-subject" label="Subject" error={errors.subject}>
+                                <input
+                                    ref={subjectRef}
+                                    id="contact-subject"
+                                    type="text"
+                                    name="subject"
+                                    value={subject}
+                                    onChange={(e) => updateSubject(e.target.value)}
+                                    placeholder="What's this about?"
+                                    maxLength={150}
+                                    disabled={isSending}
+                                    aria-required="true"
+                                    aria-invalid={errors.subject ? true : undefined}
+                                    aria-describedby={errors.subject ? "contact-subject-error" : undefined}
+                                    className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                />
+                            </Field>
+
+                            <Field id="contact-message" label="Message" error={errors.message}>
+                                <textarea
+                                    ref={messageRef}
+                                    id="contact-message"
+                                    name="message"
+                                    rows={5}
+                                    value={message}
+                                    onChange={(e) => updateMessage(e.target.value)}
+                                    placeholder="How can we help? For bugs, include what happened and your PAWSE version."
+                                    maxLength={5000}
+                                    disabled={isSending}
+                                    aria-required="true"
+                                    aria-invalid={errors.message ? true : undefined}
+                                    aria-describedby={errors.message ? "contact-message-error" : undefined}
+                                    className={`px-3.5 py-3 resize-y min-h-[132px] leading-relaxed ${INPUT_CLASSES}`}
+                                />
+                            </Field>
+
+                            {/* Honeypot: hidden from people and assistive tech; bots tend to tick it */}
+                            <input
+                                type="checkbox"
+                                name="botcheck"
+                                checked={botcheck}
+                                onChange={(e) => setBotcheck(e.target.checked)}
+                                tabIndex={-1}
+                                aria-hidden="true"
+                                className="hidden"
+                            />
+
+                            {/* Delivery problems (not field errors), always with the email fallback */}
+                            {(status.state === "error" || !isContactFormConfigured) && (
+                                <div
+                                    role="alert"
+                                    className="flex items-start gap-2.5 rounded-control border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger leading-relaxed"
+                                >
+                                    <AlertIcon className="mt-0.5" />
+                                    <p>
+                                        {status.state === "error"
+                                            ? status.reason
+                                            : "The contact form is unavailable right now."}{" "}
+                                        Please email us at{" "}
+                                        <a
+                                            href={`mailto:${CONTACT_EMAIL}`}
+                                            className="font-medium link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                                        >
+                                            {CONTACT_EMAIL}
+                                        </a>
+                                        .
+                                    </p>
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={isSending || !isContactFormConfigured}
+                                aria-busy={isSending}
+                                className={buttonClasses({ className: `w-full h-12 ${buttonLabelClasses("md")}` })}
+                            >
+                                {isSending && (
+                                    <span
+                                        aria-hidden="true"
+                                        className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                                    />
+                                )}
+                                {isSending ? "Sending..." : "Send Message"}
+                            </button>
+                        </form>
+                    )}
                 </div>
             </div>
         </section>
