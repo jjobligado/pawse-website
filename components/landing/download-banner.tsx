@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { usePlatform } from "@/hooks/use-platform";
+import { OS_LABELS, usePlatform, type DesktopOs } from "@/hooks/use-platform";
+import { DownloadNote } from "./download-options";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import Section from "./section";
 import { SectionTitle } from "./section-heading";
@@ -18,11 +19,11 @@ const FACES = [
  * page can download without going back to the hero.
  */
 export default function DownloadBanner() {
-    const { platform, config: platformInfo, desktopPlatforms, isMobile } = usePlatform();
+    const { platform, config: platformInfo, downloads, isMobile } = usePlatform();
     const { copied, sendToDesktop } = useSendToDesktop();
     // Unknown desktop OSes get the Windows button (see PLATFORM_CONFIG.other), so exclude it here too.
-    const primaryId = platform === "other" ? "windows" : platform;
-    const otherPlatforms = desktopPlatforms.filter((p) => p.id !== primaryId);
+    const primaryOs: DesktopOs = platform === "mac" || platform === "linux" ? platform : "windows";
+    const otherOses = (Object.keys(OS_LABELS) as DesktopOs[]).filter((os) => os !== primaryOs);
 
     return (
         <Section id="download" className="flex flex-col items-stretch">
@@ -88,6 +89,12 @@ export default function DownloadBanner() {
                         </a>
                     )}
 
+                    {!isMobile && (
+                        <p className="text-xs md:text-sm text-muted">
+                            <DownloadNote info={platformInfo} />
+                        </p>
+                    )}
+
                     {/* Other platforms as plain links (no popover needed this far down) */}
                     <p suppressHydrationWarning className="text-xs md:text-sm text-muted">
                         {isMobile ? (
@@ -95,18 +102,32 @@ export default function DownloadBanner() {
                         ) : (
                             <>
                                 Also available for{" "}
-                                {otherPlatforms.map((p, i) => (
-                                    <span key={p.id}>
-                                        {i > 0 && (i === otherPlatforms.length - 1 ? " and " : ", ")}
-                                        <a
-                                            href={p.href}
-                                            download={p.fileName}
-                                            className="font-medium text-ink link-underline"
-                                        >
-                                            {p.name}
-                                        </a>
-                                    </span>
-                                ))}
+                                {otherOses.map((os, i) => {
+                                    const builds = downloads.filter((d) => d.os === os);
+                                    return (
+                                        <span key={os}>
+                                            {i > 0 && (i === otherOses.length - 1 ? " and " : ", ")}
+                                            {builds.length === 1 ? (
+                                                <a href={builds[0].href} download={builds[0].fileName} className="font-medium text-ink link-underline">
+                                                    {OS_LABELS[os]}
+                                                </a>
+                                            ) : (
+                                                <>
+                                                    {OS_LABELS[os]} (
+                                                    {builds.map((d, j) => (
+                                                        <span key={d.id}>
+                                                            {j > 0 && ", "}
+                                                            <a href={d.href} download={d.fileName} className="font-medium text-ink link-underline">
+                                                                {d.short}
+                                                            </a>
+                                                        </span>
+                                                    ))}
+                                                    )
+                                                </>
+                                            )}
+                                        </span>
+                                    );
+                                })}
                                 .
                             </>
                         )}
