@@ -681,7 +681,7 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
                         direction="up"
                         onRegisterUpdater={handleRegisterPixelUpdater}
                     />
-                    <div className="w-full flex-1 bg-accent-highlight" />
+                    <div className="w-full flex-1 bg-[linear-gradient(180deg,var(--color-accent-highlight)_0%,#99D5FD_65%,#90CFFD_100%)]" />
                 </div>
 
                 {/* Spacer matching the 3-row PixelDivider height (3 pixels of ~19px each) */}
@@ -691,7 +691,7 @@ export function FooterSpreadSection({ children }: { children: ReactNode }) {
                 />
 
                 {/* Unmasked Foreground Footer Content (z-10) */}
-                <footer className="relative z-10 w-full flex flex-col md:flex-row py-12 md:py-16 px-6 md:px-16 lg:px-[120px] justify-between items-center md:items-end gap-8">
+                <footer className="relative z-10 w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 pt-12 pb-8 md:pt-16 md:pb-10">
                     {children}
                 </footer>
             </div>
