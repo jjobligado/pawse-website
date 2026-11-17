@@ -25,6 +25,13 @@ const IDLE: Record<TimerCat, { frames: 4 | 5; seconds: number }> = {
     void: { frames: 5, seconds: 0.75 },
 };
 
+// The break strips (64px frames), played once when the cat is clicked: Tux grooms,
+// Ginger does zoomies, Void does a shadow poof (docs/SPRITES.md)
+const BREAK: Record<TimerCat, 7 | 9 | 10> = { tux: 10, ginger: 9, void: 7 };
+/** How long one break animation lasts. */
+export const BREAK_FRAME_MS = 130;
+export const breakMs = (cat: TimerCat) => BREAK[cat] * BREAK_FRAME_MS;
+
 const FISH: Record<TimerCat, string> = {
     tux: "/images/completed-tuxedo-fish.png",
     ginger: "/images/completed-orange-fish.png",
@@ -48,6 +55,7 @@ export default function TimerWindow({
     hot = null,
     down = null,
     animate = true,
+    playing = false,
 }: {
     cat: TimerCat;
     /** Time left, in seconds. */
@@ -65,6 +73,8 @@ export default function TimerWindow({
     down?: TimerPart | null;
     /** Play the idle loop (off for reduced motion). */
     animate?: boolean;
+    /** Play the break animation once (the cat was clicked); keep it on for breakMs(cat). */
+    playing?: boolean;
 }) {
     const state = (part: TimerPart) => `${hot === part ? " is-hot" : ""}${down === part ? " is-down" : ""}`;
     const idle = IDLE[cat];
@@ -98,11 +108,19 @@ export default function TimerWindow({
                 <div className="at-cat">
                     <span
                         className="at-sprite"
-                        style={{
-                            backgroundImage: `url(/sprites/${cat}-body-idle-sheet.png)`,
-                            backgroundSize: `${idle.frames * 64}px 64px`,
-                            animation: animate ? `at-idle-${idle.frames} ${idle.seconds}s steps(${idle.frames}) infinite` : undefined,
-                        }}
+                        style={
+                            playing && animate
+                                ? {
+                                      backgroundImage: `url(/sprites/${cat}-body-break-sheet.png)`,
+                                      backgroundSize: `${BREAK[cat] * 64}px 64px`,
+                                      animation: `at-strip-${BREAK[cat]} ${breakMs(cat)}ms steps(${BREAK[cat]}) 1`,
+                                  }
+                                : {
+                                      backgroundImage: `url(/sprites/${cat}-body-idle-sheet.png)`,
+                                      backgroundSize: `${idle.frames * 64}px 64px`,
+                                      animation: animate ? `at-idle-${idle.frames} ${idle.seconds}s steps(${idle.frames}) infinite` : undefined,
+                                  }
+                        }
                     />
                 </div>
                 <div className="at-controls">

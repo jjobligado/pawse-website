@@ -1268,3 +1268,7 @@ body {
 
 @keyframes at-idle-4 { to { background-position: -256px 0; } }
 @keyframes at-idle-5 { to { background-position: -320px 0; } }
+/* Break strips, played once (Void 7, Ginger 9, Tux 10 frames) */
+@keyframes at-strip-7 { to { background-position: -448px 0; } }
+@keyframes at-strip-9 { to { background-position: -576px 0; } }
+@keyframes at-strip-10 { to { background-position: -640px 0; } }

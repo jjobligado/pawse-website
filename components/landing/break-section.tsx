@@ -1,12 +1,12 @@
 import SplitFeature from "./split-feature";
-import TimerMockup from "./timer-mockup";
+import BreakDemo from "./break-demo";
 
 export default function BreakSection() {
     return (
         <SplitFeature
             id="break"
             titleLines={["Time to Play", "and Recharge"]}
-            media={<TimerMockup />}
+            media={<BreakDemo />}
             mediaFirst
             spacing="pair-end"
         >
