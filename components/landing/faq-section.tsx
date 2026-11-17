@@ -4,28 +4,18 @@ import { FAQ_GROUPS, FAQS } from "./faq-data";
 
 export { FAQS } from "./faq-data";
 
-function ContactPill() {
+function ContactNote({ className = "" }: { className?: string }) {
     return (
-        <a
-            href="#contact"
-            className="inline-flex items-center gap-2 rounded-pill bg-white px-4 py-1.5 text-sm font-medium text-[#1A6CA3] ring-1 ring-inset ring-[#CFE6F8] shadow-control transition-[background-color,box-shadow,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#EAF5FD] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
-        >
-            <span>Contact us</span>
-            <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+        <p className={`text-body-sm text-muted ${className}`}>
+            Still looking for an answer?{" "}
+            <a
+                href="#contact"
+                className="font-medium text-ink link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
             >
-                <path d="M12 5v14" />
-                <path d="m19 12-7 7-7-7" />
-            </svg>
-        </a>
+                Contact us
+            </a>
+            .
+        </p>
     );
 }
 
@@ -37,7 +27,7 @@ export default function FaqSection() {
     return (
         <Section id="faq" className="flex flex-col items-stretch">
             <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 lg:gap-14">
-                {/* Left column: sticky heading, subtitle, and direct contact prompt */}
+                {/* Left column: sticky heading, subtitle, and understated contact link */}
                 <div className="w-full lg:w-[36%] lg:sticky lg:top-24 flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
                     <SectionTitle className="text-center lg:text-left text-balance">
                         Frequently Asked Questions
@@ -46,15 +36,7 @@ export default function FaqSection() {
                         Everything you need to know before you download.
                     </SectionSubtitle>
 
-                    <div className="hidden lg:flex w-full mt-3 rounded-card border-2 border-stroke surface-sky p-5 flex-col items-start gap-3">
-                        <p className="text-base font-semibold text-ink-strong">
-                            Still looking for an answer?
-                        </p>
-                        <p className="text-body-sm text-ink-soft leading-relaxed">
-                            Send our team a note below and we&apos;ll get back to you.
-                        </p>
-                        <ContactPill />
-                    </div>
+                    <ContactNote className="hidden lg:block pt-1" />
                 </div>
 
                 {/* Right column: all 9 tactile accordion cards visible at once, grouped by topic */}
@@ -95,11 +77,8 @@ export default function FaqSection() {
                         );
                     })}
 
-                    {/* Mobile / tablet bridge below cards */}
-                    <div className="lg:hidden flex flex-wrap items-center justify-center gap-x-3 gap-y-2 pt-1 text-body-sm text-muted">
-                        <span>Still looking for an answer?</span>
-                        <ContactPill />
-                    </div>
+                    {/* Mobile / tablet inline note below cards */}
+                    <ContactNote className="lg:hidden pt-1 text-center" />
                 </div>
             </div>
         </Section>
