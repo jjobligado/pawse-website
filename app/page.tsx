@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
     return (
-        <div className="w-full flex flex-col bg-white overflow-x-hidden">
+        <div className="w-full flex flex-col bg-white overflow-x-clip">
             <StructuredData />
             <HeroSection />
             <HowItWorksSection />
