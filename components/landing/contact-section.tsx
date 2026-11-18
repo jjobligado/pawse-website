@@ -39,7 +39,7 @@ function validate(email: string, subject: string, message: string): FieldErrors 
 }
 
 const INPUT_CLASSES =
-    "w-full rounded-card bg-white border-2 border-stroke text-body-sm text-ink placeholder:text-faint transition-[background-color,border-color,box-shadow] duration-(--duration-short) ease-standard hover:border-stroke-strong hover:bg-sky-50/45 focus:outline-none focus:border-focus-ring focus:bg-white focus:ring-4 focus:ring-accent-highlight/40 aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60 disabled:cursor-not-allowed";
+    "w-full rounded-control bg-white border border-stroke text-body-sm text-ink placeholder:text-faint transition-[background-color,border-color,box-shadow] duration-(--duration-short) ease-standard hover:border-stroke-strong hover:bg-sky-50/35 focus:outline-none focus:border-focus-ring focus:bg-white focus:ring-4 focus:ring-accent-highlight/40 aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60 disabled:cursor-not-allowed";
 
 type Status = { state: "idle" | "sending" | "sent" } | { state: "error"; reason: string };
 
@@ -60,8 +60,8 @@ function EmailNote({ className = "" }: { className?: string }) {
 
 /**
  * Sticky split contact section matching the FAQ layout: sticky heading, subtitle,
- * and email fallback on the left; open form fields styled like the FAQ cards
- * directly on the page on the right (no outer card container).
+ * and email fallback on the left (directly on the page); the contact form
+ * encapsulated in a FAQ-style bordered card on the right.
  */
 export default function ContactSection() {
     const [name, setName] = useState("");
@@ -149,7 +149,7 @@ export default function ContactSection() {
                     <EmailNote className="hidden lg:block pt-1" />
                 </div>
 
-                {/* Right column: borderless tactile form matching the FAQ card aesthetic */}
+                {/* Right column: contact form encapsulated in a FAQ-style bordered card */}
                 <div className="w-full lg:w-[60%] max-w-[760px] mx-auto lg:mx-0 flex flex-col gap-7">
                     <div className="flex flex-col gap-3">
                         <h3 className="px-1 text-xs font-semibold uppercase tracking-[0.08em] text-ink-soft">
@@ -191,131 +191,133 @@ export default function ContactSection() {
                                 </button>
                             </div>
                         ) : (
-                            <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-                                {/* Name and email side by side from sm up; stacked on phones */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                    <Field id="contact-name" label="Name" optional>
-                                        <input
-                                            id="contact-name"
-                                            type="text"
-                                            name="name"
-                                            autoComplete="name"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            maxLength={100}
-                                            disabled={isSending}
-                                            className={`h-12 px-4 ${INPUT_CLASSES}`}
-                                        />
-                                    </Field>
+                            <div className="rounded-card border-2 border-stroke bg-white p-6 sm:p-8">
+                                <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+                                    {/* Name and email side by side from sm up; stacked on phones */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <Field id="contact-name" label="Name" optional>
+                                            <input
+                                                id="contact-name"
+                                                type="text"
+                                                name="name"
+                                                autoComplete="name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                maxLength={100}
+                                                disabled={isSending}
+                                                className={`h-12 px-4 ${INPUT_CLASSES}`}
+                                            />
+                                        </Field>
 
-                                    <Field id="contact-email" label="Email" error={errors.email}>
+                                        <Field id="contact-email" label="Email" error={errors.email}>
+                                            <input
+                                                ref={emailRef}
+                                                id="contact-email"
+                                                type="email"
+                                                name="email"
+                                                autoComplete="email"
+                                                inputMode="email"
+                                                value={email}
+                                                onChange={(e) => updateEmail(e.target.value)}
+                                                placeholder="name@example.com"
+                                                maxLength={254}
+                                                disabled={isSending}
+                                                aria-required="true"
+                                                aria-invalid={errors.email ? true : undefined}
+                                                aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                                className={`h-12 px-4 ${INPUT_CLASSES}`}
+                                            />
+                                        </Field>
+                                    </div>
+
+                                    <Field id="contact-subject" label="Subject" error={errors.subject}>
                                         <input
-                                            ref={emailRef}
-                                            id="contact-email"
-                                            type="email"
-                                            name="email"
-                                            autoComplete="email"
-                                            inputMode="email"
-                                            value={email}
-                                            onChange={(e) => updateEmail(e.target.value)}
-                                            placeholder="name@example.com"
-                                            maxLength={254}
+                                            ref={subjectRef}
+                                            id="contact-subject"
+                                            type="text"
+                                            name="subject"
+                                            value={subject}
+                                            onChange={(e) => updateSubject(e.target.value)}
+                                            placeholder="What's this about?"
+                                            maxLength={150}
                                             disabled={isSending}
                                             aria-required="true"
-                                            aria-invalid={errors.email ? true : undefined}
-                                            aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                            aria-invalid={errors.subject ? true : undefined}
+                                            aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                                             className={`h-12 px-4 ${INPUT_CLASSES}`}
                                         />
                                     </Field>
-                                </div>
 
-                                <Field id="contact-subject" label="Subject" error={errors.subject}>
-                                    <input
-                                        ref={subjectRef}
-                                        id="contact-subject"
-                                        type="text"
-                                        name="subject"
-                                        value={subject}
-                                        onChange={(e) => updateSubject(e.target.value)}
-                                        placeholder="What's this about?"
-                                        maxLength={150}
-                                        disabled={isSending}
-                                        aria-required="true"
-                                        aria-invalid={errors.subject ? true : undefined}
-                                        aria-describedby={errors.subject ? "contact-subject-error" : undefined}
-                                        className={`h-12 px-4 ${INPUT_CLASSES}`}
-                                    />
-                                </Field>
-
-                                <Field id="contact-message" label="Message" error={errors.message}>
-                                    <textarea
-                                        ref={messageRef}
-                                        id="contact-message"
-                                        name="message"
-                                        rows={5}
-                                        value={message}
-                                        onChange={(e) => updateMessage(e.target.value)}
-                                        placeholder="How can we help? For bugs, include what happened and your PAWSE version."
-                                        maxLength={5000}
-                                        disabled={isSending}
-                                        aria-required="true"
-                                        aria-invalid={errors.message ? true : undefined}
-                                        aria-describedby={errors.message ? "contact-message-error" : undefined}
-                                        className={`px-4 py-3.5 resize-y min-h-[140px] leading-relaxed ${INPUT_CLASSES}`}
-                                    />
-                                </Field>
-
-                                {/* Honeypot: hidden from people and assistive tech; bots tend to tick it */}
-                                <input
-                                    type="checkbox"
-                                    name="botcheck"
-                                    checked={botcheck}
-                                    onChange={(e) => setBotcheck(e.target.checked)}
-                                    tabIndex={-1}
-                                    aria-hidden="true"
-                                    className="hidden"
-                                />
-
-                                {/* Delivery problems (not field errors), always with the email fallback */}
-                                {(status.state === "error" || !isContactFormConfigured) && (
-                                    <div
-                                        role="alert"
-                                        className="flex items-start gap-2.5 rounded-card border-2 border-danger-border bg-danger-soft px-4 py-3.5 text-sm text-danger leading-relaxed"
-                                    >
-                                        <AlertIcon className="mt-0.5" />
-                                        <p>
-                                            {status.state === "error"
-                                                ? status.reason
-                                                : "The contact form is unavailable right now."}{" "}
-                                            Please email us at{" "}
-                                            <a
-                                                href={`mailto:${CONTACT_EMAIL}`}
-                                                className="font-medium link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                                            >
-                                                {CONTACT_EMAIL}
-                                            </a>
-                                            .
-                                        </p>
-                                    </div>
-                                )}
-
-                                <button
-                                    type="submit"
-                                    disabled={isSending || !isContactFormConfigured}
-                                    aria-busy={isSending}
-                                    className={buttonClasses({ className: "w-full sm:w-auto sm:self-center sm:min-w-[200px] h-12" })}
-                                >
-                                    {isSending && (
-                                        <span
-                                            aria-hidden="true"
-                                            className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                                    <Field id="contact-message" label="Message" error={errors.message}>
+                                        <textarea
+                                            ref={messageRef}
+                                            id="contact-message"
+                                            name="message"
+                                            rows={5}
+                                            value={message}
+                                            onChange={(e) => updateMessage(e.target.value)}
+                                            placeholder="How can we help? For bugs, include what happened and your PAWSE version."
+                                            maxLength={5000}
+                                            disabled={isSending}
+                                            aria-required="true"
+                                            aria-invalid={errors.message ? true : undefined}
+                                            aria-describedby={errors.message ? "contact-message-error" : undefined}
+                                            className={`px-4 py-3.5 resize-y min-h-[140px] leading-relaxed ${INPUT_CLASSES}`}
                                         />
+                                    </Field>
+
+                                    {/* Honeypot: hidden from people and assistive tech; bots tend to tick it */}
+                                    <input
+                                        type="checkbox"
+                                        name="botcheck"
+                                        checked={botcheck}
+                                        onChange={(e) => setBotcheck(e.target.checked)}
+                                        tabIndex={-1}
+                                        aria-hidden="true"
+                                        className="hidden"
+                                    />
+
+                                    {/* Delivery problems (not field errors), always with the email fallback */}
+                                    {(status.state === "error" || !isContactFormConfigured) && (
+                                        <div
+                                            role="alert"
+                                            className="flex items-start gap-2.5 rounded-control border border-danger-border bg-danger-soft px-4 py-3.5 text-sm text-danger leading-relaxed"
+                                        >
+                                            <AlertIcon className="mt-0.5" />
+                                            <p>
+                                                {status.state === "error"
+                                                    ? status.reason
+                                                    : "The contact form is unavailable right now."}{" "}
+                                                Please email us at{" "}
+                                                <a
+                                                    href={`mailto:${CONTACT_EMAIL}`}
+                                                    className="font-medium link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                                                >
+                                                    {CONTACT_EMAIL}
+                                                </a>
+                                                .
+                                            </p>
+                                        </div>
                                     )}
-                                    <span className={buttonLabelClasses("md")}>
-                                        {isSending ? "Sending..." : "Send Message"}
-                                    </span>
-                                </button>
-                            </form>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSending || !isContactFormConfigured}
+                                        aria-busy={isSending}
+                                        className={buttonClasses({ className: "w-full sm:w-auto sm:self-center sm:min-w-[200px] h-12" })}
+                                    >
+                                        {isSending && (
+                                            <span
+                                                aria-hidden="true"
+                                                className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                                            />
+                                        )}
+                                        <span className={buttonLabelClasses("md")}>
+                                            {isSending ? "Sending..." : "Send Message"}
+                                        </span>
+                                    </button>
+                                </form>
+                            </div>
                         )}
                     </div>
 
