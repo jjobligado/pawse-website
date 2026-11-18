@@ -56,6 +56,7 @@ export default function Header() {
     const navLinks = [
         { label: "How It Works", id: "how-it-works" },
         { label: "Features", id: "companions" },
+        { label: "Coming Soon", id: "coming-soon" },
         { label: "FAQ", id: "faq" },
         { label: "Contact Us", id: "contact" },
     ];
@@ -118,7 +119,7 @@ export default function Header() {
                                 href={`/#${link.id}`}
                                 onClick={(e) => handleNavClick(e, link.id)}
                                 aria-current={isActive ? "location" : undefined}
-                                className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
+                                className={`whitespace-nowrap text-sm tracking-[0.02em] transition-colors duration-200 ${
                                     isActive
                                         ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
                                         : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
