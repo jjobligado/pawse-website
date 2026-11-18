@@ -9,7 +9,9 @@ import { measureGlyphs, sampleGlyphs, type GlyphData } from "@/lib/pixel-glyphs"
  *
  * Samples the site's loaded Pixelify Sans font (weight 700) onto an integer
  * pixel grid (mirroring "A" and "W" for exact symmetry) and paints each letter
- * in the app's companion colours, adapted to the current time-of-day sky:
+ * in the app's companion colours, framed by a crisp pixel perimeter contour so
+ * every letter maintains high graphic contrast against all 4 sky phases and
+ * skyline rooftops:
  * - Entrance: letters drop in one by one and bounce onto the sill.
  * - Hover: the letter under the cursor hops two grid pixels (its 1px drop
  *   shadow stays put on the sill).
@@ -27,6 +29,7 @@ interface LetterPaint {
 
 interface WordmarkPalette {
     letters: readonly LetterPaint[];
+    outline: string;
     pawRgb: string;
     pawAlpha: number;
     sparks?: readonly string[];
@@ -37,56 +40,57 @@ interface WordmarkPalette {
 const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
     morning: {
         letters: [
-            { face: "#CFE58A", shade: "#60791F", light: "#ECFEA9" }, // P: Classic green
-            { face: "#F8C47F", shade: "#B26A06", light: "#FEE1A9" }, // A: Sprint orange
-            { face: "#BDA9FE", shade: "#7D49C6", light: "#E4DAFF" }, // W: Focused purple
-            { face: "#7CC8F8", shade: "#1A74AE", light: "#D3EDFF" }, // S: Site sky blue
-            { face: "#FFA08C", shade: "#B9472F", light: "#FFD8CF" }, // E: Coral
+            { face: "#CFE58A", shade: "#465B12", light: "#ECFEA9" }, // P: Classic green
+            { face: "#F8C47F", shade: "#824B04", light: "#FEE1A9" }, // A: Sprint orange
+            { face: "#BDA9FE", shade: "#562D94", light: "#E4DAFF" }, // W: Focused purple
+            { face: "#7CC8F8", shade: "#124F7A", light: "#D3EDFF" }, // S: Site sky blue
+            { face: "#FFA08C", shade: "#8B2E1B", light: "#FFD8CF" }, // E: Coral
         ],
+        outline: "#232323",
         pawRgb: "35,35,35",
         pawAlpha: 0.14,
         fallbackClass: "text-ink",
     },
     day: {
-        // Deeper fills so every letter separates cleanly from the sunny sky & blue skyline
         letters: [
-            { face: "#C2DC72", shade: "#556D18", light: "#ECFEA9" },
-            { face: "#F4B867", shade: "#9E5C03", light: "#FEE1A9" },
-            { face: "#AE96FC", shade: "#6737B0", light: "#E4DAFF" },
-            { face: "#54B2EE", shade: "#165F92", light: "#D3EDFF" },
-            { face: "#F78C76", shade: "#A83B24", light: "#FFD8CF" },
+            { face: "#C2DC72", shade: "#465B12", light: "#ECFEA9" },
+            { face: "#F4B867", shade: "#824B04", light: "#FEE1A9" },
+            { face: "#AE96FC", shade: "#562D94", light: "#E4DAFF" },
+            { face: "#54B2EE", shade: "#124F7A", light: "#D3EDFF" },
+            { face: "#F78C76", shade: "#8B2E1B", light: "#FFD8CF" },
         ],
+        outline: "#232323",
         pawRgb: "26,116,174",
         pawAlpha: 0.16,
         fallbackClass: "text-ink",
     },
     dusk: {
-        // Sunset-warmed companion tones
         letters: [
-            { face: "#D4DF82", shade: "#5B6B1E", light: "#FFF0B8" },
-            { face: "#F5B26B", shade: "#9A530C", light: "#FFE2B0" },
-            { face: "#C4A2F0", shade: "#6A3D9E", light: "#F2D9FF" },
-            { face: "#7EBBE8", shade: "#285C8A", light: "#FFE3D6" },
-            { face: "#F28D82", shade: "#9E3933", light: "#FFD8C9" },
+            { face: "#D4DF82", shade: "#465B12", light: "#FFF0B8" },
+            { face: "#F5B26B", shade: "#824B04", light: "#FFE2B0" },
+            { face: "#C4A2F0", shade: "#562D94", light: "#F2D9FF" },
+            { face: "#7EBBE8", shade: "#124F7A", light: "#FFE3D6" },
+            { face: "#F28D82", shade: "#8B2E1B", light: "#FFD8C9" },
         ],
-        pawRgb: "56,35,60",
+        outline: "#232323",
+        pawRgb: "35,35,35",
         pawAlpha: 0.15,
         fallbackClass: "text-ink",
     },
     night: {
-        // Moonlit companion hues with warm #FFE7B0 top rims & deep midnight shadows
         letters: [
-            { face: "#A9C46C", shade: "#162040", light: "#FFE7B0" },
-            { face: "#E0A35C", shade: "#162040", light: "#FFE7B0" },
-            { face: "#9C89E0", shade: "#162040", light: "#FFE7B0" },
-            { face: "#68A8DC", shade: "#162040", light: "#FFE7B0" },
-            { face: "#DE847A", shade: "#162040", light: "#FFE7B0" },
+            { face: "#A9C46C", shade: "#141414", light: "#FFE7B0" },
+            { face: "#E0A35C", shade: "#141414", light: "#FFE7B0" },
+            { face: "#9C89E0", shade: "#141414", light: "#FFE7B0" },
+            { face: "#68A8DC", shade: "#141414", light: "#FFE7B0" },
+            { face: "#DE847A", shade: "#141414", light: "#FFE7B0" },
         ],
-        pawRgb: "22,32,64",
+        outline: "#141414",
+        pawRgb: "20,20,20",
         pawAlpha: 0.18,
         sparks: ["#FFE7B0", "#A9C46C", "#E0A35C", "#9C89E0", "#68A8DC"],
         glow: "rgba(255,231,176,0.3)",
-        fallbackClass: "text-[#162040]",
+        fallbackClass: "text-ink-strong",
     },
 };
 
@@ -107,6 +111,9 @@ interface Cell {
     row: number;
     letter: number;
     top: boolean;
+    bottom: boolean;
+    left: boolean;
+    right: boolean;
 }
 
 interface LetterBox {
@@ -185,7 +192,7 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
         let inView = false;
         let rafId: number | null = null;
 
-        const colX = (col: number) => col * step;
+        const colX = (col: number) => (col + 0.25) * step;
         const rowY = (row: number) => bleedTop + yOffset + row * step;
         const snap = (v: number) => Math.round(v / step) * step;
 
@@ -202,11 +209,9 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             if (!sampled) return;
 
             const cols = sampled.reduce((sum, g) => sum + g.gCols, 0) + gapCols * (sampled.length - 1);
-            // Leave one spare column/row for the 1px drop shadow
-            const pad = 1;
-            step = width / (cols + pad);
-            // Anchor letters flush to the bottom so they rest directly on the sill
-            yOffset = Math.max(0, height - (rows + pad) * step);
+            // Leave 0.25 col on the left for the outer contour and 1 col/row on the right/bottom for the drop shadow
+            step = width / (cols + 1.25);
+            yOffset = Math.max(0, height - (rows + 1) * step);
             bleedTop = Math.round(height * BLEED_TOP);
             bleedBottom = Math.round(height * BLEED_BOTTOM);
 
@@ -225,7 +230,15 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                     for (let c = 0; c < g.gCols; c++) {
                         if (!g.grid[r][c]) continue;
                         if (r < topRow) topRow = r;
-                        list.push({ col: colStart + c, row: r, letter: i, top: r === 0 || !g.grid[r - 1][c] });
+                        list.push({
+                            col: colStart + c,
+                            row: r,
+                            letter: i,
+                            top: r === 0 || !g.grid[r - 1][c],
+                            bottom: r === rows - 1 || !g.grid[r + 1][c],
+                            left: c === 0 || !g.grid[r][c - 1],
+                            right: c === g.gCols - 1 || !g.grid[r][c + 1],
+                        });
                     }
                 }
                 cellsByLetter.push(list);
@@ -284,35 +297,51 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                 }
             }
 
-            // 2. Letters
+            // 2. Letters: 1-cell drop shadow, outer pixel contour, bright face, and top highlight
             const drops = letters.map((_, i) => {
                 const e = entranceOffset(i, now, reduced);
                 return e === null ? null : snap(e);
             });
             const lifts = letters.map((_, i) => (reduced ? 0 : snap(hopOffset(i, now))));
             const lightH = Math.max(1, Math.round(step * 0.28));
+            const b = Math.max(1, Math.round(step * 0.14));
 
             cellsByLetter.forEach((list, i) => {
                 const drop = drops[i];
                 if (drop === null) return;
                 const paint = palette.letters[i % palette.letters.length];
                 const shade = new Path2D();
+                const border = new Path2D();
                 const face = new Path2D();
                 const light = new Path2D();
+
                 for (const cell of list) {
                     const x0 = Math.round(colX(cell.col));
                     const x1 = Math.round(colX(cell.col + 1));
-                    // The shadow stays on the sill while the letter hops
+                    const w = x1 - x0;
+                    // Shadow stays anchored on the sill while the letter hops
                     const sy0 = Math.round(rowY(cell.row) + drop + step);
                     const sy1 = Math.round(rowY(cell.row + 1) + drop + step);
                     shade.rect(Math.round(x0 + step), sy0, Math.round(x1 + step) - Math.round(x0 + step), sy1 - sy0);
+
                     const y0 = Math.round(rowY(cell.row) + drop + lifts[i]);
                     const y1 = Math.round(rowY(cell.row + 1) + drop + lifts[i]);
-                    face.rect(x0, y0, x1 - x0, y1 - y0);
-                    if (cell.top) light.rect(x0, y0, x1 - x0, lightH);
+                    const h = y1 - y0;
+                    face.rect(x0, y0, w, h);
+                    if (cell.top) {
+                        light.rect(x0, y0, w, lightH);
+                        border.rect(x0 - b, y0 - b, w + b * 2, b);
+                    }
+                    if (cell.bottom) border.rect(x0 - b, y1, w + b * 2, b);
+                    if (cell.left) border.rect(x0 - b, y0 - b, b, h + b * 2);
+                    if (cell.right) border.rect(x1, y0 - b, b, h + b * 2);
                 }
+
                 ctx.fillStyle = paint.shade;
                 ctx.fill(shade);
+                ctx.fillStyle = palette.outline;
+                ctx.fill(border);
+
                 if (palette.glow) {
                     ctx.save();
                     ctx.shadowColor = palette.glow;

@@ -94,11 +94,13 @@ function WalnutSillBand() {
     );
 }
 
+const NIGHT_BACKDROP =
+    "pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
+
 export default function Footer() {
     const skyPhase = useSkyPhase();
     const isNight = skyPhase === "night";
     const metaText = isNight ? "text-ink" : "text-[#33404D]";
-    const linkHover = isNight ? "hover:text-[#1C3F8F]" : "hover:text-accent-strong-hover";
 
     return (
         <footer className="w-full flex flex-col bg-white">
@@ -125,12 +127,7 @@ export default function Footer() {
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-20">
                         {/* Left: Editorial closing + direct team email */}
                         <div className="relative w-full lg:max-w-[340px] flex flex-col items-start">
-                            {isNight && (
-                                <div
-                                    aria-hidden="true"
-                                    className="pointer-events-none absolute -z-10 -inset-x-10 -inset-y-8 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl"
-                                />
-                            )}
+                            {isNight && <div aria-hidden="true" className={NIGHT_BACKDROP} />}
                             <h2 className="font-pixel text-3xl sm:text-4xl font-semibold text-ink leading-[1.08] tracking-tight">
                                 Focus, without the rush.
                             </h2>
@@ -142,7 +139,7 @@ export default function Footer() {
 
                             <FooterLink
                                 href={`mailto:${CONTACT_EMAIL}`}
-                                className={`mt-5 gap-2 font-medium ${linkHover}`}
+                                className="mt-5 gap-2 font-medium"
                             >
                                 <svg
                                     width="16"
@@ -168,12 +165,7 @@ export default function Footer() {
                             aria-label="Footer"
                             className="relative w-full lg:w-auto lg:shrink-0 grid grid-cols-2 sm:grid-cols-3 gap-x-10 gap-y-8 sm:gap-x-12 xl:gap-x-16"
                         >
-                            {isNight && (
-                                <div
-                                    aria-hidden="true"
-                                    className="pointer-events-none absolute -z-10 -inset-x-12 -inset-y-8 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl"
-                                />
-                            )}
+                            {isNight && <div aria-hidden="true" className={NIGHT_BACKDROP} />}
                             {LINK_GROUPS.map((group) => (
                                 <div key={group.heading} className="flex flex-col gap-2.5">
                                     <h3 className={`text-xs font-semibold uppercase tracking-[0.08em] transition-colors duration-1000 ${metaText}`}>
@@ -182,7 +174,7 @@ export default function Footer() {
                                     <ul className="flex flex-col gap-1 md:gap-2">
                                         {group.links.map((link) => (
                                             <li key={link.href}>
-                                                <FooterLink href={link.href} className={linkHover}>
+                                                <FooterLink href={link.href}>
                                                     {link.label}
                                                 </FooterLink>
                                             </li>
