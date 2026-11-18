@@ -129,7 +129,9 @@ export default function Footer() {
                         <div className="relative w-full lg:max-w-[340px] flex flex-col items-start">
                             {isNight && <div aria-hidden="true" className={NIGHT_BACKDROP} />}
                             <h2 className="font-pixel text-3xl sm:text-4xl font-semibold text-ink leading-[1.08] tracking-tight">
-                                Focus, without the rush.
+                                Focus, without{" "}
+                                <br />
+                                the rush.
                             </h2>
 
                             <p className={`mt-3 text-body-sm leading-relaxed text-pretty transition-colors duration-1000 ${metaText}`}>
