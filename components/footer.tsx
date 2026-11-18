@@ -144,7 +144,7 @@ export default function Footer() {
 
                             <FooterLink
                                 href={`mailto:${CONTACT_EMAIL}`}
-                                className="mt-5 gap-2 font-medium"
+                                className="mt-5 gap-2"
                             >
                                 <svg
                                     width="16"
