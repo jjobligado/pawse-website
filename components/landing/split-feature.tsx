@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import Section from "./section";
+import Parallax from "@/components/parallax";
 import { SectionTitle } from "./section-heading";
 
 interface SplitFeatureProps {
@@ -36,6 +37,13 @@ export default function SplitFeature({
         </div>
     );
 
+    // The media trails the page a touch while scrolling, so the row reads as two layers
+    const drifting = (
+        <Parallax depth={0.05} className="w-full lg:w-[56%] shrink-0">
+            {media}
+        </Parallax>
+    );
+
     return (
         <Section id={id} spacing={spacing} className="flex flex-col items-stretch">
             <div
@@ -45,13 +53,13 @@ export default function SplitFeature({
             >
                 {mediaFirst ? (
                     <>
-                        {media}
+                        {drifting}
                         {copy}
                     </>
                 ) : (
                     <>
                         {copy}
-                        {media}
+                        {drifting}
                     </>
                 )}
             </div>

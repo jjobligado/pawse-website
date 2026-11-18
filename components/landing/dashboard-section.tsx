@@ -1,5 +1,7 @@
 import Image from "next/image";
+import Parallax from "@/components/parallax";
 import { DashboardSpreadSection } from "@/components/pixel-divider";
+import DashboardWindow from "@/components/app-ui/dashboard-window";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 
 const FEATURES = [
@@ -41,16 +43,10 @@ export default function DashboardSection() {
                     </div>
                 </div>
 
-                {/* Dashboard Preview Image */}
-                <div className="w-full max-w-[600px] lg:flex-1 shrink-0 shadow-screenshot rounded-control overflow-hidden bg-white">
-                    <Image
-                        src="/images/dashboard.png"
-                        alt="PAWSE Dashboard showing focus time, completed pomodoros, favorite companion, and weekly flow"
-                        width={600}
-                        height={433}
-                        className="w-full h-auto object-cover"
-                    />
-                </div>
+                {/* The app's Dashboard, rebuilt from the desktop app and scaled as one piece */}
+                <Parallax depth={0.05} className="w-full max-w-[600px] lg:flex-1 shrink-0">
+                    <DashboardWindow />
+                </Parallax>
             </div>
         </DashboardSpreadSection>
     );

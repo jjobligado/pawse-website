@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Short viewports (laptops at 768px tall and less): the hero tightens so the sill stays above the fold */
+@custom-variant short (@media (max-height: 780px));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -118,6 +121,26 @@
   --container-content: 80rem; /* 1280px */
   --container-chrome: 90rem; /* 1440px */
 
+  /* Hero window: walnut casement frame, set in the white wall (the header) above it */
+  --color-window-frame: #7A4E35;
+  --color-window-frame-shade: #5E3B27;
+  --color-window-frame-edge: #432918;
+
+  /* PAWSE desktop app tokens (src/renderer/index.css), for the app UI replicas
+     in components/app-ui. Use these only inside app replicas. */
+  --color-app-text-black: #141414;
+  --color-app-bg-main: #F6F8F7;
+  --color-app-stroke: #E4E4E7;
+  --color-app-classic-solid: #CFE58A;
+  --color-app-classic-light: #ECFEA9;
+  --color-app-classic-dark: #60791F;
+  --color-app-sprint-solid: #F8C47F;
+  --color-app-sprint-light: #FEE1A9;
+  --color-app-sprint-dark: #B26A06;
+  --color-app-focused-solid: #BDA9FE;
+  --color-app-focused-light: #E0A9FE;
+  --color-app-focused-dark: #7D49C6;
+
   /* Radius scale: `rounded-pill`, `rounded-card-lg`, `rounded-card`, `rounded-control`, `rounded-chip` */
   --radius-pill: 9999px; /* buttons, segmented control, step numbers */
   --radius-card-lg: 1.5rem; /* 24px: banners, FAQ card, contact card, preview frames */
@@ -169,13 +192,17 @@ html {
     opacity: 1 !important;
     transform: none !important;
   }
+  /* Birds: show one wing pose, not both frames on top of each other. */
+  .animate-wing-down {
+    display: none;
+  }
   /* The CTA aura is purely decorative; hide it instead of freezing it on. */
   .animate-cta-aura::after {
     opacity: 0 !important;
   }
   /* Final state of the "Done" reveal (accent color + full underline). */
   .animate-hero-done {
-    color: var(--color-accent-strong) !important;
+    color: var(--hero-done, var(--color-accent-strong)) !important;
   }
 }
 
@@ -196,63 +223,39 @@ body {
   }
 }
 
-@keyframes cat-intro-ginger {
+/*
+ * Hero scene (window, sill, laptop). One authored entrance: the sky settles,
+ * the cats hop onto the sill, the laptop rises. Then only slow ambient drift.
+ * All of it is transform/opacity, and every class starts with `animate-` so the
+ * reduced-motion rule above freezes it in its final, visible state.
+ */
+@keyframes hero-sky-settle {
+  from {
+    opacity: 0.45;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-hero-sky {
+  animation: hero-sky-settle 0.9s var(--ease-emphasized) both;
+}
+
+/* A small hop: up, land with a squash, settle. Starts already near its spot. */
+@keyframes cat-hop {
   0% {
     opacity: 0;
-    transform: translateY(-55px) scale(0.65) rotate(-14deg);
+    transform: translateY(-18px) scale(0.96);
   }
-  60% {
+  55% {
     opacity: 1;
-    transform: translateY(8px) scale(1.08, 0.92) rotate(4deg);
+    transform: translateY(2px) scale(1.04, 0.96);
   }
   80% {
-    transform: translateY(-3px) scale(0.97, 1.02) rotate(-1deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg);
-  }
-}
-
-.animate-cat-intro-ginger {
-  opacity: 0;
-  animation: cat-intro-ginger 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
-}
-
-@keyframes cat-intro-tuxedo {
-  0% {
-    opacity: 0;
-    transform: translateX(65px) translateY(18px) scale(0.65) rotate(12deg);
-  }
-  65% {
-    opacity: 1;
-    transform: translateX(-6px) translateY(-4px) scale(1.07, 0.93) rotate(-3deg);
-  }
-  85% {
-    transform: translateX(2px) translateY(1px) scale(0.98, 1.02) rotate(1deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scale(1) rotate(0deg);
-  }
-}
-
-.animate-cat-intro-tuxedo {
-  opacity: 0;
-  animation: cat-intro-tuxedo 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
-}
-
-@keyframes cat-intro-void {
-  0% {
-    opacity: 0;
-    transform: translateY(65px) scale(0.65);
-  }
-  65% {
-    opacity: 1;
-    transform: translateY(-10px) scale(1.08);
-  }
-  85% {
-    transform: translateY(2px) scale(0.98);
+    transform: translateY(-1px) scale(0.99, 1.01);
   }
   100% {
     opacity: 1;
@@ -260,9 +263,113 @@ body {
   }
 }
 
-.animate-cat-intro-void {
-  opacity: 0;
-  animation: cat-intro-void 0.85s cubic-bezier(0.34, 1.35, 0.64, 1) 0.75s forwards;
+.animate-cat-hop {
+  transform-origin: bottom center;
+  animation: cat-hop 0.6s var(--ease-emphasized) 0.6s both;
+}
+
+@keyframes hero-laptop-rise {
+  from {
+    opacity: 0;
+    transform: translateY(56px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-laptop {
+  animation: hero-laptop-rise 0.9s var(--ease-emphasized) 0.3s both;
+}
+
+/* Looping sprite strip (laptop screen): the strip slides one frame per step. */
+@keyframes sprite-loop {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-sprite-loop {
+  animation-name: sprite-loop;
+  animation-iteration-count: infinite;
+}
+
+/* Clouds and birds cross the whole window; negative delays spread them out. */
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-260px);
+  }
+  to {
+    transform: translateX(min(100vw, 1440px));
+  }
+}
+
+.animate-cloud-drift {
+  animation: cloud-drift 140s linear infinite;
+}
+
+.animate-cloud-drift-slow {
+  animation: cloud-drift 220s linear infinite;
+}
+
+.animate-bird-flight {
+  animation: cloud-drift 60s linear -25s infinite;
+}
+
+/* Night stars: a slow, uneven twinkle (delays vary per star). */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 3.6s ease-in-out infinite;
+}
+
+/* Paw prints on the glass: decoration, so they only fade in (no movement). */
+@keyframes paw-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-paw-fade {
+  animation: paw-fade 0.8s ease-out both;
+}
+
+/* Two-frame wing flap: one frame shows while the other hides. */
+@keyframes wing-up {
+  0%, 49.9% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes wing-down {
+  0%, 49.9% {
+    opacity: 0;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+
+.animate-wing-up {
+  animation: wing-up 0.5s steps(1) infinite;
+}
+
+.animate-wing-down {
+  animation: wing-down 0.5s steps(1) infinite;
 }
 
 @keyframes hero-done-color {
@@ -270,7 +377,7 @@ body {
     color: var(--color-ink);
   }
   100% {
-    color: var(--color-accent-strong);
+    color: var(--hero-done, var(--color-accent-strong));
   }
 }
 
@@ -365,6 +472,59 @@ body {
   animation: hero-done-underline 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.62s forwards;
 }
 
+/*
+  "Done" fish (components/landing/done-word.tsx). They rest on the cap tops
+  (top: 0.12em, lifted by their own height, plus --rise), so they never cover
+  letters. Transitions, not keyframes, so a hover that ends mid-hop reverses from
+  where the fish are. Rise: 420ms with a small overshoot and an uneven stagger
+  (--d). Sink: 180ms, no stagger: exits are quicker than entrances. They start
+  mostly above the letters, at 0.7 scale and hidden (never from scale(0)).
+*/
+.done-lift {
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.done-fish {
+  position: absolute;
+  z-index: 20;
+  top: 0.12em;
+  left: var(--x);
+  line-height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -55%) scale(0.7) rotate(0deg);
+  transition:
+    transform 180ms cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.done-word[data-leaping="true"] .done-fish {
+  opacity: 1;
+  transform: translate(-50%, calc(-100% - var(--rise))) scale(1) rotate(var(--rot));
+  transition:
+    transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--d),
+    opacity 160ms cubic-bezier(0.23, 1, 0.32, 1) var(--d);
+}
+@media (hover: hover) and (pointer: fine) {
+  .done-word:hover .done-lift {
+    transform: translateY(-0.05em);
+  }
+  .done-word:hover .done-fish {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% - var(--rise))) scale(1) rotate(var(--rot));
+    transition:
+      transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--d),
+      opacity 160ms cubic-bezier(0.23, 1, 0.32, 1) var(--d);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .done-lift,
+  .done-fish,
+  .done-word:hover .done-fish,
+  .done-word[data-leaping="true"] .done-fish {
+    transition: opacity 150ms linear !important;
+  }
+}
+
 @keyframes fish-swim-gentle {
   0%,
   100% {
@@ -407,57 +567,6 @@ body {
  * under a 30-56px blur forced a full re-blur every frame, and the corner shape
  * is invisible under that much blur anyway. Slow cycles keep the section calm.
  */
-@keyframes fluid-flow-left {
-  0% {
-    transform: translate3d(0px, 0px, 0) scale(0.96) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(150px, 50px, 0) scale(1.14) rotate(14deg);
-  }
-  100% {
-    transform: translate3d(35px, -45px, 0) scale(1.02) rotate(-10deg);
-  }
-}
-
-@keyframes fluid-flow-right {
-  0% {
-    transform: translate3d(0px, 0px, 0) scale(1) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(-160px, -50px, 0) scale(1.15) rotate(-16deg);
-  }
-  100% {
-    transform: translate3d(-50px, 45px, 0) scale(0.95) rotate(12deg);
-  }
-}
-
-@keyframes fluid-flow-bottom {
-  0% {
-    transform: translate3d(0px, 0px, 0) scale(0.94);
-    opacity: 0.88;
-  }
-  50% {
-    transform: translate3d(45px, -110px, 0) scale(1.16);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(-35px, -50px, 0) scale(1.02);
-    opacity: 0.92;
-  }
-}
-
-.animate-fluid-left {
-  animation: fluid-flow-left 14s ease-in-out infinite alternate;
-}
-
-.animate-fluid-right {
-  animation: fluid-flow-right 16s ease-in-out 0.8s infinite alternate;
-}
-
-.animate-fluid-bottom {
-  animation: fluid-flow-bottom 12s ease-in-out 1.2s infinite alternate;
-}
-
 /*
  * Text links. One source of truth so every link behaves the same:
  * - underline follows the text color (ink on the page, red inside error alerts;
@@ -467,6 +576,26 @@ body {
  * Footer links use `hover:link-underline` (underline only appears on hover)
  * together with `link-hover-weight`.
  */
+/*
+  Walnut with a soft grain: fine lines, a few wider streaks, and a light-to-dark
+  falloff across the piece. wood-h runs along horizontal pieces, wood-v along
+  vertical ones. Base colour is --wood (defaults to the frame colour).
+*/
+@utility wood-h {
+  background-color: var(--wood, var(--color-window-frame));
+  background-image:
+    linear-gradient(180deg, rgb(255 236 214 / 0.12), transparent 45%, rgb(30 14 4 / 0.16)),
+    repeating-linear-gradient(179.4deg, rgb(30 14 4 / 0.09) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(180.6deg, rgb(255 228 196 / 0.07) 0 2px, transparent 2px 13px);
+}
+@utility wood-v {
+  background-color: var(--wood, var(--color-window-frame));
+  background-image:
+    linear-gradient(90deg, rgb(255 236 214 / 0.12), transparent 45%, rgb(30 14 4 / 0.16)),
+    repeating-linear-gradient(89.4deg, rgb(30 14 4 / 0.09) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90.6deg, rgb(255 228 196 / 0.07) 0 2px, transparent 2px 13px);
+}
+
 @utility link-underline {
   text-decoration-line: underline;
   text-decoration-color: currentColor;
@@ -509,3 +638,637 @@ body {
 @utility surface-sky-fill {
   background-image: linear-gradient(to top, var(--color-sky-fill) 0%, var(--color-sky-fill) 70%, transparent 100%);
 }
+
+/* ==================================================================
+   App UI replicas (components/app-ui). Values copied from the PAWSE
+   desktop app (src/renderer/index.css, test-branch), at 1.5x for the web.
+   ================================================================== */
+
+/* Scaled as one piece: laid out at 330px wide (the xl card) and sized in --u,
+   1/330 of the card's width, so every size shrinks or grows together
+   instead of only the width changing. The wrapper is the size container. */
+.app-cat-scale {
+  container-type: inline-size;
+}
+.app-cat-btn {
+  /* Theme values per companion, from the app's --theme-* tokens */
+  --cat-solid: var(--color-app-classic-solid);
+  --cat-light: var(--color-app-classic-light);
+  --cat-dark: var(--color-app-classic-dark);
+
+  --u: calc(100cqw / 330);
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: calc(132 * var(--u));
+  padding: calc(10 * var(--u)) calc(18 * var(--u));
+  border: none;
+  border-radius: calc(12 * var(--u));
+  overflow: hidden;
+  text-align: left;
+  cursor: default;
+  background-image: linear-gradient(180deg, #FFF 0%, var(--cat-light) 50%, var(--cat-light) 100%);
+  background-origin: border-box;
+  background-size: 1% 200%;
+  background-position: top;
+  box-shadow: 0 calc(3 * var(--u)) calc(9 * var(--u)) 0 rgb(0 0 0 / 0.25);
+  transition:
+    background-position 2.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.app-cat-btn[data-theme="sprint"] {
+  --cat-solid: var(--color-app-sprint-solid);
+  --cat-light: var(--color-app-sprint-light);
+  --cat-dark: var(--color-app-sprint-dark);
+}
+.app-cat-btn[data-theme="focused"] {
+  --cat-solid: var(--color-app-focused-solid);
+  --cat-light: var(--color-app-focused-light);
+  --cat-dark: var(--color-app-focused-dark);
+}
+@media (hover: hover) {
+  .app-cat-btn:hover {
+    background-position: bottom;
+    transform: translateY(calc(-3 * var(--u)));
+    box-shadow: 0 calc(6 * var(--u)) calc(15 * var(--u)) 0 rgb(0 0 0 / 0.15);
+  }
+}
+
+.app-cat-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 62%;
+  min-width: 0;
+}
+.app-cat-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: calc(3 * var(--u)) calc(9 * var(--u));
+  border: max(1px, calc(1.5 * var(--u))) solid transparent;
+  border-radius: calc(12 * var(--u));
+  background: var(--cat-solid);
+  color: var(--color-app-text-black);
+  font: 500 calc(13 * var(--u))/1.2 var(--font-inter), sans-serif;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+@media (hover: hover) {
+  .app-cat-btn:hover .app-cat-label {
+    background: var(--color-app-bg-main);
+    border-color: var(--cat-solid);
+    color: var(--cat-dark);
+  }
+}
+.app-cat-name {
+  margin-top: calc(2 * var(--u));
+  font: 700 calc(42 * var(--u))/1.05 var(--font-pixelify), monospace;
+  color: var(--color-app-text-black);
+}
+.app-cat-session {
+  margin-top: calc(2 * var(--u));
+  font: 400 calc(15 * var(--u))/1.3 var(--font-inter), sans-serif;
+  color: var(--color-app-text-black);
+}
+
+/* The cat peeks up from the bottom edge (the app's bottom-aligned peeking sprite) */
+.app-cat-image {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 38%;
+  margin-bottom: calc(-10 * var(--u));
+}
+.app-cat-sprite {
+  position: relative;
+  display: block;
+  width: calc(128 * var(--u));
+  height: calc(128 * var(--u));
+  flex-shrink: 0;
+  pointer-events: none;
+}
+/* All pose layers stay painted; only opacity switches (no load or decode on change) */
+.app-cat-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+}
+.app-cat-strip {
+  background-size: 400% 100%;
+}
+/* 4 frames; 1s, like the app's 1.0s steps(4). In %, so it follows the scaled size:
+   with a 400% strip, 133.33% moves it by four frame widths. */
+.animate-app-peek {
+  animation: app-peek 1s steps(4) infinite;
+}
+@keyframes app-peek {
+  to { background-position: 133.333% 0; }
+}
+
+/* ==================================================================
+   Paw-print trail down the feature tour (components/landing/paw-trail.tsx).
+   Each print lands once and stays: fade + a small step, settling from 0.85
+   scale (never 0), strong ease-out, with --paw-delay so a batch lands one by
+   one. The newest print per side is blue ([data-fresh]); older ones cool to
+   grey over 1.4s (slow on purpose: decoration shouldn't compete).
+   --gutter: the side margin; --paw-edge / --paw-wander / --paw-lane are
+   shares of it (start, drift range, step between paws), so the walk uses the
+   empty space on wide screens and stays out of the content on narrow ones.
+   ================================================================== */
+.paw-trail {
+  display: none;
+  /* The side margin: the sections' own padding, plus the space outside the
+     1280px content column on wide screens. The walk lives inside it. */
+  --pad: 24px;
+  --gutter: max(var(--pad), calc((100vw - 80rem) / 2 + var(--pad)));
+  --paw-size: 12px;
+  --paw-edge: calc(var(--gutter) * 0.18);
+  /* Drift range: the walk's furthest reach is 75% of the margin, so a quarter stays clear of the content */
+  --paw-wander: max(2px, calc(var(--gutter) * 0.75 - var(--paw-edge) - var(--paw-size) - var(--paw-lane)));
+  --paw-lane: clamp(3px, calc(var(--gutter) * 0.07), 12px);
+  --paw-grey: rgb(140 148 160 / 0.38);
+  --paw-blue: rgb(35 148 223 / 0.78);
+  /* Inside Progress' blue: tints of that blue, so the prints sink into it */
+  --paw-in-blue: rgb(96 170 226 / 0.34);
+  --paw-in-blue-fresh: rgb(53 150 222 / 0.55);
+  z-index: 20;
+}
+/* Only where the side margins have room (lg+); on narrower screens it would crowd the content */
+@media (min-width: 1024px) { .paw-trail { display: block; } }
+@media (min-width: 768px) { .paw-trail { --pad: 48px; --paw-size: 16px; --paw-edge: calc(var(--gutter) * 0.25); } }
+@media (min-width: 1024px) { .paw-trail { --pad: 80px; } }
+@media (min-width: 1280px) { .paw-trail { --paw-size: 22px; } }
+.paw-print {
+  position: absolute;
+  width: var(--paw-size);
+  line-height: 0;
+  color: var(--paw-grey);
+  opacity: 0;
+  transform: translateY(-6px) rotate(var(--paw-tilt)) scale(0.85);
+  transition:
+    opacity 360ms cubic-bezier(0.23, 1, 0.32, 1) var(--paw-delay, 0ms),
+    transform 360ms cubic-bezier(0.23, 1, 0.32, 1) var(--paw-delay, 0ms),
+    color 1400ms ease;
+}
+.paw-print[data-shown] {
+  opacity: 1;
+  transform: translateY(0) rotate(var(--paw-tilt)) scale(1);
+}
+.paw-print[data-fresh] {
+  color: var(--paw-blue);
+}
+.paw-print[data-blue] {
+  color: var(--paw-in-blue);
+}
+.paw-print[data-blue][data-fresh] {
+  color: var(--paw-in-blue-fresh);
+}
+@media (prefers-reduced-motion: reduce) {
+  .paw-print { transition: none; }
+}
+
+/* ==================================================================
+   App Dashboard replica (components/app-ui/dashboard-window.tsx).
+   Values from the app's settings.css / index.css (test-branch), at the
+   app's real size (720x480), scaled as one piece to the frame's width.
+   ================================================================== */
+@font-face {
+  font-family: "Pixeloid Sans";
+  src: url("/fonts/pixeloid-sans-digits.woff") format("woff"); /* the app maps weight 500 to PixeloidSans-Bold.ttf */
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0030-003A; /* digits and the colon */
+}
+.app-dash-frame {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 720 / 480;
+}
+.app-dash {
+  /* The app's tokens, scoped to the replica */
+  --ad-black: #141414;
+  --ad-gray: #52525B;
+  --ad-gray-light: #5F5F5F;
+  --ad-bg: #F6F8F7;
+  --ad-stroke: #E4E4E7;
+  --ad-blue: #35A6F1;
+  --ad-blue-grad: #A8DCFF;
+  --ad-teal: #10BCAC;
+  --ad-teal-sub: #0C8C80;
+  --ad-streak: #F28936;
+  --ad-streak-sub: #9E5F2E;
+  --ad-inter: var(--font-inter), "Inter", sans-serif;
+  --ad-pixel: var(--font-pixelify), "Pixelify Sans", sans-serif;
+  --ad-num: "Pixeloid Sans", var(--font-pixelify), monospace;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 720px;
+  height: 480px;
+  /* Scale = frame width / 720px (a unitless ratio from two lengths) */
+  transform: scale(tan(atan2(100cqw, 720px)));
+  transform-origin: 0 0;
+  background: var(--ad-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08), 0 30px 60px -30px rgb(20 40 70 / 0.35);
+  color: var(--ad-black);
+  font-family: var(--ad-inter);
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+}
+.app-dash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--ad-stroke);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.app-dash p { margin: 0; }
+.app-dash img { display: block; max-width: none; }
+.ad-page { height: 100%; display: flex; }
+
+/* Sidebar */
+.ad-side {
+  width: 180px; flex-shrink: 0; padding: 8px 16px; display: flex; flex-direction: column;
+  border-right: 1px solid var(--ad-stroke); background: var(--ad-bg); white-space: nowrap;
+}
+.ad-side-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.ad-brand { display: flex; align-items: center; gap: 4px; }
+.ad-brand-logo { width: 24px; height: 24px; object-fit: contain; image-rendering: pixelated; }
+.ad-title { font: 700 16px/16px var(--ad-pixel); }
+.ad-dock { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.ad-dock img { width: 20px; height: 20px; image-rendering: pixelated; }
+.ad-nav {
+  height: 36px; padding: 8px 10px; display: flex; align-items: center; gap: 4px;
+  border: 1px solid transparent; border-radius: 8px; font: 500 12px var(--ad-inter);
+}
+.ad-nav img { width: 16px; height: 16px; }
+.ad-nav-active { border-color: var(--ad-stroke); background: rgb(0 0 0 / 0.06); }
+.ad-utilities { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
+
+/* Right side */
+.ad-right { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.ad-titlebar {
+  height: 40px; flex-shrink: 0; padding: 8px 12px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--ad-stroke);
+}
+.ad-ctl img { width: 24px; height: 24px; image-rendering: pixelated; }
+.ad-main { flex: 1; min-height: 0; padding: 32px 24px; display: flex; flex-direction: column; gap: 16px; }
+.ad-header { display: flex; flex-direction: column; gap: 4px; }
+.ad-header-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ad-h1 { font: 600 20px var(--ad-inter); }
+.ad-refresh { width: 16px; height: 16px; }
+.ad-date { font: 500 12px var(--ad-inter); color: var(--ad-gray-light); min-height: 15px; }
+
+/* Analytics cards */
+.ad-cards { display: flex; gap: 16px; }
+.ad-card {
+  position: relative; flex: 1 0 0; height: 86px; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  border: 1px solid var(--ad-stroke); border-radius: 8px; overflow: hidden;
+}
+.ad-card-focus { background: linear-gradient(180deg, #FFFFFF 0%, #99F6E4 100%); }
+.ad-card-streak { background: linear-gradient(180deg, #FFF 0%, #FFBE8A 100%); }
+.ad-card-companion { background: linear-gradient(180deg, #FFF 0%, #ECFEA9 100%); }
+.ad-card-title { width: calc(100% - 30px); font: 600 11px var(--ad-inter); color: var(--ad-gray-light); }
+.ad-card-focus .ad-card-title { color: var(--ad-teal); }
+.ad-card-streak .ad-card-title { color: var(--ad-streak); }
+.ad-icon {
+  position: absolute; right: 12px; top: 12px; width: 22px; height: 22px; padding: 4px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle 22px at center, #5F5F5F 0%, #5F5F5F 10%, #D9D9D9 72%, #ECECEC 88%, #FFFFFF 100%);
+  box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.15);
+}
+.ad-card-companion .ad-icon { background: rgb(255 255 255 / 0.5); box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.1); }
+.ad-icon-focus {
+  background: radial-gradient(circle 22px at center, #13D3C2 0%, #89E9E1 35%, #C4F4F0 60%, #E1F9F7 80%, #FFFFFF 100%);
+  box-shadow: 0 1px 4px 0 rgb(19 211 194 / 0.25);
+}
+.ad-icon-streak {
+  background: radial-gradient(circle 22px at center, #F28936 0%, #F4984F 35%, #F5A768 60%, #F9C49A 80%, #FFFFFF 100%);
+  box-shadow: 0 1px 4px 0 rgb(158 95 46 / 0.25);
+}
+.ad-icon img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.ad-card-body { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; line-height: 1; }
+.ad-value { display: flex; align-items: center; gap: 8px; font: 700 24px/1 var(--ad-pixel); }
+.ad-value > span { display: inline-flex; align-items: center; line-height: 1; }
+.ad-num { font: 500 20px/1 var(--ad-num); text-shadow: 0 0 1.15px currentColor; }
+.ad-sub { font: 400 10px var(--ad-inter); color: var(--ad-gray-light); white-space: nowrap; }
+.ad-card-focus .ad-sub { color: var(--ad-teal-sub); }
+.ad-card-streak .ad-sub { color: var(--ad-streak-sub); }
+
+/* Weekly Flow */
+.ad-graph {
+  flex: 1; min-height: 0; padding: 8px 16px 12px; display: flex; flex-direction: column;
+  border: 1px solid var(--ad-stroke); border-radius: 8px; background: #FFFFFF;
+}
+.ad-graph-head { display: flex; justify-content: space-between; align-items: center; }
+.ad-h2 { font: 500 14px var(--ad-inter); color: var(--ad-black); }
+.ad-picker { width: 120px; display: flex; align-items: center; }
+.ad-arrow { padding: 4px; font-size: 18px; line-height: 1; color: var(--ad-gray); }
+.ad-arrow-off { color: var(--ad-stroke); }
+.ad-range { width: 100px; text-align: center; font: 500 10px/1.2 var(--ad-inter); white-space: nowrap; }
+.ad-legend { display: flex; gap: 10px; font: 400 8px var(--ad-inter); color: var(--ad-gray); }
+.ad-legend span { display: flex; align-items: center; gap: 4px; }
+.ad-sw { width: 6px; height: 6px; border-radius: 1px; background: var(--ad-blue-grad); }
+.ad-sw-today { background: var(--color-app-classic-light); }
+.ad-bars {
+  position: relative; flex: 1; min-height: 0; display: flex; align-items: stretch; justify-content: space-between;
+  gap: 16px; padding-top: 16px; padding-right: 68px;
+}
+.ad-col { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; height: 100%; }
+.ad-bar {
+  position: relative; width: 100%; border-radius: 6px; background: var(--ad-blue-grad);
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+.ad-today .ad-bar { background: var(--color-app-classic-light); }
+.ad-day { font: 400 10px var(--ad-inter); color: var(--ad-gray); line-height: 12px; transition: color 0.2s ease; }
+.ad-today .ad-day { color: var(--ad-black); font-weight: 600; }
+.ad-tip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) translateY(4px);
+  padding: 4px 6px; border-radius: 4px; background: var(--ad-black); color: #FFF; font: 500 10px var(--ad-inter);
+  white-space: nowrap; opacity: 0; pointer-events: none; z-index: 10;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25); transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.ad-tip::after {
+  content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 4px solid transparent; border-top-color: var(--ad-black);
+}
+@media (hover: hover) {
+  .ad-col:hover .ad-bar { background: var(--ad-blue); transform: translateY(-2px); }
+  .ad-today:hover .ad-bar { background: var(--color-app-classic-solid); }
+  .ad-col:hover .ad-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .ad-col:hover .ad-day { color: var(--ad-black); font-weight: 600; }
+}
+.ad-avg {
+  position: absolute; left: 0; right: 12px; height: 0; z-index: 4; pointer-events: none;
+  border-top: 1.5px dashed rgb(53 166 241 / 0.75);
+}
+.ad-avg-label {
+  position: absolute; right: -12px; top: 0; transform: translateY(-50%);
+  padding: 2px 6px 2px 10px; border-radius: 0 4px 4px 0; background: var(--ad-blue); color: #FFF;
+  font: 400 10px var(--ad-inter); white-space: nowrap;
+  clip-path: polygon(6px 0%, 100% 0%, 100% 100%, 6px 100%, 0% 50%);
+}
+.ad-avg-label strong { font-weight: 600; }
+
+/* ==================================================================
+   App timer replica + Focus demo (components/app-ui/timer-window.tsx,
+   components/landing/focus-demo.tsx). Values from the app's timer.css /
+   index.css (test-branch). The window is shown at the app's real size;
+   the stage only scales down on very narrow screens.
+   ================================================================== */
+/* The panel (.fd-panel) is the size container. --k shrinks the stage only
+   when the panel is narrower than 360px; otherwise the window is 1:1. */
+.fd-panel { container-type: inline-size; }
+.fd-frame {
+  --k: min(1, tan(atan2(100cqw, 360px)));
+  position: relative;
+  width: 100%;
+  height: calc(480px * var(--k));
+  overflow: hidden;
+}
+.fd-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100cqw / var(--k));
+  height: 480px;
+  transform: scale(var(--k));
+  transform-origin: 0 0;
+}
+/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage */
+.fd-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  transition: transform var(--fd-glide, 1000ms) cubic-bezier(0.45, 0.05, 0.25, 1);
+}
+.fd-slot { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+/* The cursor, and a ring where it clicks. X and Y move on separate layers with
+   different easings, so every move bends into a soft arc like a real hand. */
+.fd-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform var(--fd-ms, 900ms) cubic-bezier(0.45, 0, 0.2, 1), opacity 450ms ease;
+}
+.fd-cursor.is-on { opacity: 1; }
+.fd-cursor-y {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 22px;
+  transition: transform var(--fd-ms, 900ms) cubic-bezier(0.2, 0.4, 0.2, 1);
+}
+.fd-cursor svg { display: block; width: 22px; height: 22px; filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.3)); transition: transform 160ms ease; transform-origin: 4px 3px; }
+.fd-cursor.is-down svg { transform: scale(0.86); }
+.fd-cursor-y::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: -10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgb(53 166 241 / 0.7);
+  opacity: 0;
+  transform: scale(0.4);
+}
+.fd-cursor.is-down .fd-cursor-y::before { animation: fd-ring 600ms ease-out; }
+@keyframes fd-ring {
+  0% { opacity: 1; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+/* ---- The timer window ---- */
+.at-win {
+  --at-black: #141414;
+  --at-bg: #F6F8F7;
+  --at-stroke: #E4E4E7;
+  --at-blue: #35A6F1;
+  --at-topbar: #FAFAFA;
+  --at-inter: var(--font-inter), "Inter", sans-serif;
+  --at-pixel: var(--font-pixelify), "Pixelify Sans", sans-serif;
+  --at-num: "Pixeloid Sans", var(--font-pixelify), monospace;
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  width: 294px;
+  height: 422px;
+  background: var(--at-bg);
+  border: 1px solid var(--at-stroke);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08), 0 24px 48px -24px rgb(20 40 70 / 0.35);
+  color: var(--at-black);
+  font-family: var(--at-inter);
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  transition: width 350ms cubic-bezier(0.2, 0.8, 0.2, 1), height 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.at-win img { display: block; max-width: none; }
+.at-win.is-cat { width: 224px; height: 232px; }
+.at-win.is-timer { width: 224px; height: 92px; }
+
+/* On a mode change the window resizes quickly and its new layout fades in as it
+   arrives, instead of popping in clipped (the parts remount, replaying this). */
+.at-titlebar,
+.at-main { animation: at-settle 220ms ease-out 160ms both; }
+@keyframes at-settle { from { opacity: 0; } }
+
+/* Title bar */
+.at-titlebar {
+  position: relative;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--at-stroke);
+  background: var(--at-topbar);
+}
+.at-title { display: flex; align-items: center; gap: 8px; }
+.at-logo { width: 24px; height: 24px; image-rendering: pixelated; }
+.at-name { font: 700 16px/16px var(--at-pixel); }
+.at-ctls { display: flex; gap: 8px; align-items: center; }
+.at-ctl { position: relative; width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background-color 150ms ease, transform 150ms ease; }
+.at-ctl img { width: 24px; height: 24px; image-rendering: pixelated; }
+.at-ctl.is-hot { background: rgb(0 0 0 / 0.05); }
+.at-divider { width: 2px; height: 24px; margin: 0 4px; background: var(--at-stroke); }
+
+/* The app's clock style (.font-pixel-num-*: Pixeloid Sans at weight 500, which
+   the app maps to PixeloidSans-Bold, plus a faint same-colour glow). Size is
+   set by the caller; the glow scales with it (1.2px at 48px). */
+.app-clock {
+  font-family: "Pixeloid Sans", var(--font-pixelify), monospace;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 0.025em currentColor;
+}
+
+/* Main content */
+/* The app's index.css .main-content (flex column, space-between) with timer.css's padding */
+.at-main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 20px 22px; overflow: hidden; }
+.at-time { width: 100%; padding-top: 8px; text-align: center; line-height: 1; }
+.at-digits { font: 500 48px/1 var(--at-num); font-variant-numeric: tabular-nums; text-shadow: 0 0 1.2px currentColor; }
+.at-fish { display: flex; justify-content: center; gap: 8px; }
+.at-fish span { width: 24px; height: 24px; background: center / contain no-repeat; image-rendering: pixelated; }
+.at-cat { width: 100%; height: 210px; padding: 8px 0; display: flex; align-items: center; justify-content: center; }
+.at-sprite {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  transform: scale(3);
+  image-rendering: pixelated;
+  transition: filter 250ms ease;
+}
+.at-controls { position: relative; width: 100%; padding: 2px 0; display: flex; justify-content: center; align-items: center; gap: 16px; }
+.at-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--at-stroke);
+  background: #FAFAFA;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+  transition: transform 150ms ease;
+}
+.at-btn img { width: 14px; height: 14px; object-fit: contain; opacity: 0.8; }
+.at-play { width: 42px; height: 42px; border: none; background: var(--at-blue); box-shadow: 0 4px 8px rgb(53 166 241 / 0.3); }
+.at-play img { width: 18px; height: 18px; opacity: 1; filter: brightness(0) invert(1); }
+.at-restore { display: none; }
+
+/* Mini modes (the app's body.cat-only-mode / body.timer-only-mode) */
+.at-win.is-cat .at-titlebar,
+.at-win.is-timer .at-titlebar {
+  position: absolute; inset: 0 0 auto; height: 12px; padding: 0; border: none; background: transparent; z-index: 10;
+}
+.at-win.is-cat .at-titlebar > *,
+.at-win.is-timer .at-titlebar > * { display: none; }
+.at-win.is-cat .at-titlebar::after,
+.at-win.is-timer .at-titlebar::after {
+  content: ""; position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 3px; border-radius: 2px; background: var(--at-stroke); opacity: 0.6;
+}
+.at-win.is-hover .at-titlebar::after { opacity: 1; background: var(--at-blue); }
+.at-win.is-cat .at-main,
+.at-win.is-timer .at-main { position: relative; padding: 0; width: 100%; height: 100%; }
+.at-win.is-cat .at-fish,
+.at-win.is-timer .at-fish,
+.at-win.is-timer .at-cat { display: none; }
+.at-win.is-cat .at-cat { height: 100%; padding: 0; }
+.at-win.is-cat .at-time {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0;
+  transform: translateY(-18px); z-index: 6; opacity: 0; transition: opacity 300ms ease;
+}
+.at-win.is-cat .at-digits { color: #FFF; text-shadow: 0 2px 8px rgb(0 0 0 / 0.8); }
+.at-win.is-cat.is-hover .at-time { opacity: 1; }
+.at-win.is-cat.is-hover .at-sprite { filter: blur(4px); }
+.at-win.is-timer .at-time { height: 100%; display: flex; align-items: center; justify-content: center; padding: 0; transition: filter 250ms ease, opacity 250ms ease; }
+.at-win.is-timer.is-hover .at-time { filter: blur(3px); opacity: 0.45; }
+.at-win.is-cat .at-controls,
+.at-win.is-timer .at-controls {
+  position: absolute; inset: 0; padding: 0; z-index: 5; background: rgb(0 0 0 / 0.5); opacity: 0; transition: opacity 300ms ease;
+}
+.at-win.is-cat .at-controls { align-items: flex-end; padding-bottom: 24px; }
+.at-win.is-cat .at-btn:not(.at-play):not(.at-restore) { margin-bottom: 5px; }
+.at-win.is-cat .at-btn:not(.at-play):not(.at-restore),
+.at-win.is-timer .at-btn:not(.at-play):not(.at-restore) { box-shadow: 0 4px 12px rgb(0 0 0 / 0.2); }
+.at-win.is-cat .at-play,
+.at-win.is-timer .at-play { box-shadow: 0 4px 15px rgb(53 166 241 / 0.5); }
+.at-win.is-hover .at-controls { opacity: 1; }
+.at-win.is-cat .at-restore,
+.at-win.is-timer .at-restore {
+  display: flex; position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; margin: 0;
+  border: none; border-radius: 0; background: transparent; box-shadow: none; z-index: 11;
+}
+.at-restore img { width: 18px; height: 18px; opacity: 0.7; filter: brightness(0) invert(1); transition: opacity 150ms ease, filter 150ms ease; }
+.at-restore.is-hot img { opacity: 1; filter: invert(57%) sepia(90%) saturate(1469%) hue-rotate(178deg) brightness(98%) contrast(93%); }
+
+/* Select Mode dialog */
+.at-modal {
+  position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+  background: rgb(0 0 0 / 0.5); opacity: 0; visibility: hidden; transition: opacity 300ms ease, visibility 0s 300ms;
+}
+.at-modal.is-open { opacity: 1; visibility: visible; transition: opacity 300ms ease; }
+.at-dialog {
+  width: 80%; padding: 24px; display: flex; flex-direction: column; gap: 16px; border-radius: 8px;
+  background: var(--at-bg); text-align: center; transform: scale(0.92); transition: transform 300ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.at-modal.is-open .at-dialog { transform: scale(1); }
+.at-dialog-title { margin: 0; font: 500 16px var(--at-inter); }
+.at-options { display: flex; flex-direction: column; gap: 8px; }
+.at-option {
+  display: flex; justify-content: center; align-items: center; padding: 8px 24px; border-radius: 16px;
+  border: 2px solid var(--at-blue); background: var(--at-blue); color: var(--at-bg); font: 500 12px var(--at-inter);
+  transition: transform 150ms ease, filter 150ms ease;
+}
+.at-option.is-hot { filter: brightness(0.95); }
+.at-option.is-down, .at-btn.is-down, .at-ctl.is-down { transform: scale(0.95); }
+
+@keyframes at-idle-4 { to { background-position: -256px 0; } }
+@keyframes at-idle-5 { to { background-position: -320px 0; } }
+/* Break strips, played once (Void 7, Ginger 9, Tux 10 frames) */
+@keyframes at-strip-7 { to { background-position: -448px 0; } }
+@keyframes at-strip-9 { to { background-position: -576px 0; } }
+@keyframes at-strip-10 { to { background-position: -640px 0; } }

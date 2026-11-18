@@ -4,13 +4,45 @@ import { useSyncExternalStore } from "react";
 
 export type DetectedPlatform = "windows" | "mac" | "linux" | "mobile" | "other";
 
-export interface DesktopPlatformOption {
-    id: "windows" | "mac" | "linux";
+export type DesktopOs = "windows" | "mac" | "linux";
+
+export type DownloadId = "windows" | "mac" | "linux-appimage" | "linux-deb";
+
+export interface DesktopDownload {
+    id: DownloadId;
+    os: DesktopOs;
     name: string;
     subtitle: string;
+    /** Tells builds of one OS apart in running text ("Linux (AppImage, .deb)"). */
+    short: string;
     extension: string;
     fileName: string;
     href: string;
+}
+
+/**
+ * Where the installers live: the latest GitHub release of the public
+ * educ-jkescritor/Pawse-Releases repo. File names carry no version, so these
+ * links always serve the newest release without changes here.
+ */
+const DOWNLOAD_BASE = "https://github.com/educ-jkescritor/Pawse-Releases/releases/latest/download";
+
+function download(d: Omit<DesktopDownload, "href">): DesktopDownload {
+    return { ...d, href: `${DOWNLOAD_BASE}/${d.fileName}` };
+}
+
+/** Every installer, in the order the "Other platforms" list shows them. */
+export const DESKTOP_DOWNLOADS: DesktopDownload[] = [
+    download({ id: "windows", short: "Windows", os: "windows", name: "Windows", subtitle: "Windows 10 & 11 (64-bit)", extension: ".exe", fileName: "PawseSetup.exe" }),
+    download({ id: "mac", short: "Mac", os: "mac", name: "macOS", subtitle: "Apple Silicon & Intel", extension: ".dmg", fileName: "Pawse.dmg" }),
+    download({ id: "linux-appimage", short: "AppImage", os: "linux", name: "Linux", subtitle: "Any distro, updates itself", extension: ".AppImage", fileName: "Pawse.AppImage" }),
+    download({ id: "linux-deb", short: ".deb", os: "linux", name: "Linux", subtitle: "Ubuntu, Debian & Mint", extension: ".deb", fileName: "Pawse.deb" }),
+];
+
+export const OS_LABELS: Record<DesktopOs, string> = { windows: "Windows", mac: "Mac", linux: "Linux" };
+
+export function getDownload(id: DownloadId): DesktopDownload {
+    return DESKTOP_DOWNLOADS.find((d) => d.id === id)!;
 }
 
 export interface PlatformDownloadInfo {
@@ -20,62 +52,45 @@ export interface PlatformDownloadInfo {
     isDownload: boolean;
     isMobileShare?: boolean;
     altPlatformText?: string;
-    altPlatformFile?: string;
     iconType: "download" | "share";
+    /** Desktop: the build the main button gives. */
+    downloadId?: DownloadId;
+    /** Desktop OSes with more than one build: names the one the button gives ("AppImage"). */
+    buildLabel?: string;
 }
 
-export const DESKTOP_PLATFORMS: DesktopPlatformOption[] = [
-    {
-        id: "windows",
-        name: "Windows",
-        subtitle: "Windows 10 & 11 (64-bit)",
-        extension: ".exe",
-        fileName: "pawse-setup.exe",
-        href: "/downloads/pawse-setup.exe",
-    },
-    {
-        id: "mac",
-        name: "macOS",
-        subtitle: "Apple Silicon & Intel",
-        extension: ".dmg",
-        fileName: "pawse.dmg",
-        href: "/downloads/pawse.dmg",
-    },
-    {
-        id: "linux",
-        name: "Linux",
-        subtitle: "64-bit Linux (x86_64)",
-        extension: ".AppImage",
-        fileName: "pawse.AppImage",
-        href: "/downloads/pawse.AppImage",
-    },
-];
+function desktopConfig(label: string, id: DownloadId, buildLabel?: string): PlatformDownloadInfo {
+    const d = getDownload(id);
+    return {
+        label,
+        fileName: d.fileName,
+        href: d.href,
+        isDownload: true,
+        altPlatformText: "Other platforms",
+        iconType: "download",
+        downloadId: id,
+        buildLabel,
+    };
+}
 
+/**
+ * Every build except the one the main button gives: the same OS's other build
+ * first (.deb), then the other OSes in list order.
+ */
+export function otherDownloads(primary: DownloadId): DesktopDownload[] {
+    const os = getDownload(primary).os;
+    const rest = DESKTOP_DOWNLOADS.filter((d) => d.id !== primary);
+    return [...rest.filter((d) => d.os === os), ...rest.filter((d) => d.os !== os)];
+}
+
+/**
+ * Macs get the single .dmg. Linux defaults to the AppImage, which runs
+ * anywhere; the .deb comes first in Other platforms.
+ */
 export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
-    windows: {
-        label: "Download for Windows",
-        fileName: "pawse-setup.exe",
-        href: "/downloads/pawse-setup.exe",
-        isDownload: true,
-        altPlatformText: "Other platforms",
-        iconType: "download",
-    },
-    mac: {
-        label: "Download for Mac",
-        fileName: "pawse.dmg",
-        href: "/downloads/pawse.dmg",
-        isDownload: true,
-        altPlatformText: "Other platforms",
-        iconType: "download",
-    },
-    linux: {
-        label: "Download for Linux",
-        fileName: "pawse.AppImage",
-        href: "/downloads/pawse.AppImage",
-        isDownload: true,
-        altPlatformText: "Other platforms",
-        iconType: "download",
-    },
+    windows: desktopConfig("Download for Windows", "windows"),
+    mac: desktopConfig("Download for Mac", "mac"),
+    linux: desktopConfig("Download for Linux", "linux-appimage", "AppImage"),
     mobile: {
         label: "Send to My Desktop",
         href: "#",
@@ -84,14 +99,8 @@ export const PLATFORM_CONFIG: Record<DetectedPlatform, PlatformDownloadInfo> = {
         altPlatformText: "PAWSE is built for Windows, Mac & Linux",
         iconType: "share",
     },
-    other: {
-        label: "Download for Windows",
-        fileName: "pawse-setup.exe",
-        href: "/downloads/pawse-setup.exe",
-        isDownload: true,
-        altPlatformText: "Other platforms",
-        iconType: "download",
-    },
+    // Unknown desktop OS: offer Windows, the most likely.
+    other: desktopConfig("Download for Windows", "windows"),
 };
 
 function getClientPlatform(): DetectedPlatform {
@@ -175,7 +184,7 @@ export function usePlatform() {
     return {
         platform,
         config,
-        desktopPlatforms: DESKTOP_PLATFORMS,
+        downloads: DESKTOP_DOWNLOADS,
         isMobile: platform === "mobile",
         isDownload: config.isDownload,
     };

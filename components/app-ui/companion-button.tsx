@@ -1,0 +1,187 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+/**
+ * The companion picker button from the PAWSE desktop app, rebuilt for the web
+ * as a display (not a control: no click, press or selected state).
+ *
+ * Source of truth: the app's `src/renderer/index.html` / `index.css` / `index.js`
+ * (educ-jkescritor/Pawse, test-branch). Same structure (label pill, pixel name,
+ * session line, a cat peeking up from the bottom edge), same colours (the app's
+ * --theme-* values, in globals.css as --color-app-*), same hover: the
+ * white→theme gradient slides down over 2.5s, the card rises, the label pill
+ * inverts (light fill, theme border, dark theme text), and the cat does its
+ * look-around once (mouse only), as if it noticed you.
+ * Sized at 1.5x the app's window for the web (fonts, padding, radius, shadows).
+ *
+ * The peeking cat runs the app's idle routine: it holds a random pose (1 of 4)
+ * for 2-4.2s, then sometimes plays the 4-frame look-around once or twice (1s
+ * each), never choosing a pose another cat is already showing, and only one cat
+ * animates at a time. The sprites are the app's own files (public/sprites/
+ * *-head-peek-*). The loop pauses off screen and doesn't run with reduced
+ * motion (the cat just holds its first pose).
+ *
+ * No flicker: all five images (4 poses + the look-around strip) are stacked
+ * and painted from the start, and only their opacity switches, so nothing has
+ * to load or decode at the moment the cat changes.
+ */
+
+export type AppCompanion = {
+    id: "tux" | "ginger" | "void";
+    name: string;
+    /** "Classic" | "Sprint" | "Focused" */
+    mode: string;
+    /** Matches the app's theme: classic (green), sprint (orange), focused (purple). */
+    theme: "classic" | "sprint" | "focused";
+    focusMin: number;
+    breakMin: number;
+};
+
+const SPRITES = "/sprites";
+const POSES = [1, 2, 3, 4] as const;
+
+// Shared across the three buttons, like the app: which poses are showing and who's animating.
+const currentPose: Partial<Record<AppCompanion["id"], number>> = {};
+const animating = new Set<AppCompanion["id"]>();
+
+function pickNextPose(id: AppCompanion["id"], previous: number) {
+    const others = Object.entries(currentPose)
+        .filter(([key]) => key !== id)
+        .map(([, pose]) => pose);
+    const available = POSES.filter((p) => p !== previous);
+    const preferred = available.filter((p) => !others.includes(p));
+    const pool = preferred.length > 0 ? preferred : available;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+const between = (min: number, spread: number) => min + Math.floor(Math.random() * spread);
+
+function usePeekRoutine(id: AppCompanion["id"], initialPose: number, rootRef: React.RefObject<HTMLElement | null>) {
+    const [pose, setPose] = useState(initialPose);
+    const [playing, setPlaying] = useState(false);
+
+    useEffect(() => {
+        currentPose[id] = initialPose;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        let timer: number | undefined;
+        let isStatic = true;
+        let visible = false;
+        let poseNow = initialPose;
+
+        const step = () => {
+            if (!visible) return;
+            // About to animate while another cat is: hold this pose a bit longer
+            if (isStatic && animating.size > 0) {
+                timer = window.setTimeout(step, between(400, 500));
+                return;
+            }
+            isStatic = !isStatic;
+            if (isStatic) {
+                animating.delete(id);
+                poseNow = pickNextPose(id, poseNow);
+                currentPose[id] = poseNow;
+                setPose(poseNow);
+                setPlaying(false);
+                timer = window.setTimeout(step, between(2000, 2200));
+            } else {
+                animating.add(id);
+                setPlaying(true);
+                timer = window.setTimeout(step, (Math.random() < 0.5 ? 1 : 2) * 1000);
+            }
+        };
+
+        const el = rootRef.current;
+        const io = new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting;
+            window.clearTimeout(timer);
+            if (visible) {
+                timer = window.setTimeout(step, between(1200, 1600));
+            } else if (!isStatic) {
+                // Leaving the screen mid-animation: settle on a pose
+                isStatic = true;
+                animating.delete(id);
+                setPlaying(false);
+            }
+        });
+        if (el) io.observe(el);
+
+        return () => {
+            io.disconnect();
+            window.clearTimeout(timer);
+            animating.delete(id);
+        };
+    }, [id, initialPose, rootRef]);
+
+    return { pose, playing };
+}
+
+/** Mouse hover: play the look-around once (1s), unless it's already playing. */
+function useHoverLook() {
+    const [looking, setLooking] = useState(false);
+    const timer = useRef<number | undefined>(undefined);
+    useEffect(() => () => window.clearTimeout(timer.current), []);
+    const onPointerEnter = (e: React.PointerEvent) => {
+        if (e.pointerType !== "mouse" || looking) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        setLooking(true);
+        timer.current = window.setTimeout(() => setLooking(false), 1000);
+    };
+    return { looking, onPointerEnter };
+}
+
+export default function CompanionButton({
+    companion,
+    initialPose,
+    className = "",
+}: {
+    companion: AppCompanion;
+    /** Distinct per cat, so server and client render the same first frame. */
+    initialPose: number;
+    className?: string;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+    const { pose, playing: idlePlaying } = usePeekRoutine(companion.id, initialPose, ref);
+    const { looking, onPointerEnter } = useHoverLook();
+    const playing = idlePlaying || looking;
+
+    return (
+        <div
+            ref={ref}
+            data-theme={companion.theme}
+            onPointerEnter={onPointerEnter}
+            className={`app-cat-btn ${className}`}
+        >
+            <span className="app-cat-info">
+                <span className="app-cat-label">{companion.mode}</span>
+                <span className="app-cat-name">{companion.name}</span>
+                <span className="app-cat-session">
+                    {companion.focusMin}m Focus / {companion.breakMin}m Break
+                </span>
+            </span>
+            <span className="app-cat-image" aria-hidden="true">
+                <span className="app-cat-sprite">
+                    {POSES.map((p) => (
+                        <span
+                            key={p}
+                            className="app-cat-layer"
+                            style={{
+                                backgroundImage: `url(${SPRITES}/${companion.id}-head-peek-${p}.png)`,
+                                opacity: !playing && pose === p ? 1 : 0,
+                            }}
+                        />
+                    ))}
+                    {/* The look-around strip: restarts from its first frame each time it's shown */}
+                    <span
+                        className={`app-cat-layer app-cat-strip ${playing ? "animate-app-peek" : ""}`}
+                        style={{
+                            backgroundImage: `url(${SPRITES}/${companion.id}-head-peek-sheet.png)`,
+                            opacity: playing ? 1 : 0,
+                        }}
+                    />
+                </span>
+            </span>
+        </div>
+    );
+}

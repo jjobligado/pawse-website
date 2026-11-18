@@ -1,10 +1,12 @@
 "use client";
 
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { usePlatform, type DetectedPlatform } from "@/hooks/use-platform";
 import { isContactFormConfigured, sendContactMessage } from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 import { SectionTitle } from "./section-heading";
+import SpriteCat, { type FrameStep } from "./sprite-cat";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 
 const OS_NAMES: Partial<Record<DetectedPlatform, string>> = {
@@ -15,6 +17,21 @@ const OS_NAMES: Partial<Record<DetectedPlatform, string>> = {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MESSAGE_LENGTH = 10;
+
+const GINGER_IDLE: readonly FrameStep[] = [
+    { frame: 0, ms: 2400 },
+    { frame: 1, ms: 220 },
+    { frame: 2, ms: 750 },
+    { frame: 1, ms: 180 },
+];
+
+const GINGER_ACTION: readonly FrameStep[] = [
+    { frame: 1, ms: 150 },
+    { frame: 2, ms: 320 },
+    { frame: 1, ms: 150 },
+    { frame: 2, ms: 420 },
+    { frame: 0, ms: 150 },
+];
 
 type FieldErrors = Partial<Record<"email" | "subject" | "message", string>>;
 
@@ -37,7 +54,7 @@ function validate(email: string, subject: string, message: string): FieldErrors 
 }
 
 const INPUT_CLASSES =
-    "w-full rounded-control bg-white border border-stroke text-body-sm text-ink placeholder:text-faint transition-[border-color,box-shadow] duration-150 hover:border-stroke-strong focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent-highlight/40 aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60 disabled:cursor-not-allowed";
+    "w-full rounded-control bg-white border border-stroke text-body-sm text-ink placeholder:text-faint transition-[border-color,box-shadow] duration-150 hover:border-stroke-strong focus:outline-none focus:border-focus-ring focus:ring-4 focus:ring-accent-highlight/40 aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60 disabled:cursor-not-allowed";
 
 type Status = { state: "idle" | "sending" | "sent" } | { state: "error"; reason: string };
 
@@ -114,178 +131,201 @@ export default function ContactSection() {
     return (
         <section
             id="contact"
-            className="scroll-mt-20 w-full max-w-content mx-auto py-12 md:py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center gap-6 bg-white"
+            className="scroll-mt-20 w-full max-w-content mx-auto py-12 md:py-24 px-6 md:px-12 lg:px-20 bg-white"
         >
-            <SectionTitle>Contact Us</SectionTitle>
+            <div className="w-full rounded-card-lg border-2 border-stroke bg-white shadow-raised overflow-hidden flex flex-col lg:flex-row">
+                {/* Left pane: sky intro + Ginger resting in the lower-left corner */}
+                <div className="relative overflow-hidden lg:w-[42%] surface-sky p-6 sm:p-8 lg:p-10 pb-20 sm:pb-36 lg:pb-40 flex flex-col items-start text-left gap-3.5">
+                    <SectionTitle className="text-left">
+                        Contact Us
+                    </SectionTitle>
+                    <p className="max-w-[420px] text-base md:text-lg text-ink-soft leading-relaxed text-pretty">
+                        Have questions, feedback, or need support? Reach out and our
+                        team will get back to you.
+                    </p>
 
-            <p className="max-w-[560px] px-4 text-base md:text-lg text-muted text-center leading-relaxed">
-                Questions, ideas, or something not working? Send us a message and
-                we&apos;ll get back to you.
-            </p>
-
-            <div className="w-full max-w-[720px] mt-2 p-5 sm:p-8 rounded-card-lg border-2 border-stroke surface-wash shadow-raised">
-                {status.state === "sent" ? (
-                    <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3">
-                        <div className="w-11 h-11 rounded-full bg-success-soft text-success flex items-center justify-center">
-                            <svg
-                                width="22"
-                                height="22"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.25"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                            >
-                                <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                        </div>
-                        <h3
-                            ref={successHeadingRef}
-                            tabIndex={-1}
-                            className="text-xl font-semibold text-ink focus:outline-none"
-                        >
-                            Message sent
-                        </h3>
-                        <p role="status" className="max-w-[420px] text-body-sm text-muted leading-relaxed">
-                            Thanks{name.trim() ? `, ${name.trim()}` : ""}. We&apos;ve
-                            received your message and will reply
-                            to <span className="font-medium text-ink break-all">{email.trim()}</span>.
-                        </p>
-                        <button
-                            type="button"
-                            onClick={handleReset}
-                            className="mt-2 text-sm font-medium text-ink link-underline transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-                        >
-                            Send another message
-                        </button>
+                    {/* Ginger portrait sits flush in the bottom-left corner (mirrored to face the form) */}
+                    <div className="absolute bottom-0 left-0 -scale-x-100">
+                        <SpriteCat
+                            idle={{
+                                src: "/sprites/ginger-portrait-idle-sheet.png",
+                                frames: 3,
+                            }}
+                            action={{
+                                src: "/sprites/ginger-portrait-idle-sheet.png",
+                                frames: 3,
+                            }}
+                            idleSequence={GINGER_IDLE}
+                            actionSequence={GINGER_ACTION}
+                            label="Say hi to Ginger"
+                            className="w-16 h-16 sm:w-32 sm:h-32"
+                        />
                     </div>
-                ) : (
-                    <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-                        {/* Name and email side by side from sm up; stacked on phones */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <Field id="contact-name" label="Name" optional>
-                                <input
-                                    id="contact-name"
-                                    type="text"
-                                    name="name"
-                                    autoComplete="name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    maxLength={100}
-                                    disabled={isSending}
-                                    className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                                />
-                            </Field>
+                </div>
 
-                            <Field id="contact-email" label="Email" error={errors.email}>
+                {/* Right pane: message form */}
+                <div className="lg:w-[58%] border-t-2 lg:border-t-0 lg:border-l-2 border-stroke surface-wash p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
+                    {status.state === "sent" ? (
+                        <div className="py-6 sm:py-10 flex flex-col items-center text-center gap-3.5">
+                            <div aria-hidden="true" className="flex items-center gap-2">
+                                {["orange", "tuxedo", "black"].map((fish, i) => (
+                                    <Image
+                                        key={fish}
+                                        src={`/images/completed-${fish}-fish.png`}
+                                        alt=""
+                                        width={32}
+                                        height={32}
+                                        className={`w-8 h-8 [image-rendering:pixelated] drop-shadow-[0_2px_3px_rgba(0,0,0,0.12)] ${i === 1 ? "-scale-x-100" : ""}`}
+                                    />
+                                ))}
+                            </div>
+                            <h3
+                                ref={successHeadingRef}
+                                tabIndex={-1}
+                                className="font-pixel text-2xl font-semibold text-ink focus:outline-none"
+                            >
+                                Message sent
+                            </h3>
+                            <p role="status" className="max-w-[420px] text-body-sm text-muted leading-relaxed">
+                                Thanks{name.trim() ? `, ${name.trim()}` : ""}. We&apos;ve
+                                received your message and will reply
+                                to <span className="font-medium text-ink break-all">{email.trim()}</span>.
+                            </p>
+                            <button
+                                type="button"
+                                onClick={handleReset}
+                                className="mt-2 rounded-pill bg-[#EAF5FD] px-4 py-1.5 text-sm font-medium text-[#1A6CA3] ring-1 ring-inset ring-[#CFE6F8] transition-colors duration-150 hover:bg-[#DDEFFC] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
+                            >
+                                Send another message
+                            </button>
+                        </div>
+                    ) : (
+                        <form noValidate onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+                            {/* Name and email side by side from sm up; stacked on phones */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <Field id="contact-name" label="Name" optional>
+                                    <input
+                                        id="contact-name"
+                                        type="text"
+                                        name="name"
+                                        autoComplete="name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        maxLength={100}
+                                        disabled={isSending}
+                                        className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                    />
+                                </Field>
+
+                                <Field id="contact-email" label="Email" error={errors.email}>
+                                    <input
+                                        ref={emailRef}
+                                        id="contact-email"
+                                        type="email"
+                                        name="email"
+                                        autoComplete="email"
+                                        inputMode="email"
+                                        value={email}
+                                        onChange={(e) => updateEmail(e.target.value)}
+                                        placeholder="name@example.com"
+                                        maxLength={254}
+                                        disabled={isSending}
+                                        aria-required="true"
+                                        aria-invalid={errors.email ? true : undefined}
+                                        aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                        className={`h-11 px-3.5 ${INPUT_CLASSES}`}
+                                    />
+                                </Field>
+                            </div>
+
+                            <Field id="contact-subject" label="Subject" error={errors.subject}>
                                 <input
-                                    ref={emailRef}
-                                    id="contact-email"
-                                    type="email"
-                                    name="email"
-                                    autoComplete="email"
-                                    inputMode="email"
-                                    value={email}
-                                    onChange={(e) => updateEmail(e.target.value)}
-                                    placeholder="name@example.com"
-                                    maxLength={254}
+                                    ref={subjectRef}
+                                    id="contact-subject"
+                                    type="text"
+                                    name="subject"
+                                    value={subject}
+                                    onChange={(e) => updateSubject(e.target.value)}
+                                    placeholder="What's this about?"
+                                    maxLength={150}
                                     disabled={isSending}
                                     aria-required="true"
-                                    aria-invalid={errors.email ? true : undefined}
-                                    aria-describedby={errors.email ? "contact-email-error" : undefined}
+                                    aria-invalid={errors.subject ? true : undefined}
+                                    aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                                     className={`h-11 px-3.5 ${INPUT_CLASSES}`}
                                 />
                             </Field>
-                        </div>
 
-                        <Field id="contact-subject" label="Subject" error={errors.subject}>
-                            <input
-                                ref={subjectRef}
-                                id="contact-subject"
-                                type="text"
-                                name="subject"
-                                value={subject}
-                                onChange={(e) => updateSubject(e.target.value)}
-                                placeholder="What's this about?"
-                                maxLength={150}
-                                disabled={isSending}
-                                aria-required="true"
-                                aria-invalid={errors.subject ? true : undefined}
-                                aria-describedby={errors.subject ? "contact-subject-error" : undefined}
-                                className={`h-11 px-3.5 ${INPUT_CLASSES}`}
-                            />
-                        </Field>
-
-                        <Field id="contact-message" label="Message" error={errors.message}>
-                            <textarea
-                                ref={messageRef}
-                                id="contact-message"
-                                name="message"
-                                rows={5}
-                                value={message}
-                                onChange={(e) => updateMessage(e.target.value)}
-                                placeholder="How can we help? For bugs, include what happened and your PAWSE version."
-                                maxLength={5000}
-                                disabled={isSending}
-                                aria-required="true"
-                                aria-invalid={errors.message ? true : undefined}
-                                aria-describedby={errors.message ? "contact-message-error" : undefined}
-                                className={`px-3.5 py-3 resize-y min-h-[132px] leading-relaxed ${INPUT_CLASSES}`}
-                            />
-                        </Field>
-
-                        {/* Honeypot: hidden from people and assistive tech; bots tend to tick it */}
-                        <input
-                            type="checkbox"
-                            name="botcheck"
-                            checked={botcheck}
-                            onChange={(e) => setBotcheck(e.target.checked)}
-                            tabIndex={-1}
-                            aria-hidden="true"
-                            className="hidden"
-                        />
-
-                        {/* Delivery problems (not field errors), always with the email fallback */}
-                        {(status.state === "error" || !isContactFormConfigured) && (
-                            <div
-                                role="alert"
-                                className="flex items-start gap-2.5 rounded-control border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger leading-relaxed"
-                            >
-                                <AlertIcon className="mt-0.5" />
-                                <p>
-                                    {status.state === "error"
-                                        ? status.reason
-                                        : "The contact form is unavailable right now."}{" "}
-                                    Please email us at{" "}
-                                    <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium link-underline">
-                                        {CONTACT_EMAIL}
-                                    </a>
-                                    .
-                                </p>
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={isSending || !isContactFormConfigured}
-                            aria-busy={isSending}
-                            className={buttonClasses({ className: `w-full h-12 ${buttonLabelClasses("md")}` })}
-                        >
-                            {isSending && (
-                                <span
-                                    aria-hidden="true"
-                                    className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                            <Field id="contact-message" label="Message" error={errors.message}>
+                                <textarea
+                                    ref={messageRef}
+                                    id="contact-message"
+                                    name="message"
+                                    rows={5}
+                                    value={message}
+                                    onChange={(e) => updateMessage(e.target.value)}
+                                    placeholder="How can we help? For bugs, include what happened and your PAWSE version."
+                                    maxLength={5000}
+                                    disabled={isSending}
+                                    aria-required="true"
+                                    aria-invalid={errors.message ? true : undefined}
+                                    aria-describedby={errors.message ? "contact-message-error" : undefined}
+                                    className={`px-3.5 py-3 resize-y min-h-[132px] leading-relaxed ${INPUT_CLASSES}`}
                                 />
-                            )}
-                            {isSending ? "Sending..." : "Send Message"}
-                        </button>
-                    </form>
-                )}
-            </div>
+                            </Field>
 
-            <EmailFallback />
+                            {/* Honeypot: hidden from people and assistive tech; bots tend to tick it */}
+                            <input
+                                type="checkbox"
+                                name="botcheck"
+                                checked={botcheck}
+                                onChange={(e) => setBotcheck(e.target.checked)}
+                                tabIndex={-1}
+                                aria-hidden="true"
+                                className="hidden"
+                            />
+
+                            {/* Delivery problems (not field errors), always with the email fallback */}
+                            {(status.state === "error" || !isContactFormConfigured) && (
+                                <div
+                                    role="alert"
+                                    className="flex items-start gap-2.5 rounded-control border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger leading-relaxed"
+                                >
+                                    <AlertIcon className="mt-0.5" />
+                                    <p>
+                                        {status.state === "error"
+                                            ? status.reason
+                                            : "The contact form is unavailable right now."}{" "}
+                                        Please email us at{" "}
+                                        <a
+                                            href={`mailto:${CONTACT_EMAIL}`}
+                                            className="font-medium link-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                                        >
+                                            {CONTACT_EMAIL}
+                                        </a>
+                                        .
+                                    </p>
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={isSending || !isContactFormConfigured}
+                                aria-busy={isSending}
+                                className={buttonClasses({ className: `w-full h-12 ${buttonLabelClasses("md")}` })}
+                            >
+                                {isSending && (
+                                    <span
+                                        aria-hidden="true"
+                                        className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                                    />
+                                )}
+                                {isSending ? "Sending..." : "Send Message"}
+                            </button>
+                        </form>
+                    )}
+                </div>
+            </div>
         </section>
     );
 }
@@ -339,57 +379,5 @@ function AlertIcon({ className = "" }: { className?: string }) {
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
-    );
-}
-
-/** "Prefer email?" row: clicking the address copies it (works for webmail users too). */
-function EmailFallback() {
-    const [copyState, setCopyState] = useState<"idle" | "copied" | "manual">("idle");
-    const addressRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        if (copyState === "idle") return;
-        const timer = setTimeout(() => setCopyState("idle"), 2500);
-        return () => clearTimeout(timer);
-    }, [copyState]);
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(CONTACT_EMAIL);
-            setCopyState("copied");
-        } catch {
-            // Clipboard blocked: select the address so the visitor can copy it manually.
-            const node = addressRef.current;
-            const selection = window.getSelection();
-            if (node && selection) {
-                const range = document.createRange();
-                range.selectNodeContents(node);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-            setCopyState("manual");
-        }
-    };
-
-    return (
-        <div className="flex flex-col items-center gap-1 text-sm text-muted text-center">
-            <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
-                <span>Prefer email?</span>
-                <button
-                    ref={addressRef}
-                    type="button"
-                    onClick={handleCopy}
-                    title="Click to copy"
-                    aria-label={`Copy email address ${CONTACT_EMAIL}`}
-                    className="font-medium text-ink break-all link-underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-                >
-                    {CONTACT_EMAIL}
-                </button>
-            </div>
-            <span aria-live="polite" className="min-h-5 text-xs">
-                {copyState === "copied" && "Copied to clipboard."}
-                {copyState === "manual" && "Address selected. Press Ctrl+C (⌘C on Mac) to copy."}
-            </span>
-        </div>
     );
 }
