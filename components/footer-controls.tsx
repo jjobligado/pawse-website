@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
 
 const FOCUS_RING =
-    "rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-accent-highlight";
+    "rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-sky-100";
 
 const LINK_CLASSES =
     `inline-flex items-center min-h-9 md:min-h-0 py-1 md:py-0.5 text-body-sm text-ink hover:link-underline link-hover-weight ${FOCUS_RING}`;

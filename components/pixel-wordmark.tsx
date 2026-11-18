@@ -1,135 +1,160 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { SkyPhase } from "@/components/landing/hero-scene";
+import { measureGlyphs, sampleGlyphs, type GlyphData } from "@/lib/pixel-glyphs";
 
 /**
  * Interactive pixel-art "PAWSE" wordmark anchored at the bottom of the footer.
  *
- * Samples the site's loaded Pixelify Sans font (weight 700) glyph-by-glyph onto
- * an integer pixel grid with uniform cell sizes, and mirrors the sampled grids
- * of "A" and "W" so they remain 100% symmetrical:
- * - Renders an instant Pixelify Sans SVG fallback until the canvas is ready.
- * - Cascades pixels in diagonally with a calm fade-and-settle when scrolled into
- *   view, then rests still without periodic flashing.
- * - Reveals a faint ghost pixel field around the cursor on desktop, gently
- *   repelling and deepening nearby pixels, and emits a shockwave on click.
- * - Sleeps completely when idle or off-screen, and renders statically under
+ * Samples the site's loaded Pixelify Sans font (weight 700) onto an integer
+ * pixel grid (mirroring "A" and "W" for exact symmetry) and paints each letter
+ * in the app's companion colours, adapted to the current time-of-day sky:
+ * - Entrance: letters drop in one by one and bounce onto the sill.
+ * - Hover: the letter under the cursor hops two grid pixels (its 1px drop
+ *   shadow stays put on the sill).
+ * - Pointer move: leaves fading pixel paw-print stamps behind the letters.
+ * - Click / tap: bursts pixel confetti and sends a hop wave across the letters.
+ * - Sleeps when idle or off-screen, and renders statically under
  *   `prefers-reduced-motion: reduce`.
  */
 
-type RGB = readonly [number, number, number];
-const COLOR_BASE: RGB = [27, 127, 190]; // #1B7FBE (accent-strong-hover)
-const COLOR_HOVER: RGB = [20, 78, 118]; // #144E78 (deep azure ink)
-const COLOR_ACCENT: RGB = [211, 237, 255]; // #D3EDFF (soft sky highlight for entrance & click ripples)
-
-const ENTRANCE_TOTAL_MS = 1550;
-const RIPPLE_DURATION_MS = 1400;
-const BLEED_RATIO = 0.12;
-const LETTERS = ["P", "A", "W", "S", "E"] as const;
-
-interface RawGlyph {
-    ch: (typeof LETTERS)[number];
-    canvas: HTMLCanvasElement;
-    minX: number;
-    minY: number;
-    w: number;
-    h: number;
+interface LetterPaint {
+    face: string;
+    shade: string;
+    light: string;
 }
 
-interface PixelCell {
-    x: number;
-    y: number;
-    delay: number;
+interface WordmarkPalette {
+    letters: readonly LetterPaint[];
+    pawRgb: string;
+    pawAlpha: number;
+    sparks?: readonly string[];
+    glow?: string;
+    fallbackClass: string;
 }
 
-interface Ripple {
+const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
+    morning: {
+        letters: [
+            { face: "#CFE58A", shade: "#60791F", light: "#ECFEA9" }, // P: Classic green
+            { face: "#F8C47F", shade: "#B26A06", light: "#FEE1A9" }, // A: Sprint orange
+            { face: "#BDA9FE", shade: "#7D49C6", light: "#E4DAFF" }, // W: Focused purple
+            { face: "#7CC8F8", shade: "#1A74AE", light: "#D3EDFF" }, // S: Site sky blue
+            { face: "#FFA08C", shade: "#B9472F", light: "#FFD8CF" }, // E: Coral
+        ],
+        pawRgb: "35,35,35",
+        pawAlpha: 0.14,
+        fallbackClass: "text-ink",
+    },
+    day: {
+        // Deeper fills so every letter separates cleanly from the sunny sky & blue skyline
+        letters: [
+            { face: "#C2DC72", shade: "#556D18", light: "#ECFEA9" },
+            { face: "#F4B867", shade: "#9E5C03", light: "#FEE1A9" },
+            { face: "#AE96FC", shade: "#6737B0", light: "#E4DAFF" },
+            { face: "#54B2EE", shade: "#165F92", light: "#D3EDFF" },
+            { face: "#F78C76", shade: "#A83B24", light: "#FFD8CF" },
+        ],
+        pawRgb: "26,116,174",
+        pawAlpha: 0.16,
+        fallbackClass: "text-ink",
+    },
+    dusk: {
+        // Sunset-warmed companion tones
+        letters: [
+            { face: "#D4DF82", shade: "#5B6B1E", light: "#FFF0B8" },
+            { face: "#F5B26B", shade: "#9A530C", light: "#FFE2B0" },
+            { face: "#C4A2F0", shade: "#6A3D9E", light: "#F2D9FF" },
+            { face: "#7EBBE8", shade: "#285C8A", light: "#FFE3D6" },
+            { face: "#F28D82", shade: "#9E3933", light: "#FFD8C9" },
+        ],
+        pawRgb: "56,35,60",
+        pawAlpha: 0.15,
+        fallbackClass: "text-ink",
+    },
+    night: {
+        // Moonlit companion hues with warm #FFE7B0 top rims & deep midnight shadows
+        letters: [
+            { face: "#A9C46C", shade: "#162040", light: "#FFE7B0" },
+            { face: "#E0A35C", shade: "#162040", light: "#FFE7B0" },
+            { face: "#9C89E0", shade: "#162040", light: "#FFE7B0" },
+            { face: "#68A8DC", shade: "#162040", light: "#FFE7B0" },
+            { face: "#DE847A", shade: "#162040", light: "#FFE7B0" },
+        ],
+        pawRgb: "22,32,64",
+        pawAlpha: 0.18,
+        sparks: ["#FFE7B0", "#A9C46C", "#E0A35C", "#9C89E0", "#68A8DC"],
+        glow: "rgba(255,231,176,0.3)",
+        fallbackClass: "text-[#162040]",
+    },
+};
+
+const BLEED_TOP = 0.35;
+const BLEED_BOTTOM = 0.12;
+
+const DROP_MS = 760;
+const DROP_STAGGER_MS = 120;
+const HOP_MS = 300;
+const STAMP_LIFE_MS = 1500;
+const SPARK_LIFE_MS = 950;
+
+/** 6×6 paw print, drawn at half the wordmark's pixel size. */
+const PAW_PATTERN = [".X..X.", "X....X", "..XX..", ".XXXX.", ".XXXX.", "..XX.."] as const;
+
+interface Cell {
+    col: number;
+    row: number;
+    letter: number;
+    top: boolean;
+}
+
+interface LetterBox {
+    left: number;
+    right: number;
+    topRow: number;
+}
+
+interface Stamp {
     x: number;
     y: number;
     at: number;
 }
 
-function hash01(c: number, r: number): number {
-    let h = (Math.imul(c + 1, 374761393) + Math.imul(r + 1, 668265263)) >>> 0;
-    h = (h ^ (h >>> 13)) >>> 0;
-    h = Math.imul(h, 1274126177) >>> 0;
-    return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+interface Spark {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    color: string;
+    at: number;
 }
 
-function clamp01(v: number): number {
-    return v < 0 ? 0 : v > 1 ? 1 : v;
+function easeOutBounce(t: number): number {
+    const n = 7.5625;
+    const d = 2.75;
+    if (t < 1 / d) return n * t * t;
+    if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75;
+    if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375;
+    return n * (t -= 2.625 / d) * t + 0.984375;
 }
 
-function easeOutCubic(t: number): number {
-    const u = 1 - t;
-    return 1 - u * u * u;
-}
-
-function mixRgb(a: RGB, b: RGB, t: number): RGB {
-    return [
-        Math.round(a[0] + (b[0] - a[0]) * t),
-        Math.round(a[1] + (b[1] - a[1]) * t),
-        Math.round(a[2] + (b[2] - a[2]) * t),
-    ];
-}
-
-function rgbStr(c: RGB): string {
-    return `rgb(${c[0]},${c[1]},${c[2]})`;
-}
-
-/**
- * Rasterizes each letter of "PAWSE" in the resolved Pixelify Sans font so
- * per-glyph integer sampling can keep consistent proportions and exact symmetry.
- */
-function measureGlyphs(fontFamily: string): { glyphs: RawGlyph[]; minTop: number; totalH: number } | null {
-    const glyphs: RawGlyph[] = [];
-
-    for (const ch of LETTERS) {
-        const g = document.createElement("canvas");
-        g.width = 400;
-        g.height = 420;
-        const gctx = g.getContext("2d", { willReadFrequently: true });
-        if (!gctx) return null;
-
-        gctx.fillStyle = "#000000";
-        gctx.font = `700 260px ${fontFamily}`;
-        gctx.textBaseline = "top";
-        gctx.fillText(ch, 20, 40);
-
-        const d = gctx.getImageData(0, 0, g.width, g.height).data;
-        let minX = g.width;
-        let minY = g.height;
-        let maxX = 0;
-        let maxY = 0;
-
-        for (let y = 0; y < g.height; y++) {
-            for (let x = 0; x < g.width; x++) {
-                if (d[(y * g.width + x) * 4 + 3] > 20) {
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
-                }
-            }
-        }
-
-        if (maxX <= minX || maxY <= minY) return null;
-        glyphs.push({ ch, canvas: g, minX, minY, w: maxX - minX + 1, h: maxY - minY + 1 });
-    }
-
-    const minTop = Math.min(...glyphs.map((item) => item.minY));
-    const maxBot = Math.max(...glyphs.map((item) => item.minY + item.h));
-    return { glyphs, minTop, totalH: maxBot - minTop };
-}
-
-export default function PixelWordmark() {
+export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
     const wrapRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const paletteRef = useRef<WordmarkPalette>(COMPANION_PALETTES[phase]);
+    const redrawRef = useRef<(() => void) | null>(null);
+
+    useEffect(() => {
+        paletteRef.current = COMPANION_PALETTES[phase];
+        redrawRef.current?.();
+    }, [phase]);
 
     useEffect(() => {
         const wrap = wrapRef.current;
         const canvas = canvasRef.current;
         if (!wrap || !canvas) return;
-
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
@@ -137,27 +162,32 @@ export default function PixelWordmark() {
         const finePointerMq = window.matchMedia("(hover: hover) and (pointer: fine)");
 
         let disposed = false;
-        let glyphData: ReturnType<typeof measureGlyphs> = null;
+        let glyphData: GlyphData | null = null;
         let width = 0;
         let height = 0;
-        let bleedY = 0;
-        let yOffset = 0;
+        let bleedTop = 0;
+        let bleedBottom = 0;
         let step = 0;
-        let box = 0;
-        let cols = 82;
         let rows = 20;
-        let cells: PixelCell[] = [];
-        let haloRadius = 115;
+        let yOffset = 0;
+        let cellsByLetter: Cell[][] = [];
+        let letters: LetterBox[] = [];
 
         let entranceStart = -1;
-        let pointerX = -1e4;
-        let pointerY = -1e4;
-        let hoverStrength = 0;
-        const ripples: Ripple[] = [];
+        const hops = [-1, -1, -1, -1, -1];
+        const stamps: Stamp[] = [];
+        const sparks: Spark[] = [];
+        let hovered = -1;
+        let lastStampX = Number.NaN;
+        let lastStampY = Number.NaN;
+        let stampSide = 1;
 
         let inView = false;
         let rafId: number | null = null;
-        let lastFrameTime = 0;
+
+        const colX = (col: number) => col * step;
+        const rowY = (row: number) => bleedTop + yOffset + row * step;
+        const snap = (v: number) => Math.round(v / step) * step;
 
         const buildGrid = () => {
             if (!glyphData) return;
@@ -165,285 +195,173 @@ export default function PixelWordmark() {
             if (rect.width < 2 || rect.height < 2) return;
 
             width = rect.width;
+            height = rect.height;
             rows = width < 520 ? 14 : 20;
             const gapCols = width < 520 ? 2 : 3;
+            const sampled = sampleGlyphs(glyphData, rows);
+            if (!sampled) return;
 
-            const sampled: { gCols: number; grid: boolean[][] }[] = [];
-            for (const rg of glyphData.glyphs) {
-                let gCols = Math.max(6, Math.round((rg.w / glyphData.totalH) * rows));
-                if ((rg.ch === "A" || rg.ch === "W") && gCols % 2 !== 0) gCols += 1;
-
-                const samp = document.createElement("canvas");
-                samp.width = gCols * 4;
-                samp.height = rows * 4;
-                const sctx = samp.getContext("2d", { willReadFrequently: true });
-                if (!sctx) return;
-
-                sctx.drawImage(
-                    rg.canvas,
-                    rg.minX,
-                    glyphData.minTop,
-                    rg.w,
-                    glyphData.totalH,
-                    0,
-                    0,
-                    samp.width,
-                    samp.height
-                );
-                const sd = sctx.getImageData(0, 0, samp.width, samp.height).data;
-                const grid: boolean[][] = Array.from({ length: rows }, () => Array(gCols).fill(false));
-
-                for (let r = 0; r < rows; r++) {
-                    for (let c = 0; c < gCols; c++) {
-                        let sum = 0;
-                        for (let sy = 0; sy < 4; sy++) {
-                            for (let sx = 0; sx < 4; sx++) {
-                                sum += sd[((r * 4 + sy) * samp.width + (c * 4 + sx)) * 4 + 3];
-                            }
-                        }
-                        grid[r][c] = sum / 4080 >= 0.44;
-                    }
-                }
-
-                // Mirror A and W after sampling so both sides are guaranteed 100% symmetrical
-                if (rg.ch === "A" || rg.ch === "W") {
-                    for (let r = 0; r < rows; r++) {
-                        for (let c = 0; c < Math.floor(gCols / 2); c++) {
-                            grid[r][gCols - 1 - c] = grid[r][c];
-                        }
-                    }
-                }
-
-                // Cap horizontal bars/caps on P and A to at most 4 pixels high without breaking strokes
-                if (rows === 20 && rg.ch === "A") {
-                    const mid = Math.floor(gCols / 2);
-                    // 1. Top solid cap: keep at most 4 consecutive solid rows from row 0
-                    let topSolid = 0;
-                    for (let r = 0; r <= 6; r++) {
-                        if (grid[r][mid - 1] && grid[r][mid]) {
-                            topSolid++;
-                            if (topSolid > 4) {
-                                grid[r][mid - 1] = false;
-                                grid[r][mid] = false;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                    // 2. Horizontal crossbar (rows 9..17): keep at most 4 consecutive bridged rows
-                    const barRows: number[] = [];
-                    for (let r = 9; r <= 17; r++) {
-                        if (grid[r][mid - 1] && grid[r][mid]) barRows.push(r);
-                    }
-                    while (barRows.length > 4) {
-                        const dropRow = barRows.pop()!;
-                        const archRow = Math.min(rows - 1, dropRow + 1);
-                        for (let c = 4; c < gCols - 4; c++) {
-                            if (!grid[archRow][c]) grid[dropRow][c] = false;
-                        }
-                        // Fallback if archRow was also solid
-                        grid[dropRow][mid - 1] = false;
-                        grid[dropRow][mid] = false;
-                    }
-                }
-                if (rows === 20 && rg.ch === "P") {
-                    const midCol = Math.floor(gCols / 2);
-                    // 1. Top bar (rows 0..6): keep at most 4 bridged rows, preserving right bowl wall
-                    let topBridged = 0;
-                    for (let r = 0; r <= 6; r++) {
-                        if (grid[r][4] && grid[r][midCol]) {
-                            topBridged++;
-                            if (topBridged > 4) {
-                                for (let c = 4; c < gCols - 4; c++) grid[r][c] = false;
-                            }
-                        }
-                    }
-                    // 2. Middle bar (rows 8..15): trim from the bottom so the upper edge stays connected to the bowl
-                    const midRows: number[] = [];
-                    for (let r = 8; r <= 15; r++) {
-                        if (grid[r][4] && grid[r][5] && grid[r][6]) midRows.push(r);
-                    }
-                    while (midRows.length > 4) {
-                        const dropRow = midRows.pop()!;
-                        for (let c = 4; c < gCols; c++) grid[dropRow][c] = false;
-                    }
-                }
-
-                sampled.push({ gCols, grid });
-            }
-
-            cols = sampled.reduce((sum, item) => sum + item.gCols, 0) + gapCols * (sampled.length - 1);
-            step = width / cols;
-            box = step * 0.88;
-            height = rect.height;
-            yOffset = Math.max(0, (height - rows * step) / 2);
-            bleedY = Math.round(height * BLEED_RATIO);
-            haloRadius = Math.max(76, Math.min(145, width * 0.11));
+            const cols = sampled.reduce((sum, g) => sum + g.gCols, 0) + gapCols * (sampled.length - 1);
+            // Leave one spare column/row for the 1px drop shadow
+            const pad = 1;
+            step = width / (cols + pad);
+            // Anchor letters flush to the bottom so they rest directly on the sill
+            yOffset = Math.max(0, height - (rows + pad) * step);
+            bleedTop = Math.round(height * BLEED_TOP);
+            bleedBottom = Math.round(height * BLEED_BOTTOM);
 
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const canvasHeight = height + bleedY * 2;
             canvas.width = Math.round(width * dpr);
-            canvas.height = Math.round(canvasHeight * dpr);
+            canvas.height = Math.round((height + bleedTop + bleedBottom) * dpr);
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-            const next: PixelCell[] = [];
-            let colOffset = 0;
-            for (const item of sampled) {
+            cellsByLetter = [];
+            letters = [];
+            let colStart = 0;
+            sampled.forEach((g, i) => {
+                const list: Cell[] = [];
+                let topRow = rows;
                 for (let r = 0; r < rows; r++) {
-                    for (let c = 0; c < item.gCols; c++) {
-                        if (!item.grid[r][c]) continue;
-                        const col = colOffset + c;
-                        next.push({
-                            x: col * step + step / 2,
-                            y: bleedY + yOffset + r * step + step / 2,
-                            delay: (0.78 * (col / cols) + 0.22 * (r / rows)) * 620 + hash01(col, r) * 160,
-                        });
+                    for (let c = 0; c < g.gCols; c++) {
+                        if (!g.grid[r][c]) continue;
+                        if (r < topRow) topRow = r;
+                        list.push({ col: colStart + c, row: r, letter: i, top: r === 0 || !g.grid[r - 1][c] });
                     }
                 }
-                colOffset += item.gCols + gapCols;
-            }
-            cells = next;
+                cellsByLetter.push(list);
+                letters.push({ left: colX(colStart), right: colX(colStart + g.gCols), topRow });
+                colStart += g.gCols + gapCols;
+            });
         };
 
-        const drawFrame = (now: number, isReduced: boolean) => {
-            if (!width || !height || cells.length === 0) return;
+        const entranceOffset = (i: number, now: number, reduced: boolean): number | null => {
+            if (reduced) return 0;
+            if (entranceStart < 0) return null;
+            const t = (now - entranceStart - i * DROP_STAGGER_MS) / DROP_MS;
+            if (t <= 0) return null;
+            if (t >= 1) return 0;
+            // Start fully above the canvas, fall, and bounce on the sill
+            return -rowY(rows) * (1 - easeOutBounce(t));
+        };
 
-            const canvasHeight = height + bleedY * 2;
-            ctx.clearRect(0, 0, width, canvasHeight);
+        const landed = (i: number, now: number) =>
+            reducedMq.matches || (entranceStart >= 0 && now - entranceStart - i * DROP_STAGGER_MS >= DROP_MS);
 
-            const elapsedSinceStart = isReduced
-                ? 1e9
-                : entranceStart < 0
-                    ? -1
-                    : now - entranceStart;
-
-            const radius = box * 0.15;
-
-            // 1. Faint background grid around pointer (aligned to PAWSE grid, uniform box size)
-            if (!isReduced && hoverStrength > 0.01 && pointerX > -1e3) {
-                const cMin = Math.max(0, Math.floor((pointerX - haloRadius) / step));
-                const cMax = Math.min(cols - 1, Math.ceil((pointerX + haloRadius) / step));
-                const gridOriginY = bleedY + yOffset;
-                const rMin = Math.floor((pointerY - gridOriginY - haloRadius) / step);
-                const rMax = Math.ceil((pointerY - gridOriginY + haloRadius) / step);
-
-                for (let r = rMin; r <= rMax; r++) {
-                    const gy = gridOriginY + r * step + step / 2;
-                    if (gy < box / 2 || gy > canvasHeight - box / 2) continue;
-                    for (let c = cMin; c <= cMax; c++) {
-                        const gx = c * step + step / 2;
-                        const dist = Math.hypot(gx - pointerX, gy - pointerY);
-                        if (dist > haloRadius) continue;
-                        const alpha = 0.2 * (1 - dist / haloRadius) * hoverStrength;
-                        ctx.fillStyle = `rgba(27,127,190,${alpha.toFixed(3)})`;
-                        ctx.beginPath();
-                        ctx.roundRect(gx - box / 2, gy - box / 2, box, box, radius);
-                        ctx.fill();
-                    }
-                }
+        const hopOffset = (i: number, now: number) => {
+            const start = hops[i];
+            if (start < 0) return 0;
+            const t = (now - start) / HOP_MS;
+            if (t < 0) return 0; // queued by a click wave
+            if (t >= 1) {
+                hops[i] = -1;
+                return 0;
             }
+            return -step * 2 * Math.sin(Math.PI * t);
+        };
 
-            // 2. Lit pixels: uniform size across every cell; batch static cells into a single Path2D
-            const batchPath = new Path2D();
-
-            for (let i = 0; i < cells.length; i++) {
-                const cell = cells[i];
-                let cx = cell.x;
-                let cy = cell.y;
-                let alpha = 1;
-                let color: RGB | null = null;
-
-                if (!isReduced) {
-                    if (elapsedSinceStart < 0) continue;
-                    const fadeT = (elapsedSinceStart - cell.delay) / 420;
-                    if (fadeT <= 0) continue;
-                    if (fadeT < 1) {
-                        const eased = easeOutCubic(fadeT);
-                        alpha = eased;
-                        cy += (1 - eased) * step * 0.75;
-                    }
-
-                    const colorT = (elapsedSinceStart - cell.delay) / 680;
-                    if (colorT < 1) {
-                        color = mixRgb(COLOR_ACCENT, COLOR_BASE, easeOutCubic(clamp01(colorT)));
-                    }
-
-                    if (hoverStrength > 0.01) {
-                        const dx = cx - pointerX;
-                        const dy = cy - pointerY;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist < haloRadius) {
-                            const raw = 1 - dist / haloRadius;
-                            const smooth = raw * raw * (3 - 2 * raw) * hoverStrength;
-                            if (dist > 0.01) {
-                                const push = 8 * smooth;
-                                cx += (dx / dist) * push;
-                                cy += (dy / dist) * push;
-                            }
-                            color = mixRgb(color ?? COLOR_BASE, COLOR_HOVER, 0.92 * smooth);
-                        }
-                    }
-
-                    for (let j = 0; j < ripples.length; j++) {
-                        const rp = ripples[j];
-                        const age = now - rp.at;
-                        const waveR = age * 0.78;
-                        const ringDist = Math.abs(Math.hypot(cell.x - rp.x, cell.y - rp.y) - waveR);
-                        const band = Math.max(0, 1 - ringDist / 60) * (1 - age / RIPPLE_DURATION_MS);
-                        if (band > 0) {
-                            const dx = cell.x - rp.x;
-                            const dy = cell.y - rp.y;
-                            const dist = Math.hypot(dx, dy);
-                            if (dist > 0.01) {
-                                cx += (dx / dist) * 4 * band;
-                                cy += (dy / dist) * 4 * band;
-                            }
-                            color = mixRgb(color ?? COLOR_BASE, COLOR_ACCENT, 0.85 * band);
-                        }
-                    }
-                }
-
-                if (!color && alpha === 1) {
-                    batchPath.roundRect(cx - box / 2, cy - box / 2, box, box, radius);
-                } else {
-                    ctx.globalAlpha = alpha;
-                    ctx.fillStyle = rgbStr(color ?? COLOR_BASE);
-                    ctx.beginPath();
-                    ctx.roundRect(cx - box / 2, cy - box / 2, box, box, radius);
-                    ctx.fill();
-                }
-            }
-
+        const drawFrame = (now: number, reduced: boolean) => {
+            if (!width || letters.length === 0) return;
+            ctx.clearRect(0, 0, width, height + bleedTop + bleedBottom);
             ctx.globalAlpha = 1;
-            ctx.fillStyle = rgbStr(COLOR_BASE);
-            ctx.fill(batchPath);
+            const palette = paletteRef.current;
+
+            // 1. Paw prints (behind the letters), fading out in steps
+            const paw = step * 0.5;
+            for (const s of stamps) {
+                const age = now - s.at;
+                if (age >= STAMP_LIFE_MS) continue;
+                const level = Math.ceil((1 - age / STAMP_LIFE_MS) * 4) / 4;
+                ctx.fillStyle = `rgba(${palette.pawRgb},${(palette.pawAlpha * level).toFixed(3)})`;
+                const ox = s.x - 3 * paw;
+                const oy = s.y - 3 * paw;
+                for (let r = 0; r < PAW_PATTERN.length; r++) {
+                    for (let c = 0; c < PAW_PATTERN[r].length; c++) {
+                        if (PAW_PATTERN[r][c] !== "X") continue;
+                        const x0 = Math.round(ox + c * paw);
+                        const y0 = Math.round(oy + r * paw);
+                        ctx.fillRect(x0, y0, Math.round(ox + (c + 1) * paw) - x0, Math.round(oy + (r + 1) * paw) - y0);
+                    }
+                }
+            }
+
+            // 2. Letters
+            const drops = letters.map((_, i) => {
+                const e = entranceOffset(i, now, reduced);
+                return e === null ? null : snap(e);
+            });
+            const lifts = letters.map((_, i) => (reduced ? 0 : snap(hopOffset(i, now))));
+            const lightH = Math.max(1, Math.round(step * 0.28));
+
+            cellsByLetter.forEach((list, i) => {
+                const drop = drops[i];
+                if (drop === null) return;
+                const paint = palette.letters[i % palette.letters.length];
+                const shade = new Path2D();
+                const face = new Path2D();
+                const light = new Path2D();
+                for (const cell of list) {
+                    const x0 = Math.round(colX(cell.col));
+                    const x1 = Math.round(colX(cell.col + 1));
+                    // The shadow stays on the sill while the letter hops
+                    const sy0 = Math.round(rowY(cell.row) + drop + step);
+                    const sy1 = Math.round(rowY(cell.row + 1) + drop + step);
+                    shade.rect(Math.round(x0 + step), sy0, Math.round(x1 + step) - Math.round(x0 + step), sy1 - sy0);
+                    const y0 = Math.round(rowY(cell.row) + drop + lifts[i]);
+                    const y1 = Math.round(rowY(cell.row + 1) + drop + lifts[i]);
+                    face.rect(x0, y0, x1 - x0, y1 - y0);
+                    if (cell.top) light.rect(x0, y0, x1 - x0, lightH);
+                }
+                ctx.fillStyle = paint.shade;
+                ctx.fill(shade);
+                if (palette.glow) {
+                    ctx.save();
+                    ctx.shadowColor = palette.glow;
+                    ctx.shadowBlur = step * 0.9;
+                    ctx.fillStyle = paint.face;
+                    ctx.fill(face);
+                    ctx.fillStyle = paint.light;
+                    ctx.fill(light);
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = paint.face;
+                    ctx.fill(face);
+                    ctx.fillStyle = paint.light;
+                    ctx.fill(light);
+                }
+            });
+
+            // 3. Click confetti, snapped to half pixels, fading in steps
+            const q = step / 2;
+            const g = 0.0022 * (step / 13);
+            for (const p of sparks) {
+                const t = now - p.at;
+                if (t >= SPARK_LIFE_MS) continue;
+                const x = Math.round((p.x + p.vx * t) / q) * q;
+                const y = Math.round((p.y + p.vy * t + 0.5 * g * t * t) / q) * q;
+                ctx.globalAlpha = Math.ceil((1 - t / SPARK_LIFE_MS) * 3) / 3;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(Math.round(x - p.size / 2), Math.round(y - p.size / 2), Math.round(p.size), Math.round(p.size));
+            }
+            ctx.globalAlpha = 1;
         };
 
         const tick = (now: number) => {
             rafId = null;
-            const dt = lastFrameTime ? Math.min(64, now - lastFrameTime) : 16;
-            lastFrameTime = now;
+            const reduced = reducedMq.matches;
 
-            const isReduced = reducedMq.matches;
-            const targetHover = !isReduced && pointerX > -1e3 ? 1 : 0;
-            hoverStrength += (targetHover - hoverStrength) * (1 - Math.exp(-dt / 120));
+            for (let i = stamps.length - 1; i >= 0; i--) if (now - stamps[i].at > STAMP_LIFE_MS) stamps.splice(i, 1);
+            for (let i = sparks.length - 1; i >= 0; i--) if (now - sparks[i].at > SPARK_LIFE_MS) sparks.splice(i, 1);
 
-            for (let i = ripples.length - 1; i >= 0; i--) {
-                if (now - ripples[i].at > RIPPLE_DURATION_MS) {
-                    ripples.splice(i, 1);
-                }
-            }
+            drawFrame(now, reduced);
 
-            drawFrame(now, isReduced);
+            const busy =
+                (entranceStart >= 0 && now - entranceStart < DROP_STAGGER_MS * 4 + DROP_MS + 60) ||
+                hops.some((h) => h >= 0) ||
+                stamps.length > 0 ||
+                sparks.length > 0;
 
-            const entranceBusy = entranceStart >= 0 && now - entranceStart < ENTRANCE_TOTAL_MS;
-            const hoverBusy = Math.abs(targetHover - hoverStrength) > 0.004 || targetHover === 1;
-            const ripplesBusy = ripples.length > 0;
-
-            if (!isReduced && inView && !document.hidden && (entranceBusy || hoverBusy || ripplesBusy)) {
+            if (!reduced && inView && !document.hidden && busy) {
                 rafId = window.requestAnimationFrame(tick);
-            } else {
-                lastFrameTime = 0;
             }
         };
 
@@ -456,45 +374,88 @@ export default function PixelWordmark() {
             if (!glyphData || reducedMq.matches || !finePointerMq.matches) return;
             const rect = wrap.getBoundingClientRect();
             const lx = e.clientX - rect.left;
-            const lyLocal = e.clientY - rect.top;
-            const ly = lyLocal + bleedY;
-            const vPad = haloRadius * 0.45;
-            const inside =
-                lx > -haloRadius * 0.5 &&
-                lx < width + haloRadius * 0.5 &&
-                lyLocal > -vPad &&
-                lyLocal < height + vPad;
-
-            if (inside) {
-                pointerX = lx;
-                pointerY = ly;
-                wake();
-            } else if (pointerX > -1e3) {
-                pointerX = -1e4;
-                pointerY = -1e4;
-                wake();
+            const wy = e.clientY - rect.top;
+            const inside = lx >= 0 && lx <= width && wy >= -height * 0.25 && wy <= height * 1.05;
+            if (!inside) {
+                hovered = -1;
+                lastStampX = Number.NaN;
+                return;
             }
+            const now = performance.now();
+            const ly = wy + bleedTop;
+
+            // Hop the letter under the cursor, once per visit
+            const idx = letters.findIndex(
+                (box) => lx >= box.left - step && lx <= box.right + step && ly >= rowY(box.topRow) - step * 3
+            );
+            if (idx !== hovered) {
+                hovered = idx;
+                if (idx >= 0 && hops[idx] < 0 && landed(idx, now)) {
+                    hops[idx] = now;
+                    wake();
+                }
+            }
+
+            // Leave a trail of paw prints, alternating left and right feet
+            if (Number.isNaN(lastStampX)) {
+                lastStampX = lx;
+                lastStampY = ly;
+                return;
+            }
+            const dx = lx - lastStampX;
+            const dy = ly - lastStampY;
+            const dist = Math.hypot(dx, dy);
+            if (dist < step * 4.5) return;
+            const half = step / 2;
+            const side = stampSide * step * 1.1;
+            stamps.push({
+                x: Math.round((lx + (-dy / dist) * side) / half) * half,
+                y: Math.round((ly + (dx / dist) * side) / half) * half,
+                at: now,
+            });
+            if (stamps.length > 28) stamps.shift();
+            stampSide *= -1;
+            lastStampX = lx;
+            lastStampY = ly;
+            wake();
         };
 
         const onPointerDown = (e: PointerEvent) => {
             if (!glyphData || reducedMq.matches) return;
             const rect = wrap.getBoundingClientRect();
-            ripples.push({
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top + bleedY,
-                at: performance.now(),
+            const lx = e.clientX - rect.left;
+            const ly = e.clientY - rect.top + bleedTop;
+            const now = performance.now();
+            const k = step / 13;
+            const palette = paletteRef.current;
+            const sparkColors = palette.sparks ?? palette.letters.map((p) => p.face);
+
+            for (let n = 0; n < 22; n++) {
+                sparks.push({
+                    x: lx,
+                    y: ly,
+                    vx: (Math.random() - 0.5) * 0.75 * k,
+                    vy: -(0.35 + Math.random() * 0.6) * k,
+                    size: step * (Math.random() < 0.3 ? 1 : 0.5),
+                    color: sparkColors[n % sparkColors.length],
+                    at: now,
+                });
+            }
+            if (sparks.length > 88) sparks.splice(0, sparks.length - 88);
+
+            // Hop wave spreading out from the click
+            letters.forEach((box, i) => {
+                if (!landed(i, now)) return;
+                hops[i] = now + Math.abs((box.left + box.right) / 2 - lx) * 0.55;
             });
-            if (ripples.length > 4) ripples.shift();
             wake();
         };
 
         const syncVisibility = () => {
             if (!glyphData) return;
             if (reducedMq.matches) {
-                if (rafId !== null) {
-                    window.cancelAnimationFrame(rafId);
-                    rafId = null;
-                }
+                if (rafId !== null) window.cancelAnimationFrame(rafId);
+                rafId = null;
                 drawFrame(0, true);
                 return;
             }
@@ -504,7 +465,6 @@ export default function PixelWordmark() {
             } else if (rafId !== null) {
                 window.cancelAnimationFrame(rafId);
                 rafId = null;
-                lastFrameTime = 0;
             }
         };
 
@@ -513,14 +473,14 @@ export default function PixelWordmark() {
                 inView = entry.isIntersecting;
                 syncVisibility();
             },
-            { threshold: 0.1 }
+            { threshold: 0.35 }
         );
         io.observe(wrap);
 
         const ro = new ResizeObserver(() => {
             buildGrid();
-            if (reducedMq.matches) drawFrame(0, true);
-            else wake();
+            drawFrame(performance.now(), reducedMq.matches);
+            wake();
         });
         ro.observe(wrap);
 
@@ -539,8 +499,13 @@ export default function PixelWordmark() {
             syncVisibility();
         });
 
+        redrawRef.current = () => {
+            drawFrame(performance.now(), reducedMq.matches);
+        };
+
         return () => {
             disposed = true;
+            redrawRef.current = null;
             if (rafId !== null) window.cancelAnimationFrame(rafId);
             io.disconnect();
             ro.disconnect();
@@ -551,16 +516,15 @@ export default function PixelWordmark() {
         };
     }, []);
 
+    const fallbackClass = COMPANION_PALETTES[phase].fallbackClass;
+
     return (
-        <div
-            ref={wrapRef}
-            aria-hidden="true"
-            className="group/wm relative w-full font-pixel select-none cursor-pointer aspect-[82/20]"
-        >
-            {/* Typographic Pixelify Sans fallback for SSR / before canvas initialization */}
+        <div ref={wrapRef} className="group/wm relative w-full font-pixel select-none cursor-pointer aspect-[82/20]">
+            {/* Pixelify Sans fallback until the canvas is ready */}
             <svg
+                aria-hidden="true"
                 viewBox="0 0 702 172"
-                className="absolute inset-0 h-full w-full text-[#1B7FBE] transition-opacity duration-300 group-data-ready/wm:opacity-0"
+                className={`absolute inset-0 h-full w-full transition-opacity duration-300 group-data-ready/wm:opacity-0 ${fallbackClass}`}
                 fill="currentColor"
             >
                 <text
@@ -579,11 +543,9 @@ export default function PixelWordmark() {
 
             <canvas
                 ref={canvasRef}
-                className="pointer-events-none absolute left-0 w-full"
-                style={{
-                    top: `-${BLEED_RATIO * 100}%`,
-                    height: `${(1 + BLEED_RATIO * 2) * 100}%`,
-                }}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 z-[5] w-full"
+                style={{ top: `-${BLEED_TOP * 100}%`, height: `${(1 + BLEED_TOP + BLEED_BOTTOM) * 100}%` }}
             />
         </div>
     );
