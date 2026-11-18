@@ -126,7 +126,7 @@ export default function Footer() {
                 <div className="relative z-10 w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 pt-16 md:pt-20 pb-0">
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-20">
                         {/* Left: Editorial closing + direct team email */}
-                        <div className="relative w-full lg:max-w-[340px] flex flex-col items-start">
+                        <div className="relative w-full max-w-[264px] flex flex-col items-start">
                             {isNight && <div aria-hidden="true" className={NIGHT_BACKDROP} />}
                             <h2 className="font-pixel text-3xl sm:text-4xl font-semibold text-ink leading-[1.08] tracking-tight">
                                 Focus, without{" "}
