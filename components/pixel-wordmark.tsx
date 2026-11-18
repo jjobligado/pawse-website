@@ -15,9 +15,8 @@ import { measureGlyphs, sampleGlyphs, type GlyphData } from "@/lib/pixel-glyphs"
  * - Entrance: letters pop up high from behind the walnut sill with distinct
  *   timings, jump curves, and bounce counts (some settle quickly while others
  *   keep bouncing longer), moving together with their drop shadows.
- * - Hover / Click: each letter hops with its own bouncy bezier spring and shadow.
- * - Pointer move: leaves fading pixel paw-print stamps behind the letters.
- * - Click / tap: bursts pixel confetti and sends a hop wave across the letters.
+ * - Hover / Click: each letter hops with its own bouncy bezier spring and shadow,
+ *   and clicks burst pixel confetti.
  * - Sleeps when idle or off-screen, and renders statically under
  *   `prefers-reduced-motion: reduce`.
  */
@@ -31,8 +30,6 @@ interface LetterPaint {
 interface WordmarkPalette {
     letters: readonly LetterPaint[];
     outline: string;
-    pawRgb: string;
-    pawAlpha: number;
     sparks?: readonly string[];
     glow?: string;
     fallbackClass: string;
@@ -48,8 +45,6 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
             { face: "#FFA08C", shade: "#8B2E1B", light: "#FFD8CF" }, // E: Coral
         ],
         outline: "#232323",
-        pawRgb: "35,35,35",
-        pawAlpha: 0.14,
         fallbackClass: "text-ink",
     },
     day: {
@@ -61,8 +56,6 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
             { face: "#F78C76", shade: "#8B2E1B", light: "#FFD8CF" },
         ],
         outline: "#232323",
-        pawRgb: "26,116,174",
-        pawAlpha: 0.16,
         fallbackClass: "text-ink",
     },
     dusk: {
@@ -74,8 +67,6 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
             { face: "#F28D82", shade: "#8B2E1B", light: "#FFD8C9" },
         ],
         outline: "#232323",
-        pawRgb: "35,35,35",
-        pawAlpha: 0.15,
         fallbackClass: "text-ink",
     },
     night: {
@@ -87,8 +78,6 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
             { face: "#DE847A", shade: "#141414", light: "#FFE7B0" },
         ],
         outline: "#141414",
-        pawRgb: "20,20,20",
-        pawAlpha: 0.18,
         sparks: ["#FFE7B0", "#A9C46C", "#E0A35C", "#9C89E0", "#68A8DC"],
         glow: "rgba(255,231,176,0.3)",
         fallbackClass: "text-ink-strong",
@@ -98,7 +87,6 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
 const BLEED_TOP = 0.65;
 const BLEED_BOTTOM = 0.12;
 
-const STAMP_LIFE_MS = 1500;
 const SPARK_LIFE_MS = 950;
 
 interface BounceSlice {
@@ -228,9 +216,6 @@ const JUMP_PROFILES: readonly JumpProfile[] = [
 
 const MAX_ENTRANCE_END = Math.max(...JUMP_PROFILES.map((p) => p.delay + p.duration));
 
-/** 6×6 paw print, drawn at half the wordmark's pixel size. */
-const PAW_PATTERN = [".X..X.", "X....X", "..XX..", ".XXXX.", ".XXXX.", "..XX.."] as const;
-
 interface Cell {
     col: number;
     row: number;
@@ -245,12 +230,6 @@ interface LetterBox {
     left: number;
     right: number;
     topRow: number;
-}
-
-interface Stamp {
-    x: number;
-    y: number;
-    at: number;
 }
 
 interface Spark {
@@ -336,12 +315,8 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
 
         let entranceStart = -1;
         const hops = [-1, -1, -1, -1, -1];
-        const stamps: Stamp[] = [];
         const sparks: Spark[] = [];
         let hovered = -1;
-        let lastStampX = Number.NaN;
-        let lastStampY = Number.NaN;
-        let stampSide = 1;
 
         let inView = false;
         let rafId: number | null = null;
@@ -450,26 +425,7 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             ctx.globalAlpha = 1;
             const palette = paletteRef.current;
 
-            // 1. Paw prints (behind the letters), fading out in steps
-            const paw = step * 0.5;
-            for (const s of stamps) {
-                const age = now - s.at;
-                if (age >= STAMP_LIFE_MS) continue;
-                const level = Math.ceil((1 - age / STAMP_LIFE_MS) * 4) / 4;
-                ctx.fillStyle = `rgba(${palette.pawRgb},${(palette.pawAlpha * level).toFixed(3)})`;
-                const ox = s.x - 3 * paw;
-                const oy = s.y - 3 * paw;
-                for (let r = 0; r < PAW_PATTERN.length; r++) {
-                    for (let c = 0; c < PAW_PATTERN[r].length; c++) {
-                        if (PAW_PATTERN[r][c] !== "X") continue;
-                        const x0 = Math.round(ox + c * paw);
-                        const y0 = Math.round(oy + r * paw);
-                        ctx.fillRect(x0, y0, Math.round(ox + (c + 1) * paw) - x0, Math.round(oy + (r + 1) * paw) - y0);
-                    }
-                }
-            }
-
-            // 2. Letters: 1-cell drop shadow, outer pixel contour, bright face, and top highlight
+            // 1. Letters: 1-cell drop shadow, outer pixel contour, bright face, and top highlight
             const drops = letters.map((_, i) => entranceOffset(i, now, reduced));
             const lifts = letters.map((_, i) => (reduced ? 0 : hopOffset(i, now)));
             const lightH = Math.max(1, Math.round(step * 0.28));
@@ -548,7 +504,6 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             rafId = null;
             const reduced = reducedMq.matches;
 
-            for (let i = stamps.length - 1; i >= 0; i--) if (now - stamps[i].at > STAMP_LIFE_MS) stamps.splice(i, 1);
             for (let i = sparks.length - 1; i >= 0; i--) if (now - sparks[i].at > SPARK_LIFE_MS) sparks.splice(i, 1);
 
             drawFrame(now, reduced);
@@ -556,7 +511,6 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             const busy =
                 (entranceStart >= 0 && now - entranceStart < MAX_ENTRANCE_END + 60) ||
                 hops.some((h) => h >= 0) ||
-                stamps.length > 0 ||
                 sparks.length > 0;
 
             if (!reduced && inView && !document.hidden && busy) {
@@ -577,7 +531,6 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             const inside = lx >= 0 && lx <= width && wy >= -height * 0.25 && wy <= height * 1.05;
             if (!inside) {
                 hovered = -1;
-                lastStampX = Number.NaN;
                 return;
             }
             const now = performance.now();
@@ -594,29 +547,6 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                     wake();
                 }
             }
-
-            // Leave a trail of paw prints, alternating left and right feet
-            if (Number.isNaN(lastStampX)) {
-                lastStampX = lx;
-                lastStampY = ly;
-                return;
-            }
-            const dx = lx - lastStampX;
-            const dy = ly - lastStampY;
-            const dist = Math.hypot(dx, dy);
-            if (dist < step * 4.5) return;
-            const half = step / 2;
-            const side = stampSide * step * 1.1;
-            stamps.push({
-                x: Math.round((lx + (-dy / dist) * side) / half) * half,
-                y: Math.round((ly + (dx / dist) * side) / half) * half,
-                at: now,
-            });
-            if (stamps.length > 28) stamps.shift();
-            stampSide *= -1;
-            lastStampX = lx;
-            lastStampY = ly;
-            wake();
         };
 
         const onPointerDown = (e: PointerEvent) => {

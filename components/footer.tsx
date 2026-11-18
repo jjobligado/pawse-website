@@ -1,6 +1,7 @@
 "use client";
 
 import { FooterLink } from "@/components/footer-controls";
+import FooterPawTrail from "@/components/footer-paw-trail";
 import { WindowSky, useSkyPhase, type SkyPhase } from "@/components/landing/hero-scene";
 import PixelWordmark from "@/components/pixel-wordmark";
 import { CONTACT_EMAIL } from "@/lib/site-config";
@@ -122,6 +123,8 @@ export default function Footer() {
                         background: "linear-gradient(180deg, currentColor 0%, currentColor 25%, transparent 100%)",
                     }}
                 />
+
+                <FooterPawTrail phase={skyPhase} />
 
                 <div className="relative z-10 w-full max-w-chrome mx-auto px-6 sm:px-12 md:px-14 lg:px-20 pt-16 md:pt-20 pb-0">
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-20">
