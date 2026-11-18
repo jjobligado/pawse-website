@@ -123,7 +123,7 @@ export default function Footer() {
                     }}
                 />
 
-                <div className="relative z-10 w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 pt-16 md:pt-20 pb-0">
+                <div className="relative z-10 w-full max-w-chrome mx-auto px-6 sm:px-12 md:px-14 lg:px-20 pt-16 md:pt-20 pb-0">
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-20">
                         {/* Left: Editorial closing + direct team email */}
                         <div className="relative w-full max-w-[264px] flex flex-col items-start">
@@ -201,7 +201,7 @@ export default function Footer() {
 
             {/* Clean white wall below the sill */}
             <div className="w-full bg-white">
-                <div className="w-full max-w-content mx-auto px-6 md:px-12 lg:px-20 pt-2 pb-6 flex justify-center text-center">
+                <div className="w-full max-w-chrome mx-auto px-6 sm:px-12 md:px-14 lg:px-20 pt-2 pb-6 flex justify-center text-center">
                     <p className="text-caption text-ink-soft">
                         © 2026 PAWSE · Built by meowskrrt. All rights reserved.
                     </p>
