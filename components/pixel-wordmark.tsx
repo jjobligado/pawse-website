@@ -12,10 +12,10 @@ import { measureGlyphs, sampleGlyphs, type GlyphData } from "@/lib/pixel-glyphs"
  * in the app's companion colours, framed by a crisp pixel perimeter contour so
  * every letter maintains high graphic contrast against all 4 sky phases and
  * skyline rooftops:
- * - Entrance: letters pop up from behind the walnut sill at slightly different
- *   times and jump cleanly onto the platform.
- * - Hover: the letter under the cursor hops two grid pixels (its 1px drop
- *   shadow stays put on the sill).
+ * - Entrance: letters pop up high from behind the walnut sill with distinct
+ *   timings, jump curves, and bounce counts (some settle quickly while others
+ *   keep bouncing longer), moving together with their drop shadows.
+ * - Hover / Click: each letter hops with its own bouncy bezier spring and shadow.
  * - Pointer move: leaves fading pixel paw-print stamps behind the letters.
  * - Click / tap: bursts pixel confetti and sends a hop wave across the letters.
  * - Sleeps when idle or off-screen, and renders statically under
@@ -95,16 +95,138 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
     },
 };
 
-const BLEED_TOP = 0.55;
+const BLEED_TOP = 0.65;
 const BLEED_BOTTOM = 0.12;
 
-const JUMP_MS = 1050;
-/** Organic per-letter stagger [P, A, W, S, E] so each hops onto the sill at slightly different times. */
-const JUMP_DELAYS = [0, 190, 85, 310, 225] as const;
-const MAX_JUMP_DELAY = Math.max(...JUMP_DELAYS);
-const HOP_MS = 340;
 const STAMP_LIFE_MS = 1500;
 const SPARK_LIFE_MS = 950;
+
+interface BounceSlice {
+    start: number;
+    end: number;
+    height: number;
+}
+
+interface BounceTimeline {
+    dropEnd: number;
+    arcs: readonly BounceSlice[];
+}
+
+interface JumpProfile {
+    delay: number;
+    duration: number;
+    peakMult: number;
+    launchFrac: number;
+    launchCurve: readonly [number, number, number, number];
+    landing: BounceTimeline;
+    hopDuration: number;
+    hopPeakMult: number;
+    hopLanding: BounceTimeline;
+}
+
+/** Splits [0, 1] into an initial gravity fall + rebounds weighted by sqrt(height). */
+function buildBounceTimeline(bounces: readonly number[]): BounceTimeline {
+    const bounceWeights = bounces.map((h) => Math.sqrt(h));
+    const total = 1 + bounceWeights.reduce((sum, w) => sum + w, 0);
+    const dropEnd = 1 / total;
+    let cursor = dropEnd;
+    const arcs: BounceSlice[] = bounces.map((h, idx) => {
+        const start = cursor;
+        cursor += bounceWeights[idx] / total;
+        return { start, end: idx === bounces.length - 1 ? 1 : cursor, height: h };
+    });
+    return { dropEnd, arcs };
+}
+
+function makeJumpProfile(spec: {
+    delay: number;
+    duration: number;
+    peakMult: number;
+    launchFrac: number;
+    launchCurve: readonly [number, number, number, number];
+    bounces: readonly number[];
+    hopDuration: number;
+    hopPeakMult: number;
+    hopBounces: readonly number[];
+}): JumpProfile {
+    return {
+        delay: spec.delay,
+        duration: spec.duration,
+        peakMult: spec.peakMult,
+        launchFrac: spec.launchFrac,
+        launchCurve: spec.launchCurve,
+        landing: buildBounceTimeline(spec.bounces),
+        hopDuration: spec.hopDuration,
+        hopPeakMult: spec.hopPeakMult,
+        hopLanding: buildBounceTimeline(spec.hopBounces),
+    };
+}
+
+/** Distinct timing, height, and bounce personality per letter [P, A, W, S, E]. */
+const JUMP_PROFILES: readonly JumpProfile[] = [
+    // P: agile early starter, 3 crisp bounces
+    makeJumpProfile({
+        delay: 0,
+        duration: 1060,
+        peakMult: 6.9,
+        launchFrac: 0.44,
+        launchCurve: [0.18, 1.16, 0.32, 1],
+        bounces: [0.38, 0.14, 0.04],
+        hopDuration: 420,
+        hopPeakMult: 2.6,
+        hopBounces: [0.24],
+    }),
+    // A: big springy jump, 4 rebounds
+    makeJumpProfile({
+        delay: 175,
+        duration: 1460,
+        peakMult: 7.5,
+        launchFrac: 0.4,
+        launchCurve: [0.16, 1.24, 0.3, 1],
+        bounces: [0.46, 0.23, 0.1, 0.035],
+        hopDuration: 520,
+        hopPeakMult: 3.0,
+        hopBounces: [0.34, 0.11],
+    }),
+    // W: heavier letter, lower arc, 2 solid bounces
+    makeJumpProfile({
+        delay: 75,
+        duration: 1180,
+        peakMult: 6.3,
+        launchFrac: 0.48,
+        launchCurve: [0.22, 1.08, 0.36, 1],
+        bounces: [0.32, 0.1],
+        hopDuration: 400,
+        hopPeakMult: 2.3,
+        hopBounces: [0.18],
+    }),
+    // S: jumps highest and bounces the longest before settling (5 rebounds)
+    makeJumpProfile({
+        delay: 295,
+        duration: 1640,
+        peakMult: 8.1,
+        launchFrac: 0.36,
+        launchCurve: [0.15, 1.26, 0.28, 1],
+        bounces: [0.5, 0.28, 0.14, 0.065, 0.025],
+        hopDuration: 580,
+        hopPeakMult: 3.1,
+        hopBounces: [0.38, 0.16, 0.05],
+    }),
+    // E: upbeat medium-quick finish, 3 bounces
+    makeJumpProfile({
+        delay: 210,
+        duration: 1240,
+        peakMult: 7.2,
+        launchFrac: 0.43,
+        launchCurve: [0.18, 1.18, 0.34, 1],
+        bounces: [0.4, 0.17, 0.055],
+        hopDuration: 460,
+        hopPeakMult: 2.8,
+        hopBounces: [0.28, 0.08],
+    }),
+];
+
+const MAX_ENTRANCE_END = Math.max(...JUMP_PROFILES.map((p) => p.delay + p.duration));
 
 /** 6×6 paw print, drawn at half the wordmark's pixel size. */
 const PAW_PATTERN = [".X..X.", "X....X", "..XX..", ".XXXX.", ".XXXX.", "..XX.."] as const;
@@ -141,18 +263,42 @@ interface Spark {
     at: number;
 }
 
-function easeOutCubic(t: number): number {
-    const u = 1 - t;
-    return 1 - u * u * u;
+function sampleCurve(a: number, b: number, t: number): number {
+    return ((1 - 3 * b + 3 * a) * t + (3 * b - 6 * a)) * t * t + 3 * a * t;
 }
 
-function easeOutBounce(t: number): number {
-    const n = 7.5625;
-    const d = 2.75;
-    if (t < 1 / d) return n * t * t;
-    if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75;
-    if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375;
-    return n * (t -= 2.625 / d) * t + 0.984375;
+function cubicBezier(x1: number, y1: number, x2: number, y2: number, x: number): number {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    let lo = 0;
+    let hi = 1;
+    for (let i = 0; i < 10; i++) {
+        const mid = (lo + hi) * 0.5;
+        if (sampleCurve(x1, x2, mid) < x) lo = mid;
+        else hi = mid;
+    }
+    return sampleCurve(y1, y2, (lo + hi) * 0.5);
+}
+
+/** Smooth upward-decelerating, downward-accelerating bounce arc over [0, 1] -> [0, 1, 0]. */
+function bounceArc(p: number): number {
+    if (p < 0.5) return cubicBezier(0.18, 0.92, 0.36, 1, p * 2);
+    return 1 - cubicBezier(0.55, 0.05, 0.85, 0.35, (p - 0.5) * 2);
+}
+
+/** Evaluates gravity fall from -peak plus every bounce arc over v in [0, 1]. */
+function evalLanding(peak: number, timeline: BounceTimeline, v: number): number {
+    if (v <= 0) return -peak;
+    if (v >= 1) return 0;
+    if (v < timeline.dropEnd) {
+        return -peak * (1 - cubicBezier(0.55, 0.05, 0.86, 0.34, v / timeline.dropEnd));
+    }
+    for (const arc of timeline.arcs) {
+        if (v < arc.end) {
+            return -peak * arc.height * bounceArc((v - arc.start) / (arc.end - arc.start));
+        }
+    }
+    return 0;
 }
 
 export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
@@ -257,32 +403,45 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
         const entranceOffset = (i: number, now: number, reduced: boolean): number | null => {
             if (reduced) return 0;
             if (entranceStart < 0) return null;
-            const t = (now - entranceStart - JUMP_DELAYS[i % JUMP_DELAYS.length]) / JUMP_MS;
+            const profile = JUMP_PROFILES[i % JUMP_PROFILES.length];
+            const t = (now - entranceStart - profile.delay) / profile.duration;
             if (t <= 0) return null;
             if (t >= 1) return 0;
             const depth = (rows + 2) * step;
-            const peak = step * 7;
-            // Phase 1: launch up from behind the walnut sill high into the open sky above
-            if (t < 0.48) {
-                return depth + (-peak - depth) * easeOutCubic(t / 0.48);
+            const peak = step * profile.peakMult;
+            // Phase 1: launch up from behind the walnut wood into the open sky
+            if (t < profile.launchFrac) {
+                const [x1, y1, x2, y2] = profile.launchCurve;
+                return depth + (-peak - depth) * cubicBezier(x1, y1, x2, y2, t / profile.launchFrac);
             }
-            // Phase 2: fall onto the walnut sill and smoothly bounce in place
-            return -peak * (1 - easeOutBounce((t - 0.48) / 0.52));
+            // Phase 2: gravity drop + per-letter bounce sequence onto the sill
+            return evalLanding(peak, profile.landing, (t - profile.launchFrac) / (1 - profile.launchFrac));
         };
 
-        const landed = (i: number, now: number) =>
-            reducedMq.matches || (entranceStart >= 0 && now - entranceStart - JUMP_DELAYS[i % JUMP_DELAYS.length] >= JUMP_MS);
+        const landed = (i: number, now: number) => {
+            if (reducedMq.matches) return true;
+            if (entranceStart < 0) return false;
+            const profile = JUMP_PROFILES[i % JUMP_PROFILES.length];
+            return now - entranceStart >= profile.delay + profile.duration;
+        };
 
         const hopOffset = (i: number, now: number) => {
             const start = hops[i];
             if (start < 0) return 0;
-            const t = (now - start) / HOP_MS;
+            const profile = JUMP_PROFILES[i % JUMP_PROFILES.length];
+            const t = (now - start) / profile.hopDuration;
             if (t < 0) return 0; // queued by a click wave
             if (t >= 1) {
                 hops[i] = -1;
                 return 0;
             }
-            return -step * 2.5 * Math.sin(Math.PI * t);
+            const hopPeak = step * profile.hopPeakMult;
+            const hopLaunch = 0.42;
+            if (t < hopLaunch) {
+                const [x1, y1, x2, y2] = profile.launchCurve;
+                return -hopPeak * cubicBezier(x1, y1, x2, y2, t / hopLaunch);
+            }
+            return evalLanding(hopPeak, profile.hopLanding, (t - hopLaunch) / (1 - hopLaunch));
         };
 
         const drawFrame = (now: number, reduced: boolean) => {
@@ -324,16 +483,15 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                 const border = new Path2D();
                 const face = new Path2D();
                 const light = new Path2D();
-                const shadowY = Math.max(0, drop);
                 const letterY = drop + lifts[i];
 
                 for (const cell of list) {
                     const x0 = Math.round(colX(cell.col));
                     const x1 = Math.round(colX(cell.col + 1));
                     const w = x1 - x0;
-                    // Shadow rises with the letter from behind the sill, then rests on the sill during the jump apex and hops
-                    const sy0 = Math.round(rowY(cell.row) + shadowY + step);
-                    const sy1 = Math.round(rowY(cell.row + 1) + shadowY + step);
+                    // Shadow bounces and hops together with its letter
+                    const sy0 = Math.round(rowY(cell.row) + letterY + step);
+                    const sy1 = Math.round(rowY(cell.row + 1) + letterY + step);
                     shade.rect(Math.round(x0 + step), sy0, Math.round(x1 + step) - Math.round(x0 + step), sy1 - sy0);
 
                     const y0 = Math.round(rowY(cell.row) + letterY);
@@ -396,7 +554,7 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             drawFrame(now, reduced);
 
             const busy =
-                (entranceStart >= 0 && now - entranceStart < MAX_JUMP_DELAY + JUMP_MS + 60) ||
+                (entranceStart >= 0 && now - entranceStart < MAX_ENTRANCE_END + 60) ||
                 hops.some((h) => h >= 0) ||
                 stamps.length > 0 ||
                 sparks.length > 0;

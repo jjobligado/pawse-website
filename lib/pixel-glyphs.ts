@@ -1,9 +1,8 @@
 /**
  * Rasterizes "PAWSE" in the loaded Pixelify Sans font onto an integer pixel grid.
  *
- * Shared by the footer-lab wordmark variants. Same sampling rules as
- * components/pixel-wordmark.tsx: A and W are mirrored so they stay perfectly
- * symmetrical, and the bars on P and A are capped so they don't look bloated.
+ * Used by components/pixel-wordmark.tsx. A and W are mirrored so they stay
+ * perfectly symmetrical, and the bars on P and A are capped so they don't look bloated.
  */
 
 export const LETTERS = ["P", "A", "W", "S", "E"] as const;
