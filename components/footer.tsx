@@ -188,7 +188,7 @@ export default function Footer() {
                     </div>
 
                     {/* Interactive companion-coloured PAWSE wordmark resting on the walnut sill */}
-                    <div className="relative z-10 mt-16 md:mt-24">
+                    <div className="relative z-10 mt-16 md:mt-28">
                         <PixelWordmark phase={skyPhase} />
                     </div>
                 </div>

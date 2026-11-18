@@ -12,7 +12,8 @@ import { measureGlyphs, sampleGlyphs, type GlyphData } from "@/lib/pixel-glyphs"
  * in the app's companion colours, framed by a crisp pixel perimeter contour so
  * every letter maintains high graphic contrast against all 4 sky phases and
  * skyline rooftops:
- * - Entrance: letters drop in one by one and bounce onto the sill.
+ * - Entrance: letters pop up from behind the walnut sill at slightly different
+ *   times and jump cleanly onto the platform.
  * - Hover: the letter under the cursor hops two grid pixels (its 1px drop
  *   shadow stays put on the sill).
  * - Pointer move: leaves fading pixel paw-print stamps behind the letters.
@@ -94,12 +95,14 @@ const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
     },
 };
 
-const BLEED_TOP = 0.35;
+const BLEED_TOP = 0.55;
 const BLEED_BOTTOM = 0.12;
 
-const DROP_MS = 760;
-const DROP_STAGGER_MS = 120;
-const HOP_MS = 300;
+const JUMP_MS = 1050;
+/** Organic per-letter stagger [P, A, W, S, E] so each hops onto the sill at slightly different times. */
+const JUMP_DELAYS = [0, 190, 85, 310, 225] as const;
+const MAX_JUMP_DELAY = Math.max(...JUMP_DELAYS);
+const HOP_MS = 340;
 const STAMP_LIFE_MS = 1500;
 const SPARK_LIFE_MS = 950;
 
@@ -136,6 +139,11 @@ interface Spark {
     size: number;
     color: string;
     at: number;
+}
+
+function easeOutCubic(t: number): number {
+    const u = 1 - t;
+    return 1 - u * u * u;
 }
 
 function easeOutBounce(t: number): number {
@@ -194,7 +202,6 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
 
         const colX = (col: number) => (col + 0.25) * step;
         const rowY = (row: number) => bleedTop + yOffset + row * step;
-        const snap = (v: number) => Math.round(v / step) * step;
 
         const buildGrid = () => {
             if (!glyphData) return;
@@ -250,15 +257,21 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
         const entranceOffset = (i: number, now: number, reduced: boolean): number | null => {
             if (reduced) return 0;
             if (entranceStart < 0) return null;
-            const t = (now - entranceStart - i * DROP_STAGGER_MS) / DROP_MS;
+            const t = (now - entranceStart - JUMP_DELAYS[i % JUMP_DELAYS.length]) / JUMP_MS;
             if (t <= 0) return null;
             if (t >= 1) return 0;
-            // Start fully above the canvas, fall, and bounce on the sill
-            return -rowY(rows) * (1 - easeOutBounce(t));
+            const depth = (rows + 2) * step;
+            const peak = step * 7;
+            // Phase 1: launch up from behind the walnut sill high into the open sky above
+            if (t < 0.48) {
+                return depth + (-peak - depth) * easeOutCubic(t / 0.48);
+            }
+            // Phase 2: fall onto the walnut sill and smoothly bounce in place
+            return -peak * (1 - easeOutBounce((t - 0.48) / 0.52));
         };
 
         const landed = (i: number, now: number) =>
-            reducedMq.matches || (entranceStart >= 0 && now - entranceStart - i * DROP_STAGGER_MS >= DROP_MS);
+            reducedMq.matches || (entranceStart >= 0 && now - entranceStart - JUMP_DELAYS[i % JUMP_DELAYS.length] >= JUMP_MS);
 
         const hopOffset = (i: number, now: number) => {
             const start = hops[i];
@@ -269,7 +282,7 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                 hops[i] = -1;
                 return 0;
             }
-            return -step * 2 * Math.sin(Math.PI * t);
+            return -step * 2.5 * Math.sin(Math.PI * t);
         };
 
         const drawFrame = (now: number, reduced: boolean) => {
@@ -298,11 +311,8 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             }
 
             // 2. Letters: 1-cell drop shadow, outer pixel contour, bright face, and top highlight
-            const drops = letters.map((_, i) => {
-                const e = entranceOffset(i, now, reduced);
-                return e === null ? null : snap(e);
-            });
-            const lifts = letters.map((_, i) => (reduced ? 0 : snap(hopOffset(i, now))));
+            const drops = letters.map((_, i) => entranceOffset(i, now, reduced));
+            const lifts = letters.map((_, i) => (reduced ? 0 : hopOffset(i, now)));
             const lightH = Math.max(1, Math.round(step * 0.28));
             const b = Math.max(1, Math.round(step * 0.14));
 
@@ -314,18 +324,20 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                 const border = new Path2D();
                 const face = new Path2D();
                 const light = new Path2D();
+                const shadowY = Math.max(0, drop);
+                const letterY = drop + lifts[i];
 
                 for (const cell of list) {
                     const x0 = Math.round(colX(cell.col));
                     const x1 = Math.round(colX(cell.col + 1));
                     const w = x1 - x0;
-                    // Shadow stays anchored on the sill while the letter hops
-                    const sy0 = Math.round(rowY(cell.row) + drop + step);
-                    const sy1 = Math.round(rowY(cell.row + 1) + drop + step);
+                    // Shadow rises with the letter from behind the sill, then rests on the sill during the jump apex and hops
+                    const sy0 = Math.round(rowY(cell.row) + shadowY + step);
+                    const sy1 = Math.round(rowY(cell.row + 1) + shadowY + step);
                     shade.rect(Math.round(x0 + step), sy0, Math.round(x1 + step) - Math.round(x0 + step), sy1 - sy0);
 
-                    const y0 = Math.round(rowY(cell.row) + drop + lifts[i]);
-                    const y1 = Math.round(rowY(cell.row + 1) + drop + lifts[i]);
+                    const y0 = Math.round(rowY(cell.row) + letterY);
+                    const y1 = Math.round(rowY(cell.row + 1) + letterY);
                     const h = y1 - y0;
                     face.rect(x0, y0, w, h);
                     if (cell.top) {
@@ -384,7 +396,7 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
             drawFrame(now, reduced);
 
             const busy =
-                (entranceStart >= 0 && now - entranceStart < DROP_STAGGER_MS * 4 + DROP_MS + 60) ||
+                (entranceStart >= 0 && now - entranceStart < MAX_JUMP_DELAY + JUMP_MS + 60) ||
                 hops.some((h) => h >= 0) ||
                 stamps.length > 0 ||
                 sparks.length > 0;
@@ -502,7 +514,7 @@ export default function PixelWordmark({ phase = "day" }: { phase?: SkyPhase }) {
                 inView = entry.isIntersecting;
                 syncVisibility();
             },
-            { threshold: 0.35 }
+            { threshold: 0.15 }
         );
         io.observe(wrap);
 
