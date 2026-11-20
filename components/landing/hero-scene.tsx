@@ -647,8 +647,8 @@ export function SillPlant({ className }: { className?: string }) {
  * - the window it faces, faintly reflected in the screen glass.
  *
  * Top to bottom: the aluminium shell rim around the bezel (lens, thicker chin),
- * the hinge, a sliver of the keyboard deck seen from slightly above, then the
- * front lip with its thumb notch and feet.
+ * the hinge, then the keyboard deck lying flat in the room's perspective (`--pitch`)
+ * with its keyboard, trackpad and front edge.
  */
 export function Laptop({ children }: { children: React.ReactNode }) {
     return (
@@ -681,20 +681,27 @@ export function Laptop({ children }: { children: React.ReactNode }) {
                     />
                 </div>
             </div>
-            <div aria-hidden="true">
+            <div aria-hidden="true" className="relative">
                 {/* Hinge: warm dark band in the lid's shadow, crisp edge underneath */}
                 <div className="relative mx-[2%] h-[clamp(3px,0.5%,5px)] bg-[linear-gradient(180deg,#2E2724,#130F0D)] shadow-[inset_0_-1px_0_#0A0807]" />
-                {/* Keyboard deck: a sliver of the top surface, shaded where it runs under the lid */}
-                <div className="metal-h [--metal:#DDD6CC] relative -mx-[3.4%] h-[clamp(4px,0.9%,9px)] shadow-[inset_0_2px_2px_-1px_rgb(40_28_18/0.35)] [clip-path:polygon(1.6%_0,98.4%_0,100%_100%,0_100%)]" />
-                {/* Front lip: cream top edge, then a shade band and a darker edge line, like the sill */}
-                <div className="metal-h [--metal:#E4DDD3] relative -mx-[4%] h-3 sm:h-4 rounded-b-[18px] shadow-[inset_0_1px_0_rgb(255_252_246/0.95),inset_0_-2px_0_#B4AA9D,inset_0_-3px_0_#8F8578,0_18px_30px_-12px_rgb(40_20_10/0.35),0_2px_3px_rgb(40_20_10/0.2)]">
-                    {/* Specular line where the light catches the curve */}
-                    <span className="absolute inset-x-[8%] top-[30%] h-px bg-[linear-gradient(90deg,transparent,rgb(255_252_246/0.85),transparent)]" />
-                    {/* Thumb notch, cut into the lip */}
-                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-[14%] h-1.5 rounded-b-md bg-[linear-gradient(180deg,#A39A8E,#C9C1B6)] shadow-[inset_0_1px_2px_rgb(40_28_18/0.35),0_1px_0_rgb(255_252_246/0.6)]" />
-                    {/* Rubber feet */}
-                    <span className="absolute -bottom-[2px] left-[7%] w-[5%] h-[3px] rounded-b-full bg-[#3A322C]" />
-                    <span className="absolute -bottom-[2px] right-[7%] w-[5%] h-[3px] rounded-b-full bg-[#3A322C]" />
+                {/*
+                  Keyboard deck: lies flat on the desk, drawn with the room's camera angle
+                  (--pitch, shared with the desk). Near eye level it is almost edge-on; as
+                  the camera tilts down the keyboard and trackpad come into view. It hangs
+                  off the hinge outside the layout flow, so it never changes the hero's size.
+                */}
+                <div className="absolute -inset-x-[3.5%] top-full h-0 [perspective:calc(var(--lw,900px)*3)] [perspective-origin:50%_0%]">
+                    <div className="metal-h [--metal:#DCD5CB] relative w-full aspect-[1/0.62] origin-top [transform:rotateX(var(--pitch,62deg))] [transform-style:preserve-3d] rounded-t-[3px] rounded-b-[clamp(10px,2.4%,26px)] shadow-[inset_0_4px_5px_-2px_rgb(40_28_18/0.45),inset_0_0_0_1px_rgb(70_54_40/0.25),inset_0_-2px_0_rgb(255_252_246/0.7)]">
+                        {/* Keyboard well with keycaps (14 × 6), each lit along its top edge */}
+                        <div className="absolute left-[8%] right-[8%] top-[7%] h-[47%] rounded-[1.5%/3%] bg-[#2E2723] bg-[linear-gradient(90deg,#171210_0_8%,transparent_8%),linear-gradient(180deg,#171210_0_13%,transparent_13%),linear-gradient(180deg,transparent_13%,rgb(255_236_214/0.1)_13%_24%,transparent_24%)] bg-[length:calc(100%/14)_100%,100%_calc(100%/6),100%_calc(100%/6)] shadow-[inset_0_0_0_2px_#171210,0_1px_0_rgb(255_252_246/0.6)]" />
+                        {/* Trackpad */}
+                        <div className="metal-h [--metal:#D2CAC0] absolute left-1/2 -translate-x-1/2 top-[60%] w-[38%] h-[31%] rounded-[5%/8%] shadow-[inset_0_0_0_1px_rgb(70_54_40/0.3),inset_0_1px_0_rgb(255_252_246/0.8),0_1px_0_rgb(255_252_246/0.5)]" />
+                        {/* Front edge face: cream top line, shade band and darker edge, like the sill */}
+                        <div className="metal-h [--metal:#E4DDD3] absolute inset-x-0 top-full h-[clamp(6px,1.3%,14px)] origin-top [transform:rotateX(-90deg)] rounded-b-[clamp(10px,2.4%,26px)] shadow-[inset_0_1px_0_rgb(255_252_246/0.95),inset_0_-2px_0_#B4AA9D,inset_0_-3px_0_#8F8578]">
+                            {/* Thumb notch, cut into the edge */}
+                            <span className="absolute top-0 left-1/2 -translate-x-1/2 w-[14%] h-[55%] rounded-b-md bg-[linear-gradient(180deg,#A39A8E,#C9C1B6)] shadow-[inset_0_1px_2px_rgb(40_28_18/0.35)]" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
