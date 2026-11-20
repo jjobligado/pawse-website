@@ -637,34 +637,57 @@ export function SillPlant({ className }: { className?: string }) {
 
 /**
  * The visitor's own laptop, seen from the chair: the lid faces us and its screen
- * holds the app preview. Drawn smooth on purpose (it's the real-world object).
+ * holds the app preview. Drawn smooth on purpose (it's the real-world object),
+ * but lit like the window: light from above, so top edges catch a highlight and
+ * undersides fall into shade.
+ *
+ * Top to bottom: an aluminium shell edge around a glass-black bezel (lit along
+ * the top, with a lens and a thicker chin), the hinge, a sliver of the keyboard
+ * deck seen from slightly above, then the front lip with its thumb notch and feet.
  */
 export function Laptop({ children }: { children: React.ReactNode }) {
     return (
         <div className="relative w-full">
-            {/* Lid */}
-            <div className="relative rounded-t-[22px] sm:rounded-t-[28px] bg-[linear-gradient(180deg,#2B2D31,#1C1D20)] p-2.5 sm:p-3.5 pb-0 shadow-[0_30px_60px_-30px_rgb(20_30_50/0.45)] ring-1 ring-black/40">
-                {/* Camera */}
-                <span
-                    aria-hidden="true"
-                    className="absolute top-[5px] sm:top-[7px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0D0E10] ring-1 ring-white/10"
-                />
-                {/* Screen */}
-                <div className="relative overflow-hidden rounded-t-[12px] sm:rounded-t-[16px] bg-white aspect-[16/10]">
-                    {children}
-                    {/* Screen sheen */}
+            {/* Lid: the aluminium shell shows as a thin bright rim around the bezel */}
+            <div className="relative rounded-t-[24px] sm:rounded-t-[31px] p-[1.5px] sm:p-[2.5px] bg-[linear-gradient(180deg,#E4E7EB_0%,#A9AEB5_45%,#80868E_100%)] shadow-[0_30px_60px_-30px_rgb(40_20_10/0.45),0_2px_6px_rgb(20_20_20/0.12)]">
+                {/* Bezel: glass-black, lit from above, with an inner edge where it meets the panel */}
+                <div className="relative rounded-t-[22px] sm:rounded-t-[28px] bg-[linear-gradient(180deg,#34363B_0%,#222327_40%,#18191C_100%)] p-2.5 sm:p-3.5 pb-[clamp(10px,2.6%,26px)] shadow-[inset_0_1px_0_rgb(255_255_255/0.16),inset_0_0_0_1px_rgb(0_0_0/0.55)]">
+                    {/* Camera: a lens with a small glint */}
+                    <span
+                        aria-hidden="true"
+                        className="absolute top-[5px] sm:top-[7px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[radial-gradient(circle_at_35%_35%,#4A5A70_0%,#15181D_55%,#08090B_100%)] ring-1 ring-white/[0.08]"
+                    />
+                    {/* Screen */}
+                    <div className="relative overflow-hidden rounded-t-[12px] sm:rounded-t-[16px] rounded-b-[3px] bg-white aspect-[16/10] shadow-[0_0_0_1px_rgb(0_0_0/0.6)]">
+                        {children}
+                        {/* Screen glass: a soft diagonal sheen and a faint top reflection */}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgb(255_255_255/0.18)_0%,transparent_38%),linear-gradient(180deg,rgb(255_255_255/0.08),transparent_12%)]"
+                        />
+                    </div>
+                    {/* Glossy edge along the bottom of the bezel (the chin) */}
                     <div
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgb(255_255_255/0.18)_0%,transparent_38%)]"
+                        className="absolute inset-x-[6%] bottom-[1px] h-px bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.12),transparent)]"
                     />
                 </div>
             </div>
-            {/* Base: the front lip of the keyboard deck, a touch wider than the lid */}
-            <div
-                aria-hidden="true"
-                className="relative -mx-[4%] h-3 sm:h-4 rounded-b-[18px] bg-[linear-gradient(180deg,#E3E6EA,#BFC4CB)] shadow-[0_18px_30px_-12px_rgb(20_30_50/0.35)]"
-            >
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-[14%] h-1.5 rounded-b-md bg-[#AEB3BA]" />
+            <div aria-hidden="true">
+                {/* Hinge, in shadow between the lid and the deck */}
+                <div className="relative mx-[2%] h-[clamp(3px,0.5%,5px)] bg-[linear-gradient(180deg,#2A2C30,#0F1012)]" />
+                {/* Keyboard deck: a sliver of the top surface, seen from slightly above */}
+                <div className="relative -mx-[3.4%] h-[clamp(4px,0.9%,9px)] bg-[linear-gradient(180deg,#B9BEC5_0%,#D9DDE2_55%,#EEF0F3_100%)] [clip-path:polygon(1.6%_0,98.4%_0,100%_100%,0_100%)]" />
+                {/* Front lip: bright top edge, rounded underside in shade */}
+                <div className="relative -mx-[4%] h-3 sm:h-4 rounded-b-[18px] bg-[linear-gradient(180deg,#F4F6F8_0%,#D8DCE1_40%,#B3B9C1_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_-1px_1px_rgb(60_64_70/0.35),0_18px_30px_-12px_rgb(40_20_10/0.35)]">
+                    {/* Specular line where the light catches the curve */}
+                    <span className="absolute inset-x-[8%] top-[34%] h-px bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.75),transparent)]" />
+                    {/* Thumb notch */}
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-[14%] h-1.5 rounded-b-md bg-[linear-gradient(180deg,#9EA4AC,#C3C8CE)] shadow-[inset_0_1px_2px_rgb(0_0_0/0.28)]" />
+                    {/* Rubber feet */}
+                    <span className="absolute -bottom-[2px] left-[7%] w-[5%] h-[3px] rounded-b-full bg-[#3B3E43]" />
+                    <span className="absolute -bottom-[2px] right-[7%] w-[5%] h-[3px] rounded-b-full bg-[#3B3E43]" />
+                </div>
             </div>
         </div>
     );

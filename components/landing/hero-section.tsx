@@ -22,9 +22,10 @@ const PARALLAX_SPEED = {
 /**
  * Desk landing. The laptop scrolls normally until its centre reaches the middle
  * of the screen. From there, over LAND_SCROLL × `--land` px of scroll, it is lowered by
- * the section's `--land` with an ease-out: it starts perfectly still on screen
- * (at 2 the ease's starting speed equals the scroll), then slows as it is set
- * down on the felt mat, like a hand placing it.
+ * the section's `--land` (see landCurve): perfectly still on screen at first, then
+ * slowing until it is set down on the felt mat, like a hand placing it. Keeping
+ * LAND_SCROLL close to 1 keeps the laptop near the middle of the screen when it
+ * lands, so the finished scene can rest there (--dwell) before the page moves on.
  *
  * Depth comes from a "camera" that tilts down toward the desk as it goes: the
  * laptop leans back a little (LAND_TILT, degrees) and shrinks a touch as it moves
@@ -33,7 +34,21 @@ const PARALLAX_SPEED = {
  * Touch-down plays a short, time-based settle so it still feels physical when the
  * visitor stops scrolling right at the contact point.
  */
-const LAND_SCROLL = 2;
+const LAND_SCROLL = 1.25;
+
+/**
+ * Lowering (0–1) for scroll progress p (0–1). The laptop's speed relative to the
+ * page starts equal to the scroll (so it holds still on screen), stays there for
+ * the first part, then falls linearly to zero at contact: a soft set-down with no
+ * sudden stop. With LAND_SCROLL = 1.25 the hold covers the first 60%.
+ */
+function landCurve(p: number): number {
+    const k = LAND_SCROLL;
+    const hold = Math.min(Math.max(2 / k - 1, 0), 1);
+    if (p <= hold) return k * p;
+    const t = p - hold;
+    return Math.min(k * hold + k * (t - (t * t) / (2 * (1 - hold))), 1);
+}
 const LAND_TILT = 5;
 const LAND_SHRINK = 0.025;
 const DESK_PITCH_FROM = 72;
@@ -61,6 +76,7 @@ export default function HeroSection() {
     const laptopBodyRef = useRef<HTMLDivElement>(null);
     const castShadowRef = useRef<HTMLDivElement>(null);
     const deskRef = useRef<HTMLDivElement>(null);
+    const deskEdgeRef = useRef<HTMLDivElement>(null);
     const windowRef = useRef<HTMLDivElement>(null);
     const skyFarRef = useRef<HTMLDivElement>(null);
     const skyNearRef = useRef<HTMLDivElement>(null);
@@ -125,21 +141,38 @@ export default function HeroSection() {
         let land = 0;
         // Scroll position at which the laptop's centre sits in the middle of the screen.
         let start = 0;
+        // How long (px of scroll) the finished scene rests on screen (the section's --dwell).
+        let dwell = 0;
+        // Scroll position at which the laptop-on-desk scene is centred, where the rest begins.
+        let rest = 0;
         // Whether the laptop is resting on the mat (so touch-down plays once per landing).
         let landed: boolean | null = null;
         const readLand = () => {
             const section = sectionRef.current;
             const laptop = laptopParallaxRef.current;
-            land = section ? parseFloat(getComputedStyle(section).getPropertyValue("--land")) || 0 : 0;
+            const desk = deskRef.current;
+            const edge = deskEdgeRef.current;
+            const styles = section ? getComputedStyle(section) : null;
+            land = styles ? parseFloat(styles.getPropertyValue("--land")) || 0 : 0;
+            dwell = styles ? parseFloat(styles.getPropertyValue("--dwell")) || 0 : 0;
             if (laptop) {
-                // Measure the laptop's resting place without the scroll transform on it.
-                const current = laptop.style.transform;
+                // Measure resting places without the scroll transforms on them.
+                const laptopTransform = laptop.style.transform;
+                const deskTransform = desk?.style.transform ?? "";
                 laptop.style.transform = "none";
+                if (desk) desk.style.transform = "none";
                 const rect = laptop.getBoundingClientRect();
-                laptop.style.transform = current;
-                const centre = rect.top + window.scrollY + rect.height / 2;
+                const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
+                laptop.style.transform = laptopTransform;
+                if (desk) desk.style.transform = deskTransform;
+
+                const top = rect.top + window.scrollY;
                 const screenMiddle = HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) / 2;
-                start = Math.max(centre - screenMiddle, 0);
+                start = Math.max(top + rect.height / 2 - screenMiddle, 0);
+                // The rest frames the whole scene: the landed laptop's top down to the desk's
+                // front edge. It never begins before the laptop is down.
+                const sceneMiddle = edge ? (top + land + edgeBottom) / 2 : top + land + rect.height / 2;
+                rest = Math.max(sceneMiddle - screenMiddle, start + land * LAND_SCROLL);
             }
             lastScroll = -1;
         };
@@ -161,14 +194,18 @@ export default function HeroSection() {
             const laptop = laptopParallaxRef.current;
             if (!laptop) return;
             const progress = land > 0 ? Math.min(Math.max((raw - start) / (land * LAND_SCROLL), 0), 1) : 1;
-            const eased = 1 - (1 - progress) * (1 - progress);
+            const eased = landCurve(progress);
             const lowered = land * eased;
             const tilt = land > 0 ? eased * LAND_TILT : LAND_TILT;
-            laptop.style.transform = `translate3d(0, ${lowered.toFixed(2)}px, 0) perspective(1800px) rotateX(${tilt.toFixed(2)}deg) scale(${(1 - eased * LAND_SHRINK).toFixed(4)})`;
+            // The rest: once the scene is centred, the whole room holds still for
+            // --dwell px of scroll (the space is reserved under the desk), then moves on.
+            const hold = Math.min(Math.max(raw - rest, 0), dwell);
+            laptop.style.transform = `translate3d(0, ${(lowered + hold).toFixed(2)}px, 0) perspective(1800px) rotateX(${tilt.toFixed(2)}deg) scale(${(1 - eased * LAND_SHRINK).toFixed(4)})`;
+            if (deskRef.current) deskRef.current.style.transform = `translate3d(0, ${hold.toFixed(2)}px, 0)`;
 
             // The window is farther away, so it trails the lowering a little.
             if (windowRef.current) {
-                windowRef.current.style.transform = `translate3d(0, ${(lowered * WINDOW_LAG).toFixed(2)}px, 0)`;
+                windowRef.current.style.transform = `translate3d(0, ${(lowered * WINDOW_LAG + hold).toFixed(2)}px, 0)`;
             }
             // The camera pitches down toward the desk as the laptop is set down.
             deskRef.current?.style.setProperty(
@@ -242,7 +279,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:220px] lg:[--land:360px] xl:[--land:420px] lg:short:[--land:280px] motion-reduce:[--land:0px]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:220px] lg:[--land:360px] xl:[--land:420px] lg:short:[--land:280px] motion-reduce:[--land:0px] [--dwell:0px] sm:[--dwell:200px] lg:[--dwell:280px] motion-reduce:[--dwell:0px]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -530,14 +567,14 @@ export default function HeroSection() {
             <div
                 ref={deskRef}
                 aria-hidden="true"
-                className="relative z-0 w-[min(calc(var(--ww)*1.1),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_-_var(--lw)*0.12)] mb-[calc(var(--lw)*0.1)] pointer-events-none select-none [--pitch:62deg] [perspective:calc(var(--lw)*1.5)]"
+                className="relative z-0 w-[min(calc(var(--ww)*1.1),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_-_var(--lw)*0.12)] mb-[calc(var(--lw)*0.1_+_var(--dwell))] pointer-events-none select-none [--pitch:62deg] [perspective:calc(var(--lw)*1.5)]"
             >
                 {/* Desk top */}
                 <div className="wood-h [--wood:#BE936B] absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.95)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[6px] shadow-[inset_0_2px_0_rgb(255_236_210/0.3)]">
                     <div className="absolute inset-0 rounded-t-[6px] bg-[linear-gradient(180deg,rgb(40_20_10/0.22)_0%,transparent_12%,rgb(255_236_210/0.2)_42%,transparent_78%,rgb(30_14_4/0.08)_100%)]" />
                 </div>
                 {/* Front edge: highlight on top, dark underside, like the sill */}
-                <div className="wood-h [--wood:#9A6B45] absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[6px] shadow-[inset_0_1px_0_rgb(255_226_196/0.45),inset_0_-1px_0_rgb(30_14_4/0.5),0_2px_3px_rgb(40_20_10/0.25)]" />
+                <div ref={deskEdgeRef} className="wood-h [--wood:#9A6B45] absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[6px] shadow-[inset_0_1px_0_rgb(255_226_196/0.45),inset_0_-1px_0_rgb(30_14_4/0.5),0_2px_3px_rgb(40_20_10/0.25)]" />
                 {/* Apron with a drawer, in the desk top's shadow, fading into the page */}
                 <div className="wood-h [--wood:#7C5434] absolute inset-x-[4%] top-[calc(100%_+_clamp(10px,1.7cqw,24px))] h-[calc(var(--lw)*0.1)] shadow-[inset_0_8px_10px_-6px_rgb(30_14_4/0.55)] [mask-image:linear-gradient(180deg,#000_30%,transparent)]">
                     <div className="absolute left-1/2 -translate-x-1/2 top-[16%] w-[32%] h-[74%] rounded-[3px] shadow-[inset_0_0_0_1px_rgb(30_14_4/0.4),inset_0_1px_0_rgb(255_226_196/0.14)]">
