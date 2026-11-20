@@ -237,8 +237,8 @@ export default function HowItWorksSection() {
             </SectionSubtitle>
 
             {/* Top-down felt desk mat with a stitched edge */}
-            <div className="relative w-full mt-4 overflow-hidden rounded-[28px] bg-[#E8F1F8] px-5 pt-28 pb-32 sm:px-8 md:pt-36 md:pb-40 xl:px-8 xl:pt-[160px] xl:pb-[190px] shadow-[inset_0_2px_0_rgb(255_255_255/0.7),inset_0_-1px_0_rgb(20_20_20/0.04),0_1px_3px_rgb(20_20_20/0.05)]">
-                <div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-[20px] border-[1.5px] border-dashed border-ink/[0.12]" />
+            <div className="relative w-full mt-4 overflow-hidden rounded-[28px] felt px-5 pt-28 pb-32 sm:px-8 md:pt-36 md:pb-40 xl:px-8 xl:pt-[160px] xl:pb-[190px] shadow-[inset_0_2px_0_rgb(255_255_255/0.7),inset_0_-1px_0_rgb(20_20_20/0.04),0_1px_3px_rgb(20_20_20/0.05)]">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-[20px] border-2 border-dashed border-[rgb(70_105_140/0.28)]" />
 
                 {/* Props and handwritten desk notes, behind the step notes */}
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 select-none">

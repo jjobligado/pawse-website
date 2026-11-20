@@ -20,11 +20,12 @@ const PARALLAX_SPEED = {
 } as const;
 
 /**
- * Desk landing. The laptop follows the scroll at LAND_FOLLOW (1 = perfectly still
- * on screen) until it has been lowered by the section's `--land`, where it rests on
- * the felt mat. LAND_SETTLE is the touch-down dip in px.
+ * Desk landing. Over LAND_SCROLL × `--land` px of scroll the laptop is lowered by
+ * the section's `--land` with an ease-out: it starts perfectly still on screen
+ * (at 2 the ease's starting speed equals the scroll), then slows as it is set
+ * down on the felt mat, like a hand placing it. LAND_SETTLE is the touch-down dip in px.
  */
-const LAND_FOLLOW = 0.9;
+const LAND_SCROLL = 2;
 const LAND_SETTLE = 3;
 
 /**
@@ -126,11 +127,12 @@ export default function HeroSection() {
             // while the window scrolls away, until the desk rises to meet it.
             const laptop = laptopParallaxRef.current;
             if (!laptop) return;
-            const progress = land > 0 ? Math.min(raw / (land / LAND_FOLLOW), 1) : 1;
+            const progress = land > 0 ? Math.min(raw / (land * LAND_SCROLL), 1) : 1;
+            const eased = 1 - (1 - progress) * (1 - progress);
             // A small dip as it touches down, then back up: the settle.
             const settle =
-                progress > 0.88 && progress < 1 ? Math.sin(((progress - 0.88) / 0.12) * Math.PI) * LAND_SETTLE : 0;
-            laptop.style.transform = `translate3d(0, ${(land * progress + settle).toFixed(2)}px, 0)`;
+                progress > 0.86 && progress < 1 ? Math.sin(((progress - 0.86) / 0.14) * Math.PI) * LAND_SETTLE : 0;
+            laptop.style.transform = `translate3d(0, ${(land * eased + settle).toFixed(2)}px, 0)`;
             const shadow = laptopShadowRef.current;
             if (shadow) {
                 // Contact shadow tightens and darkens as the laptop nears the mat.
@@ -168,7 +170,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-14 md:pb-24 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:220px] lg:[--land:360px] xl:[--land:420px] lg:short:[--land:280px] motion-reduce:[--land:0px]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -434,7 +436,7 @@ export default function HeroSection() {
                     <div
                         ref={laptopShadowRef}
                         aria-hidden="true"
-                        className="pointer-events-none absolute left-[2%] right-[2%] -bottom-2 sm:-bottom-3 h-4 sm:h-6 rounded-[50%] bg-[rgb(20_30_50/0.32)] blur-[6px] sm:blur-[10px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                        className="pointer-events-none absolute left-[2%] right-[2%] -bottom-2 sm:-bottom-3 h-4 sm:h-6 rounded-[50%] bg-[rgb(40_20_10/0.34)] blur-[6px] sm:blur-[10px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                     <div className="relative z-10">
                         <Laptop>
@@ -444,7 +446,7 @@ export default function HeroSection() {
                     {/* Note stuck on the bezel: the bridge to How It Works' sticky notes */}
                     <div
                         aria-hidden="true"
-                        className="absolute z-20 left-[5%] bottom-[3%] w-[clamp(46px,13%,124px)] aspect-[1/0.92] p-[clamp(4px,1.4%,14px)] -rotate-[5deg] rounded-[2px] bg-[#FFEFA1] shadow-[0_1px_2px_rgb(20_20_20/0.08),0_8px_14px_-6px_rgb(20_20_20/0.25)] font-hand font-bold text-ink leading-none text-[clamp(11px,2.2cqw,25px)]"
+                        className="absolute z-20 left-[5%] bottom-[3%] w-[clamp(46px,13%,124px)] aspect-[1/0.92] p-[clamp(4px,1.4%,14px)] -rotate-[5deg] rounded-[2px] rounded-br-[10px_6px] bg-[linear-gradient(160deg,#FFF6C2_0%,#FFEFA1_45%,#F7E07F_100%)] shadow-[0_1px_1px_rgb(40_20_10/0.12),3px_9px_12px_-6px_rgb(40_20_10/0.32),inset_0_-2px_3px_rgb(160_120_20/0.12)] font-hand font-bold text-ink leading-none text-[clamp(11px,2.2cqw,25px)]"
                     >
                         how it works ↓
                     </div>
@@ -460,13 +462,19 @@ export default function HeroSection() {
                 aria-hidden="true"
                 className="relative z-0 w-[min(calc(var(--lw)*1.42),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_-_var(--lw)*0.12)] pointer-events-none select-none [perspective:calc(var(--lw)*1.5)]"
             >
-                <div className="absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.5)] origin-bottom [transform:rotateX(64deg)] rounded-[clamp(14px,3cqw,32px)] bg-[#E8F1F8] shadow-[0_2px_0_rgb(20_20_20/0.04)]">
-                    <div className="absolute inset-[clamp(6px,1.2cqw,16px)] rounded-[clamp(10px,2.2cqw,22px)] border-2 border-dashed border-ink/[0.13]" />
+                {/* Thickness: the mat's front lip, then its warm shadow on the desk */}
+                <div className="absolute inset-x-[0.4%] -bottom-[clamp(3px,0.5cqw,7px)] h-[clamp(8px,1.4cqw,18px)] rounded-b-[clamp(14px,3cqw,32px)] bg-[linear-gradient(180deg,#C6D5E2,#B3C4D3)] shadow-[0_6px_12px_-4px_rgb(40_20_10/0.22)]" />
+                <div className="felt absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.5)] origin-bottom [transform:rotateX(64deg)] rounded-[clamp(14px,3cqw,32px)] shadow-[inset_0_3px_0_rgb(255_255_255/0.7),inset_0_-2px_0_rgb(40_60_80/0.08)]">
+                    <div className="absolute inset-[clamp(6px,1.2cqw,16px)] rounded-[clamp(10px,2.2cqw,22px)] border-2 border-dashed border-[rgb(70_105_140/0.28)]" />
                 </div>
                 {/* Mug, upright on the mat to the right of the laptop */}
-                <div className="hidden lg:block absolute right-[3%] bottom-[22%] w-[calc(var(--lw)*0.075)] aspect-[0.86] rounded-[6px_6px_16px_16px] bg-white shadow-[inset_-10px_0_0_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.06),0_10px_12px_-8px_rgb(20_30_50/0.3)]">
-                    <div className="absolute inset-x-0 top-0 h-[12%] rounded-[50%] bg-[#7A5338] shadow-[0_0_0_3px_#fff]" />
-                    <div className="absolute -right-[34%] top-[22%] w-[40%] h-[46%] rounded-r-[18px] border-[7px] border-l-0 border-white [filter:drop-shadow(1px_0_0_rgb(0_0_0/0.1))_drop-shadow(0_0_0.5px_rgb(0_0_0/0.15))]" />
+                <div className="hidden lg:block absolute right-[3%] bottom-[22%] w-[calc(var(--lw)*0.075)] aspect-[0.86]">
+                    <div className="absolute -inset-x-[12%] -bottom-[8%] h-[22%] rounded-[50%] bg-[rgb(40_20_10/0.28)] blur-[5px]" />
+                    <div className="absolute -right-[30%] top-[20%] w-[40%] h-[48%] rounded-r-[40%] border-[clamp(5px,0.55cqw,8px)] border-l-0 border-[#E4E7EB] [filter:drop-shadow(1px_1px_0_rgb(40_20_10/0.12))]" />
+                    <div className="absolute inset-0 rounded-[8%_8%_22%_22%/6%_6%_16%_16%] bg-[linear-gradient(90deg,#DCE0E5_0%,#FFFFFF_28%,#F6F7F9_58%,#C9CFD6_100%)] shadow-[0_0_0_1px_rgb(40_20_10/0.06)]" />
+                    <div className="absolute inset-x-0 top-0 h-[16%] -translate-y-1/2 rounded-[50%] bg-[linear-gradient(90deg,#E9ECEF,#FFFFFF_40%,#E3E6EA)] p-[6%]">
+                        <div className="w-full h-full rounded-[50%] bg-[radial-gradient(ellipse_at_35%_35%,#9A6B4A_0%,#6B4630_45%,#4E3223_100%)]" />
+                    </div>
                 </div>
             </div>
         </section>
