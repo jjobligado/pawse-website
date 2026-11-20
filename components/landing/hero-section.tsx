@@ -20,13 +20,16 @@ const PARALLAX_SPEED = {
 } as const;
 
 /**
- * Desk landing. Over LAND_SCROLL × `--land` px of scroll the laptop is lowered by
+ * Desk landing. The laptop scrolls normally until its centre reaches the middle
+ * of the screen. From there, over LAND_SCROLL × `--land` px of scroll, it is lowered by
  * the section's `--land` with an ease-out: it starts perfectly still on screen
  * (at 2 the ease's starting speed equals the scroll), then slows as it is set
  * down on the felt mat, like a hand placing it. LAND_SETTLE is the touch-down dip in px.
  */
 const LAND_SCROLL = 2;
 const LAND_SETTLE = 3;
+/** The sticky header's height: "middle of the screen" means the middle of what's visible below it. */
+const HEADER_HEIGHT = 64;
 
 /**
  * "Done" sits on the sky, not on white, so it takes a deeper blue per time of
@@ -105,9 +108,20 @@ export default function HeroSection() {
         let lastScroll = -1;
         // How far the laptop is lowered onto the desk (the section's --land; 0 on phones).
         let land = 0;
+        // Scroll position at which the laptop's centre sits in the middle of the screen.
+        let start = 0;
+        // Current lowering, so the laptop's resting position can be measured without it.
+        let lowered = 0;
         const readLand = () => {
             const section = sectionRef.current;
+            const laptop = laptopParallaxRef.current;
             land = section ? parseFloat(getComputedStyle(section).getPropertyValue("--land")) || 0 : 0;
+            if (laptop) {
+                const rect = laptop.getBoundingClientRect();
+                const centre = rect.top + window.scrollY - lowered + rect.height / 2;
+                const screenMiddle = HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) / 2;
+                start = Math.max(centre - screenMiddle, 0);
+            }
             lastScroll = -1;
         };
 
@@ -123,16 +137,17 @@ export default function HeroSection() {
                 }
             }
 
-            // Desk landing: the laptop holds its place on screen (drifting up a touch)
-            // while the window scrolls away, until the desk rises to meet it.
+            // Desk landing: once centred, the laptop holds its place on screen while
+            // the window scrolls away, then slows as the desk rises to meet it.
             const laptop = laptopParallaxRef.current;
             if (!laptop) return;
-            const progress = land > 0 ? Math.min(raw / (land * LAND_SCROLL), 1) : 1;
+            const progress = land > 0 ? Math.min(Math.max((raw - start) / (land * LAND_SCROLL), 0), 1) : 1;
             const eased = 1 - (1 - progress) * (1 - progress);
             // A small dip as it touches down, then back up: the settle.
             const settle =
                 progress > 0.86 && progress < 1 ? Math.sin(((progress - 0.86) / 0.14) * Math.PI) * LAND_SETTLE : 0;
-            laptop.style.transform = `translate3d(0, ${(land * eased + settle).toFixed(2)}px, 0)`;
+            lowered = land * eased + settle;
+            laptop.style.transform = `translate3d(0, ${lowered.toFixed(2)}px, 0)`;
             const shadow = laptopShadowRef.current;
             if (shadow) {
                 // Contact shadow tightens and darkens as the laptop nears the mat.
@@ -150,11 +165,16 @@ export default function HeroSection() {
             handleScroll();
         };
 
+        // Re-measure when the hero's layout settles (fonts, images) or changes size.
+        const observer = new ResizeObserver(handleResize);
+        if (sectionRef.current) observer.observe(sectionRef.current);
+
         readLand();
         apply();
         window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("resize", handleResize);
         return () => {
+            observer.disconnect();
             window.removeEventListener("scroll", handleScroll);
             window.removeEventListener("resize", handleResize);
             if (frame) window.cancelAnimationFrame(frame);
