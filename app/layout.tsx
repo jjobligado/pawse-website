@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Pixelify_Sans } from "next/font/google";
+import { Caveat, Inter, Pixelify_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -14,6 +14,12 @@ const inter = Inter({
 
 const pixelifySans = Pixelify_Sans({
   variable: "--font-pixelify",
+  subsets: ["latin"],
+});
+
+// Handwriting for decorative desk notes only (How It Works); never for UI or body copy.
+const caveat = Caveat({
+  variable: "--font-caveat",
   subsets: ["latin"],
 });
 
@@ -63,7 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       // Next.js switches smooth scrolling off while changing pages, so a new page doesn't glide from the old position
       data-scroll-behavior="smooth"
       suppressHydrationWarning // This is to prevent hydration mismatch errors when using server-side rendering with Next.js
-      className={`${inter.variable} ${pixelifySans.variable} h-full antialiased scroll-smooth`}
+      className={`${inter.variable} ${pixelifySans.variable} ${caveat.variable} h-full antialiased scroll-smooth`}
     >
       <body className="min-h-full flex flex-col">
         {/* Keyboard users can jump past the header; hidden until focused */}
