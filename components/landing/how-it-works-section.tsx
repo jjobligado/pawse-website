@@ -1,25 +1,17 @@
 import Image from "next/image";
-import Polaroid, { type PolaroidTint, type WashiTape } from "./polaroid";
+import StickyNote, { type PushPinColor, type StickyNoteColor } from "./sticky-note";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 
 /**
- * The PAWSE loop as four instant photos pinned to the wall. The photos show
- * the cat's moment (what it feels like); the sections below show the app (how
- * it works), so nothing here spoils them. Photos are static, with no entrance
- * motion: animation lives in the detailed sections. Each caption ends with a small link to its section,
- * which keeps the in-page navigation (useful on mobile, where the header has no
- * nav links) without making the whole card look like a button. Connectors show
- * the flow: steps 2 ↔ 3 cycle.
+ * The PAWSE loop as four sticky notes pinned to a desk workspace mat.
+ * The notes capture the moment at a glance without spoiling the full app
+ * previews below, and each note ends with a quiet pill link to its section.
  *
- * The tint runs morning → night across the four, one working day.
- *
- * Layout is only ever a straight line, so the flow reads at a glance: one row
- * of four from xl, one column below it (arrows point down). All four polaroids
- * are the same size in both: the column uses a fixed card width, the row equal
- * columns, and every caption has the same line counts (title 2 lines,
- * description 3 lines, broken by hand). When editing copy, keep each line short
- * enough for ~200px of text at 15px and keep the line counts.
+ * Layout stays clear at every width: a single vertical flow on phones
+ * (connectors point down), a balanced 2×2 desk board on tablets (read by
+ * step stamp 01–04), and a four-note horizontal flow from xl (connectors
+ * point across). Fixed line counts keep all four notes equal in height.
  */
 
 const SPRITES = "/sprites";
@@ -43,31 +35,33 @@ function Frame({ src, frames, frame, className }: { src: string; frames: number;
 // Moderate, crisp sizes in every layout: single cats at 1.5x, the group at 1x.
 const CAT = "w-24 h-24";
 const GROUP_CAT = "w-16 h-16";
-const PHOTO = "flex items-end justify-center aspect-[4/3] pt-2";
+const STICKER_STAGE = "flex items-end justify-center w-full h-24";
+
+type ConnectorKind = "arrow" | "cycle";
 
 const STEPS: {
+    step: string;
     title: string[];
     narrow: string[];
     href: string;
     link: string;
-    tint: PolaroidTint;
-    tape: WashiTape;
+    color: StickyNoteColor;
+    pin: PushPinColor;
     tilt: string;
-    photo: React.ReactNode;
-    connector?: string;
+    sticker: React.ReactNode;
+    connector?: ConnectorKind;
 }[] = [
     {
+        step: "01",
         title: ["Pick Your", "Companion"],
         narrow: ["Three cats, three paces.", "Pick who focuses", "with you."],
         href: "#companions",
         link: "Meet the cats",
-        tint: "morning",
-        // Sage green diagonal stripes (on a peach photo)
-        tape: { width: "112px", rotate: "-4deg", offset: "-14px", pattern: "repeating-linear-gradient(45deg,#A9D3A0 0 7px,#CDE8C5 7px 14px)" },
-        tilt: "xl:-rotate-[1.2deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
-        photo: (
-            // A group photo: Ginger, Tux and Void sitting together
-            <div className={PHOTO}>
+        color: "yellow",
+        pin: "coral",
+        tilt: "xl:-rotate-[1.4deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
+        sticker: (
+            <div className={STICKER_STAGE}>
                 <div className="flex items-end -space-x-3">
                     <Frame src={`${SPRITES}/ginger-body-idle-sheet.png`} frames={5} frame={0} className={GROUP_CAT} />
                     <Frame src={`${SPRITES}/tux-body-idle-sheet.png`} frames={4} frame={0} className={GROUP_CAT} />
@@ -75,54 +69,51 @@ const STEPS: {
                 </div>
             </div>
         ),
-        connector: "/images/arrow-right-dark.svg",
+        connector: "arrow",
     },
     {
+        step: "02",
         title: ["Focus with Your", "Companion"],
         narrow: ["Work alongside your", "cat's routine. Zero", "distractions."],
         href: "#focus",
         link: "See Focus",
-        tint: "day",
-        // Coral with white polka dots (on a blue photo)
-        tape: { width: "84px", rotate: "3deg", offset: "18px", pattern: "radial-gradient(circle,#FFFFFF 1.8px,transparent 2.3px) 0 0/10px 10px,#F4AD96" },
-        tilt: "xl:rotate-[0.8deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
-        // Tux mid-sip, steam rising from the mug
-        photo: (
-            <div className={PHOTO}>
+        color: "sky",
+        pin: "blue",
+        tilt: "xl:rotate-[0.9deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
+        sticker: (
+            <div className={STICKER_STAGE}>
                 <Frame src={`${SPRITES}/tux-body-focus-sheet.png`} frames={5} frame={3} className={CAT} />
             </div>
         ),
-        connector: "/images/refresh-ccw.svg",
+        connector: "cycle",
     },
     {
+        step: "03",
         title: ["Time to Play", "and Recharge"],
         narrow: ["Take a breather, play,", "and see what they", "have to say."],
         href: "#break",
         link: "See Break",
-        tint: "dusk",
-        // Sky blue gingham (on a rose photo)
-        tape: { width: "122px", rotate: "-2deg", offset: "4px", pattern: "linear-gradient(90deg,rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/12px 12px,linear-gradient(rgb(255 255 255/0.45) 50%,transparent 50%) 0 0/12px 12px,#A7D2F1" },
-        tilt: "xl:-rotate-[0.6deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
-        // Ginger, tail up, mid-play
-        photo: (
-            <div className={PHOTO}>
+        color: "mint",
+        pin: "sage",
+        tilt: "xl:-rotate-[0.8deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:-rotate-[1.4deg]",
+        sticker: (
+            <div className={STICKER_STAGE}>
                 <Frame src={`${SPRITES}/ginger-body-break-sheet.png`} frames={9} frame={8} className={CAT} />
             </div>
         ),
-        connector: "/images/arrow-right-dark.svg",
+        connector: "arrow",
     },
     {
+        step: "04",
         title: ["Watch Your", "Progress Build"],
         narrow: ["Every session gets", "logged. Small sessions,", "big streaks."],
         href: "#progress",
         link: "See Progress",
-        tint: "night",
-        // Butter yellow pinstripes (on a lavender photo)
-        tape: { width: "74px", rotate: "5deg", offset: "-20px", pattern: "repeating-linear-gradient(90deg,#F2D27A 0 4px,#FAE7B4 4px 9px)" },
-        tilt: "xl:rotate-[1deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
-        // A souvenir snapshot: the day's completed sessions, as fish
-        photo: (
-            <div className="flex items-center justify-center aspect-[4/3]">
+        color: "lavender",
+        pin: "amber",
+        tilt: "xl:rotate-[1.2deg] xl:motion-safe:hover:rotate-0 max-xl:motion-safe:hover:rotate-[1.4deg]",
+        sticker: (
+            <div className="flex items-center justify-center w-full h-24">
                 <div className="flex items-center gap-1.5">
                     {["orange", "tuxedo", "black", "orange"].map((fish, i) => (
                         <Image
@@ -140,23 +131,61 @@ const STEPS: {
     },
 ];
 
+/** Hand-sketched desk-mat arrow connecting adjacent sticky notes on linear layouts (phones and xl+). */
+function StepConnector({ kind }: { kind: ConnectorKind }) {
+    return (
+        <div aria-hidden="true" className="flex md:hidden xl:flex justify-center items-center shrink-0 py-1 xl:py-0 text-ink/55">
+            {kind === "arrow" ? (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="rotate-90 xl:rotate-0"
+                >
+                    <path d="M4 13c4.5-1.6 10-1.6 15.5-.2" />
+                    <path d="M14.5 8.5 20 12.8l-5 4.2" />
+                </svg>
+            ) : (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="rotate-90 xl:rotate-0"
+                >
+                    <path d="M20 11a8 8 0 0 0-14.5-4.4L3 9" />
+                    <path d="M3 4v5h5" />
+                    <path d="M4 13a8 8 0 0 0 14.5 4.4L21 15" />
+                    <path d="M21 20v-5h-5" />
+                </svg>
+            )}
+        </div>
+    );
+}
+
 /**
- * "See Focus ↓": a small, clearly-a-link pill at the foot of the caption.
- * Darker blue text for AA contrast; on hover (Tailwind's hover variant only
- * applies on devices that can hover) the wash deepens and the arrow chip darkens
- * a shade (a little more when pressed) without moving; pressing scales the
- * pill to 0.97. Strong ease-out, exact properties only.
+ * Crisp white pill link anchored at the foot of each sticky note so it reads
+ * cleanly across all four paper colors.
  */
 function SectionLink({ href, children }: { href: string; children: React.ReactNode }) {
     return (
         <a
             href={href}
-            className="group/link mt-auto inline-flex items-center gap-2 rounded-full pl-3.5 pr-1 py-1 text-sm font-medium text-[#1A6CA3] bg-[#EAF5FD] ring-1 ring-inset ring-[#CFE6F8] transition-[background-color,box-shadow,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#DDEFFC] hover:ring-[#B9DCF6] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:ring-offset-2"
+            className="group/link mt-auto inline-flex items-center gap-2 rounded-full pl-3.5 pr-1 py-1 text-sm font-medium text-ink bg-white/95 ring-1 ring-ink/12 shadow-[0_1px_2px_rgb(20_20_20/0.07)] transition-[background-color,box-shadow,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white hover:ring-ink/25 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
         >
             {children}
             <span
                 aria-hidden="true"
-                className="w-6 h-6 rounded-full bg-white text-[#1A6CA3] flex items-center justify-center shadow-[0_1px_2px_rgb(26_108_163/0.18)] transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-[#F1F6FB] group-active/link:bg-[#E7EFF7]"
+                className="w-6 h-6 rounded-full bg-ink/[0.06] text-ink flex items-center justify-center transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-ink/[0.11] group-active/link:bg-ink/[0.16]"
             >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14" />
@@ -187,41 +216,41 @@ export default function HowItWorksSection() {
                 From choosing your companion to seeing your progress grow.
             </SectionSubtitle>
 
-            {/* A straight column (arrows down) → a straight row of four from xl */}
-            <ol className="w-full flex flex-col items-center gap-3 xl:grid xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] xl:items-stretch xl:gap-4 mt-4">
-                {STEPS.map((step) => (
-                    <li key={step.href} className="contents">
-                        <Polaroid
-                            tint={step.tint}
-                            photo={step.photo}
-                            tape={step.tape}
-                            className={`w-[264px] xl:w-full h-full ${step.tilt}`}
-                        >
-                            <div className="flex flex-1 flex-col items-center gap-2 text-center">
-                                {/* Always 2 / 3 lines; min-heights keep all four the same size even if a font renders wider */}
-                                <h3 className="min-h-[2lh] text-lg font-semibold text-ink-strong leading-snug tracking-[0.005em]">
-                                    <Lines lines={step.title} className="block whitespace-nowrap" />
-                                </h3>
-                                <p className="w-full min-h-[3lh] text-body-sm text-ink-soft leading-relaxed">
-                                    <Lines lines={step.narrow} className="block" />
-                                </p>
-                                <SectionLink href={step.href}>{step.link}</SectionLink>
-                            </div>
-                        </Polaroid>
-                        {step.connector && (
-                            <div aria-hidden="true" className="flex justify-center items-center shrink-0 py-1 xl:py-0">
-                                <Image
-                                    src={step.connector}
-                                    alt=""
-                                    width={20}
-                                    height={20}
-                                    className="rotate-90 xl:rotate-0"
-                                />
-                            </div>
-                        )}
-                    </li>
-                ))}
-            </ol>
+            {/* Desk workspace dot-grid mat holding the pinned sticky-note flow */}
+            <div
+                className="relative w-full mt-4 rounded-card-lg border border-[#EAE4D8] bg-[#FAF8F4] px-5 py-9 sm:px-8 sm:py-11 xl:px-7 xl:py-12 shadow-[inset_0_1px_0_rgb(255_255_255/0.85),0_1px_3px_rgb(20_20_20/0.04)]"
+                style={{
+                    backgroundImage: "radial-gradient(circle, rgb(35 35 35 / 0.085) 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                }}
+            >
+                {/* Vertical flow on phones → 2×2 board on tablets → four-note row from xl */}
+                <ol className="w-full flex flex-col items-center gap-4 md:grid md:grid-cols-2 md:gap-8 md:max-w-[620px] md:mx-auto xl:max-w-none xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] xl:items-stretch xl:gap-3">
+                    {STEPS.map((step) => (
+                        <li key={step.href} className="contents">
+                            <StickyNote
+                                step={step.step}
+                                color={step.color}
+                                pinColor={step.pin}
+                                sticker={step.sticker}
+                                className={`w-[272px] sm:w-[292px] md:w-full h-full ${step.tilt}`}
+                            >
+                                <div className="flex flex-1 flex-col items-center gap-2 text-center">
+                                    {/* Always 2 / 3 lines; min-heights keep all four the same size even if a font renders wider */}
+                                    <h3 className="min-h-[2lh] text-lg font-semibold text-ink-strong leading-snug tracking-[0.005em]">
+                                        <Lines lines={step.title} className="block whitespace-nowrap" />
+                                    </h3>
+                                    <p className="w-full min-h-[3lh] text-body-sm text-ink/80 leading-relaxed">
+                                        <Lines lines={step.narrow} className="block" />
+                                    </p>
+                                    <SectionLink href={step.href}>{step.link}</SectionLink>
+                                </div>
+                            </StickyNote>
+                            {step.connector && <StepConnector kind={step.connector} />}
+                        </li>
+                    ))}
+                </ol>
+            </div>
         </Section>
     );
 }
