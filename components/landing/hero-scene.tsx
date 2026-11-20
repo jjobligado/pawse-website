@@ -637,34 +637,65 @@ export function SillPlant({ className }: { className?: string }) {
 
 /**
  * The visitor's own laptop, seen from the chair: the lid faces us and its screen
- * holds the app preview. Drawn smooth on purpose (it's the real-world object).
+ * holds the app preview. Drawn smooth on purpose (it's the real-world object),
+ * in the window's art style:
+ * - warm materials: champagne brushed aluminium (`metal-h`) and a warm charcoal
+ *   bezel, so it sits in the room's light instead of reading as cold grey;
+ * - crisp stacked edge bands like the frame and sill (a shade band, then a darker
+ *   edge line) rather than soft gradients;
+ * - a warm cream highlight on every top edge and warm brown shadows beneath;
+ * - the window it faces, faintly reflected in the screen glass.
+ *
+ * Top to bottom: the aluminium shell rim around the bezel (lens, thicker chin),
+ * the hinge, a sliver of the keyboard deck seen from slightly above, then the
+ * front lip with its thumb notch and feet.
  */
 export function Laptop({ children }: { children: React.ReactNode }) {
     return (
         <div className="relative w-full">
-            {/* Lid */}
-            <div className="relative rounded-t-[22px] sm:rounded-t-[28px] bg-[linear-gradient(180deg,#2B2D31,#1C1D20)] p-2.5 sm:p-3.5 pb-0 shadow-[0_30px_60px_-30px_rgb(20_30_50/0.45)] ring-1 ring-black/40">
-                {/* Camera */}
-                <span
-                    aria-hidden="true"
-                    className="absolute top-[5px] sm:top-[7px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0D0E10] ring-1 ring-white/10"
-                />
-                {/* Screen */}
-                <div className="relative overflow-hidden rounded-t-[12px] sm:rounded-t-[16px] bg-white aspect-[16/10]">
-                    {children}
-                    {/* Screen sheen */}
+            {/* Lid: the aluminium shell shows as a bright rim, with a crisp outer edge line */}
+            <div className="metal-h [--metal:#CFC7BC] relative rounded-t-[24px] sm:rounded-t-[31px] p-[2px] sm:p-[3px] shadow-[inset_0_1px_0_rgb(255_250_242/0.95),inset_0_0_0_1px_rgb(70_54_40/0.35),0_30px_60px_-30px_rgb(40_20_10/0.45),0_3px_8px_-2px_rgb(40_20_10/0.2)]">
+                {/* Bezel: warm charcoal glass, lit along the top, with a shaded chin band */}
+                <div className="relative rounded-t-[22px] sm:rounded-t-[28px] bg-[linear-gradient(180deg,#36302C_0%,#26211E_38%,#1C1816_100%)] p-2.5 sm:p-3.5 pb-[clamp(10px,2.6%,26px)] shadow-[inset_0_1px_0_rgb(255_236_214/0.18),inset_0_0_0_1px_rgb(20_14_10/0.6),inset_0_-3px_0_#14110F]">
+                    {/* Camera: a lens with a warm glint */}
+                    <span
+                        aria-hidden="true"
+                        className="absolute top-[5px] sm:top-[7px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[radial-gradient(circle_at_35%_35%,#6B6A78_0%,#1A1716_55%,#0B0908_100%)] ring-1 ring-[rgb(255_236_214/0.08)]"
+                    />
+                    {/* Screen: a crisp dark edge where the panel meets the bezel */}
+                    <div className="relative overflow-hidden rounded-t-[12px] sm:rounded-t-[16px] rounded-b-[3px] bg-white aspect-[16/10] shadow-[0_0_0_1px_#0E0B0A]">
+                        {children}
+                        {/* Screen glass: a faint reflection of the window it faces (two pane
+                            panels, warm daylight), a diagonal sheen, and a glow along the top */}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0 bg-[linear-gradient(104deg,transparent_0_6%,rgb(255_246_232/0.09)_6%_15%,transparent_15%_17%,rgb(255_246_232/0.07)_17%_25%,transparent_25%),linear-gradient(115deg,rgb(255_255_255/0.14)_0%,transparent_34%),linear-gradient(180deg,rgb(255_244_228/0.1),transparent_10%)]"
+                        />
+                        {/* Inner shadow cast by the bezel lip onto the glass */}
+                        <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0_2px_3px_rgb(20_14_10/0.25)]" />
+                    </div>
+                    {/* Glossy edge along the chin */}
                     <div
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgb(255_255_255/0.18)_0%,transparent_38%)]"
+                        className="absolute inset-x-[6%] bottom-[3px] h-px bg-[linear-gradient(90deg,transparent,rgb(255_236_214/0.14),transparent)]"
                     />
                 </div>
             </div>
-            {/* Base: the front lip of the keyboard deck, a touch wider than the lid */}
-            <div
-                aria-hidden="true"
-                className="relative -mx-[4%] h-3 sm:h-4 rounded-b-[18px] bg-[linear-gradient(180deg,#E3E6EA,#BFC4CB)] shadow-[0_18px_30px_-12px_rgb(20_30_50/0.35)]"
-            >
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-[14%] h-1.5 rounded-b-md bg-[#AEB3BA]" />
+            <div aria-hidden="true">
+                {/* Hinge: warm dark band in the lid's shadow, crisp edge underneath */}
+                <div className="relative mx-[2%] h-[clamp(3px,0.5%,5px)] bg-[linear-gradient(180deg,#2E2724,#130F0D)] shadow-[inset_0_-1px_0_#0A0807]" />
+                {/* Keyboard deck: a sliver of the top surface, shaded where it runs under the lid */}
+                <div className="metal-h [--metal:#DDD6CC] relative -mx-[3.4%] h-[clamp(4px,0.9%,9px)] shadow-[inset_0_2px_2px_-1px_rgb(40_28_18/0.35)] [clip-path:polygon(1.6%_0,98.4%_0,100%_100%,0_100%)]" />
+                {/* Front lip: cream top edge, then a shade band and a darker edge line, like the sill */}
+                <div className="metal-h [--metal:#E4DDD3] relative -mx-[4%] h-3 sm:h-4 rounded-b-[18px] shadow-[inset_0_1px_0_rgb(255_252_246/0.95),inset_0_-2px_0_#B4AA9D,inset_0_-3px_0_#8F8578,0_18px_30px_-12px_rgb(40_20_10/0.35),0_2px_3px_rgb(40_20_10/0.2)]">
+                    {/* Specular line where the light catches the curve */}
+                    <span className="absolute inset-x-[8%] top-[30%] h-px bg-[linear-gradient(90deg,transparent,rgb(255_252_246/0.85),transparent)]" />
+                    {/* Thumb notch, cut into the lip */}
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-[14%] h-1.5 rounded-b-md bg-[linear-gradient(180deg,#A39A8E,#C9C1B6)] shadow-[inset_0_1px_2px_rgb(40_28_18/0.35),0_1px_0_rgb(255_252_246/0.6)]" />
+                    {/* Rubber feet */}
+                    <span className="absolute -bottom-[2px] left-[7%] w-[5%] h-[3px] rounded-b-full bg-[#3A322C]" />
+                    <span className="absolute -bottom-[2px] right-[7%] w-[5%] h-[3px] rounded-b-full bg-[#3A322C]" />
+                </div>
             </div>
         </div>
     );
