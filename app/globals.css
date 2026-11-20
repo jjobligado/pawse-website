@@ -13,6 +13,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;       
   --font-pixel: var(--font-pixelify), monospace; 
+  --font-hand: var(--font-caveat), cursive; /* decorative desk notes only */
 }
 
 @theme {
