@@ -32,12 +32,16 @@ const PARALLAX_SPEED = {
  * while the desk rises and slows into it, touching down just as the desk stops
  * (second L), then laptop and desk ease back into the scroll together (last L).
  *
- * Depth comes from a "camera" that tilts down toward the desk as it goes: the
- * laptop leans back a little (LAND_TILT, degrees) and shrinks a touch as it moves
- * away from you (LAND_SHRINK), the desk swings into view (DESK_PITCH_FROM → TO),
- * and the window, being farther away, trails behind (WINDOW_LAG of the lowering).
- * Touch-down plays a short, time-based settle so it still feels physical when the
- * visitor stops scrolling right at the contact point.
+ * Depth comes from one "camera" shared by the desk, the mat and the laptop's
+ * keyboard deck (--cam distance, --pitch angle). It tilts down toward the desk as
+ * the laptop is set down (DESK_PITCH_FROM → TO), so the desk and the keyboard swing
+ * into view together. While in the air the laptop is held front-up (APPROACH_TILT,
+ * degrees: the deck tips away and the lid leans back), levelling out exactly at
+ * contact; it also shrinks a touch as it moves away from you (LAND_SHRINK). Its
+ * shadow lies on the mat and sharpens as it comes down. The window, being farther
+ * away, trails behind (WINDOW_LAG of the lowering). Touch-down plays a short,
+ * time-based settle so it still feels physical when the visitor stops scrolling
+ * right at the contact point.
  */
 /**
  * Share (0–1) of an offset applied at progress t (0–1). Its rate follows sin²: it
@@ -49,10 +53,10 @@ function smoothRamp(t: number): number {
     const c = Math.min(Math.max(t, 0), 1);
     return c - Math.sin(2 * Math.PI * c) / (2 * Math.PI);
 }
-const LAND_TILT = 5;
-const LAND_SHRINK = 0.025;
-const DESK_PITCH_FROM = 72;
-const DESK_PITCH_TO = 62;
+const APPROACH_TILT = 4;
+const LAND_SHRINK = 0.04;
+const DESK_PITCH_FROM = 76;
+const DESK_PITCH_TO = 68;
 const WINDOW_LAG = 0.3;
 /** The sticky header's height: "middle of the screen" means the middle of what's visible below it. */
 const HEADER_HEIGHT = 64;
@@ -142,6 +146,9 @@ export default function HeroSection() {
         // Scroll position where the lowering begins (chosen so the scene is centred
         // while the laptop stands still).
         let start = 0;
+        // The desk's vanishing point, measured from the laptop's hinge with the laptop
+        // landed; the keyboard deck shares it so both recede toward the same spot.
+        let vanish = 0;
         // Whether the laptop is resting on the mat (so touch-down plays once per landing).
         let landed: boolean | null = null;
         const readLand = () => {
@@ -159,6 +166,8 @@ export default function HeroSection() {
                 if (desk) desk.style.transform = "none";
                 const rect = laptop.getBoundingClientRect();
                 const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
+                const deskRect = desk?.getBoundingClientRect();
+                vanish = deskRect ? deskRect.top + deskRect.height / 2 - rect.bottom - land : 0;
                 laptop.style.transform = laptopTransform;
                 if (desk) desk.style.transform = deskTransform;
 
@@ -192,35 +201,40 @@ export default function HeroSection() {
             const progress = land > 0 ? Math.min(Math.max((raw - start) / (2 * land), 0), 1) : 1;
             const eased = smoothRamp(progress);
             const lowered = land * eased;
-            const tilt = land > 0 ? eased * LAND_TILT : LAND_TILT;
+            // Held front-up in the air, levelling out as it meets the mat.
+            const approach = APPROACH_TILT * (1 - eased);
+            const pitch = DESK_PITCH_FROM - (DESK_PITCH_FROM - DESK_PITCH_TO) * eased;
             // The rest: the desk rises and slows into the standing laptop, then both ease
             // back into the scroll (the space they trail into is reserved under the desk).
             const hold = land > 0 ? land * smoothRamp((raw - start - land) / (2 * land)) : 0;
-            laptop.style.transform = `translate3d(0, ${(lowered + hold).toFixed(2)}px, 0) perspective(1800px) rotateX(${tilt.toFixed(2)}deg) scale(${(1 - eased * LAND_SHRINK).toFixed(4)})`;
+            laptop.style.transform = `translate3d(0, ${(lowered + hold).toFixed(2)}px, 0) perspective(var(--cam)) rotateX(${approach.toFixed(2)}deg) scale(${(1 - eased * LAND_SHRINK).toFixed(4)})`;
+            laptop.style.setProperty("--deck-pitch", `${(pitch + approach).toFixed(2)}deg`);
+            // The desk's vanishing point, as seen from the landed hinge. It travels with the
+            // laptop (rather than staying on the desk), so the deck is never seen from below.
+            laptop.style.setProperty("--vp", `${vanish.toFixed(1)}px`);
             if (deskRef.current) deskRef.current.style.transform = `translate3d(0, ${hold.toFixed(2)}px, 0)`;
 
             // The window is farther away, so it trails the lowering a little.
             if (windowRef.current) {
                 windowRef.current.style.transform = `translate3d(0, ${(lowered * WINDOW_LAG + hold).toFixed(2)}px, 0)`;
             }
-            // The camera pitches down toward the desk as the laptop is set down.
-            deskRef.current?.style.setProperty(
-                "--pitch",
-                `${(DESK_PITCH_FROM - (DESK_PITCH_FROM - DESK_PITCH_TO) * eased).toFixed(2)}deg`,
-            );
+            // The camera pitches down toward the desk as the laptop is set down
+            // (on the section, so the desk, the mat and the keyboard deck share it).
+            sectionRef.current?.style.setProperty("--pitch", `${pitch.toFixed(2)}deg`);
 
-            // Shadows: a soft one forms on the mat where the laptop will land, then the
-            // tight contact shadow takes over in the last stretch.
+            // Shadows, lying on the mat in the laptop's footprint: a soft one that
+            // sharpens and darkens as the laptop comes down, then a tight contact
+            // shadow in the last stretch.
             const cast = castShadowRef.current;
             if (cast) {
-                cast.style.opacity = (Math.min(progress / 0.8, 1) * 0.9).toFixed(3);
-                cast.style.transform = `scale(${(1.3 - eased * 0.3).toFixed(3)})`;
+                cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.35 + 0.55 * eased)).toFixed(3);
+                cast.style.filter = `blur(${(6 + 30 * (1 - eased)).toFixed(1)}px)`;
+                cast.style.transform = `scale(${(1.12 - eased * 0.12).toFixed(3)})`;
             }
             const contact = laptopShadowRef.current;
             if (contact) {
                 const near = Math.max((progress - 0.7) / 0.3, 0);
                 contact.style.opacity = near.toFixed(3);
-                contact.style.transform = `scaleX(${(1.15 - near * 0.15).toFixed(3)})`;
             }
 
             // Touch-down: a short settle the first time it reaches the mat; lifting it
@@ -275,7 +289,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:220px] lg:[--land:360px] xl:[--land:420px] lg:short:[--land:280px] motion-reduce:[--land:0px]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:220px] lg:[--land:360px] xl:[--land:420px] lg:short:[--land:280px] motion-reduce:[--land:0px] [--cam:calc(var(--lw)*2.4)] [--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -537,12 +551,6 @@ export default function HeroSection() {
                 className="relative z-40 w-[var(--lw)] mt-[calc(var(--lw)*var(--ov)*-1)] origin-bottom will-change-transform"
             >
                 <div className="relative animate-hero-laptop">
-                    {/* Contact shadow on the mat, revealed as the laptop lands */}
-                    <div
-                        ref={laptopShadowRef}
-                        aria-hidden="true"
-                        className="pointer-events-none absolute left-[2%] right-[2%] -bottom-2 sm:-bottom-3 h-4 sm:h-6 rounded-[50%] bg-[rgb(40_20_10/0.34)] blur-[6px] sm:blur-[10px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
-                    />
                     <div ref={laptopBodyRef} className="relative z-10">
                         <Laptop>
                             <LaptopDesktop />
@@ -563,10 +571,10 @@ export default function HeroSection() {
             <div
                 ref={deskRef}
                 aria-hidden="true"
-                className="relative z-0 w-[min(calc(var(--ww)*1.1),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_-_var(--lw)*0.12)] mb-[calc(var(--lw)*0.1_+_var(--land))] pointer-events-none select-none [--pitch:62deg] [perspective:calc(var(--lw)*1.5)]"
+                className="relative z-0 w-[min(calc(var(--ww)*1.1),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_+_var(--lw)*0.02)] mb-[calc(var(--lw)*0.1_+_var(--land))] pointer-events-none select-none [perspective:var(--cam)]"
             >
                 {/* Desk top */}
-                <div className="wood-h [--wood:#BE936B] absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.95)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[6px] shadow-[inset_0_2px_0_rgb(255_236_210/0.3)]">
+                <div className="wood-h [--wood:#BE936B] absolute inset-x-0 bottom-0 h-[calc(var(--lw)*1.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[6px] shadow-[inset_0_2px_0_rgb(255_236_210/0.3)]">
                     <div className="absolute inset-0 rounded-t-[6px] bg-[linear-gradient(180deg,rgb(40_20_10/0.22)_0%,transparent_12%,rgb(255_236_210/0.2)_42%,transparent_78%,rgb(30_14_4/0.08)_100%)]" />
                 </div>
                 {/* Front edge: highlight on top, dark underside, like the sill */}
@@ -579,17 +587,25 @@ export default function HeroSection() {
                 </div>
 
                 {/* The felt mat and what sits on it, centred on the desk */}
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(var(--lw)*0.025)] w-[min(calc(var(--lw)*1.42),86%)] h-full [perspective:calc(var(--lw)*1.5)]">
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(var(--lw)*0.025)] w-[min(calc(var(--lw)*1.42),86%)] h-full [perspective:var(--cam)]">
                 {/* Thickness: the mat's front lip, then its warm shadow on the desk */}
                 <div className="absolute inset-x-[0.4%] -bottom-[clamp(3px,0.5cqw,7px)] h-[clamp(8px,1.4cqw,18px)] rounded-b-[clamp(14px,3cqw,32px)] bg-[linear-gradient(180deg,#C6D5E2,#B3C4D3)] shadow-[0_6px_12px_-4px_rgb(40_20_10/0.3)]" />
-                <div className="felt absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-[clamp(14px,3cqw,32px)] shadow-[inset_0_3px_0_rgb(255_255_255/0.7),inset_0_-2px_0_rgb(40_60_80/0.08)]">
+                <div className="felt absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.95)] [--foot:calc(var(--lw)*0.2)] origin-bottom [transform:rotateX(var(--pitch))] rounded-[clamp(14px,3cqw,32px)] shadow-[inset_0_3px_0_rgb(255_255_255/0.7),inset_0_-2px_0_rgb(40_60_80/0.08)]">
                     <div className="absolute inset-[clamp(6px,1.2cqw,16px)] rounded-[clamp(10px,2.2cqw,22px)] border-2 border-dashed border-[rgb(70_105_140/0.28)]" />
+                    {/*
+                      Shadows in the laptop's footprint, lying on the mat (so they share its
+                      perspective): a soft one that sharpens as the laptop comes down, and a
+                      tight contact shadow revealed as it lands.
+                    */}
+                    <div
+                        ref={castShadowRef}
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.34)] blur-[6px] opacity-0 motion-reduce:opacity-90"
+                    />
+                    <div
+                        ref={laptopShadowRef}
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.4)] blur-[2px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                    />
                 </div>
-                {/* Soft shadow forming on the mat where the laptop will land */}
-                <div
-                    ref={castShadowRef}
-                    className="absolute left-[12%] right-[12%] top-[calc(var(--lw)*0.06)] h-[calc(var(--lw)*0.07)] rounded-[50%] bg-[rgb(40_20_10/0.3)] blur-[18px] opacity-0 motion-reduce:opacity-90"
-                />
                 {/* Mug, upright on the mat to the right of the laptop */}
                 <div className="hidden lg:block absolute right-[3%] bottom-[22%] w-[calc(var(--lw)*0.075)] aspect-[0.86]">
                     <div className="absolute -inset-x-[12%] -bottom-[8%] h-[22%] rounded-[50%] bg-[rgb(40_20_10/0.28)] blur-[5px]" />
