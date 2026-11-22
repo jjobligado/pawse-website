@@ -159,16 +159,16 @@ export default function DownloadBanner() {
                 <WindowSill className="z-20">
                     <div className={`${ON_SILL} left-[2%] ${hop("[animation-delay:0.05s]")}`}>
                         <SillShadow />
-                        <SpriteCat {...CATS.ginger} className={GINGER_SIZE} />
+                        <SpriteCat {...CATS.ginger} interactive={false} className={GINGER_SIZE} />
                     </div>
                     <div className={`hidden sm:block ${ON_SILL} left-[17%] lg:left-[15%] ${hop("[animation-delay:0.2s]")}`}>
                         <SillShadow />
-                        <SpriteCat {...CATS.void} className={CAT_SIZE} />
+                        <SpriteCat {...CATS.void} interactive={false} className={CAT_SIZE} />
                     </div>
                     <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
                     <div className={`${ON_SILL} right-[3%] xl:right-[6.5%] ${hop("[animation-delay:0.35s]")}`}>
                         <SillShadow />
-                        <SpriteCat {...CATS.tux} className={CAT_SIZE} />
+                        <SpriteCat {...CATS.tux} interactive={false} className={CAT_SIZE} />
                     </div>
                 </WindowSill>
                 </div>
