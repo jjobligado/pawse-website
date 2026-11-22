@@ -73,6 +73,9 @@ const SHADOW_LIP = 3;
 const DESK_HIDDEN_MARGIN = 8;
 /** How far toward the viewer (× the laptop's width, on the mat) the shadow falls when the laptop is highest. */
 const SHADOW_THROW = 0.12;
+/** At rest: how far toward the viewer the soft shadow reaches (× the laptop's width), and its blur (px). */
+const SHADOW_REST_THROW = 0.02;
+const SHADOW_REST_BLUR = 8;
 /** Fallback shortest landing, as a share of the laptop's width; the section sets it per screen size (--land-min, longer on phones). */
 const MIN_LAND_PER_WIDTH = 0.45;
 /** An element's layout width, ignoring transforms. */
@@ -333,15 +336,17 @@ export default function HeroSection() {
             if (cast) {
                 // High up it is a faint, wide blur; it gathers and darkens as the laptop
                 // nears the mat, ending as the tight shadow it rests on.
-                cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.04 + 0.86 * eased ** 3)).toFixed(3);
-                cast.style.filter = `blur(${(2 + 34 * (1 - eased)).toFixed(1)}px)`;
+                cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.04 + 0.6 * eased ** 3)).toFixed(3);
+                cast.style.filter = `blur(${(SHADOW_REST_BLUR + 30 * (1 - eased)).toFixed(1)}px)`;
                 // The window light comes from behind the desk, so the higher the laptop,
                 // the further toward you the shadow falls, the bigger and rounder it
-                // spreads; it slides back under the laptop and squares up as it lands.
+                // spreads; it slides back under the laptop as it lands. At rest it is a soft
+                // contact shadow, a little larger than the base and longest on the
+                // viewer's side, never a solid block.
                 const lift = 1 - eased;
                 const laptopWidth = cam / CAM_PER_WIDTH;
-                cast.style.transform = `translateY(${(lift * SHADOW_THROW * laptopWidth).toFixed(1)}px) scale(${(1 + 0.22 * lift).toFixed(3)}, ${(1 + 0.4 * lift).toFixed(3)})`;
-                cast.style.borderRadius = `${(4 + 30 * lift).toFixed(1)}% / ${(7 + 38 * lift).toFixed(1)}%`;
+                cast.style.transform = `translateY(${((SHADOW_REST_THROW + lift * SHADOW_THROW) * laptopWidth).toFixed(1)}px) scale(${(1.04 + 0.2 * lift).toFixed(3)}, ${(1.08 + 0.36 * lift).toFixed(3)})`;
+                cast.style.borderRadius = `${(7 + 27 * lift).toFixed(1)}% / ${(11 + 34 * lift).toFixed(1)}%`;
             }
             const contact = laptopShadowRef.current;
             if (contact) {
@@ -721,11 +726,11 @@ export default function HeroSection() {
                     */}
                     <div
                         ref={castShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.3)] blur-[2px] opacity-0 motion-reduce:opacity-90"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.3)] blur-[8px] opacity-0 motion-reduce:opacity-60"
                     />
                     <div
                         ref={laptopShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.42)] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.32)] blur-[3px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                 </div>
                 </div>
