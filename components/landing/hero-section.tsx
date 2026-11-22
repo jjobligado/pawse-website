@@ -657,15 +657,6 @@ export default function HeroSection() {
                         className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.42)] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                 </div>
-                {/* Mug, a pixel sprite like Tux's: ink outline, coffee line, hard shadow on the mat */}
-                <div className="hidden lg:block absolute right-[3%] bottom-[22%] w-[calc(var(--lw)*0.06)] aspect-[0.86]">
-                    <div className="absolute left-[6%] -right-[24%] -bottom-[10%] h-[12%] bg-[rgb(40_20_10/0.3)]" />
-                    <div className="absolute -right-[34%] top-[22%] w-[40%] h-[44%] border-[clamp(3px,0.4cqw,5px)] border-l-0 border-ink" />
-                    <div className="absolute inset-0 bg-white border-[clamp(3px,0.4cqw,5px)] border-ink">
-                        <div className="absolute inset-x-0 top-0 h-[16%] bg-[#6B4226]" />
-                        <div className="absolute left-[14%] top-[30%] w-[14%] h-[44%] bg-[#E5EEF5]" />
-                    </div>
-                </div>
                 </div>
             </div>
         </section>
