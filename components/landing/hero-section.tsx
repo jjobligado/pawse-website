@@ -540,6 +540,11 @@ export default function HeroSection() {
                         <SpriteCat {...CATS.tux} className={CAT_SIZE} />
                     </div>
                 </WindowSill>
+                {/*
+                  Daylight from the window falling down the wall to the desk, so the window
+                  and the desk read as one room rather than two scenes with white between.
+                */}
+                <div aria-hidden="true" className="hidden sm:block absolute inset-x-[4%] top-full h-[calc(var(--land)_+_var(--lw)*0.5)] -z-10 pointer-events-none bg-[linear-gradient(180deg,rgb(168_220_255/0.32),rgb(168_220_255/0.12)_55%,transparent)] [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" />
             </div>
 
             {/*
