@@ -11,7 +11,7 @@ import { type CSSProperties, useCallback, useEffect, useRef, useState } from "re
  *   once from the start, then returns to idle. It always finishes, even if the
  *   pointer leaves mid-way, and a new hover is needed to play it again.
  * - Ambient (interactive={false}): no hover, click or focus; the cat is pure
- *   decoration and plays its action on its own every few seconds (autoPlayMs).
+ *   decoration and only loops its idle animation (the action never plays).
  * - Reduced motion: shows the first idle frame and never animates.
  *
  * Frames are stepped with a CSS transform on an <img> strip inside a clipping
@@ -47,11 +47,9 @@ interface SpriteCatProps {
     className?: string;
     /**
      * false: an ambient cat with no hover, click or focus (and hidden from
-     * assistive tech) that plays its action on its own. Defaults to true.
+     * assistive tech) that only loops its idle animation. Defaults to true.
      */
     interactive?: boolean;
-    /** Ambient cats: random wait (ms) between actions, [min, max]. */
-    autoPlayMs?: readonly [number, number];
 }
 
 /**
@@ -94,7 +92,6 @@ export default function SpriteCat({
     actionSequence,
     className = "",
     interactive = true,
-    autoPlayMs = [7000, 13000],
 }: SpriteCatProps) {
     const [playing, setPlaying] = useState(false);
     const reducedMotion = useReducedMotion();
@@ -129,15 +126,6 @@ export default function SpriteCat({
         playingRef.current = false;
         setPlaying(false);
     };
-
-    // Ambient cats play their action on their own, after a random wait each time,
-    // so two cats side by side never move in step.
-    const [minWait, maxWait] = autoPlayMs;
-    useEffect(() => {
-        if (interactive || reducedMotion || playing) return;
-        const id = window.setTimeout(play, minWait + Math.random() * (maxWait - minWait));
-        return () => window.clearTimeout(id);
-    }, [interactive, reducedMotion, playing, play, minWait, maxWait]);
 
     const stripStyle = (frames: number): CSSProperties => ({
         width: `${frames * 100}%`,

@@ -686,7 +686,7 @@ export default function HeroSection() {
 
                     </div>
 
-                {/* The sill, where Ginger naps and Tux has his coffee: ambient cats that move on their own (no hover or click) */}
+                {/* The sill, where Ginger naps and Tux has his coffee: ambient cats that only loop their idle animation (no hover, click or action) */}
                 <WindowSill className="z-30">
                     {/* Cats from md, where the sill has room beside the laptop; on phones and small tablets they're left out so the scene doesn't feel cramped */}
                     <div className="hidden md:block absolute bottom-[calc(100%-10px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] lg:left-[4%] animate-cat-hop [animation-delay:0.95s]">
