@@ -69,6 +69,8 @@ const CAM_PER_WIDTH = 2.4;
 const DECK_FACE = 8;
 /** How much of the contact shadow (px) shows past the deck's front face, grounding it on the mat. */
 const SHADOW_LIP = 3;
+/** How far (px) below the first screen the desk starts, so none of it shows before scrolling. */
+const DESK_HIDDEN_MARGIN = 8;
 /** The sticky header's height: "middle of the screen" means the middle of what's visible below it. */
 const HEADER_HEIGHT = 64;
 
@@ -185,6 +187,8 @@ export default function HeroSection() {
             const laptop = laptopParallaxRef.current;
             const desk = deskRef.current;
             const edge = deskEdgeRef.current;
+            // Start from the section's own --land (an earlier pass may have raised it).
+            section?.style.removeProperty("--land");
             const styles = section ? getComputedStyle(section) : null;
             land = styles ? parseFloat(styles.getPropertyValue("--land")) || 0 : 0;
             pitchFrom = styles ? parseFloat(styles.getPropertyValue("--pitch-from")) || DESK_PITCH_FROM : DESK_PITCH_FROM;
@@ -197,6 +201,21 @@ export default function HeroSection() {
                 const sectionPitch = section?.style.getPropertyValue("--pitch") ?? "";
                 laptop.style.transform = "none";
                 if (desk) desk.style.transform = "none";
+
+                // The first screen shows only the window and the peeking laptop; the desk
+                // slides up to meet the laptop once you scroll. Wherever the desk's far
+                // edge would show at load (phones, tablets, short screens), lower it,
+                // and the landing with it, until it starts just below the first screen.
+                const deskTop = desk?.firstElementChild;
+                if (!reduceMotion && section && deskTop) {
+                    section.style.setProperty("--pitch", `${pitchFrom}deg`);
+                    const showing = window.innerHeight + DESK_HIDDEN_MARGIN - (deskTop.getBoundingClientRect().top + window.scrollY);
+                    if (showing > 0) {
+                        land += showing;
+                        section.style.setProperty("--land", `${land.toFixed(1)}px`);
+                    }
+                }
+
                 section?.style.setProperty("--pitch", `${pitchTo}deg`);
                 const rect = laptop.getBoundingClientRect();
                 const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
@@ -604,7 +623,7 @@ export default function HeroSection() {
                   Daylight from the window falling down the wall to the desk, so the window
                   and the desk read as one room rather than two scenes with white between.
                 */}
-                <div aria-hidden="true" className="hidden sm:block absolute inset-x-[4%] top-full h-[calc(var(--land)_+_var(--lw)*0.5)] -z-10 pointer-events-none bg-[linear-gradient(180deg,rgb(168_220_255/0.32),rgb(168_220_255/0.12)_55%,transparent)] [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" />
+                <div aria-hidden="true" className="absolute inset-x-[4%] top-full h-[calc(var(--land)_+_var(--lw)*0.5)] -z-10 pointer-events-none bg-[linear-gradient(180deg,rgb(168_220_255/0.32),rgb(168_220_255/0.12)_55%,transparent)] [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" />
             </div>
 
             {/*
