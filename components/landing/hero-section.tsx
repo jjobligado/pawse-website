@@ -67,6 +67,8 @@ const WINDOW_LAG = 0.3;
 const CAM_PER_WIDTH = 2.4;
 /** Approximate height (px) of the deck's front face, which hangs below its front edge. */
 const DECK_FACE = 8;
+/** How much of the contact shadow (px) shows past the deck's front face, grounding it on the mat. */
+const SHADOW_LIP = 3;
 /** The sticky header's height: "middle of the screen" means the middle of what's visible below it. */
 const HEADER_HEIGHT = 64;
 
@@ -211,7 +213,7 @@ export default function HeroSection() {
                     const sc = 1 - LAND_SHRINK;
                     const p = (pitchTo * Math.PI) / 180;
                     const far = 2 * cam;
-                    const y = (footprint.bottom - DECK_FACE - (rect.bottom + land)) / sc;
+                    const y = (footprint.bottom - SHADOW_LIP - DECK_FACE - (rect.bottom + land)) / sc;
                     const origin = deckOrigin(pitchTo, pitchTo, sc);
                     const depth = (y * far) / (far * Math.cos(p) + (y - origin) * Math.sin(p));
                     const clamped = Math.min(Math.max(depth, rect.width * 0.35), rect.width * 0.75);
@@ -347,7 +349,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -369,7 +371,7 @@ export default function HeroSection() {
                         </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_48px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
                 <div
                     aria-hidden="true"
                     className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"

@@ -695,10 +695,10 @@ export function Laptop({ children }: { children: React.ReactNode }) {
                 */}
                 <div className="absolute inset-x-0 top-full h-0 [perspective:calc(var(--cam,2000px)*2)] [perspective-origin:50%_var(--vp,0px)]">
                     <div className="bg-[#E2DBD0] relative w-full aspect-[var(--deck-aspect,1/0.6)] origin-top [transform:rotateX(var(--deck-pitch,var(--pitch,68deg)))] [transform-style:preserve-3d] rounded-t-[3px] rounded-b-[clamp(10px,2.4%,26px)] shadow-[inset_0_5px_6px_-2px_rgb(40_28_18/0.45),inset_0_0_0_1px_rgb(70_54_40/0.25),inset_0_-2px_0_rgb(255_252_246/0.7)]">
-                        {/* Keyboard: light keycaps (14 × 6) with thin outlines, shaded along their bottom edge */}
-                        <div className="absolute left-[8%] right-[8%] top-[8%] h-[46%] rounded-[1.5%/3%] bg-[#F5F1EA] bg-[linear-gradient(90deg,#B9AE9F_0_8%,transparent_8%),linear-gradient(180deg,#B9AE9F_0_13%,transparent_13%),linear-gradient(180deg,transparent_80%,rgb(120_100_80/0.14)_80%)] bg-[length:calc(100%/14)_100%,100%_calc(100%/6),100%_calc(100%/6)] shadow-[inset_0_0_0_2px_#B9AE9F,0_1px_0_rgb(255_252_246/0.6)]" />
+                        {/* Keyboard: light keycaps (14 × 5) with thin outlines, shaded along their bottom edge */}
+                        <div className="absolute left-[8%] right-[8%] top-[8%] h-[46%] rounded-[1.5%/3%] bg-[#F5F1EA] bg-[linear-gradient(90deg,#B9AE9F_0_8%,transparent_8%),linear-gradient(180deg,#B9AE9F_0_13%,transparent_13%),linear-gradient(180deg,transparent_80%,rgb(120_100_80/0.14)_80%)] bg-[length:calc(100%/14)_100%,100%_calc(100%/5),100%_calc(100%/5)] shadow-[inset_0_0_0_2px_#B9AE9F,0_1px_0_rgb(255_252_246/0.6)]" />
                         {/* Trackpad */}
-                        <div className="bg-[#D8D0C4] absolute left-1/2 -translate-x-1/2 top-[61%] w-[38%] h-[30%] rounded-[5%/8%] shadow-[inset_0_0_0_1px_rgb(70_54_40/0.3),inset_0_1px_0_rgb(255_252_246/0.8),0_1px_0_rgb(255_252_246/0.5)]" />
+                        <div className="bg-[#D8D0C4] absolute left-1/2 -translate-x-1/2 top-[59%] w-[38%] h-[33%] rounded-[5%/8%] shadow-[inset_0_0_0_1px_rgb(70_54_40/0.3),inset_0_1px_0_rgb(255_252_246/0.8),0_1px_0_rgb(255_252_246/0.5)]" />
                         {/* Front edge face: cream top line, shade band and darker edge, like the sill */}
                         <div className="bg-[#E4DDD3] absolute inset-x-0 top-full h-[clamp(7px,1.5%,15px)] origin-top [transform:rotateX(-90deg)] rounded-b-[clamp(10px,2.4%,26px)] shadow-[inset_0_1px_0_rgb(255_252_246/0.95),inset_0_-2px_0_#B4AA9D,inset_0_-3px_0_#8F8578]">
                             {/* Thumb notch, cut into the edge */}
