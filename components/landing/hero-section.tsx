@@ -329,8 +329,10 @@ export default function HeroSection() {
             // shadow in the last stretch.
             const cast = castShadowRef.current;
             if (cast) {
-                cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.35 + 0.55 * eased)).toFixed(3);
-                cast.style.filter = `blur(${(10 * (1 - eased)).toFixed(1)}px)`;
+                // High up it is a faint, wide blur; it gathers and darkens as the laptop
+                // nears the mat, ending as the tight shadow it rests on.
+                cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.04 + 0.86 * eased ** 3)).toFixed(3);
+                cast.style.filter = `blur(${(2 + 34 * (1 - eased)).toFixed(1)}px)`;
                 cast.style.transform = `scale(${(1.12 - eased * 0.12).toFixed(3)})`;
             }
             const contact = laptopShadowRef.current;
