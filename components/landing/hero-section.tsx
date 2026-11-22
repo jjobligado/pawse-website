@@ -5,7 +5,7 @@ import { otherDownloads, usePlatform } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
-import { Laptop, SillPlant, SillShadow, WindowFrame, WindowSill, WindowSky, useSkyPhase } from "./hero-scene";
+import { Laptop, SillPlant, SillShadow, WindowFrame, WindowSill, WindowSky } from "./hero-scene";
 import { CATS, CAT_SIZE, GINGER_SIZE } from "./cats";
 import LaptopDesktop from "./laptop-desktop";
 import DoneWord from "./done-word";
@@ -85,33 +85,10 @@ const rect0Width = (el: HTMLElement) => el.offsetWidth;
 /** The sticky header's height: "middle of the screen" means the middle of what's visible below it. */
 const HEADER_HEIGHT = 64;
 
-/**
- * "Done" and its underline (which takes the text colour) shift with the sky
- * behind them: a brand blue that deepens toward dusk and night. Each shade is
- * ≥4.5:1 against the darkest sky pixel behind "Done" (measured at 1440 and 820
- * wide) and well above that on the white wall where phones show the copy.
- */
-const DONE_COLOR = {
-    morning: "#17679C",
-    day: "#16639A",
-    dusk: "#14578A",
-    night: "#1A3480",
-} as const;
-
-/**
- * The light the window throws down the wall to the desk, per time of day (RGB
- * and strength): soft peach in the morning, pale sunlight by day, warm
- * amber-rose at dusk, faint cool moonlight at night.
- */
-const WALL_LIGHT = {
-    morning: { rgb: "255 214 178", alpha: 0.34 },
-    day: { rgb: "255 232 178", alpha: 0.32 },
-    dusk: { rgb: "255 178 140", alpha: 0.3 },
-    night: { rgb: "168 184 236", alpha: 0.22 },
-} as const;
+// "Done"'s colour (--hero-done-sky) and the window's light on the wall
+// (--wall-light, --wall-a) come per time of day from lib/sky-phase.ts.
 
 export default function HeroSection() {
-    const skyPhase = useSkyPhase();
     const sectionRef = useRef<HTMLElement>(null);
     const laptopParallaxRef = useRef<HTMLDivElement>(null);
     const laptopShadowRef = useRef<HTMLDivElement>(null);
@@ -445,7 +422,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase], "--wall-light": WALL_LIGHT[skyPhase].rgb, "--wall-a": WALL_LIGHT[skyPhase].alpha } as React.CSSProperties} className="@container group/sky [--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
+        <section ref={sectionRef} id="hero" className="@container [--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -464,7 +441,7 @@ export default function HeroSection() {
                           it sits on the wall instead of looking pasted on.
                         */}
                         <div className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
-                            <WindowSky phase={skyPhase} farRef={skyFarRef} nearRef={skyNearRef} />
+                            <WindowSky farRef={skyFarRef} nearRef={skyNearRef} />
                             <WindowFrame />
                         </div>
 
@@ -472,7 +449,7 @@ export default function HeroSection() {
             <div className={`relative z-30 col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-7 sm:gap-6 sm:px-12 md:px-14 pt-12 pb-12 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
                 <div
                     aria-hidden="true"
-                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
+                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 in-data-[sky=night]:opacity-100"
                 />
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.8rem,calc(10.7vw_-_5px),2.9rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
@@ -488,7 +465,7 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:group-data-[sky=night]/sky:text-ink">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:in-data-[sky=night]:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -572,7 +549,7 @@ export default function HeroSection() {
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:group-data-[sky=night]/sky:text-ink"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:in-data-[sky=night]:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
@@ -701,7 +678,7 @@ export default function HeroSection() {
                 </WindowSill>
                 {/*
                   Light from the window spilling onto the wall below the sill, tinted by
-                  the time of day (WALL_LIGHT): brightest under the window and fading
+                  the time of day (--wall-light): brightest under the window and fading
                   softly in every direction, so the window and the desk read as one room.
                 */}
                 <div aria-hidden="true" className="absolute -inset-x-[12%] top-full h-[calc(var(--land)_+_var(--lw)*0.7)] -z-10 pointer-events-none bg-[radial-gradient(ellipse_50%_100%_at_50%_0%,rgb(var(--wall-light)/var(--wall-a))_0%,rgb(var(--wall-light)/calc(var(--wall-a)*0.55))_35%,rgb(var(--wall-light)/calc(var(--wall-a)*0.18))_62%,transparent_85%)]" />
