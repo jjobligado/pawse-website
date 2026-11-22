@@ -645,11 +645,11 @@ export default function HeroSection() {
                     </div>
                 </WindowSill>
                 {/*
-                  Light from the window falling down the wall to the desk, tinted by the
-                  time of day (WALL_LIGHT), so the window and the desk read as one room
-                  rather than two scenes with white between.
+                  Light from the window spilling onto the wall below the sill, tinted by
+                  the time of day (WALL_LIGHT): brightest under the window and fading
+                  softly in every direction, so the window and the desk read as one room.
                 */}
-                <div aria-hidden="true" className="absolute inset-x-[4%] top-full h-[calc(var(--land)_+_var(--lw)*0.5)] -z-10 pointer-events-none bg-[linear-gradient(180deg,rgb(var(--wall-light)/var(--wall-a)),rgb(var(--wall-light)/calc(var(--wall-a)*0.4))_55%,transparent)] [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" />
+                <div aria-hidden="true" className="absolute -inset-x-[12%] top-full h-[calc(var(--land)_+_var(--lw)*0.7)] -z-10 pointer-events-none bg-[radial-gradient(ellipse_50%_100%_at_50%_0%,rgb(var(--wall-light)/var(--wall-a))_0%,rgb(var(--wall-light)/calc(var(--wall-a)*0.55))_35%,rgb(var(--wall-light)/calc(var(--wall-a)*0.18))_62%,transparent_85%)]" />
             </div>
 
             {/*
@@ -686,6 +686,8 @@ export default function HeroSection() {
                 {/* Desk top */}
                 <div className="wood-h [--wood:#BE936B] absolute inset-x-0 bottom-0 h-[calc(var(--lw)*1.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[6px] shadow-[inset_0_2px_0_rgb(255_236_210/0.3)]">
                     <div className="absolute inset-0 rounded-t-[6px] bg-[linear-gradient(180deg,rgb(40_20_10/0.22)_0%,transparent_12%,rgb(255_236_210/0.2)_42%,transparent_78%,rgb(30_14_4/0.08)_100%)]" />
+                    {/* The window's light landing on the desk: a soft pool toward the back, in the desk's perspective */}
+                    <div className="absolute inset-0 rounded-t-[6px] bg-[radial-gradient(ellipse_55%_45%_at_50%_8%,rgb(var(--wall-light)/calc(var(--wall-a)*1.1)),rgb(var(--wall-light)/calc(var(--wall-a)*0.35))_55%,transparent_100%)]" />
                 </div>
                 {/* Front edge: highlight on top, dark underside, like the sill */}
                 <div ref={deskEdgeRef} className="wood-h [--wood:#9A6B45] absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[6px] shadow-[inset_0_1px_0_rgb(255_226_196/0.45),inset_0_-1px_0_rgb(30_14_4/0.5),0_2px_3px_rgb(40_20_10/0.25)]" />
