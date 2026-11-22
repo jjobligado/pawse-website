@@ -438,7 +438,7 @@ export default function HeroSection() {
               There the copy takes 60% of the screen below the header, 50% on tall
               phones (taller than 2:1), or its natural height if that is more, and the window fills the rest above the peeking laptop.
             */}
-            <div ref={windowRef} className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
+            <div ref={windowRef} className={`relative ${platformsOpen ? "z-[45]" : ""} w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center`}>
                     <div className="relative w-full grid grid-cols-1 grid-rows-[minmax(auto,calc((100svh_-_64px)*0.6_-_var(--wt)))_minmax(120px,1fr)] [@media(max-aspect-ratio:1/2)]:grid-rows-[minmax(auto,calc((100svh_-_64px)*0.5_-_var(--wt)))_minmax(120px,1fr)] min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))] sm:grid-rows-1 sm:min-h-0">
                         {/*
                           The window: softened corners and layered shadows (a tight contact
