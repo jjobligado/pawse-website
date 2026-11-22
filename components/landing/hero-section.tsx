@@ -58,6 +58,10 @@ const LAND_SHRINK = 0.04;
 const DESK_PITCH_FROM = 76;
 const DESK_PITCH_TO = 68;
 const WINDOW_LAG = 0.3;
+/** --cam as a multiple of the laptop's width (keep in step with the section's --cam). */
+const CAM_PER_WIDTH = 2.4;
+/** Approximate height (px) of the deck's front face, which hangs below its front edge. */
+const DECK_FACE = 8;
 /** The sticky header's height: "middle of the screen" means the middle of what's visible below it. */
 const HEADER_HEIGHT = 64;
 
@@ -151,6 +155,19 @@ export default function HeroSection() {
         let vanish = 0;
         // Whether the laptop is resting on the mat (so touch-down plays once per landing).
         let landed: boolean | null = null;
+        // The desk's camera distance (--cam, px); the deck's camera sits twice as far back.
+        let cam = 0;
+        /**
+         * Where the deck's perspective origin goes (px below the hinge, in the
+         * laptop's units at scale sc) so that its sides recede toward the same
+         * vanishing point as the desk's. A plane tilted back by θ under a camera at
+         * distance d recedes toward a point d·cot θ above that camera's origin; the
+         * desk's origin is its centre (vanish), the deck's camera is at 2·cam.
+         */
+        const deckOrigin = (deskPitch: number, deckPitch: number, sc: number) => {
+            const cot = (deg: number) => 1 / Math.tan((deg * Math.PI) / 180);
+            return (vanish - cam * cot(deskPitch)) / sc + 2 * cam * cot(deckPitch);
+        };
         const readLand = () => {
             const section = sectionRef.current;
             const laptop = laptopParallaxRef.current;
@@ -159,17 +176,44 @@ export default function HeroSection() {
             const styles = section ? getComputedStyle(section) : null;
             land = styles ? parseFloat(styles.getPropertyValue("--land")) || 0 : 0;
             if (laptop) {
-                // Measure resting places without the scroll transforms on them.
+                // Measure resting places without the scroll transforms on them,
+                // with the desk at its landed camera angle.
                 const laptopTransform = laptop.style.transform;
                 const deskTransform = desk?.style.transform ?? "";
+                const sectionPitch = section?.style.getPropertyValue("--pitch") ?? "";
                 laptop.style.transform = "none";
                 if (desk) desk.style.transform = "none";
+                section?.style.setProperty("--pitch", `${DESK_PITCH_TO}deg`);
                 const rect = laptop.getBoundingClientRect();
                 const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
                 const deskRect = desk?.getBoundingClientRect();
+                const footprint = laptopShadowRef.current?.getBoundingClientRect();
                 vanish = deskRect ? deskRect.top + deskRect.height / 2 - rect.bottom - land : 0;
+                cam = rect.width * CAM_PER_WIDTH;
+
+                // The deck's depth, chosen so its front edge lands on the front of the
+                // laptop's contact shadow: the laptop then sits on the mat, never past
+                // the desk's edge. Solved from the deck's projection at the landed
+                // angle (in the laptop's own units, which are scaled by LAND_SHRINK).
+                if (footprint && footprint.height > 0) {
+                    const sc = 1 - LAND_SHRINK;
+                    const p = (DESK_PITCH_TO * Math.PI) / 180;
+                    const far = 2 * cam;
+                    const y = (footprint.bottom - DECK_FACE - (rect.bottom + land)) / sc;
+                    const origin = deckOrigin(DESK_PITCH_TO, DESK_PITCH_TO, sc);
+                    const depth = (y * far) / (far * Math.cos(p) + (y - origin) * Math.sin(p));
+                    const clamped = Math.min(Math.max(depth, rect.width * 0.35), rect.width * 0.75);
+                    if (Number.isFinite(clamped)) {
+                        laptop.style.setProperty("--deck-aspect", `${rect.width.toFixed(1)} / ${clamped.toFixed(1)}`);
+                        // The shadows on the mat cover the same footprint.
+                        section?.style.setProperty("--deck-depth", `${clamped.toFixed(1)}px`);
+                    }
+                }
+
                 laptop.style.transform = laptopTransform;
                 if (desk) desk.style.transform = deskTransform;
+                if (sectionPitch) section?.style.setProperty("--pitch", sectionPitch);
+                else section?.style.removeProperty("--pitch");
 
                 const top = rect.top + window.scrollY;
                 const screenMiddle = HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) / 2;
@@ -207,11 +251,13 @@ export default function HeroSection() {
             // The rest: the desk rises and slows into the standing laptop, then both ease
             // back into the scroll (the space they trail into is reserved under the desk).
             const hold = land > 0 ? land * smoothRamp((raw - start - land) / (2 * land)) : 0;
-            laptop.style.transform = `translate3d(0, ${(lowered + hold).toFixed(2)}px, 0) perspective(var(--cam)) rotateX(${approach.toFixed(2)}deg) scale(${(1 - eased * LAND_SHRINK).toFixed(4)})`;
+            const sc = 1 - eased * LAND_SHRINK;
+            laptop.style.transform = `translate3d(0, ${(lowered + hold).toFixed(2)}px, 0) perspective(var(--cam)) rotateX(${approach.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
             laptop.style.setProperty("--deck-pitch", `${(pitch + approach).toFixed(2)}deg`);
-            // The desk's vanishing point, as seen from the landed hinge. It travels with the
-            // laptop (rather than staying on the desk), so the deck is never seen from below.
-            laptop.style.setProperty("--vp", `${vanish.toFixed(1)}px`);
+            // The deck recedes toward the desk's vanishing point, as seen from the landed
+            // hinge. It travels with the laptop (rather than staying on the desk), so the
+            // deck is never seen from below.
+            laptop.style.setProperty("--vp", `${deckOrigin(pitch, pitch + approach, sc).toFixed(1)}px`);
             if (deskRef.current) deskRef.current.style.transform = `translate3d(0, ${hold.toFixed(2)}px, 0)`;
 
             // The window is farther away, so it trails the lowering a little.
@@ -604,11 +650,11 @@ export default function HeroSection() {
                     */}
                     <div
                         ref={castShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.3)] blur-[2px] opacity-0 motion-reduce:opacity-90"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.3)] blur-[2px] opacity-0 motion-reduce:opacity-90"
                     />
                     <div
                         ref={laptopShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.42)] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.42)] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                 </div>
                 {/* Mug, a pixel sprite like Tux's: ink outline, coffee line, hard shadow on the mat */}
