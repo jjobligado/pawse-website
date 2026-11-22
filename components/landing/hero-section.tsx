@@ -665,17 +665,17 @@ export default function HeroSection() {
 
                     </div>
 
-                {/* The sill, where Ginger naps and Tux has his coffee */}
+                {/* The sill, where Ginger naps and Tux has his coffee: ambient cats that move on their own (no hover or click) */}
                 <WindowSill className="z-30">
                     {/* Cats from md, where the sill has room beside the laptop; on phones and small tablets they're left out so the scene doesn't feel cramped */}
                     <div className="hidden md:block absolute bottom-[calc(100%-10px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
                         <SillShadow />
-                        <SpriteCat {...CATS.ginger} className={GINGER_SIZE} />
+                        <SpriteCat {...CATS.ginger} interactive={false} className={GINGER_SIZE} />
                     </div>
                     <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
                     <div className="hidden md:block absolute bottom-[calc(100%-9px)] sm:bottom-[calc(100%-14px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                         <SillShadow />
-                        <SpriteCat {...CATS.tux} className={CAT_SIZE} />
+                        <SpriteCat {...CATS.tux} interactive={false} className={CAT_SIZE} />
                     </div>
                 </WindowSill>
                 {/*
