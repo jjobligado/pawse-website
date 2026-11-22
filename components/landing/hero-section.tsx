@@ -86,14 +86,16 @@ const rect0Width = (el: HTMLElement) => el.offsetWidth;
 const HEADER_HEIGHT = 64;
 
 /**
- * "Done" sits on the sky, not on white, so it takes a deeper blue per time of
- * day to keep large-text contrast (≥3:1) against the gradient behind it.
+ * "Done" and its underline (which takes the text colour) shift with the sky
+ * behind them: a brand blue that deepens toward dusk and night. Each shade is
+ * ≥4.5:1 against the darkest sky pixel behind "Done" (measured at 1440 and 820
+ * wide) and well above that on the white wall where phones show the copy.
  */
 const DONE_COLOR = {
-    morning: "#1A74AE",
-    day: "#1A74AE",
-    dusk: "#17679C",
-    night: "#1C3F8F",
+    morning: "#17679C",
+    day: "#16639A",
+    dusk: "#14578A",
+    night: "#1A3480",
 } as const;
 
 /**
@@ -425,7 +427,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase], "--wall-light": WALL_LIGHT[skyPhase].rgb, "--wall-a": WALL_LIGHT[skyPhase].alpha } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase], "--wall-light": WALL_LIGHT[skyPhase].rgb, "--wall-a": WALL_LIGHT[skyPhase].alpha } as React.CSSProperties} className="@container group/sky [--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -668,7 +670,7 @@ export default function HeroSection() {
                 {/* The sill, where Ginger naps and Tux has his coffee: ambient cats that move on their own (no hover or click) */}
                 <WindowSill className="z-30">
                     {/* Cats from md, where the sill has room beside the laptop; on phones and small tablets they're left out so the scene doesn't feel cramped */}
-                    <div className="hidden md:block absolute bottom-[calc(100%-10px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
+                    <div className="hidden md:block absolute bottom-[calc(100%-10px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] lg:left-[4%] animate-cat-hop [animation-delay:0.95s]">
                         <SillShadow />
                         <SpriteCat {...CATS.ginger} interactive={false} className={GINGER_SIZE} />
                     </div>

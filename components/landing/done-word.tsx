@@ -76,7 +76,7 @@ export default function DoneWord() {
                 Done
                 <span
                     aria-hidden="true"
-                    className="absolute left-[0.06em] right-[0.06em] bottom-[calc(0.06em-5px)] h-[3px] md:h-[5px] bg-accent animate-hero-done-line"
+                    className="absolute left-[0.06em] right-[0.06em] bottom-[calc(0.06em-5px)] h-[3px] md:h-[5px] bg-current animate-hero-done-line"
                 />
             </span>
 
