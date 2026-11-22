@@ -386,9 +386,11 @@ export default function HeroSection() {
               From sm the copy sits inside the glass (both in one grid cell). On phones
               the copy moves out onto the wall above, and the window (panels nearly
               closed) becomes the picture under it, so the text gets full contrast and width.
+              There the copy takes 70% of the screen below the header (its natural
+              height if that is more) and the window fills the rest above the peeking laptop.
             */}
             <div ref={windowRef} className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
-                    <div className="relative w-full grid grid-cols-1 grid-rows-[1fr_clamp(130px,18svh,190px)] min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))] sm:grid-rows-1 sm:min-h-0">
+                    <div className="relative w-full grid grid-cols-1 grid-rows-[minmax(auto,calc((100svh_-_64px)*0.7_-_var(--wt)))_minmax(120px,1fr)] min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))] sm:grid-rows-1 sm:min-h-0">
                         {/*
                           The window: softened corners and layered shadows (a tight contact
                           shadow, a mid one, and a long soft one falling down the wall), so
