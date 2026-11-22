@@ -76,6 +76,8 @@ const SHADOW_THROW = 0.12;
 /** At rest: how far toward the viewer the soft shadow reaches (× the laptop's width), and its blur (px). */
 const SHADOW_REST_THROW = 0.02;
 const SHADOW_REST_BLUR = 8;
+/** How much wider than the laptop's base its shadow reaches (penumbra). */
+const SHADOW_SPREAD = 1.04;
 /** Fallback shortest landing, as a share of the laptop's width; the section sets it per screen size (--land-min, longer on phones). */
 const MIN_LAND_PER_WIDTH = 0.45;
 /** An element's layout width, ignoring transforms. */
@@ -210,6 +212,7 @@ export default function HeroSection() {
             const edge = deskEdgeRef.current;
             // Start from the section's own --land (an earlier pass may have raised it).
             section?.style.removeProperty("--land");
+            section?.style.removeProperty("--shadow-scale");
             const styles = section ? getComputedStyle(section) : null;
             land = styles ? parseFloat(styles.getPropertyValue("--land")) || 0 : 0;
             pitchFrom = styles ? parseFloat(styles.getPropertyValue("--pitch-from")) || DESK_PITCH_FROM : DESK_PITCH_FROM;
@@ -268,6 +271,22 @@ export default function HeroSection() {
                         laptop.style.setProperty("--deck-aspect", `${rect.width.toFixed(1)} / ${clamped.toFixed(1)}`);
                         // The shadows on the mat cover the same footprint.
                         section?.style.setProperty("--deck-depth", `${clamped.toFixed(1)}px`);
+                    }
+
+                    // The deck and the mat use different cameras, so a shadow as wide as
+                    // the laptop on the mat looks narrower than the deck. Widen the shadows
+                    // to the deck's front edge as it appears landed, plus a little penumbra.
+                    const deckEl = laptop.querySelector<HTMLElement>("[data-laptop-deck]");
+                    if (deckEl && footprint.width > 0) {
+                        const prevPitch = laptop.style.getPropertyValue("--deck-pitch");
+                        const prevVp = laptop.style.getPropertyValue("--vp");
+                        laptop.style.setProperty("--deck-pitch", `${pitchTo}deg`);
+                        laptop.style.setProperty("--vp", `${deckOrigin(pitchTo, pitchTo, sc).toFixed(1)}px`);
+                        const deckWidth = deckEl.getBoundingClientRect().width * sc;
+                        laptop.style.setProperty("--deck-pitch", prevPitch);
+                        laptop.style.setProperty("--vp", prevVp);
+                        const scale = (deckWidth * SHADOW_SPREAD) / footprint.width;
+                        if (Number.isFinite(scale) && scale > 0) section?.style.setProperty("--shadow-scale", scale.toFixed(3));
                     }
                 }
 
@@ -727,11 +746,11 @@ export default function HeroSection() {
                     */}
                     <div
                         ref={castShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[radial-gradient(closest-side,rgb(40_20_10/0.34),rgb(40_20_10/0.18)_55%,transparent)] blur-[8px] opacity-0 motion-reduce:opacity-60"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5*var(--shadow-scale,1))] w-[calc(var(--lw)*var(--shadow-scale,1))] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[radial-gradient(closest-side,rgb(40_20_10/0.34),rgb(40_20_10/0.18)_55%,transparent)] blur-[8px] opacity-0 motion-reduce:opacity-60"
                     />
                     <div
                         ref={laptopShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] bg-[linear-gradient(to_top,transparent,rgb(40_20_10/0.3)_9%,rgb(40_20_10/0.3))] [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] blur-[1px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5*var(--shadow-scale,1))] w-[calc(var(--lw)*var(--shadow-scale,1))] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] bg-[linear-gradient(to_top,transparent,rgb(40_20_10/0.3)_9%,rgb(40_20_10/0.3))] [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] blur-[1px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                 </div>
                 </div>
