@@ -124,46 +124,64 @@ export default function HeroSection() {
     const skyNearRef = useRef<HTMLDivElement>(null);
     const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
-    const popoverRef = useRef<HTMLDivElement>(null);
     const platformsTriggerRef = useRef<HTMLButtonElement>(null);
+    const platformsListRef = useRef<HTMLDivElement>(null);
     const {
         platform: detectedPlatform,
         config: platformInfo,
         isMobile,
     } = usePlatform();
 
+    // The Other platforms list is a native popover, so it renders in the browser's
+    // top layer: above the laptop and the window without changing how either of them
+    // stacks. The browser handles click-outside and Escape; this keeps React's state
+    // in sync and pins the list under its trigger while open.
+    useEffect(() => {
+        const list = platformsListRef.current;
+        if (!list) return;
+        const onToggle = (e: Event) => setPlatformsOpen((e as ToggleEvent).newState === "open");
+        // Tabbing past the last platform link closes the list.
+        const onFocusOut = (e: FocusEvent) => {
+            const next = e.relatedTarget as Node | null;
+            if (next && !list.contains(next) && next !== platformsTriggerRef.current) list.hidePopover();
+        };
+        list.addEventListener("toggle", onToggle);
+        list.addEventListener("focusout", onFocusOut);
+        return () => {
+            list.removeEventListener("toggle", onToggle);
+            list.removeEventListener("focusout", onFocusOut);
+        };
+    }, []);
+
     useEffect(() => {
         if (!platformsOpen) return;
-
-        const handleClickOutside = (e: MouseEvent) => {
-            if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-                setPlatformsOpen(false);
+        const list = platformsListRef.current;
+        const trigger = platformsTriggerRef.current;
+        if (!list || !trigger) return;
+        let frame = 0;
+        const place = () => {
+            frame = 0;
+            const r = trigger.getBoundingClientRect();
+            // Once the trigger slides under the sticky header, close rather than float over it.
+            if (r.bottom < HEADER_HEIGHT) {
+                list.hidePopover();
+                return;
             }
+            const half = list.offsetWidth / 2;
+            const center = Math.min(Math.max(r.left + r.width / 2, half + 16), window.innerWidth - half - 16);
+            list.style.top = `${r.bottom + 10}px`;
+            list.style.left = `${center - half}px`;
         };
-
-        // Escape closes the list and returns focus to the trigger so keyboard users stay oriented.
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                setPlatformsOpen(false);
-                platformsTriggerRef.current?.focus();
-            }
+        const schedule = () => {
+            if (!frame) frame = requestAnimationFrame(place);
         };
-
-        // Tabbing past the last platform link closes the list.
-        const container = popoverRef.current;
-        const handleFocusOut = (e: FocusEvent) => {
-            if (container && !container.contains(e.relatedTarget as Node | null)) {
-                setPlatformsOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        document.addEventListener("keydown", handleKeyDown);
-        container?.addEventListener("focusout", handleFocusOut);
+        place();
+        window.addEventListener("scroll", schedule, { passive: true });
+        window.addEventListener("resize", schedule);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.removeEventListener("keydown", handleKeyDown);
-            container?.removeEventListener("focusout", handleFocusOut);
+            cancelAnimationFrame(frame);
+            window.removeEventListener("scroll", schedule);
+            window.removeEventListener("resize", schedule);
         };
     }, [platformsOpen]);
 
@@ -438,7 +456,7 @@ export default function HeroSection() {
               There the copy takes 60% of the screen below the header, 50% on tall
               phones (taller than 2:1), or its natural height if that is more, and the window fills the rest above the peeking laptop.
             */}
-            <div ref={windowRef} className={`relative ${platformsOpen ? "z-[45]" : ""} w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center`}>
+            <div ref={windowRef} className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
                     <div className="relative w-full grid grid-cols-1 grid-rows-[minmax(auto,calc((100svh_-_64px)*0.6_-_var(--wt)))_minmax(120px,1fr)] [@media(max-aspect-ratio:1/2)]:grid-rows-[minmax(auto,calc((100svh_-_64px)*0.5_-_var(--wt)))_minmax(120px,1fr)] min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))] sm:grid-rows-1 sm:min-h-0">
                         {/*
                           The window: softened corners and layered shadows (a tight contact
@@ -451,7 +469,7 @@ export default function HeroSection() {
                         </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-7 sm:gap-6 sm:px-12 md:px-14 pt-12 pb-12 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
+            <div className={`relative z-30 col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-7 sm:gap-6 sm:px-12 md:px-14 pt-12 pb-12 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
                 <div
                     aria-hidden="true"
                     className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
@@ -566,12 +584,12 @@ export default function HeroSection() {
                                     <span aria-hidden="true">·</span>
                                 </>
                             )}
-                            <div ref={popoverRef} className="inline-flex items-center">
+                            <div className="inline-flex items-center">
                                 {/* Other Platforms Popover Trigger */}
                                 <button
                                     ref={platformsTriggerRef}
                                     type="button"
-                                    onClick={() => setPlatformsOpen((prev) => !prev)}
+                                    popoverTarget="other-platforms-list"
                                     aria-expanded={platformsOpen}
                                     aria-controls="other-platforms-list"
                                     className={`inline-flex items-center gap-1 rounded hover:text-black transition-colors duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
@@ -603,14 +621,15 @@ export default function HeroSection() {
                                     </svg>
                                 </button>
 
-                                {/* Floating Other Platforms list (disclosure pattern: plain links, Tab to move) */}
+                                {/*
+                                  Floating Other Platforms list (disclosure pattern: plain links, Tab to move).
+                                  A native popover in the top layer, placed under the trigger by the effect above.
+                                */}
                                 <div
+                                    ref={platformsListRef}
                                     id="other-platforms-list"
-                                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-[min(340px,calc(100vw_-_32px))] rounded-card bg-white border-2 border-stroke p-1.5 shadow-elevated z-50 origin-top transition-all duration-200 ease-out ${
-                                        platformsOpen
-                                            ? "visible opacity-100 translate-y-0 scale-100 pointer-events-auto"
-                                            : "invisible opacity-0 -translate-y-1.5 scale-95 pointer-events-none"
-                                    }`}
+                                    popover="auto"
+                                    className="fixed inset-auto m-0 overflow-visible w-[min(340px,calc(100vw_-_32px))] rounded-card bg-white border-2 border-stroke p-1.5 shadow-elevated text-xs md:text-sm text-muted tracking-[0.02em] origin-top opacity-0 -translate-y-1.5 scale-95 open:opacity-100 open:translate-y-0 open:scale-100 starting:open:opacity-0 starting:open:-translate-y-1.5 starting:open:scale-95 transition-[opacity,translate,scale,display,overlay] transition-discrete duration-200 ease-out motion-reduce:transition-none"
                                 >
                                     <div className="flex flex-col gap-0.5">
                                         {otherDownloads(platformInfo.downloadId ?? "windows").map((item) => (
@@ -618,7 +637,7 @@ export default function HeroSection() {
                                                 key={item.id}
                                                 href={item.href}
                                                 download={item.fileName}
-                                                onClick={() => setPlatformsOpen(false)}
+                                                onClick={() => platformsListRef.current?.hidePopover()}
                                                 className="group/item flex items-center justify-between gap-3 px-3 py-2.5 rounded-control hover:bg-sky-50 active:bg-sky-100 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                             >
                                                 <div className="flex items-center gap-3">
