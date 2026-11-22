@@ -67,8 +67,8 @@ const WINDOW_LAG = 0.3;
 const CAM_PER_WIDTH = 2.4;
 /** Approximate height (px) of the deck's front face, which hangs below its front edge. */
 const DECK_FACE = 8;
-/** How much of the contact shadow (px) shows past the deck's front face, grounding it on the mat. */
-const SHADOW_LIP = 3;
+/** How much of the contact shadow (px) shows past the deck's front face, fading out onto the mat. */
+const SHADOW_LIP = 10;
 /** How far (px) below the first screen the desk starts, so none of it shows before scrolling. */
 const DESK_HIDDEN_MARGIN = 8;
 /** How far toward the viewer (× the laptop's width, on the mat) the shadow falls when the laptop is highest. */
@@ -722,15 +722,16 @@ export default function HeroSection() {
                     {/*
                       Shadows in the laptop's footprint, lying on the mat (so they share its
                       perspective): a soft one that sharpens as the laptop comes down, and a
-                      tight contact shadow revealed as it lands.
+                      soft contact shadow revealed as it lands. Both fade by gradient, not
+                      only blur: on the tilted mat a blur is squashed front-to-back and reads hard.
                     */}
                     <div
                         ref={castShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.3)] blur-[8px] opacity-0 motion-reduce:opacity-60"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[radial-gradient(closest-side,rgb(40_20_10/0.34),rgb(40_20_10/0.18)_55%,transparent)] blur-[8px] opacity-0 motion-reduce:opacity-60"
                     />
                     <div
                         ref={laptopShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] rounded-[4%/7%] bg-[rgb(40_20_10/0.32)] blur-[3px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[var(--deck-depth,calc(var(--lw)*0.6))] bg-[linear-gradient(to_top,transparent,rgb(40_20_10/0.3)_9%,rgb(40_20_10/0.3))] [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] blur-[1px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                 </div>
                 </div>
