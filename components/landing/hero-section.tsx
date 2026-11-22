@@ -228,7 +228,7 @@ export default function HeroSection() {
             const cast = castShadowRef.current;
             if (cast) {
                 cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.35 + 0.55 * eased)).toFixed(3);
-                cast.style.filter = `blur(${(6 + 30 * (1 - eased)).toFixed(1)}px)`;
+                cast.style.filter = `blur(${(10 * (1 - eased)).toFixed(1)}px)`;
                 cast.style.transform = `scale(${(1.12 - eased * 0.12).toFixed(3)})`;
             }
             const contact = laptopShadowRef.current;
@@ -560,11 +560,11 @@ export default function HeroSection() {
             </div>
 
             {/*
-              The desk, in the window's art style: the same wood-h grain and lighting
-              (warm light from the window, the sill's shadow along the back), a front
-              edge with highlight and dark underside like the sill, and an apron with a
-              drawer that fades into the page. Lighter oak than the sill so the two
-              read as different furniture. The felt mat and mug rest on it, placed so
+              The desk, drawn flat so it frames the laptop screen rather than competing
+              with it: one oak tone (no grain, which perspective turns into fine
+              photo-like lines), a front edge with a lit top line and dark underside
+              like the sill, and an apron with a drawer and a hard bottom edge. Lighter
+              oak than the sill so the two read as different furniture. The felt mat and mug rest on it, placed so
               the laptop's base meets the mat once it has been lowered by --land.
               --pitch is the camera angle, driven by the landing.
             */}
@@ -573,16 +573,14 @@ export default function HeroSection() {
                 aria-hidden="true"
                 className="relative z-0 w-[min(calc(var(--ww)*1.1),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_+_var(--lw)*0.02)] mb-[calc(var(--lw)*0.1_+_var(--land))] pointer-events-none select-none [perspective:var(--cam)]"
             >
-                {/* Desk top */}
-                <div className="wood-h [--wood:#BE936B] absolute inset-x-0 bottom-0 h-[calc(var(--lw)*1.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[6px] shadow-[inset_0_2px_0_rgb(255_236_210/0.3)]">
-                    <div className="absolute inset-0 rounded-t-[6px] bg-[linear-gradient(180deg,rgb(40_20_10/0.22)_0%,transparent_12%,rgb(255_236_210/0.2)_42%,transparent_78%,rgb(30_14_4/0.08)_100%)]" />
-                </div>
-                {/* Front edge: highlight on top, dark underside, like the sill */}
-                <div ref={deskEdgeRef} className="wood-h [--wood:#9A6B45] absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[6px] shadow-[inset_0_1px_0_rgb(255_226_196/0.45),inset_0_-1px_0_rgb(30_14_4/0.5),0_2px_3px_rgb(40_20_10/0.25)]" />
-                {/* Apron with a drawer, in the desk top's shadow, fading into the page */}
-                <div className="wood-h [--wood:#7C5434] absolute inset-x-[4%] top-[calc(100%_+_clamp(10px,1.7cqw,24px))] h-[calc(var(--lw)*0.1)] shadow-[inset_0_8px_10px_-6px_rgb(30_14_4/0.55)] [mask-image:linear-gradient(180deg,#000_30%,transparent)]">
-                    <div className="absolute left-1/2 -translate-x-1/2 top-[16%] w-[32%] h-[74%] rounded-[3px] shadow-[inset_0_0_0_1px_rgb(30_14_4/0.4),inset_0_1px_0_rgb(255_226_196/0.14)]">
-                        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] w-[18%] h-[clamp(3px,0.45cqw,6px)] rounded-full bg-[#4E3121] shadow-[0_1px_0_rgb(255_226_196/0.3)]" />
+                {/* Desk top: one flat oak tone, lit a little from the window behind it */}
+                <div className="absolute inset-x-0 bottom-0 h-[calc(var(--lw)*1.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[4px] bg-[linear-gradient(180deg,#A97F58_0%,#C49A71_5%,#CCA47C_45%,#C49A71_100%)]" />
+                {/* Front edge, built like the sill: a lit top line, the edge band, a dark underside */}
+                <div ref={deskEdgeRef} className="absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[3px] bg-[#9A6B45] shadow-[inset_0_2px_0_#D9AE84,inset_0_-2px_0_#6A422C]" />
+                {/* Apron with a drawer, in the desk top's shadow; a hard bottom edge like the window frame */}
+                <div className="absolute inset-x-[4%] top-[calc(100%_+_clamp(10px,1.7cqw,24px))] h-[calc(var(--lw)*0.09)] bg-[#7C5434] shadow-[inset_0_4px_0_#5E3B27,inset_0_-3px_0_#5E3B27]">
+                    <div className="absolute left-1/2 -translate-x-1/2 top-[22%] w-[32%] h-[60%] rounded-[2px] shadow-[inset_0_0_0_2px_#5E3B27]">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[30%] w-[18%] h-[clamp(3px,0.45cqw,6px)] bg-[#4E3121]" />
                     </div>
                 </div>
 
@@ -599,20 +597,20 @@ export default function HeroSection() {
                     */}
                     <div
                         ref={castShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.34)] blur-[6px] opacity-0 motion-reduce:opacity-90"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.5)] w-[var(--lw)] bottom-[var(--foot)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.3)] blur-[2px] opacity-0 motion-reduce:opacity-90"
                     />
                     <div
                         ref={laptopShadowRef}
-                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.4)] blur-[2px] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
+                        className="absolute left-1/2 -ml-[calc(var(--lw)*0.49)] w-[calc(var(--lw)*0.98)] bottom-[calc(var(--foot)_-_var(--lw)*0.03)] h-[calc(var(--lw)*0.6)] rounded-[4%/7%] bg-[rgb(40_20_10/0.42)] opacity-0 max-sm:opacity-100 motion-reduce:opacity-100"
                     />
                 </div>
-                {/* Mug, upright on the mat to the right of the laptop */}
-                <div className="hidden lg:block absolute right-[3%] bottom-[22%] w-[calc(var(--lw)*0.075)] aspect-[0.86]">
-                    <div className="absolute -inset-x-[12%] -bottom-[8%] h-[22%] rounded-[50%] bg-[rgb(40_20_10/0.28)] blur-[5px]" />
-                    <div className="absolute -right-[30%] top-[20%] w-[40%] h-[48%] rounded-r-[40%] border-[clamp(5px,0.55cqw,8px)] border-l-0 border-[#E4E7EB] [filter:drop-shadow(1px_1px_0_rgb(40_20_10/0.12))]" />
-                    <div className="absolute inset-0 rounded-[8%_8%_22%_22%/6%_6%_16%_16%] bg-[linear-gradient(90deg,#DCE0E5_0%,#FFFFFF_28%,#F6F7F9_58%,#C9CFD6_100%)] shadow-[0_0_0_1px_rgb(40_20_10/0.06)]" />
-                    <div className="absolute inset-x-0 top-0 h-[16%] -translate-y-1/2 rounded-[50%] bg-[linear-gradient(90deg,#E9ECEF,#FFFFFF_40%,#E3E6EA)] p-[6%]">
-                        <div className="w-full h-full rounded-[50%] bg-[radial-gradient(ellipse_at_35%_35%,#9A6B4A_0%,#6B4630_45%,#4E3223_100%)]" />
+                {/* Mug, a pixel sprite like Tux's: ink outline, coffee line, hard shadow on the mat */}
+                <div className="hidden lg:block absolute right-[3%] bottom-[22%] w-[calc(var(--lw)*0.06)] aspect-[0.86]">
+                    <div className="absolute left-[6%] -right-[24%] -bottom-[10%] h-[12%] bg-[rgb(40_20_10/0.3)]" />
+                    <div className="absolute -right-[34%] top-[22%] w-[40%] h-[44%] border-[clamp(3px,0.4cqw,5px)] border-l-0 border-ink" />
+                    <div className="absolute inset-0 bg-white border-[clamp(3px,0.4cqw,5px)] border-ink">
+                        <div className="absolute inset-x-0 top-0 h-[16%] bg-[#6B4226]" />
+                        <div className="absolute left-[14%] top-[30%] w-[14%] h-[44%] bg-[#E5EEF5]" />
                     </div>
                 </div>
                 </div>
