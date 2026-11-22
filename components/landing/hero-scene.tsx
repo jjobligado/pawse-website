@@ -9,6 +9,7 @@
  */
 
 import { useSyncExternalStore } from "react";
+import { DEFAULT_SKY_PHASE, SKY_PHASES, THEMES, isSkyPhase, type SkyPhase } from "@/lib/sky-phase";
 
 type Palette = Record<string, string>;
 
@@ -38,7 +39,14 @@ export function PixelArt({
             }
             let run = 1;
             while (x + run < width && row[x + run] === ch) run++;
-            rects.push(<rect key={`${x}-${y}`} x={x} y={y} width={run} height={1} fill={palette[ch]} />);
+            const fill = palette[ch];
+            rects.push(
+                fill.startsWith("var(") ? (
+                    <rect key={`${x}-${y}`} x={x} y={y} width={run} height={1} style={{ fill }} />
+                ) : (
+                    <rect key={`${x}-${y}`} x={x} y={y} width={run} height={1} fill={fill} />
+                ),
+            );
             x += run;
         }
     });
@@ -143,95 +151,43 @@ const LIT_WINDOWS = ROOFS.flatMap((h, x) =>
 /* Time of day                                                         */
 /* ------------------------------------------------------------------ */
 
-export type SkyPhase = "morning" | "day" | "dusk" | "night";
-
-const SKY_PHASES: readonly SkyPhase[] = ["morning", "day", "dusk", "night"];
-
-interface PhaseTheme {
-    /** Sky gradient, top to horizon. The copy sits on its lighter middle. */
-    gradient: string;
-    glow: string;
-    cloud: Palette;
-    hill: string;
-    roof: string;
-    /** Opacity of the lit town windows */
-    lights: number;
-    birds: boolean;
-}
-
 /*
- * Contrast: the headline (ink) stays ≥3:1 on each gradient's top half, and the
- * subtitle switches to a darker ink on dusk and night (see hero-section.tsx),
- * so body copy stays ≥4.5:1 wherever it sits.
+ * The phase lives on <html data-sky> (set before the first paint, see
+ * lib/sky-phase.ts), so everything below switches on it in CSS rather than
+ * on a React value that only knows the real phase after hydration.
  */
-const THEMES: Record<SkyPhase, PhaseTheme> = {
-    morning: {
-        gradient: "linear-gradient(180deg,#B9DDFB 0%,#D6E8FA 40%,#FBE4D4 80%,#FFF2E8 100%)",
-        glow: "radial-gradient(circle,rgb(255 220 180/0.9) 0%,rgb(255 220 180/0.35) 35%,transparent 68%)",
-        cloud: { W: "#FFFFFF", S: "#F6DCCD" },
-        hill: "#D8DEF0",
-        roof: "#C0CAE6",
-        lights: 0,
-        birds: true,
-    },
-    day: {
-        gradient: "linear-gradient(180deg,#9FD6FF 0%,#C6E8FF 42%,#E6F5FF 78%,#F3FAFF 100%)",
-        glow: "radial-gradient(circle,rgb(255 244 204/0.85) 0%,rgb(255 244 204/0.35) 35%,transparent 68%)",
-        cloud: { W: "#FFFFFF", S: "#DDEFFC" },
-        hill: "#C4E4FA",
-        roof: "#A9D6F5",
-        lights: 0,
-        birds: true,
-    },
-    dusk: {
-        gradient: "linear-gradient(180deg,#F0A79C 0%,#F6C2A6 40%,#FCDDC2 75%,#FFEEDF 100%)",
-        glow: "radial-gradient(circle,rgb(255 196 140/0.9) 0%,rgb(255 196 140/0.4) 35%,transparent 68%)",
-        cloud: { W: "#FFF1E7", S: "#EFB8A8" },
-        hill: "#E2B3B0",
-        roof: "#C6939C",
-        lights: 0.75,
-        birds: true,
-    },
-    night: {
-        gradient: "linear-gradient(180deg,#5E73B8 0%,#8597D2 30%,#B9C5EC 55%,#D3DAF3 80%,#E4E8F8 100%)",
-        glow: "radial-gradient(circle,rgb(226 232 255/0.6) 0%,rgb(226 232 255/0.2) 35%,transparent 68%)",
-        cloud: { W: "#DDE3F7", S: "#AEB9E0" },
-        hill: "#8F9ED1",
-        roof: "#6E7EB9",
-        lights: 1,
-        birds: false,
-    },
+
+/** Shows a per-phase layer only in its phase (crossfading when the phase changes). */
+const SHOW_IN: Record<SkyPhase, string> = {
+    morning: "in-data-[sky=morning]:opacity-100",
+    day: "in-data-[sky=day]:opacity-100",
+    dusk: "in-data-[sky=dusk]:opacity-100",
+    night: "in-data-[sky=night]:opacity-100",
 };
 
-function phaseForHour(hour: number): SkyPhase {
-    if (hour >= 5 && hour < 9) return "morning";
-    if (hour >= 9 && hour < 17) return "day";
-    if (hour >= 17 && hour < 20) return "dusk";
-    return "night";
+const CLOUD_PALETTE = { W: "var(--sky-cloud-w)", S: "var(--sky-cloud-s)" } as const;
+
+function subscribePhase(onChange: () => void) {
+    const observer = new MutationObserver(onChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-sky"] });
+    return () => observer.disconnect();
 }
 
 function getClientPhase(): SkyPhase {
-    // QA override in development only: ?sky=morning|day|dusk|night
-    if (process.env.NODE_ENV === "development") {
-        const forced = new URLSearchParams(window.location.search).get("sky");
-        if (forced && (SKY_PHASES as readonly string[]).includes(forced)) return forced as SkyPhase;
-    }
-    return phaseForHour(new Date().getHours());
-}
-
-function subscribePhase(onChange: () => void) {
-    // Re-check once a minute so a long visit crosses into dusk on its own.
-    const id = window.setInterval(onChange, 60_000);
-    return () => window.clearInterval(id);
+    const phase = document.documentElement.dataset.sky;
+    return isSkyPhase(phase) ? phase : DEFAULT_SKY_PHASE;
 }
 
 /**
- * The visitor's local time of day. The page is prerendered as "day"; the real
- * phase takes over right after hydration (while the sky is still settling in).
+ * The phase as a React value, for art drawn in script (the footer's canvases).
+ * It reads <html data-sky>, but is "day" on the server and in the first client
+ * render, so markup should switch on the attribute in CSS instead.
  */
 export function useSkyPhase(): SkyPhase {
-    return useSyncExternalStore(subscribePhase, getClientPhase, () => "day");
+    return useSyncExternalStore(subscribePhase, getClientPhase, () => DEFAULT_SKY_PHASE);
 }
+
+export type { SkyPhase };
 
 /* ------------------------------------------------------------------ */
 /* Celestial bodies                                                    */
@@ -260,8 +216,8 @@ const STARS = [
     { x: 81, y: 24, d: 2.3 }, { x: 88, y: 40, d: 0.3 }, { x: 4, y: 38, d: 1.9 }, { x: 52, y: 32, d: 2.9 },
 ] as const;
 
-function Celestial({ phase }: { phase: SkyPhase }) {
-    const show = (p: SkyPhase) => (phase === p ? "opacity-100" : "opacity-0");
+function Celestial() {
+    const show = (p: SkyPhase) => `opacity-0 ${SHOW_IN[p]}`;
     const fade = "transition-opacity duration-1000 ease-out";
     return (
         <>
@@ -316,8 +272,7 @@ function Celestial({ phase }: { phase: SkyPhase }) {
 }
 
 /** Distant hills and a low town, on the bottom edge of the glass. */
-function Skyline({ phase, className }: { phase: SkyPhase; className?: string }) {
-    const theme = THEMES[phase];
+function Skyline({ className }: { className?: string }) {
     return (
         <svg
             viewBox={`0 0 ${SKY_COLS} ${SKY_ROWS}`}
@@ -327,12 +282,12 @@ function Skyline({ phase, className }: { phase: SkyPhase; className?: string }) 
             aria-hidden="true"
         >
             {HILLS.map((h, x) => (
-                <rect key={`h${x}`} x={x} y={SKY_ROWS - h - 4} width={1.02} height={h + 4} fill={theme.hill} />
+                <rect key={`h${x}`} x={x} y={SKY_ROWS - h - 4} width={1.02} height={h + 4} style={{ fill: "var(--sky-hill)" }} />
             ))}
             {ROOFS.map((h, x) => (
-                <rect key={`r${x}`} x={x} y={SKY_ROWS - h} width={1.02} height={h} fill={theme.roof} />
+                <rect key={`r${x}`} x={x} y={SKY_ROWS - h} width={1.02} height={h} style={{ fill: "var(--sky-roof)" }} />
             ))}
-            <g opacity={theme.lights} className="transition-opacity duration-1000">
+            <g style={{ opacity: "var(--sky-lights)" }} className="transition-opacity duration-1000">
                 {LIT_WINDOWS.map(({ x, y }) => (
                     <rect key={`w${x}`} x={x} y={y} width={1} height={1} fill="#FFE08A" />
                 ))}
@@ -346,60 +301,56 @@ function Skyline({ phase, className }: { phase: SkyPhase; className?: string }) 
  * refs are attached by the hero (far layers move less than near ones).
  */
 export function WindowSky({
-    phase,
     farRef,
     nearRef,
     entrance = true,
 }: {
-    phase: SkyPhase;
     farRef?: React.Ref<HTMLDivElement>;
     nearRef?: React.Ref<HTMLDivElement>;
     /** Play the load-in settle (hero only; scenes further down skip it). */
     entrance?: boolean;
 }) {
-    const theme = THEMES[phase];
     return (
         <div aria-hidden="true" className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}>
             {/* Sky gradients, crossfaded when the phase changes */}
             {SKY_PHASES.map((p) => (
                 <div
                     key={p}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-out ${phase === p ? "opacity-100" : "opacity-0"}`}
+                    className={`absolute inset-0 opacity-0 transition-opacity duration-1000 ease-out ${SHOW_IN[p]}`}
                     style={{ background: THEMES[p].gradient }}
                 />
             ))}
 
-            <Celestial phase={phase} />
+            <Celestial />
 
             {/* Far layer: small clouds + birds, slow */}
             <div ref={farRef} className="absolute inset-0 will-change-transform">
                 <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]">
-                    <PixelArt rows={CLOUD_SMALL} palette={theme.cloud} className="w-[96px] h-auto opacity-90" />
+                    <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
                 </div>
                 <div className="absolute top-[46%] left-[62%] animate-cloud-drift-slow [animation-delay:-150s]">
-                    <PixelArt rows={CLOUD_SMALL} palette={theme.cloud} className="w-[80px] h-auto opacity-80" />
+                    <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[80px] h-auto opacity-80" />
                 </div>
-                {theme.birds && (
-                    <div className="absolute top-[22%] left-[30%] animate-bird-flight">
-                        <div className="flex gap-3 items-start">
-                            <Bird className="w-[15px]" />
-                            <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
-                        </div>
+                {/* Birds: morning to dusk, none at night */}
+                <div className="absolute top-[22%] left-[30%] animate-bird-flight in-data-[sky=night]:hidden">
+                    <div className="flex gap-3 items-start">
+                        <Bird className="w-[15px]" />
+                        <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
                     </div>
-                )}
+                </div>
             </div>
 
             {/* Near layer: big clouds, a little faster */}
             <div ref={nearRef} className="absolute inset-0 will-change-transform">
                 <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]">
-                    <PixelArt rows={CLOUD_LARGE} palette={theme.cloud} className="w-[168px] lg:w-[196px] h-auto" />
+                    <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
                 </div>
                 <div className="absolute top-[58%] left-[74%] animate-cloud-drift [animation-delay:-75s]">
-                    <PixelArt rows={CLOUD_LARGE} palette={theme.cloud} className="w-[140px] lg:w-[168px] h-auto" />
+                    <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[140px] lg:w-[168px] h-auto" />
                 </div>
             </div>
 
-            <Skyline phase={phase} className="absolute inset-x-0 bottom-0 w-full h-[72px] sm:h-[88px] lg:h-[104px]" />
+            <Skyline className="absolute inset-x-0 bottom-0 w-full h-[72px] sm:h-[88px] lg:h-[104px]" />
 
             {/* Soft shade under the head of the frame */}
             <div className="absolute inset-0 shadow-[inset_0_14px_28px_-16px_rgb(16_60_100/0.35)]" />

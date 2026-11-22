@@ -5,6 +5,8 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
 import SmoothScrollProvider from "@/components/smooth-scroll-provider";
+import SkyPhaseSync from "@/components/sky-phase-sync";
+import { DEFAULT_SKY_PHASE, SKY_PHASE_CSS, SKY_PHASE_SCRIPT } from "@/lib/sky-phase";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site-config";
 
 const inter = Inter({
@@ -68,10 +70,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       // Next.js switches smooth scrolling off while changing pages, so a new page doesn't glide from the old position
       data-scroll-behavior="smooth"
+      // The visitor's time of day; the head script below replaces it before the first paint
+      data-sky={DEFAULT_SKY_PHASE}
       suppressHydrationWarning // This is to prevent hydration mismatch errors when using server-side rendering with Next.js
       className={`${inter.variable} ${pixelifySans.variable} ${caveat.variable} h-full antialiased scroll-smooth`}
     >
+      <head>
+        {/* Per-phase sky colours, switched by <html data-sky> */}
+        <style dangerouslySetInnerHTML={{ __html: SKY_PHASE_CSS }} />
+        {/* Sets <html data-sky> from the visitor's clock before anything paints, so the windows never start on the wrong sky */}
+        <script dangerouslySetInnerHTML={{ __html: SKY_PHASE_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
+        <SkyPhaseSync />
         {/* Keyboard users can jump past the header; hidden until focused */}
         <a
           href="#main-content"

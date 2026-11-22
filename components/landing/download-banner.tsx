@@ -8,7 +8,7 @@ import { SectionTitle } from "./section-heading";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
 import { CATS, CAT_SIZE, GINGER_SIZE } from "./cats";
-import { SillPlant, SillShadow, WindowFrame, WindowSill, WindowSky, useSkyPhase } from "./hero-scene";
+import { SillPlant, SillShadow, WindowFrame, WindowSill, WindowSky } from "./hero-scene";
 
 /** Where each cat sits on the sill (from the bottom of the window). */
 const ON_SILL = "absolute bottom-[calc(100%-12px)] sm:bottom-[calc(100%-16px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)]";
@@ -20,7 +20,6 @@ const ON_SILL = "absolute bottom-[calc(100%-12px)] sm:bottom-[calc(100%-16px)] l
  * page can download without going back up.
  */
 export default function DownloadBanner() {
-    const skyPhase = useSkyPhase();
     const { config: platformInfo, isMobile } = usePlatform();
     const { copied, sendToDesktop } = useSendToDesktop();
     // Everything but the button's build, grouped by OS (same OS's other build first).
@@ -48,26 +47,25 @@ export default function DownloadBanner() {
     const hop = (delay: string) => (arrived ? `animate-cat-hop ${delay}` : "opacity-0");
 
     // Meta text sits on the sky: a darker ink than `muted` keeps it readable on every phase.
-    const metaText = "text-[#33404D] transition-colors duration-1000 group-data-[sky=night]/sky:text-ink";
+    const metaText = "text-[#33404D] transition-colors duration-1000 in-data-[sky=night]:text-ink";
 
     return (
         <Section id="download" className="flex flex-col items-stretch">
             <div
                 ref={sceneRef}
-                data-sky={skyPhase}
-                className="@container group/sky relative w-full flex flex-col items-center [--so:clamp(8px,2cqw,32px)]"
+                className="@container relative w-full flex flex-col items-center [--so:clamp(8px,2cqw,32px)]"
             >
                 <div className="relative w-[calc(100%_-_2*var(--so))] flex flex-col items-center">
                 {/* The window, with the copy on its glass */}
                 <div className="relative w-full overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
-                    <WindowSky phase={skyPhase} entrance={false} />
+                    <WindowSky entrance={false} />
                     <WindowFrame alwaysOpen />
 
                     <div className="relative z-10 flex flex-col items-center text-center gap-5 px-8 sm:px-16 pt-14 sm:pt-20 lg:pt-24 pb-28 sm:pb-36 lg:pb-44">
                         {/* Soft light behind the copy, so it reads on every sky */}
                         <div
                             aria-hidden="true"
-                            className="pointer-events-none absolute -z-10 left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-[min(900px,130%)] h-[80%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl opacity-85 transition-opacity duration-1000 group-data-[sky=night]/sky:opacity-100"
+                            className="pointer-events-none absolute -z-10 left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-[min(900px,130%)] h-[80%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl opacity-85 transition-opacity duration-1000 in-data-[sky=night]:opacity-100"
                         />
 
                         <SectionTitle className="text-center text-balance">
@@ -161,16 +159,16 @@ export default function DownloadBanner() {
                 <WindowSill className="z-20">
                     <div className={`${ON_SILL} left-[2%] ${hop("[animation-delay:0.05s]")}`}>
                         <SillShadow />
-                        <SpriteCat {...CATS.ginger} className={GINGER_SIZE} />
+                        <SpriteCat {...CATS.ginger} interactive={false} className={GINGER_SIZE} />
                     </div>
                     <div className={`hidden sm:block ${ON_SILL} left-[17%] lg:left-[15%] ${hop("[animation-delay:0.2s]")}`}>
                         <SillShadow />
-                        <SpriteCat {...CATS.void} className={CAT_SIZE} />
+                        <SpriteCat {...CATS.void} interactive={false} className={CAT_SIZE} />
                     </div>
                     <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
                     <div className={`${ON_SILL} right-[3%] xl:right-[6.5%] ${hop("[animation-delay:0.35s]")}`}>
                         <SillShadow />
-                        <SpriteCat {...CATS.tux} className={CAT_SIZE} />
+                        <SpriteCat {...CATS.tux} interactive={false} className={CAT_SIZE} />
                     </div>
                 </WindowSill>
                 </div>
