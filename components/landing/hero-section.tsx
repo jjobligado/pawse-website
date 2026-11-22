@@ -55,6 +55,11 @@ function smoothRamp(t: number): number {
 }
 const APPROACH_TILT = 4;
 const LAND_SHRINK = 0.04;
+/**
+ * Fallback camera angles (degrees) for the landing; the section sets them per
+ * screen size (--pitch-from / --pitch-to). Smaller screens look down at the desk
+ * less steeply, so the desk and the keyboard still have room to show.
+ */
 const DESK_PITCH_FROM = 76;
 const DESK_PITCH_TO = 68;
 const WINDOW_LAG = 0.3;
@@ -136,7 +141,9 @@ export default function HeroSection() {
     // Parallax writes transforms straight to the DOM via refs, so scrolling never
     // re-renders this component. Updates stop once the hero is scrolled out of range.
     useEffect(() => {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        // With reduced motion nothing moves (--land is 0 and the sky stays put), but the
+        // deck is still fitted to the desk below.
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
             [skyFarRef, PARALLAX_SPEED.skyFar],
@@ -153,6 +160,9 @@ export default function HeroSection() {
         // The desk's vanishing point, measured from the laptop's hinge with the laptop
         // landed; the keyboard deck shares it so both recede toward the same spot.
         let vanish = 0;
+        // The landing camera angles for this screen size (see DESK_PITCH_FROM).
+        let pitchFrom = DESK_PITCH_FROM;
+        let pitchTo = DESK_PITCH_TO;
         // Whether the laptop is resting on the mat (so touch-down plays once per landing).
         let landed: boolean | null = null;
         // The desk's camera distance (--cam, px); the deck's camera sits twice as far back.
@@ -175,6 +185,8 @@ export default function HeroSection() {
             const edge = deskEdgeRef.current;
             const styles = section ? getComputedStyle(section) : null;
             land = styles ? parseFloat(styles.getPropertyValue("--land")) || 0 : 0;
+            pitchFrom = styles ? parseFloat(styles.getPropertyValue("--pitch-from")) || DESK_PITCH_FROM : DESK_PITCH_FROM;
+            pitchTo = styles ? parseFloat(styles.getPropertyValue("--pitch-to")) || DESK_PITCH_TO : DESK_PITCH_TO;
             if (laptop) {
                 // Measure resting places without the scroll transforms on them,
                 // with the desk at its landed camera angle.
@@ -183,7 +195,7 @@ export default function HeroSection() {
                 const sectionPitch = section?.style.getPropertyValue("--pitch") ?? "";
                 laptop.style.transform = "none";
                 if (desk) desk.style.transform = "none";
-                section?.style.setProperty("--pitch", `${DESK_PITCH_TO}deg`);
+                section?.style.setProperty("--pitch", `${pitchTo}deg`);
                 const rect = laptop.getBoundingClientRect();
                 const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
                 const deskRect = desk?.getBoundingClientRect();
@@ -197,10 +209,10 @@ export default function HeroSection() {
                 // angle (in the laptop's own units, which are scaled by LAND_SHRINK).
                 if (footprint && footprint.height > 0) {
                     const sc = 1 - LAND_SHRINK;
-                    const p = (DESK_PITCH_TO * Math.PI) / 180;
+                    const p = (pitchTo * Math.PI) / 180;
                     const far = 2 * cam;
                     const y = (footprint.bottom - DECK_FACE - (rect.bottom + land)) / sc;
-                    const origin = deckOrigin(DESK_PITCH_TO, DESK_PITCH_TO, sc);
+                    const origin = deckOrigin(pitchTo, pitchTo, sc);
                     const depth = (y * far) / (far * Math.cos(p) + (y - origin) * Math.sin(p));
                     const clamped = Math.min(Math.max(depth, rect.width * 0.35), rect.width * 0.75);
                     if (Number.isFinite(clamped)) {
@@ -233,7 +245,7 @@ export default function HeroSection() {
             lastScroll = raw;
             const scroll = Math.min(raw, PARALLAX_MAX_SCROLL);
             for (const [ref, speed] of layers) {
-                if (ref.current) {
+                if (ref.current && !reduceMotion) {
                     ref.current.style.transform = `translate3d(0, ${(scroll * speed).toFixed(2)}px, 0)`;
                 }
             }
@@ -247,7 +259,7 @@ export default function HeroSection() {
             const lowered = land * eased;
             // Held front-up in the air, levelling out as it meets the mat.
             const approach = APPROACH_TILT * (1 - eased);
-            const pitch = DESK_PITCH_FROM - (DESK_PITCH_FROM - DESK_PITCH_TO) * eased;
+            const pitch = pitchFrom - (pitchFrom - pitchTo) * eased;
             // The rest: the desk rises and slows into the standing laptop, then both ease
             // back into the scroll (the space they trail into is reserved under the desk).
             const hold = land > 0 ? land * smoothRamp((raw - start - land) / (2 * land)) : 0;
@@ -335,7 +347,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--cam:calc(var(--lw)*2.4)] [--pitch:68deg]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-10 md:pb-12 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:short:[--ov:0.13] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:clamp(20px,5svh,44px)] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -641,7 +653,7 @@ export default function HeroSection() {
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(var(--lw)*0.025)] w-[min(calc(var(--lw)*1.42),86%)] h-full [perspective:var(--cam)]">
                 {/* Thickness: the mat's front lip, then its warm shadow on the desk */}
                 <div className="absolute inset-x-[0.4%] -bottom-[clamp(3px,0.5cqw,7px)] h-[clamp(8px,1.4cqw,18px)] rounded-b-[clamp(14px,3cqw,32px)] bg-[linear-gradient(180deg,#C6D5E2,#B3C4D3)] shadow-[0_6px_12px_-4px_rgb(40_20_10/0.3)]" />
-                <div className="felt absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.95)] [--foot:calc(var(--lw)*0.2)] origin-bottom [transform:rotateX(var(--pitch))] rounded-[clamp(14px,3cqw,32px)] shadow-[inset_0_3px_0_rgb(255_255_255/0.7),inset_0_-2px_0_rgb(40_60_80/0.08)]">
+                <div className="felt absolute inset-x-0 bottom-0 h-[calc(var(--lw)*0.95)] [--foot:calc(var(--lw)*0.07)] sm:[--foot:calc(var(--lw)*0.12)] lg:[--foot:calc(var(--lw)*0.2)] origin-bottom [transform:rotateX(var(--pitch))] rounded-[clamp(14px,3cqw,32px)] shadow-[inset_0_3px_0_rgb(255_255_255/0.7),inset_0_-2px_0_rgb(40_60_80/0.08)]">
                     <div className="absolute inset-[clamp(6px,1.2cqw,16px)] rounded-[clamp(10px,2.2cqw,22px)] border-2 border-dashed border-[rgb(70_105_140/0.28)]" />
                     {/*
                       Shadows in the laptop's footprint, lying on the mat (so they share its
