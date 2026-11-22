@@ -71,6 +71,8 @@ const DECK_FACE = 8;
 const SHADOW_LIP = 3;
 /** How far (px) below the first screen the desk starts, so none of it shows before scrolling. */
 const DESK_HIDDEN_MARGIN = 8;
+/** How far toward the viewer (× the laptop's width, on the mat) the shadow falls when the laptop is highest. */
+const SHADOW_THROW = 0.12;
 /** Fallback shortest landing, as a share of the laptop's width; the section sets it per screen size (--land-min, longer on phones). */
 const MIN_LAND_PER_WIDTH = 0.45;
 /** An element's layout width, ignoring transforms. */
@@ -333,7 +335,13 @@ export default function HeroSection() {
                 // nears the mat, ending as the tight shadow it rests on.
                 cast.style.opacity = (Math.min(progress / 0.6, 1) * (0.04 + 0.86 * eased ** 3)).toFixed(3);
                 cast.style.filter = `blur(${(2 + 34 * (1 - eased)).toFixed(1)}px)`;
-                cast.style.transform = `scale(${(1.12 - eased * 0.12).toFixed(3)})`;
+                // The window light comes from behind the desk, so the higher the laptop,
+                // the further toward you the shadow falls, the bigger and rounder it
+                // spreads; it slides back under the laptop and squares up as it lands.
+                const lift = 1 - eased;
+                const laptopWidth = cam / CAM_PER_WIDTH;
+                cast.style.transform = `translateY(${(lift * SHADOW_THROW * laptopWidth).toFixed(1)}px) scale(${(1 + 0.22 * lift).toFixed(3)}, ${(1 + 0.4 * lift).toFixed(3)})`;
+                cast.style.borderRadius = `${(4 + 30 * lift).toFixed(1)}% / ${(7 + 38 * lift).toFixed(1)}%`;
             }
             const contact = laptopShadowRef.current;
             if (contact) {
