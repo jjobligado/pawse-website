@@ -89,6 +89,18 @@ const DONE_COLOR = {
     night: "#1C3F8F",
 } as const;
 
+/**
+ * The light the window throws down the wall to the desk, per time of day (RGB
+ * and strength): soft peach in the morning, pale sunlight by day, warm
+ * amber-rose at dusk, faint cool moonlight at night.
+ */
+const WALL_LIGHT = {
+    morning: { rgb: "255 214 178", alpha: 0.34 },
+    day: { rgb: "255 232 178", alpha: 0.32 },
+    dusk: { rgb: "255 178 140", alpha: 0.3 },
+    night: { rgb: "168 184 236", alpha: 0.22 },
+} as const;
+
 export default function HeroSection() {
     const skyPhase = useSkyPhase();
     const sectionRef = useRef<HTMLElement>(null);
@@ -379,7 +391,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase] } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
+        <section ref={sectionRef} id="hero" data-sky={skyPhase} style={{ "--hero-done-sky": DONE_COLOR[skyPhase], "--wall-light": WALL_LIGHT[skyPhase].rgb, "--wall-a": WALL_LIGHT[skyPhase].alpha } as React.CSSProperties} className="@container group/sky [--hero-done:var(--color-accent-strong)] sm:[--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -633,10 +645,11 @@ export default function HeroSection() {
                     </div>
                 </WindowSill>
                 {/*
-                  Daylight from the window falling down the wall to the desk, so the window
-                  and the desk read as one room rather than two scenes with white between.
+                  Light from the window falling down the wall to the desk, tinted by the
+                  time of day (WALL_LIGHT), so the window and the desk read as one room
+                  rather than two scenes with white between.
                 */}
-                <div aria-hidden="true" className="absolute inset-x-[4%] top-full h-[calc(var(--land)_+_var(--lw)*0.5)] -z-10 pointer-events-none bg-[linear-gradient(180deg,rgb(168_220_255/0.32),rgb(168_220_255/0.12)_55%,transparent)] [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" />
+                <div aria-hidden="true" className="absolute inset-x-[4%] top-full h-[calc(var(--land)_+_var(--lw)*0.5)] -z-10 pointer-events-none bg-[linear-gradient(180deg,rgb(var(--wall-light)/var(--wall-a)),rgb(var(--wall-light)/calc(var(--wall-a)*0.4))_55%,transparent)] [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" />
             </div>
 
             {/*
