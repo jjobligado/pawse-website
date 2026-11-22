@@ -359,7 +359,7 @@ export default function HeroSection() {
               closed) becomes the picture under it, so the text gets full contrast and width.
             */}
             <div ref={windowRef} className="relative w-[var(--ww)] mt-[var(--wt)] flex flex-col items-center">
-                    <div className="relative w-full grid grid-cols-1 grid-rows-[auto_clamp(180px,28svh,260px)] sm:grid-rows-1">
+                    <div className="relative w-full grid grid-cols-1 grid-rows-[auto_clamp(130px,18svh,190px)] sm:grid-rows-1">
                         {/*
                           The window: softened corners and layered shadows (a tight contact
                           shadow, a mid one, and a long soft one falling down the wall), so
@@ -371,7 +371,7 @@ export default function HeroSection() {
                         </div>
 
             {/* Centered Hero Copy & Actions */}
-            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-6 sm:px-12 md:px-14 pt-6 pb-8 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[min(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb),var(--ww)*0.85)]`}>
+            <div className={`relative ${platformsOpen ? "z-[45]" : "z-30"} col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-7 sm:gap-6 sm:px-12 md:px-14 pt-12 pb-12 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[min(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb),var(--ww)*0.85)]`}>
                 <div
                     aria-hidden="true"
                     className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 group-data-[sky=night]/sky:opacity-100"
@@ -589,13 +589,13 @@ export default function HeroSection() {
 
                 {/* The sill, where Ginger naps and Tux has his coffee */}
                 <WindowSill className="z-30">
-                    {/* Cats at every size, on the sill beside the laptop; on smaller screens they tuck in behind its corners */}
-                    <div className="absolute bottom-[calc(100%-10px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
+                    {/* Cats from md, where the sill has room beside the laptop; on phones and small tablets they're left out so the scene doesn't feel cramped */}
+                    <div className="hidden md:block absolute bottom-[calc(100%-10px)] sm:bottom-[calc(100%-15px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] left-[1.5%] animate-cat-hop [animation-delay:0.95s]">
                         <SillShadow />
                         <SpriteCat {...CATS.ginger} className={GINGER_SIZE} />
                     </div>
                     <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
-                    <div className="absolute bottom-[calc(100%-9px)] sm:bottom-[calc(100%-14px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
+                    <div className="hidden md:block absolute bottom-[calc(100%-9px)] sm:bottom-[calc(100%-14px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)] right-[1.5%] xl:right-[6.5%] animate-cat-hop [animation-delay:1.12s]">
                         <SillShadow />
                         <SpriteCat {...CATS.tux} className={CAT_SIZE} />
                     </div>
