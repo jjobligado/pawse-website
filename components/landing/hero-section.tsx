@@ -565,11 +565,11 @@ export default function HeroSection() {
             </div>
 
             {/*
-              The desk, drawn flat so it frames the laptop screen rather than competing
-              with it: one oak tone (no grain, which perspective turns into fine
-              photo-like lines), a front edge with a lit top line and dark underside
-              like the sill, and an apron with a drawer and a hard bottom edge. Lighter
-              oak than the sill so the two read as different furniture. The felt mat and mug rest on it, placed so
+              The desk, in the window's art style: the same wood-h grain and lighting
+              (warm light from the window, the sill's shadow along the back), a front
+              edge with highlight and dark underside like the sill, and an apron with a
+              drawer that fades into the page. Lighter oak than the sill so the two
+              read as different furniture. The felt mat and mug rest on it, placed so
               the laptop's base meets the mat once it has been lowered by --land.
               --pitch is the camera angle, driven by the landing.
             */}
@@ -578,14 +578,16 @@ export default function HeroSection() {
                 aria-hidden="true"
                 className="relative z-0 w-[min(calc(var(--ww)*1.1),calc(100%_-_8px))] h-[calc(var(--lw)*0.2)] mt-[calc(var(--land)_+_var(--lw)*0.02)] mb-[calc(var(--lw)*0.1_+_var(--land))] pointer-events-none select-none [perspective:var(--cam)]"
             >
-                {/* Desk top: one flat oak tone, lit a little from the window behind it */}
-                <div className="absolute inset-x-0 bottom-0 h-[calc(var(--lw)*1.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[4px] bg-[linear-gradient(180deg,#A97F58_0%,#C49A71_5%,#CCA47C_45%,#C49A71_100%)]" />
-                {/* Front edge, built like the sill: a lit top line, the edge band, a dark underside */}
-                <div ref={deskEdgeRef} className="absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[3px] bg-[#9A6B45] shadow-[inset_0_2px_0_#D9AE84,inset_0_-2px_0_#6A422C]" />
-                {/* Apron with a drawer, in the desk top's shadow; a hard bottom edge like the window frame */}
-                <div className="absolute inset-x-[4%] top-[calc(100%_+_clamp(10px,1.7cqw,24px))] h-[calc(var(--lw)*0.09)] bg-[#7C5434] shadow-[inset_0_4px_0_#5E3B27,inset_0_-3px_0_#5E3B27]">
-                    <div className="absolute left-1/2 -translate-x-1/2 top-[22%] w-[32%] h-[60%] rounded-[2px] shadow-[inset_0_0_0_2px_#5E3B27]">
-                        <div className="absolute left-1/2 -translate-x-1/2 top-[30%] w-[18%] h-[clamp(3px,0.45cqw,6px)] bg-[#4E3121]" />
+                {/* Desk top */}
+                <div className="wood-h [--wood:#BE936B] absolute inset-x-0 bottom-0 h-[calc(var(--lw)*1.5)] origin-bottom [transform:rotateX(var(--pitch))] rounded-t-[6px] shadow-[inset_0_2px_0_rgb(255_236_210/0.3)]">
+                    <div className="absolute inset-0 rounded-t-[6px] bg-[linear-gradient(180deg,rgb(40_20_10/0.22)_0%,transparent_12%,rgb(255_236_210/0.2)_42%,transparent_78%,rgb(30_14_4/0.08)_100%)]" />
+                </div>
+                {/* Front edge: highlight on top, dark underside, like the sill */}
+                <div ref={deskEdgeRef} className="wood-h [--wood:#9A6B45] absolute inset-x-0 top-full h-[clamp(10px,1.7cqw,24px)] rounded-b-[6px] shadow-[inset_0_1px_0_rgb(255_226_196/0.45),inset_0_-1px_0_rgb(30_14_4/0.5),0_2px_3px_rgb(40_20_10/0.25)]" />
+                {/* Apron with a drawer, in the desk top's shadow, fading into the page */}
+                <div className="wood-h [--wood:#7C5434] absolute inset-x-[4%] top-[calc(100%_+_clamp(10px,1.7cqw,24px))] h-[calc(var(--lw)*0.1)] shadow-[inset_0_8px_10px_-6px_rgb(30_14_4/0.55)] [mask-image:linear-gradient(180deg,#000_30%,transparent)]">
+                    <div className="absolute left-1/2 -translate-x-1/2 top-[16%] w-[32%] h-[74%] rounded-[3px] shadow-[inset_0_0_0_1px_rgb(30_14_4/0.4),inset_0_1px_0_rgb(255_226_196/0.14)]">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] w-[18%] h-[clamp(3px,0.45cqw,6px)] rounded-full bg-[#4E3121] shadow-[0_1px_0_rgb(255_226_196/0.3)]" />
                     </div>
                 </div>
 
