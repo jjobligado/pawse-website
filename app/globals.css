@@ -1147,7 +1147,8 @@ body {
   width: 294px;
   height: 422px;
   background: var(--at-bg);
-  border: 1px solid var(--at-stroke);
+  /* No border: the hover and Select Mode overlays only cover the padding box,
+     so a border would show as a pale ring around them; the shadow gives the edge. */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08), 0 24px 48px -24px rgb(20 40 70 / 0.35);
