@@ -249,18 +249,25 @@ export default function FocusDemo() {
                         {[...CATS, CATS[0]].map((cat, i) => {
                             const isVoid = cat.id === "void";
                             return (
-                                <div key={i} data-cat={i < CATS.length ? cat.id : undefined} className="fd-slot" style={{ transform: `rotate(${i * SPOKE}deg)` }}>
-                                    <TimerWindow
-                                        cat={cat.id}
-                                        seconds={cat.start - s.sec}
-                                        fish={cat.fish}
-                                        animate={!reduced}
-                                        mode={isVoid ? s.mode : "default"}
-                                        hover={isVoid && s.hover}
-                                        modalOpen={isVoid && s.modal}
-                                        hot={isVoid ? s.hot : null}
-                                        down={isVoid ? s.down : null}
-                                    />
+                                <div
+                                    key={i}
+                                    data-cat={i < CATS.length ? cat.id : undefined}
+                                    className={`fd-slot ${i === s.index ? "is-active" : i < s.index ? "is-prev" : "is-next"}`}
+                                    style={{ transform: `rotate(${i * SPOKE}deg)` }}
+                                >
+                                    <div className="fd-card">
+                                        <TimerWindow
+                                            cat={cat.id}
+                                            seconds={cat.start - s.sec}
+                                            fish={cat.fish}
+                                            animate={!reduced}
+                                            mode={isVoid ? s.mode : "default"}
+                                            hover={isVoid && s.hover}
+                                            modalOpen={isVoid && s.modal}
+                                            hot={isVoid ? s.hot : null}
+                                            down={isVoid ? s.down : null}
+                                        />
+                                    </div>
                                 </div>
                             );
                         })}

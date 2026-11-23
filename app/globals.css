@@ -1053,10 +1053,12 @@ body {
    it swings in briskly, then glides a long way into a soft stop. */
 .fd-track {
   --fd-pivot: 50% calc(50% + 1600px);
+  /* Fast, then a long soft stop that runs ~0.75deg past and settles back */
+  --fd-swing: cubic-bezier(0.25, 1.3, 0.5, 1);
   position: absolute;
   inset: 0;
   transform-origin: var(--fd-pivot);
-  transition: transform var(--fd-glide, 1000ms) var(--ease-emphasized);
+  transition: transform var(--fd-glide, 1000ms) var(--fd-swing);
 }
 .fd-slot {
   position: absolute;
@@ -1065,6 +1067,28 @@ body {
   align-items: center;
   justify-content: center;
   transform-origin: var(--fd-pivot);
+  perspective: 1100px;
+}
+/* Depth during the swing: off-centre windows are turned away (the leading
+   edge further back, like a card on a carousel), a little smaller, dimmer
+   and lower-shadowed; the arriving one turns to face you, grows and its
+   shadow deepens as it lands. At rest the active card has no transform, so
+   the pixel art stays crisp and the cursor targets are unchanged. */
+.fd-card {
+  transition:
+    transform var(--fd-glide, 1000ms) var(--ease-emphasized),
+    filter var(--fd-glide, 1000ms) var(--ease-emphasized);
+}
+.fd-slot.is-next .fd-card { transform: rotateY(20deg) scale(0.9); filter: brightness(0.95); }
+.fd-slot.is-prev .fd-card { transform: rotateY(-20deg) scale(0.9); filter: brightness(0.95); }
+.fd-slot .at-win {
+  transition:
+    width 380ms var(--ease-emphasized),
+    height 380ms var(--ease-emphasized),
+    box-shadow var(--fd-glide, 1000ms) var(--ease-emphasized);
+}
+.fd-slot:not(.is-active) .at-win {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 1px rgb(0 0 0 / 0.05), 0 10px 20px -14px rgb(20 40 70 / 0.25);
 }
 
 /* The cursor, and a ring where it clicks. X and Y move on separate layers with
