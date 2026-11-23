@@ -12,9 +12,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
  * line above ("y" in "Way") reaches down. Sized in em (with a 12px floor), so
  * they scale with the headline at every screen width.
  *
- * Colour: the app's own fish colours (cream, lime, lilac), shaded per time of
- * day like "Done" is (--fish-1/2/3, --fish-eye from lib/sky-phase.ts), so each
- * stays at least 3:1 against the sky behind it.
+ * Colour: the app's own pastel fish (cream, lime, lilac), nudged per time of
+ * day like "Done" is (--fish-1/2/3, --fish-eye from lib/sky-phase.ts) so they
+ * stay light without melting into the sky behind them.
  *
  * - Mouse: hover shows them (gated to `(hover: hover) and (pointer: fine)` so a
  *   tap never leaves a stuck hover). Moving away sinks them back, faster than

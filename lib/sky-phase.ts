@@ -125,24 +125,25 @@ const DONE_COLOR: Record<SkyPhase, string> = {
 };
 
 /**
- * The "Done" fish (ginger, tuxedo, void): the app's own fish colours (cream
- * #FEE1A9, lime #CFE58A, lilac #E0A9FE), kept in hue but shaded down per phase
- * until each is ≥3:1 (graphics contrast) against the sky right behind the fish
- * (morning #D3E8FC, day #CCE7F5, dusk #F6C4AE, night #9AA9D9), and so well
- * above that on the white wall phones show. The eye stays the app's dark pixel,
- * except at night, where the bodies are too dark for it and it turns cream.
+ * The "Done" fish (ginger, tuxedo, void): the app's own pastels (cream #FEE1A9,
+ * lime #CFE58A, lilac #E0A9FE), nudged per phase so they stay light but don't
+ * melt into the sky: a touch deeper on the pale morning and day skies, lighter
+ * where a colour sits too close to the dusk peach, and lighter still against
+ * the darker night sky. They're decorative (aria-hidden), so they stay pastel
+ * rather than meeting the 3:1 graphics ratio; the dark eye and the soft drop
+ * shadow keep them readable.
  */
 const FISH_COLORS: Record<SkyPhase, [string, string, string]> = {
-    morning: ["#A97818", "#708A1F", "#B355E7"],
-    day: ["#A77618", "#6E871E", "#B151E6"],
-    dusk: ["#936815", "#62791B", "#A638E3"],
-    night: ["#725010", "#4C5E15", "#841BBD"],
+    morning: ["#F7C77C", "#B3D266", "#D39AF4"],
+    day: ["#F5C377", "#AFCF60", "#D095F2"],
+    dusk: ["#FFEDC6", "#E3F2AE", "#C98AF0"],
+    night: ["#FFE9BC", "#DDF0A4", "#ECC8FF"],
 };
 const FISH_EYE: Record<SkyPhase, string> = {
     morning: "#232421",
     day: "#232421",
     dusk: "#232421",
-    night: "#FFF6E8",
+    night: "#232421",
 };
 
 /**
