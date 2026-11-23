@@ -4,20 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import TimerWindow, { breakMs, type TimerCat } from "@/components/app-ui/timer-window";
 
 /**
- * Break section media: the same timer window, stage, cursor and pacing as
- * FocusDemo (0.6s slides, ~1s holds), looping (~11.2s). Each cat is clicked
- * once and plays its break animation (Tux grooms, Ginger does zoomies, Void
- * does a shadow poof), then the window slides on, right to left.
+ * Break section media: the same timer window, wheel, cursor and pacing as
+ * FocusDemo (1.1s fast-to-slow swings with depth and a settle, ~1s holds),
+ * looping (~12.7s). Each cat is clicked once and plays its break animation
+ * (Tux grooms, Ginger does zoomies, Void does a shadow poof), then the next
+ * window swings in.
  *
  *    0.0  Tux; the cursor comes in from the right and clicks the cat
  *    3.6  → Ginger; the cursor comes back in and clicks
- *    7.1  → Void; clicks
- *   10.0  the cursor leaves to the right
- *   10.5  Void slides on to a second Tux at the end of the track; the loop
+ *    7.6  → Void; clicks
+ *   11.0  the cursor leaves to the right
+ *   11.5  Void swings on to a second Tux at the end of the wheel; the loop
  *         restarts on the first Tux unseen (they look identical)
  *
- * The cursor aims at the sprite, measured once the window has settled (it
- * never moves while the cursor travels). Clocks tick for real across loops.
+ * The cursor aims at the sprite's place in the window's resting layout
+ * (offsets, which transforms don't affect), so it lands even if the wheel is
+ * still settling. Clocks tick for real across loops.
  * Starts at half in view, resets after fully off screen, stops in a hidden
  * tab; with reduced motion it shows Tux, still. Styles: .fd-* and .at-*.
  */
@@ -28,8 +30,9 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
     { id: "void", start: 14 * 60 + 5, fish: 4 },
 ];
 
-const LOOP_MS = 11_150;
-const SLIDE_MS = 600;
+const LOOP_MS = 12_700;
+const SLIDE_MS = 1100;
+const STAGE_H = 480;
 
 type Cursor = { x: number; y: number; on: boolean; down: boolean; ms: number };
 
@@ -65,14 +68,20 @@ export default function BreakDemo() {
         const set = (patch: Partial<DemoState> | ((p: DemoState) => Partial<DemoState>)) =>
             setS((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) }));
 
-        // The cat's middle, measured within its own slot (a slot fills the stage once it
-        // has slid in, so this holds even mid-slide); unscaled by the stage's scale
+        // The cat's middle in stage pixels, from layout offsets: the window rests
+        // centred on the stage, and offsets ignore the wheel's rotation, the
+        // card's 3D turn and the stage's scale
         const onCat = (i: number) => {
             const slot = stage.querySelectorAll<HTMLElement>(".fd-slot")[i];
-            const sl = slot.getBoundingClientRect();
-            const r = slot.querySelector<HTMLElement>(".at-sprite")!.getBoundingClientRect();
-            const k = sl.width / stage.offsetWidth || 1;
-            return { x: (r.left + r.width / 2 - sl.left) / k, y: (r.top + r.height / 2 - sl.top) / k };
+            const win = slot.querySelector<HTMLElement>(".at-win")!;
+            const sprite = slot.querySelector<HTMLElement>(".at-sprite")!;
+            let x = sprite.offsetWidth / 2;
+            let y = sprite.offsetHeight / 2;
+            for (let el: HTMLElement | null = sprite; el && el !== win; el = el.offsetParent as HTMLElement | null) {
+                x += el.offsetLeft;
+                y += el.offsetTop;
+            }
+            return { x: (stage.offsetWidth - win.offsetWidth) / 2 + x, y: (STAGE_H - win.offsetHeight) / 2 + y };
         };
         const offStage = (y: number) => ({ x: stage.offsetWidth + 24, y });
         // Right of the window, clear of it
@@ -104,16 +113,16 @@ export default function BreakDemo() {
             [3600, () => set({ index: 1, glide: SLIDE_MS })],
 
             // Ginger (break 1.17s)
-            ...visit(1, 4500, 500),
-            [6450, () => move(beside(), 500)],
-            [7100, () => set({ index: 2 })],
+            ...visit(1, 5000, 500),
+            [6950, () => move(beside(), 500)],
+            [7600, () => set({ index: 2 })],
 
             // Void (break 0.91s)
-            ...visit(2, 8000, 500),
+            ...visit(2, 9000, 500),
 
             // Away, and on to Tux
-            [10000, () => move(offStage(380), 700, false)],
-            [10500, () => set({ index: 3, glide: SLIDE_MS })],
+            [11000, () => move(offStage(380), 700, false)],
+            [11500, () => set({ index: 3, glide: SLIDE_MS })],
         ];
 
         const stop = () => {
@@ -186,17 +195,24 @@ export default function BreakDemo() {
                 <div ref={stageRef} className="fd-stage">
                     <div
                         className="fd-track"
-                        style={{ transform: `translateX(-${s.index * 100}%)`, ["--fd-glide" as string]: `${s.glide}ms` }}
+                        style={{ ["--fd-index" as string]: s.index, ["--fd-glide" as string]: `${s.glide}ms` }}
                     >
+                        {/* The three cats, then Tux again so the swing from Void keeps going the same way */}
                         {[...CATS, CATS[0]].map((cat, i) => (
-                            <div key={i} className="fd-slot">
-                                <TimerWindow
-                                    cat={cat.id}
-                                    seconds={cat.start - s.sec}
-                                    fish={cat.fish}
-                                    animate={!reduced}
-                                    playing={s.playing === i}
-                                />
+                            <div
+                                key={i}
+                                className={`fd-slot ${i === s.index ? "is-active" : i < s.index ? "is-prev" : "is-next"}`}
+                                style={{ ["--fd-i" as string]: i }}
+                            >
+                                <div className="fd-card">
+                                    <TimerWindow
+                                        cat={cat.id}
+                                        seconds={cat.start - s.sec}
+                                        fish={cat.fish}
+                                        animate={!reduced}
+                                        playing={s.playing === i}
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>
