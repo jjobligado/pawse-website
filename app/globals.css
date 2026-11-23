@@ -284,26 +284,6 @@ body {
   animation: hero-laptop-rise 0.9s var(--ease-emphasized) 0.3s both;
 }
 
-/* Touch-down on the desk: a short give, a tiny rebound, then rest. */
-@keyframes laptop-settle {
-  0% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(4px);
-  }
-  62% {
-    transform: translateY(-1.5px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-.animate-laptop-settle {
-  animation: laptop-settle 0.55s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
 /* Looping sprite strip (laptop screen): the strip slides one frame per step. */
 @keyframes sprite-loop {
   to {
