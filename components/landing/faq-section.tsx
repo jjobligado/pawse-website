@@ -20,15 +20,15 @@ function ContactNote({ className = "" }: { className?: string }) {
 }
 
 /**
- * Sticky split FAQ: all questions appear immediately in three labeled groups
+ * Split FAQ: all questions appear immediately in three labeled groups
  * so visitors can scan and expand any answer without extra filter clicks.
  */
 export default function FaqSection() {
     return (
         <Section id="faq" className="flex flex-col items-stretch">
             <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 lg:gap-14">
-                {/* Left column: sticky heading, subtitle, and understated contact link */}
-                <div className="w-full lg:w-[36%] lg:sticky lg:top-24 flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
+                {/* Left column (static, scrolls with the page): heading, subtitle, and understated contact link */}
+                <div className="w-full lg:w-[36%] flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
                     <SectionTitle className="text-center lg:text-left text-balance">
                         Frequently Asked Questions
                     </SectionTitle>
