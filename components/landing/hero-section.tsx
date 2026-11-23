@@ -10,6 +10,7 @@ import { CATS, CAT_SIZE, GINGER_SIZE } from "./cats";
 import LaptopDesktop from "./laptop-desktop";
 import DoneWord from "./done-word";
 import { OsIcon } from "./download-options";
+import { onSmoothScroll } from "@/lib/smooth-scroll";
 
 // Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
 const PARALLAX_MAX_SCROLL = 700;
@@ -39,9 +40,9 @@ const PARALLAX_SPEED = {
  * degrees: the deck tips away and the lid leans back), levelling out exactly at
  * contact; it also shrinks a touch as it moves away from you (LAND_SHRINK). Its
  * shadow lies on the mat and sharpens as it comes down. The window, being farther
- * away, trails behind (WINDOW_LAG of the lowering). Touch-down plays a short,
- * time-based settle so it still feels physical when the visitor stops scrolling
- * right at the contact point.
+ * away, trails behind (WINDOW_LAG of the lowering). Everything follows the
+ * scroll position alone (no timed bounce at touch-down), so scrolling stays smooth
+ * through the contact point at any speed.
  */
 /**
  * Share (0–1) of an offset applied at progress t (0–1). Its rate follows sin²: it
@@ -92,7 +93,6 @@ export default function HeroSection() {
     const sectionRef = useRef<HTMLElement>(null);
     const laptopParallaxRef = useRef<HTMLDivElement>(null);
     const laptopShadowRef = useRef<HTMLDivElement>(null);
-    const laptopBodyRef = useRef<HTMLDivElement>(null);
     const castShadowRef = useRef<HTMLDivElement>(null);
     const deskRef = useRef<HTMLDivElement>(null);
     const deskEdgeRef = useRef<HTMLDivElement>(null);
@@ -187,8 +187,6 @@ export default function HeroSection() {
         // The landing camera angles for this screen size (see DESK_PITCH_FROM).
         let pitchFrom = DESK_PITCH_FROM;
         let pitchTo = DESK_PITCH_TO;
-        // Whether the laptop is resting on the mat (so touch-down plays once per landing).
-        let landed: boolean | null = null;
         // The desk's camera distance (--cam, px); the deck's camera sits twice as far back.
         let cam = 0;
         /**
@@ -366,26 +364,9 @@ export default function HeroSection() {
             }
             const contact = laptopShadowRef.current;
             if (contact) {
-                const near = Math.max((progress - 0.7) / 0.3, 0);
-                contact.style.opacity = near.toFixed(3);
-            }
-
-            // Touch-down: a short settle the first time it reaches the mat; lifting it
-            // back off (scrolling up) re-arms it.
-            const body = laptopBodyRef.current;
-            const isDown = progress >= 1;
-            if (landed === null) {
-                landed = isDown; // No settle for where the page happens to load.
-            } else if (isDown && !landed) {
-                landed = true;
-                if (body) {
-                    body.classList.remove("animate-laptop-settle");
-                    void body.offsetWidth;
-                    body.classList.add("animate-laptop-settle");
-                }
-            } else if (progress < 0.97 && landed) {
-                landed = false;
-                body?.classList.remove("animate-laptop-settle");
+                // Smoothstep over the last 30%, so it fades in without a visible kick.
+                const near = Math.min(Math.max((progress - 0.7) / 0.3, 0), 1);
+                contact.style.opacity = (near * near * (3 - 2 * near)).toFixed(3);
             }
         };
 
@@ -403,9 +384,14 @@ export default function HeroSection() {
 
         readLand();
         apply();
+        // Lenis moves the page inside its own animation frame: update in that same
+        // frame so the laptop, desk and window never trail the page by a frame.
+        // (apply skips repeat positions, so the native listener below is a no-op then.)
+        const unsubscribe = onSmoothScroll(apply);
         window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("resize", handleResize);
         return () => {
+            unsubscribe();
             observer.disconnect();
             window.removeEventListener("scroll", handleScroll);
             window.removeEventListener("resize", handleResize);
@@ -693,7 +679,7 @@ export default function HeroSection() {
                 className="relative z-40 w-[var(--lw)] mt-[calc(var(--lw)*var(--ov)*-1)] origin-bottom will-change-transform"
             >
                 <div className="relative animate-hero-laptop">
-                    <div ref={laptopBodyRef} className="relative z-10">
+                    <div className="relative z-10">
                         <Laptop>
                             <LaptopDesktop />
                         </Laptop>

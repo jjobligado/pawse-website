@@ -125,6 +125,28 @@ const DONE_COLOR: Record<SkyPhase, string> = {
 };
 
 /**
+ * The "Done" fish (ginger, tuxedo, void): the app's own pastels (cream #FEE1A9,
+ * lime #CFE58A, lilac #E0A9FE), nudged per phase so they stay light but don't
+ * melt into the sky: a touch deeper on the pale morning and day skies, lighter
+ * where a colour sits too close to the dusk peach, and lighter still against
+ * the darker night sky. They're decorative (aria-hidden), so they stay pastel
+ * rather than meeting the 3:1 graphics ratio; the dark eye and the soft drop
+ * shadow keep them readable.
+ */
+const FISH_COLORS: Record<SkyPhase, [string, string, string]> = {
+    morning: ["#F7C77C", "#B3D266", "#D39AF4"],
+    day: ["#F5C377", "#AFCF60", "#D095F2"],
+    dusk: ["#FFEDC6", "#E3F2AE", "#C98AF0"],
+    night: ["#FFE9BC", "#DDF0A4", "#ECC8FF"],
+};
+const FISH_EYE: Record<SkyPhase, string> = {
+    morning: "#232421",
+    day: "#232421",
+    dusk: "#232421",
+    night: "#232421",
+};
+
+/**
  * The light the window throws down the wall to the desk, per time of day (RGB
  * and strength): soft peach in the morning, pale sunlight by day, warm
  * amber-rose at dusk, faint cool moonlight at night.
@@ -139,7 +161,7 @@ const WALL_LIGHT: Record<SkyPhase, { rgb: string; alpha: number }> = {
 /** Per-phase CSS variables on <html>, rendered into <head> by the root layout. */
 export const SKY_PHASE_CSS = SKY_PHASES.map((p) => {
     const t = THEMES[p];
-    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
+    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--fish-eye:${FISH_EYE[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
 }).join("");
 
 /**

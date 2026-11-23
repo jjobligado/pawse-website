@@ -284,26 +284,6 @@ body {
   animation: hero-laptop-rise 0.9s var(--ease-emphasized) 0.3s both;
 }
 
-/* Touch-down on the desk: a short give, a tiny rebound, then rest. */
-@keyframes laptop-settle {
-  0% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(4px);
-  }
-  62% {
-    transform: translateY(-1.5px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-.animate-laptop-settle {
-  animation: laptop-settle 0.55s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
 /* Looping sprite strip (laptop screen): the strip slides one frame per step. */
 @keyframes sprite-loop {
   to {
@@ -494,15 +474,21 @@ body {
 }
 
 /*
-  "Done" fish (components/landing/done-word.tsx). They rest on the cap tops
-  (top: 0.12em, lifted by their own height, plus --rise), so they never cover
-  letters. Transitions, not keyframes, so a hover that ends mid-hop reverses from
-  where the fish are. Rise: 420ms with a small overshoot and an uneven stagger
-  (--d). Sink: 180ms, no stagger: exits are quicker than entrances. They start
-  mostly above the letters, at 0.7 scale and hidden (never from scale(0)).
+  "Done" fish (components/landing/done-word.tsx). They rest right on the cap tops
+  of the raised word (top: 0.12em is the cap line; the word rises 0.05em; 0.02em
+  keeps the low end of a tilted fish off the letters), plus their own --rise, so
+  they stay in the gap between the headline's lines and never cover letters.
+  Colours come per time of day (--fish-1/2/3, --fish-eye; lib/sky-phase.ts).
+  Transitions, not keyframes, so a hover that ends mid-hop reverses from where
+  the fish are. Rise: 420ms with a small overshoot and an uneven stagger (--d).
+  Sink: 180ms, no stagger: exits are quicker than entrances. They start low,
+  at 0.7 scale and hidden (never from scale(0)).
 */
 .done-lift {
   transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.done-word[data-leaping="true"] .done-lift {
+  transform: translateY(-0.05em);
 }
 .done-fish {
   position: absolute;
@@ -513,14 +499,14 @@ body {
   pointer-events: none;
   opacity: 0;
   transform-origin: 50% 100%;
-  transform: translate(-50%, -55%) scale(0.7) rotate(0deg);
+  transform: translate(-50%, -30%) scale(0.7) rotate(0deg);
   transition:
     transform 180ms cubic-bezier(0.23, 1, 0.32, 1),
     opacity 140ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 .done-word[data-leaping="true"] .done-fish {
   opacity: 1;
-  transform: translate(-50%, calc(-100% - var(--rise))) scale(1) rotate(var(--rot));
+  transform: translate(-50%, calc(-100% - 0.07em - var(--rise))) scale(1) rotate(var(--rot));
   transition:
     transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--d),
     opacity 160ms cubic-bezier(0.23, 1, 0.32, 1) var(--d);
@@ -531,7 +517,7 @@ body {
   }
   .done-word:hover .done-fish {
     opacity: 1;
-    transform: translate(-50%, calc(-100% - var(--rise))) scale(1) rotate(var(--rot));
+    transform: translate(-50%, calc(-100% - 0.07em - var(--rise))) scale(1) rotate(var(--rot));
     transition:
       transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--d),
       opacity 160ms cubic-bezier(0.23, 1, 0.32, 1) var(--d);
@@ -1095,12 +1081,13 @@ body {
   transform: scale(var(--k));
   transform-origin: 0 0;
 }
-/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage */
+/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage.
+   Fast to slow: the next window shoots in, then eases to a soft stop. */
 .fd-track {
   position: absolute;
   inset: 0;
   display: flex;
-  transition: transform var(--fd-glide, 1000ms) cubic-bezier(0.45, 0.05, 0.25, 1);
+  transition: transform var(--fd-glide, 1000ms) var(--ease-pop);
 }
 .fd-slot { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
@@ -1169,7 +1156,7 @@ body {
   text-align: left;
   -webkit-font-smoothing: antialiased;
   user-select: none;
-  transition: width 350ms cubic-bezier(0.2, 0.8, 0.2, 1), height 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: width 380ms var(--ease-emphasized), height 380ms var(--ease-emphasized);
 }
 .at-win img { display: block; max-width: none; }
 .at-win.is-cat { width: 224px; height: 232px; }
@@ -1305,7 +1292,7 @@ body {
   width: 80%; padding: 24px; display: flex; flex-direction: column; gap: 16px; border-radius: 8px;
   background: var(--at-bg); text-align: center; transform: scale(0.92); transition: transform 300ms cubic-bezier(0.2, 0.8, 0.3, 1);
 }
-.at-modal.is-open .at-dialog { transform: scale(1); }
+.at-modal.is-open .at-dialog { transform: scale(1); transition: transform 420ms var(--ease-spring); }
 .at-dialog-title { margin: 0; font: 500 16px var(--at-inter); }
 .at-options { display: flex; flex-direction: column; gap: 8px; }
 .at-option {
