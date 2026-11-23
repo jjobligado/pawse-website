@@ -59,8 +59,8 @@ function EmailNote({ className = "" }: { className?: string }) {
 }
 
 /**
- * Sticky split contact section matching the FAQ layout: sticky heading, subtitle,
- * and email fallback on the left (directly on the page); the contact form
+ * Split contact section matching the FAQ layout: heading, subtitle, and email
+ * fallback on the left (static, scrolling with the page) (directly on the page); the contact form
  * encapsulated in a FAQ-style bordered card on the right.
  */
 export default function ContactSection() {
@@ -136,8 +136,8 @@ export default function ContactSection() {
     return (
         <Section id="contact" className="flex flex-col items-stretch">
             <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 lg:gap-14">
-                {/* Left column: sticky heading, subtitle, and understated direct email */}
-                <div className="w-full lg:w-[36%] lg:sticky lg:top-24 flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
+                {/* Left column (static, scrolls with the page): heading, subtitle, and understated direct email */}
+                <div className="w-full lg:w-[36%] flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
                     <SectionTitle className="text-center lg:text-left text-balance">
                         Contact Us
                     </SectionTitle>
