@@ -474,15 +474,21 @@ body {
 }
 
 /*
-  "Done" fish (components/landing/done-word.tsx). They rest on the cap tops
-  (top: 0.12em, lifted by their own height, plus --rise), so they never cover
-  letters. Transitions, not keyframes, so a hover that ends mid-hop reverses from
-  where the fish are. Rise: 420ms with a small overshoot and an uneven stagger
-  (--d). Sink: 180ms, no stagger: exits are quicker than entrances. They start
-  mostly above the letters, at 0.7 scale and hidden (never from scale(0)).
+  "Done" fish (components/landing/done-word.tsx). They rest right on the cap tops
+  of the raised word (top: 0.12em is the cap line; the word rises 0.05em; 0.02em
+  keeps the low end of a tilted fish off the letters), plus their own --rise, so
+  they stay in the gap between the headline's lines and never cover letters.
+  Colours come per time of day (--fish-1/2/3, lib/sky-phase.ts).
+  Transitions, not keyframes, so a hover that ends mid-hop reverses from where
+  the fish are. Rise: 420ms with a small overshoot and an uneven stagger (--d).
+  Sink: 180ms, no stagger: exits are quicker than entrances. They start low,
+  at 0.7 scale and hidden (never from scale(0)).
 */
 .done-lift {
   transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.done-word[data-leaping="true"] .done-lift {
+  transform: translateY(-0.05em);
 }
 .done-fish {
   position: absolute;
@@ -493,14 +499,14 @@ body {
   pointer-events: none;
   opacity: 0;
   transform-origin: 50% 100%;
-  transform: translate(-50%, -55%) scale(0.7) rotate(0deg);
+  transform: translate(-50%, -30%) scale(0.7) rotate(0deg);
   transition:
     transform 180ms cubic-bezier(0.23, 1, 0.32, 1),
     opacity 140ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 .done-word[data-leaping="true"] .done-fish {
   opacity: 1;
-  transform: translate(-50%, calc(-100% - var(--rise))) scale(1) rotate(var(--rot));
+  transform: translate(-50%, calc(-100% - 0.07em - var(--rise))) scale(1) rotate(var(--rot));
   transition:
     transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--d),
     opacity 160ms cubic-bezier(0.23, 1, 0.32, 1) var(--d);
@@ -511,7 +517,7 @@ body {
   }
   .done-word:hover .done-fish {
     opacity: 1;
-    transform: translate(-50%, calc(-100% - var(--rise))) scale(1) rotate(var(--rot));
+    transform: translate(-50%, calc(-100% - 0.07em - var(--rise))) scale(1) rotate(var(--rot));
     transition:
       transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--d),
       opacity 160ms cubic-bezier(0.23, 1, 0.32, 1) var(--d);

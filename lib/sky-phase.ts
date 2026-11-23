@@ -125,6 +125,20 @@ const DONE_COLOR: Record<SkyPhase, string> = {
 };
 
 /**
+ * The "Done" fish (ginger, tuxedo, void), in deep shades that sit with "Done":
+ * a rust, Done's own blue, and a violet, darkened toward dusk and night. Each is
+ * ≥3:1 (graphics contrast) against the darkest sky stop for its phase, which is
+ * darker than anything behind the fish, and ≥5.9:1 on the white wall phones
+ * show the copy on. A cream eye pixel keeps them reading as fish.
+ */
+const FISH_COLORS: Record<SkyPhase, [string, string, string]> = {
+    morning: ["#A8461E", "#17679C", "#5B3E99"],
+    day: ["#A3431B", "#16639A", "#503C96"],
+    dusk: ["#9A3A1C", "#14578A", "#6B2F6E"],
+    night: ["#7A2C12", "#1A3480", "#3E2A82"],
+};
+
+/**
  * The light the window throws down the wall to the desk, per time of day (RGB
  * and strength): soft peach in the morning, pale sunlight by day, warm
  * amber-rose at dusk, faint cool moonlight at night.
@@ -139,7 +153,7 @@ const WALL_LIGHT: Record<SkyPhase, { rgb: string; alpha: number }> = {
 /** Per-phase CSS variables on <html>, rendered into <head> by the root layout. */
 export const SKY_PHASE_CSS = SKY_PHASES.map((p) => {
     const t = THEMES[p];
-    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
+    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
 }).join("");
 
 /**
