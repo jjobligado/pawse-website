@@ -43,8 +43,6 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
 const LOOP_MS = 17_400;
 const SLIDE_MS = 1100;
 const STAGE_H = 480;
-// Degrees between cats on the wheel (.fd-track): far enough that neighbours rest off stage
-const SPOKE = 25;
 
 // The window's size per mode (timer-window: .at-win, .is-cat, .is-timer)
 const SIZE: Record<TimerMode, { w: number; h: number }> = {
@@ -243,7 +241,7 @@ export default function FocusDemo() {
                 <div ref={stageRef} className="fd-stage">
                     <div
                         className="fd-track"
-                        style={{ transform: `rotate(-${s.index * SPOKE}deg)`, ["--fd-glide" as string]: `${s.glide}ms` }}
+                        style={{ ["--fd-index" as string]: s.index, ["--fd-glide" as string]: `${s.glide}ms` }}
                     >
                         {/* The three cats, then Tux again so the swing from Void keeps going the same way */}
                         {[...CATS, CATS[0]].map((cat, i) => {
@@ -253,7 +251,7 @@ export default function FocusDemo() {
                                     key={i}
                                     data-cat={i < CATS.length ? cat.id : undefined}
                                     className={`fd-slot ${i === s.index ? "is-active" : i < s.index ? "is-prev" : "is-next"}`}
-                                    style={{ transform: `rotate(${i * SPOKE}deg)` }}
+                                    style={{ ["--fd-i" as string]: i }}
                                 >
                                     <div className="fd-card">
                                         <TimerWindow

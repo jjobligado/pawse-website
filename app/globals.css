@@ -1045,19 +1045,22 @@ body {
   transform: scale(var(--k));
   transform-origin: 0 0;
 }
-/* The carousel is a wheel: each cat sits one spoke apart (SPOKE in focus-demo)
-   around a pivot far below the stage, so the next window swings in along an
+/* The carousel is a wheel: each cat sits one spoke (--fd-spoke) apart around a
+   pivot far below the stage, so the next window swings in along an
    arc from the lower right, tilted, and levels out as it reaches the centre.
    The pivot sits far down so the arc stays shallow (a gentle tilt). Neighbours
    rest fully off stage. Fast to slow (--ease-emphasized, a quint-out bezier):
    it swings in briskly, then glides a long way into a soft stop. */
 .fd-track {
   --fd-pivot: 50% calc(50% + 1600px);
+  --fd-spoke: 25deg; /* far enough apart that neighbours rest off stage */
   /* Fast, then a long soft stop that runs ~0.75deg past and settles back */
   --fd-swing: cubic-bezier(0.25, 1.3, 0.5, 1);
   position: absolute;
   inset: 0;
   transform-origin: var(--fd-pivot);
+  /* --fd-index (set by the demo): which cat faces the viewer */
+  transform: rotate(calc(var(--fd-index, 0) * var(--fd-spoke) * -1));
   transition: transform var(--fd-glide, 1000ms) var(--fd-swing);
 }
 .fd-slot {
@@ -1067,6 +1070,7 @@ body {
   align-items: center;
   justify-content: center;
   transform-origin: var(--fd-pivot);
+  transform: rotate(calc(var(--fd-i, 0) * var(--fd-spoke))); /* --fd-i: the slot's place on the wheel */
   perspective: 1100px;
 }
 /* Depth during the swing: off-centre windows are turned away (the leading
