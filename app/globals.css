@@ -1045,12 +1045,13 @@ body {
   transform: scale(var(--k));
   transform-origin: 0 0;
 }
-/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage */
+/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage.
+   Fast to slow: the next window shoots in, then eases to a soft stop. */
 .fd-track {
   position: absolute;
   inset: 0;
   display: flex;
-  transition: transform var(--fd-glide, 1000ms) cubic-bezier(0.45, 0.05, 0.25, 1);
+  transition: transform var(--fd-glide, 1000ms) var(--ease-pop);
 }
 .fd-slot { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
@@ -1119,7 +1120,7 @@ body {
   text-align: left;
   -webkit-font-smoothing: antialiased;
   user-select: none;
-  transition: width 350ms cubic-bezier(0.2, 0.8, 0.2, 1), height 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: width 380ms var(--ease-emphasized), height 380ms var(--ease-emphasized);
 }
 .at-win img { display: block; max-width: none; }
 .at-win.is-cat { width: 224px; height: 232px; }
@@ -1255,7 +1256,7 @@ body {
   width: 80%; padding: 24px; display: flex; flex-direction: column; gap: 16px; border-radius: 8px;
   background: var(--at-bg); text-align: center; transform: scale(0.92); transition: transform 300ms cubic-bezier(0.2, 0.8, 0.3, 1);
 }
-.at-modal.is-open .at-dialog { transform: scale(1); }
+.at-modal.is-open .at-dialog { transform: scale(1); transition: transform 420ms var(--ease-spring); }
 .at-dialog-title { margin: 0; font: 500 16px var(--at-inter); }
 .at-options { display: flex; flex-direction: column; gap: 8px; }
 .at-option {
