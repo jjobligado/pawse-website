@@ -12,9 +12,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
  * line above ("y" in "Way") reaches down. Sized in em (with a 12px floor), so
  * they scale with the headline at every screen width.
  *
- * Colour: the app's pastel fish vanish against the sky, so these are drawn in
- * deep shades that follow the time of day like "Done" does (--fish-1/2/3 from
- * lib/sky-phase.ts), each at least 3:1 against the sky behind it.
+ * Colour: the app's own fish colours (cream, lime, lilac), shaded per time of
+ * day like "Done" is (--fish-1/2/3, --fish-eye from lib/sky-phase.ts), so each
+ * stays at least 3:1 against the sky behind it.
  *
  * - Mouse: hover shows them (gated to `(hover: hover) and (pointer: fine)` so a
  *   tap never leaves a stuck hover). Moving away sinks them back, faster than
@@ -62,7 +62,7 @@ function FishPixels({ flip }: { flip: boolean }) {
                 fill="currentColor"
                 d="M8 5h3v1H8zM3 6h1v1H3zM6 6h7v1H6zM2 7h9v1H2zM12 7h2v1h-2zM1 8h14v1H1zM2 9h12v1H2zM3 10h1v1H3zM6 10h7v1H6zM8 11h3v1H8z"
             />
-            <path fill="var(--fish-eye, #FFF6E8)" d="M11 7h1v1h-1z" />
+            <path fill="var(--fish-eye, #232421)" d="M11 7h1v1h-1z" />
         </svg>
     );
 }

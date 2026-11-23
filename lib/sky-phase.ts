@@ -125,17 +125,24 @@ const DONE_COLOR: Record<SkyPhase, string> = {
 };
 
 /**
- * The "Done" fish (ginger, tuxedo, void), in deep shades that sit with "Done":
- * a rust, Done's own blue, and a violet, darkened toward dusk and night. Each is
- * ≥3:1 (graphics contrast) against the darkest sky stop for its phase, which is
- * darker than anything behind the fish, and ≥5.9:1 on the white wall phones
- * show the copy on. A cream eye pixel keeps them reading as fish.
+ * The "Done" fish (ginger, tuxedo, void): the app's own fish colours (cream
+ * #FEE1A9, lime #CFE58A, lilac #E0A9FE), kept in hue but shaded down per phase
+ * until each is ≥3:1 (graphics contrast) against the sky right behind the fish
+ * (morning #D3E8FC, day #CCE7F5, dusk #F6C4AE, night #9AA9D9), and so well
+ * above that on the white wall phones show. The eye stays the app's dark pixel,
+ * except at night, where the bodies are too dark for it and it turns cream.
  */
 const FISH_COLORS: Record<SkyPhase, [string, string, string]> = {
-    morning: ["#A8461E", "#17679C", "#5B3E99"],
-    day: ["#A3431B", "#16639A", "#503C96"],
-    dusk: ["#9A3A1C", "#14578A", "#6B2F6E"],
-    night: ["#7A2C12", "#1A3480", "#3E2A82"],
+    morning: ["#A97818", "#708A1F", "#B355E7"],
+    day: ["#A77618", "#6E871E", "#B151E6"],
+    dusk: ["#936815", "#62791B", "#A638E3"],
+    night: ["#725010", "#4C5E15", "#841BBD"],
+};
+const FISH_EYE: Record<SkyPhase, string> = {
+    morning: "#232421",
+    day: "#232421",
+    dusk: "#232421",
+    night: "#FFF6E8",
 };
 
 /**
@@ -153,7 +160,7 @@ const WALL_LIGHT: Record<SkyPhase, { rgb: string; alpha: number }> = {
 /** Per-phase CSS variables on <html>, rendered into <head> by the root layout. */
 export const SKY_PHASE_CSS = SKY_PHASES.map((p) => {
     const t = THEMES[p];
-    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
+    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--fish-eye:${FISH_EYE[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
 }).join("");
 
 /**

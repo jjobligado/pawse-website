@@ -478,7 +478,7 @@ body {
   of the raised word (top: 0.12em is the cap line; the word rises 0.05em; 0.02em
   keeps the low end of a tilted fish off the letters), plus their own --rise, so
   they stay in the gap between the headline's lines and never cover letters.
-  Colours come per time of day (--fish-1/2/3, lib/sky-phase.ts).
+  Colours come per time of day (--fish-1/2/3, --fish-eye; lib/sky-phase.ts).
   Transitions, not keyframes, so a hover that ends mid-hop reverses from where
   the fish are. Rise: 420ms with a small overshoot and an uneven stagger (--d).
   Sink: 180ms, no stagger: exits are quicker than entrances. They start low,
