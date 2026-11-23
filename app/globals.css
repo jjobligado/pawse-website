@@ -1079,8 +1079,8 @@ body {
     transform var(--fd-glide, 1000ms) var(--ease-emphasized),
     filter var(--fd-glide, 1000ms) var(--ease-emphasized);
 }
-.fd-slot.is-next .fd-card { transform: rotateY(20deg) scale(0.9); filter: brightness(0.95); }
-.fd-slot.is-prev .fd-card { transform: rotateY(-20deg) scale(0.9); filter: brightness(0.95); }
+.fd-slot.is-next .fd-card { transform: rotateY(28deg) scale(0.85); filter: brightness(0.94); }
+.fd-slot.is-prev .fd-card { transform: rotateY(-28deg) scale(0.85); filter: brightness(0.94); }
 .fd-slot .at-win {
   transition:
     width 380ms var(--ease-emphasized),
