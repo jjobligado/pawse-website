@@ -1081,15 +1081,55 @@ body {
   transform: scale(var(--k));
   transform-origin: 0 0;
 }
-/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage.
-   Fast to slow: the next window shoots in, then eases to a soft stop. */
+/* The carousel is a wheel: each cat sits one spoke (--fd-spoke) apart around a
+   pivot far below the stage, so the next window swings in along an
+   arc from the lower right, tilted, and levels out as it reaches the centre.
+   The pivot sits far down so the arc stays shallow (a gentle tilt). Neighbours
+   rest fully off stage. Fast to slow (--fd-swing):
+   it swings in briskly, then glides into a soft stop with a small settle. */
 .fd-track {
+  --fd-pivot: 50% calc(50% + 1600px);
+  --fd-spoke: 25deg; /* far enough apart that neighbours rest off stage */
+  /* Fast, then a long soft stop that runs ~0.75deg past and settles back */
+  --fd-swing: cubic-bezier(0.25, 1.3, 0.5, 1);
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--fd-pivot);
+  /* --fd-index (set by the demo): which cat faces the viewer */
+  transform: rotate(calc(var(--fd-index, 0) * var(--fd-spoke) * -1));
+  transition: transform var(--fd-glide, 1000ms) var(--fd-swing);
+}
+.fd-slot {
   position: absolute;
   inset: 0;
   display: flex;
-  transition: transform var(--fd-glide, 1000ms) var(--ease-pop);
+  align-items: center;
+  justify-content: center;
+  transform-origin: var(--fd-pivot);
+  transform: rotate(calc(var(--fd-i, 0) * var(--fd-spoke))); /* --fd-i: the slot's place on the wheel */
+  perspective: 1100px;
 }
-.fd-slot { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+/* Depth during the swing: off-centre windows are turned away (the leading
+   edge further back, like a card on a carousel), a little smaller, dimmer
+   and lower-shadowed; the arriving one turns to face you, grows and its
+   shadow deepens as it lands. At rest the active card has no transform, so
+   the pixel art stays crisp and the cursor targets are unchanged. */
+.fd-card {
+  transition:
+    transform var(--fd-glide, 1000ms) var(--ease-emphasized),
+    filter var(--fd-glide, 1000ms) var(--ease-emphasized);
+}
+.fd-slot.is-next .fd-card { transform: rotateY(28deg) scale(0.85); filter: brightness(0.94); }
+.fd-slot.is-prev .fd-card { transform: rotateY(-28deg) scale(0.85); filter: brightness(0.94); }
+.fd-slot .at-win {
+  transition:
+    width 380ms var(--ease-emphasized),
+    height 380ms var(--ease-emphasized),
+    box-shadow var(--fd-glide, 1000ms) var(--ease-emphasized);
+}
+.fd-slot:not(.is-active) .at-win {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 1px rgb(0 0 0 / 0.05), 0 10px 20px -14px rgb(20 40 70 / 0.25);
+}
 
 /* The cursor, and a ring where it clicks. X and Y move on separate layers with
    different easings, so every move bends into a soft arc like a real hand. */
@@ -1147,10 +1187,17 @@ body {
   width: 294px;
   height: 422px;
   background: var(--at-bg);
-  border: 1px solid var(--at-stroke);
+  /* No border: the hover and Select Mode overlays only cover the padding box,
+     so a border would show as a pale ring around them; the shadow gives the edge. */
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08), 0 24px 48px -24px rgb(20 40 70 / 0.35);
+  /* Layered so it floats: a tight contact shadow, a mid one, and a wide soft
+     ambient one, tinted toward the sky's navy rather than grey */
+  box-shadow:
+    0 1px 2px rgb(20 40 70 / 0.10),
+    0 4px 10px rgb(20 40 70 / 0.10),
+    0 14px 28px -6px rgb(20 40 70 / 0.18),
+    0 30px 60px -16px rgb(20 40 70 / 0.38);
   color: var(--at-black);
   font-family: var(--at-inter);
   text-align: left;

@@ -4,21 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/components/app-ui/timer-window";
 
 /**
- * Focus section media: the app's timer window at its real size, looping (~16s).
- * Each cat holds 1s between 0.6s slides.
+ * Focus section media: the app's timer window at its real size, looping (~17s).
+ * Each cat holds ~1s between 1.1s swings (fast, then a long soft stop).
  *
- *    0.0  Tux (Classic)                 slides right to left on its own
+ *    0.0  Tux (Classic)                 swings on along an arc, on its own
  *    1.0  → Ginger (Sprint)
- *    2.6  → Void (Focused)
- *    3.5  the cursor comes in from the right: Resize → Select Mode → Timer
+ *    3.1  → Void (Focused)
+ *    4.5  the cursor comes in from the right: Resize → Select Mode → Timer
  *         Only; it steps off while the window shrinks, the bar holds on its
  *         own (~1.8s), then it comes back in (hover) and clicks Restore
- *    9.2  Resize → Cat Only; it steps off, the window shrinks, it comes back
+ *   10.2  Resize → Cat Only; it steps off, the window shrinks, it comes back
  *         in (hover), then Restore → full window
- *   14.7  the cursor leaves to the right
- *   15.2  Void slides on, right to left, to a second Tux at the end of the
- *         track; when the loop restarts the track jumps back to the first
- *         Tux unseen (they look identical), so it reads as one endless loop
+ *   15.7  the cursor leaves to the right
+ *   16.2  Void swings on to a second Tux at the end of the wheel; when
+ *         the loop restarts the wheel jumps back to the first Tux unseen
+ *         (they look identical), so it reads as one endless loop
  *
  * Every mode change has a visible cause, as in the app (a mini window only
  * returns to full size through Restore).
@@ -40,8 +40,8 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
     { id: "void", start: 37 * 60 + 5, fish: 1 },
 ];
 
-const LOOP_MS = 15_850;
-const SLIDE_MS = 600;
+const LOOP_MS = 17_400;
+const SLIDE_MS = 1100;
 const STAGE_H = 480;
 
 // The window's size per mode (timer-window: .at-win, .is-cat, .is-timer)
@@ -121,51 +121,51 @@ export default function FocusDemo() {
             // Back on the first Tux, instantly; the cursor waits off the right edge
             [0, () => set((p) => ({ index: 0, glide: 0, cursor: { ...p.cursor, ...offStage(330), ms: 0, on: false } }))],
             [1000, () => set({ index: 1, glide: SLIDE_MS })],
-            [2600, () => set({ index: 2 })],
+            [3100, () => set({ index: 2 })],
 
             // Resize → Select Mode → Timer Only
-            [3500, () => move(target("resize"), 800)],
-            [4350, () => set({ hot: "resize" })],
-            [4550, () => press("resize")],
-            [4700, () => { release(); set({ hot: null, modal: true }); }],
-            [5000, () => move(target("timer-only"), 450)],
-            [5550, () => set({ hot: "timer-only" })],
-            [5750, () => press("timer-only")],
-            [5900, () => { release(); set({ hot: null, modal: false }); move(beside("timer", 60), 500); }],
+            [4500, () => move(target("resize"), 800)],
+            [5350, () => set({ hot: "resize" })],
+            [5550, () => press("resize")],
+            [5700, () => { release(); set({ hot: null, modal: true }); }],
+            [6000, () => move(target("timer-only"), 450)],
+            [6550, () => set({ hot: "timer-only" })],
+            [6750, () => press("timer-only")],
+            [6900, () => { release(); set({ hot: null, modal: false }); move(beside("timer", 60), 500); }],
             // Shrinks only once the cursor is clear of it
-            [6350, () => set({ mode: "timer" })],
+            [7350, () => set({ mode: "timer" })],
 
             // The Timer Only bar holds on its own for a moment, then the cursor comes
             // back in to Restore (hover starts as it crosses the edge) → full window
-            [7750, () => move(target("restore", "timer"), 650)],
-            [8150, () => set({ hover: true })],
-            [8500, () => set({ hot: "restore" })],
-            [8700, () => press("restore")],
-            [8850, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
+            [8750, () => move(target("restore", "timer"), 650)],
+            [9150, () => set({ hover: true })],
+            [9500, () => set({ hot: "restore" })],
+            [9700, () => press("restore")],
+            [9850, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
 
             // Resize → Select Mode → Cat Only
-            [9200, () => move(target("resize"), 500)],
-            [9750, () => set({ hot: "resize" })],
-            [9950, () => press("resize")],
-            [10100, () => { release(); set({ hot: null, modal: true }); }],
-            [10400, () => move(target("cat-only"), 500)],
-            [10950, () => set({ hot: "cat-only" })],
-            [11150, () => press("cat-only")],
-            [11300, () => { release(); set({ hot: null, modal: false }); move(beside("cat", 40), 500); }],
-            [11750, () => set({ mode: "cat" })],
+            [10200, () => move(target("resize"), 500)],
+            [10750, () => set({ hot: "resize" })],
+            [10950, () => press("resize")],
+            [11100, () => { release(); set({ hot: null, modal: true }); }],
+            [11400, () => move(target("cat-only"), 500)],
+            [11950, () => set({ hot: "cat-only" })],
+            [12150, () => press("cat-only")],
+            [12300, () => { release(); set({ hot: null, modal: false }); move(beside("cat", 40), 500); }],
+            [12750, () => set({ mode: "cat" })],
             // Back over the mini window: hover shows its controls
-            [12300, () => move(onWindow("cat", 132, 100), 550)],
-            [12550, () => set({ hover: true })],
+            [13300, () => move(onWindow("cat", 132, 100), 550)],
+            [13550, () => set({ hover: true })],
 
             // Restore → full window
-            [13600, () => move(target("restore", "cat"), 450)],
-            [14100, () => set({ hot: "restore" })],
-            [14300, () => press("restore")],
-            [14450, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
+            [14600, () => move(target("restore", "cat"), 450)],
+            [15100, () => set({ hot: "restore" })],
+            [15300, () => press("restore")],
+            [15450, () => { release(); set({ hot: null, hover: false, mode: "default" }); }],
 
             // Away, and on to Tux
-            [14700, () => move(offStage(380), 700, false)],
-            [15200, () => set({ index: 3, glide: SLIDE_MS })],
+            [15700, () => move(offStage(380), 700, false)],
+            [16200, () => set({ index: 3, glide: SLIDE_MS })],
         ];
 
         const stop = () => {
@@ -241,24 +241,31 @@ export default function FocusDemo() {
                 <div ref={stageRef} className="fd-stage">
                     <div
                         className="fd-track"
-                        style={{ transform: `translateX(-${s.index * 100}%)`, ["--fd-glide" as string]: `${s.glide}ms` }}
+                        style={{ ["--fd-index" as string]: s.index, ["--fd-glide" as string]: `${s.glide}ms` }}
                     >
-                        {/* The three cats, then Tux again so the slide from Void keeps going right to left */}
+                        {/* The three cats, then Tux again so the swing from Void keeps going the same way */}
                         {[...CATS, CATS[0]].map((cat, i) => {
                             const isVoid = cat.id === "void";
                             return (
-                                <div key={i} data-cat={i < CATS.length ? cat.id : undefined} className="fd-slot">
-                                    <TimerWindow
-                                        cat={cat.id}
-                                        seconds={cat.start - s.sec}
-                                        fish={cat.fish}
-                                        animate={!reduced}
-                                        mode={isVoid ? s.mode : "default"}
-                                        hover={isVoid && s.hover}
-                                        modalOpen={isVoid && s.modal}
-                                        hot={isVoid ? s.hot : null}
-                                        down={isVoid ? s.down : null}
-                                    />
+                                <div
+                                    key={i}
+                                    data-cat={i < CATS.length ? cat.id : undefined}
+                                    className={`fd-slot ${i === s.index ? "is-active" : i < s.index ? "is-prev" : "is-next"}`}
+                                    style={{ ["--fd-i" as string]: i }}
+                                >
+                                    <div className="fd-card">
+                                        <TimerWindow
+                                            cat={cat.id}
+                                            seconds={cat.start - s.sec}
+                                            fish={cat.fish}
+                                            animate={!reduced}
+                                            mode={isVoid ? s.mode : "default"}
+                                            hover={isVoid && s.hover}
+                                            modalOpen={isVoid && s.modal}
+                                            hot={isVoid ? s.hot : null}
+                                            down={isVoid ? s.down : null}
+                                        />
+                                    </div>
                                 </div>
                             );
                         })}
