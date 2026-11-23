@@ -5,9 +5,9 @@ import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/co
 
 /**
  * Focus section media: the app's timer window at its real size, looping (~16s).
- * Each cat holds 1s between 0.6s slides.
+ * Each cat holds 1s between 0.6s swings.
  *
- *    0.0  Tux (Classic)                 slides right to left on its own
+ *    0.0  Tux (Classic)                 swings on along an arc, on its own
  *    1.0  → Ginger (Sprint)
  *    2.6  → Void (Focused)
  *    3.5  the cursor comes in from the right: Resize → Select Mode → Timer
@@ -16,8 +16,7 @@ import TimerWindow, { type TimerCat, type TimerMode, type TimerPart } from "@/co
  *    9.2  Resize → Cat Only; it steps off, the window shrinks, it comes back
  *         in (hover), then Restore → full window
  *   14.7  the cursor leaves to the right
- *   15.2  Void slides on, right to left, to a second Tux at the end of the
- *         track; when the loop restarts the track jumps back to the first
+ *   15.2  Void swings on to a second Tux at the end of the wheel; when the loop restarts the track jumps back to the first
  *         Tux unseen (they look identical), so it reads as one endless loop
  *
  * Every mode change has a visible cause, as in the app (a mini window only
@@ -43,6 +42,8 @@ const CATS: { id: TimerCat; start: number; fish: number }[] = [
 const LOOP_MS = 15_850;
 const SLIDE_MS = 600;
 const STAGE_H = 480;
+// Degrees between cats on the wheel (.fd-track): far enough that neighbours rest off stage
+const SPOKE = 45;
 
 // The window's size per mode (timer-window: .at-win, .is-cat, .is-timer)
 const SIZE: Record<TimerMode, { w: number; h: number }> = {
@@ -241,13 +242,13 @@ export default function FocusDemo() {
                 <div ref={stageRef} className="fd-stage">
                     <div
                         className="fd-track"
-                        style={{ transform: `translateX(-${s.index * 100}%)`, ["--fd-glide" as string]: `${s.glide}ms` }}
+                        style={{ transform: `rotate(-${s.index * SPOKE}deg)`, ["--fd-glide" as string]: `${s.glide}ms` }}
                     >
-                        {/* The three cats, then Tux again so the slide from Void keeps going right to left */}
+                        {/* The three cats, then Tux again so the swing from Void keeps going the same way */}
                         {[...CATS, CATS[0]].map((cat, i) => {
                             const isVoid = cat.id === "void";
                             return (
-                                <div key={i} data-cat={i < CATS.length ? cat.id : undefined} className="fd-slot">
+                                <div key={i} data-cat={i < CATS.length ? cat.id : undefined} className="fd-slot" style={{ transform: `rotate(${i * SPOKE}deg)` }}>
                                     <TimerWindow
                                         cat={cat.id}
                                         seconds={cat.start - s.sec}

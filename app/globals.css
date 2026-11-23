@@ -1045,15 +1045,26 @@ body {
   transform: scale(var(--k));
   transform-origin: 0 0;
 }
-/* The carousel: one stage-wide slot per cat, so neighbours are always just off stage.
-   Fast to slow: the next window shoots in, then eases to a soft stop. */
+/* The carousel is a wheel: each cat sits one spoke apart (SPOKE in focus-demo)
+   around a pivot far below the stage, so the next window swings in along an
+   arc from the lower right, tilted, and levels out as it reaches the centre.
+   Neighbours rest fully off stage. Fast to slow: it swings in quickly, then
+   eases to a soft stop. */
 .fd-track {
+  --fd-pivot: 50% calc(50% + 900px);
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--fd-pivot);
+  transition: transform var(--fd-glide, 1000ms) var(--ease-pop);
+}
+.fd-slot {
   position: absolute;
   inset: 0;
   display: flex;
-  transition: transform var(--fd-glide, 1000ms) var(--ease-pop);
+  align-items: center;
+  justify-content: center;
+  transform-origin: var(--fd-pivot);
 }
-.fd-slot { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
 /* The cursor, and a ring where it clicks. X and Y move on separate layers with
    different easings, so every move bends into a soft arc like a real hand. */
