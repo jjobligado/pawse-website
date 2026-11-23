@@ -1048,14 +1048,15 @@ body {
 /* The carousel is a wheel: each cat sits one spoke apart (SPOKE in focus-demo)
    around a pivot far below the stage, so the next window swings in along an
    arc from the lower right, tilted, and levels out as it reaches the centre.
-   Neighbours rest fully off stage. Fast to slow: it swings in quickly, then
-   eases to a soft stop. */
+   The pivot sits far down so the arc stays shallow (a gentle tilt). Neighbours
+   rest fully off stage. Fast to slow (--ease-emphasized, a quint-out bezier):
+   it swings in briskly, then glides a long way into a soft stop. */
 .fd-track {
-  --fd-pivot: 50% calc(50% + 900px);
+  --fd-pivot: 50% calc(50% + 1600px);
   position: absolute;
   inset: 0;
   transform-origin: var(--fd-pivot);
-  transition: transform var(--fd-glide, 1000ms) var(--ease-pop);
+  transition: transform var(--fd-glide, 1000ms) var(--ease-emphasized);
 }
 .fd-slot {
   position: absolute;
