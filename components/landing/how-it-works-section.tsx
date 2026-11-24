@@ -1,230 +1,245 @@
-import StickyNote, { type StickyNoteColor } from "./sticky-note";
+import type { CSSProperties, ReactNode } from "react";
+import PixelStamp, { StampFilters } from "./pixel-stamp";
+import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
+import WallFit from "./wall-fit";
 
 /**
- * The PAWSE loop as four sticky notes on a top-down felt desk mat: the camera
- * tilts down from the hero's window to the desk. Around the notes sit a few
- * smooth-drawn props (mug, pencil, paperclip, the hero laptop's corner) and
- * handwritten notes, half of them crossed-out distractions. Everything except
+ * The PAWSE loop as four paper step notes on a wall of small notes. Every
+ * drawing is a pixel-art rubber stamp pressed into the paper. From lg the
+ * wall is a fixed 1120×600 board scaled to fit, and hovering a step note
+ * peels its lower corner. Below lg the steps stack (one column on phones,
+ * 2×2 on tablets) between two short rows of small notes. Everything except
  * the four step notes is decorative and hidden from assistive tech.
  */
 
-type ConnectorKind = "arrow" | "cycle";
+type Paper = "yellow" | "sky" | "mint" | "lavender" | "pink" | "peach" | "cream" | "white";
+type Ink = "blue" | "red" | "violet" | "green" | "black";
 
 const STEPS: {
     step: string;
-    title: string[];
-    narrow: string[];
-    href: string;
-    link: string;
-    color: StickyNoteColor;
-    pose: string;
-    connector?: ConnectorKind;
+    title: string;
+    body: string;
+    paper: Paper;
+    stamp: StampName;
+    frame: StampFrame;
+    ink: Ink;
+    hand: string;
+    /** left, top, rotation on the 1120×600 board */
+    pos: [number, number, number];
+    stampRot: number;
 }[] = [
-    {
-        step: "01",
-        title: ["Pick Your", "Companion"],
-        narrow: ["Three cats, three paces.", "Pick who focuses", "with you."],
-        href: "#companions",
-        link: "Meet the cats",
-        color: "yellow",
-        pose: "md:-rotate-[1.5deg] xl:-translate-y-2 xl:-rotate-[2.2deg] md:motion-safe:hover:rotate-0 max-md:motion-safe:hover:-rotate-[1.5deg]",
-        connector: "arrow",
-    },
-    {
-        step: "02",
-        title: ["Focus with Your", "Companion"],
-        narrow: ["Work alongside your", "cat's routine. Zero", "distractions."],
-        href: "#focus",
-        link: "See Focus",
-        color: "sky",
-        pose: "md:rotate-[1.2deg] xl:translate-y-2.5 xl:rotate-[1.6deg] md:motion-safe:hover:rotate-0 max-md:motion-safe:hover:rotate-[1.5deg]",
-        connector: "cycle",
-    },
-    {
-        step: "03",
-        title: ["Time to Play", "and Recharge"],
-        narrow: ["Take a breather, play,", "and see what they", "have to say."],
-        href: "#break",
-        link: "See Break",
-        color: "mint",
-        pose: "md:-rotate-[1deg] xl:-translate-y-1.5 xl:-rotate-[1.5deg] md:motion-safe:hover:rotate-0 max-md:motion-safe:hover:-rotate-[1.5deg]",
-        connector: "arrow",
-    },
-    {
-        step: "04",
-        title: ["Watch Your", "Progress Build"],
-        narrow: ["Every session gets", "logged. Small sessions,", "big streaks."],
-        href: "#progress",
-        link: "See Progress",
-        color: "lavender",
-        pose: "md:rotate-[1.4deg] xl:translate-y-2 xl:rotate-[2deg] md:motion-safe:hover:rotate-0 max-md:motion-safe:hover:rotate-[1.5deg]",
-    },
+    { step: "01", title: "Pick Your Companion", body: "Three cats, three paces. Pick who focuses with you.", paper: "yellow", stamp: "tux", frame: "round", ink: "blue", hand: "Tux!", pos: [78, 196, -3], stampRot: 6 },
+    { step: "02", title: "Focus with Your Companion", body: "Work alongside your cat’s routine. Zero distractions.", paper: "sky", stamp: "clock", frame: "square", ink: "red", hand: "25:00", pos: [330, 168, 2.2], stampRot: -5 },
+    { step: "03", title: "Time to Play and Recharge", body: "Take a breather, play, and see what they have to say.", paper: "mint", stamp: "yarn", frame: "round", ink: "violet", hand: "zoomies", pos: [582, 200, -1.8], stampRot: 4 },
+    { step: "04", title: "Watch Your Progress Build", body: "Every session gets logged. Small sessions, big streaks.", paper: "lavender", stamp: "chart", frame: "square", ink: "green", hand: "day 12", pos: [834, 172, 2.8], stampRot: -7 },
 ];
 
-/**
- * Handwritten desk notes in the mat's top and bottom bands. Positions are per
- * breakpoint: 4 on phones (corners), 5 on tablets, 7 from xl.
- */
-const DESK_NOTES: { content: React.ReactNode; color: string; className: string }[] = [
-    {
-        content: "drink water!",
-        color: "bg-[#FFE3EC]",
-        className: "top-4 left-3 -rotate-[7deg] md:top-6 md:left-[6%] xl:top-8 xl:left-[7%]",
-    },
-    {
-        content: <s>37 open tabs</s>,
-        color: "bg-[#FFF7CC]",
-        className: "hidden xl:block xl:top-5 xl:left-[22%] rotate-[5deg]",
-    },
-    {
-        content: <s>check email</s>,
-        color: "bg-[#FFE7D1]",
-        className: "top-5 right-4 rotate-[6deg] md:right-auto md:top-5 md:left-[40%] xl:top-9 xl:left-[38%] xl:-rotate-[4deg]",
-    },
-    {
-        content: (
-            <span className="flex h-full flex-col items-center justify-center font-pixel text-[22px] xl:text-[26px] font-medium text-ink/75">
-                25:00
-                <span className="text-[13px] xl:text-[15px] text-ink/55">then 5:00</span>
-            </span>
-        ),
-        color: "bg-[#E3F3FF]",
-        className: "hidden md:block md:top-7 md:right-[6%] -rotate-[4deg] xl:right-auto xl:top-6 xl:left-[54%] xl:rotate-[3deg]",
-    },
-    {
-        content: "Tux needs a coffee refill",
-        color: "bg-[#E5F9E2]",
-        className: "bottom-5 left-4 rotate-[5deg] md:bottom-7 md:left-[6%] xl:bottom-10 xl:left-[17%]",
-    },
-    {
-        content: (
-            <>
-                <s>doomscroll</s>
-                <br />
-                nope.
-            </>
-        ),
-        color: "bg-[#FFE7D1]",
-        className: "bottom-4 right-3 -rotate-[6deg] md:hidden xl:block xl:right-auto xl:bottom-8 xl:left-[42%] xl:-rotate-[5deg]",
-    },
-    {
-        content: (
-            <>
-                streak:
-                <br />
-                <span className="text-[1.45em] font-bold">day 12</span>
-            </>
-        ),
-        color: "bg-[#F2E7FF]",
-        className: "hidden md:block md:bottom-6 md:right-[6%] rotate-[8deg] xl:bottom-12 xl:right-[4%]",
-    },
+type Item = { text: ReactNode } | { stamp: StampName; caption?: string };
+const T = (text: ReactNode): Item => ({ text });
+const S = (stamp: StampName, caption?: string): Item => ({ stamp, caption });
+
+const ITEMS: Item[] = [
+    T("drink water!"), T(<s>37 open tabs</s>), T(<s>check email</s>),
+    T(<span className="hiw-timer">25:00<small>then 5:00</small></span>),
+    T("Tux needs a coffee refill"), T(<><s>doomscroll</s><br />nope.</>),
+    T(<>streak:<br /><span className="hiw-big">day 12</span></>),
+    T("Ginger did zoomies again"), T("Void was here"), T("4 fish today!"), T("stretch your back"), T("you got this :)"),
+    T("one tab only"), T("lo-fi on"), T("nap break?"), T("finish the essay"), T("pet the cat"), T("phone in the drawer"),
+    T("deep breath"), T(<s>quick scroll</s>), T("snack o’clock"), T("3 sessions done"), T("be kind to you"), T("purr purr"),
+    S("cat"), S("loaf", "zzz"), S("fish", "x4"), S("heart"), S("star", "nice!"), S("mug"),
+    S("paw"), S("yarn"), S("tux", "hi!"), S("loaf"), S("fish"), S("sparkle"), S("phone", "away"),
+    S("heart", "focus"), S("zzz"), S("clock", "25 min"),
 ];
 
-/** Smooth-drawn desk props. Purely decorative; tablet and up only. */
-function DeskProps() {
-    return (
-        <>
-            {/* Corner of the hero's laptop, seen from above */}
-            <div className="hidden md:block absolute -top-[90px] -right-[120px] w-[380px] h-[240px] rounded-[22px] bg-[#CDD3D9] -rotate-[14deg] shadow-[0_14px_30px_-12px_rgb(20_20_20/0.25)] md:scale-75 md:origin-top-right xl:scale-100">
-                <div className="absolute left-[30px] right-[30px] bottom-6 h-[150px] rounded-[10px] bg-[#BFC6CD]" />
-            </div>
+const PAPERS: Paper[] = ["yellow", "sky", "mint", "lavender", "pink", "peach", "cream", "white", "yellow", "white", "cream"];
+const INKS: Ink[] = ["blue", "red", "violet", "green", "black"];
+const MARKS: StampName[] = ["star", "heart", "paw", "sparkle", "fish"];
+const PIN_COLORS = ["#2394DF", "#F08AA6", "#7FCB76", "#F5B83D", "#A98BE6"];
 
-            {/* Coffee ring and paperclip */}
-            <div className="hidden xl:block absolute top-6 left-[69%] w-24 h-24 rounded-full border-[2.5px] border-[#8C6239]/[0.2]" />
-            <svg className="hidden xl:block absolute top-14 left-[66%] rotate-[30deg]" width="22" height="60" viewBox="0 0 22 60" fill="none" stroke="#9AA3AD" strokeWidth="2.4" strokeLinecap="round">
-                <path d="M16 18V46a7 7 0 0 1-14 0V10a5 5 0 0 1 10 0v34a2 2 0 0 1-4 0V18" />
-            </svg>
+type SmallNoteData = {
+    item: Item;
+    paper: Paper;
+    ink: Ink;
+    rot: number;
+    frame: StampFrame;
+    stampRot: number;
+    ghost: boolean;
+    mark: StampName | null;
+    markRot: number;
+    press: number;
+    fastener: "tape" | "pin" | null;
+    pinColor: string;
+};
 
-            {/* Mug of coffee, top-down */}
-            <div className="hidden md:flex absolute md:bottom-8 md:left-[30%] xl:bottom-11 xl:left-[3%] w-24 h-24 xl:w-[104px] xl:h-[104px] items-center justify-center rounded-full bg-white shadow-[0_10px_18px_-8px_rgb(20_20_20/0.25),0_0_0_1px_rgb(0_0_0/0.04)]">
-                <div className="w-[72%] h-[72%] rounded-full bg-[#7A5338] shadow-[inset_0_3px_6px_rgb(0_0_0/0.25)]" />
-                <div className="absolute -right-[24px] top-[36%] w-[30px] h-[26px] rounded-r-[14px] border-[7px] border-l-0 border-white" />
-            </div>
-
-            {/* Pencil */}
-            <div className="hidden xl:flex absolute bottom-16 left-[59%] w-[240px] h-3.5 -rotate-[12deg] drop-shadow-[0_4px_4px_rgb(20_20_20/0.15)]">
-                <div className="w-5 rounded-l-[3px] bg-[#F4A6B8]" />
-                <div className="w-2.5 bg-[#C9CED3]" />
-                <div className="flex-1 bg-[#FFCF4A] shadow-[inset_0_-4px_0_rgb(0_0_0/0.06)]" />
-                <div className="w-0 h-0 border-y-[7px] border-y-transparent border-l-[24px] border-l-[#EBCB9E]" />
-            </div>
-        </>
-    );
+/** Seeded random, so the wall is the same on every render. */
+function rng(seed: number) {
+    return () => {
+        seed |= 0;
+        seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
 }
 
-/** Hand-drawn connector between adjacent step notes (the cycle marks the focus ↔ break loop). */
-function StepConnector({ kind }: { kind: ConnectorKind }) {
+const BOARD_W = 1120;
+const BOARD_H = 600;
+
+/**
+ * The small notes: an 11×6 jittered grid, thinning toward the edges, every
+ * note kept whole inside the board. Layout and stamp styling draw from
+ * separate random streams so either can change without moving the other.
+ */
+const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[] = (() => {
+    const r = rng(11);
+    const r2 = rng(97);
+    const cols = 11;
+    const rows = 6;
+    const cw = BOARD_W / cols;
+    const ch = BOARD_H / rows;
+    const out: (SmallNoteData & { x: number; y: number; size: number; z: number })[] = [];
+    let k = 0;
+    let press = 0;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const size = 112 + r() * 32;
+            let x = (col + 0.5) * cw + (r() - 0.5) * 40;
+            let y = (row + 0.5) * ch + (r() - 0.5) * 34;
+            const e = Math.max(Math.abs(x - BOARD_W / 2) / (BOARD_W / 2), (Math.abs(y - BOARD_H / 2) / (BOARD_H / 2)) * 0.9);
+            const keep = e < 0.55 ? 1 : 1 - (e - 0.55) * 1.5;
+            const skip = r() > keep;
+            const rot = (r() - 0.5) * 14;
+            const paper = PAPERS[Math.floor(r() * PAPERS.length)];
+            const f = r();
+            const pinColor = PIN_COLORS[Math.floor(r() * PIN_COLORS.length)];
+            const z = Math.floor(r() * 20);
+            const ink = INKS[Math.floor(r2() * INKS.length)];
+            const fr = r2();
+            const stampRot = (r2() - 0.5) * 18;
+            const ghost = r2() < 0.16;
+            const markRoll = r2();
+            const markName = MARKS[Math.floor(r2() * MARKS.length)];
+            const markRot = (r2() - 0.5) * 30;
+            if (skip) continue;
+            const m = size * 0.6 + 4;
+            x = Math.min(BOARD_W - m, Math.max(m, x));
+            y = Math.min(BOARD_H - m, Math.max(m, y));
+            const item = ITEMS[(k++ * 7 + row) % ITEMS.length];
+            const isStamp = "stamp" in item;
+            out.push({
+                x: x - size / 2,
+                y: y - size / 2,
+                size,
+                z,
+                item,
+                paper,
+                ink,
+                rot,
+                frame: fr < 0.3 ? "square" : fr < 0.5 ? "round" : "none",
+                stampRot,
+                ghost,
+                mark: !isStamp && markRoll < 0.24 ? markName : null,
+                markRot,
+                press: press++,
+                fastener: f < 0.22 ? "tape" : f < 0.38 ? "pin" : null,
+                pinColor,
+            });
+        }
+    }
+    return out;
+})();
+
+/** Small notes above and below the stacked steps (below lg). */
+const STRIP_NOTE = (item: Item, paper: Paper, ink: Ink, rot: number, frame: StampFrame = "none"): SmallNoteData => ({
+    item, paper, ink, rot, frame, stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: 0, fastener: null, pinColor: "",
+});
+const STRIP_TOP = [
+    STRIP_NOTE(T("drink water!"), "pink", "blue", -6),
+    STRIP_NOTE(S("fish", "x4"), "cream", "blue", 4, "round"),
+    STRIP_NOTE(T(<s>37 open tabs</s>), "peach", "red", -3),
+];
+const STRIP_BOTTOM = [
+    STRIP_NOTE(S("heart", "focus"), "white", "red", 5),
+    STRIP_NOTE(T(<>streak:<br /><span className="hiw-big">day 12</span></>), "lavender", "violet", -4),
+    STRIP_NOTE(S("loaf", "zzz"), "sky", "violet", 6, "square"),
+];
+
+const vars = (v: Record<string, string>) => v as CSSProperties;
+
+function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style?: CSSProperties; className?: string }) {
+    const { item } = note;
+    let inner: ReactNode;
+    if ("stamp" in item) {
+        const scale = note.frame === "none" ? (item.caption ? 78 : 86) : item.caption ? 92 : 100;
+        inner = (
+            <>
+                <div className="hiw-art">
+                    <div className="hiw-stamp-box" style={{ width: `${scale}%`, height: `${scale}%`, rotate: `${note.stampRot}deg` }}>
+                        <PixelStamp name={item.stamp} frame={note.frame} press={note.press} ghost={note.ghost} />
+                    </div>
+                </div>
+                {item.caption && <span>{item.caption}</span>}
+            </>
+        );
+    } else {
+        inner = item.text;
+    }
     return (
-        <div aria-hidden="true" className="relative z-10 flex md:hidden xl:flex justify-center items-center shrink-0 py-0.5 xl:py-0 text-ink/40">
-            {kind === "arrow" ? (
-                <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="rotate-90 xl:rotate-0"
-                >
-                    <path d="M4 13c4.5-1.6 10-1.6 15.5-.2" />
-                    <path d="M14.5 8.5 20 12.8l-5 4.2" />
-                </svg>
-            ) : (
-                <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="rotate-90 xl:rotate-0"
-                >
-                    <path d="M20 11a8 8 0 0 0-14.5-4.4L3 9" />
-                    <path d="M3 4v5h5" />
-                    <path d="M4 13a8 8 0 0 0 14.5 4.4L21 15" />
-                    <path d="M21 20v-5h-5" />
-                </svg>
-            )}
+        <div
+            className={`hiw-note ${className}`}
+            style={{ ...vars({ "--paper": `var(--hiw-${note.paper})`, "--ink-c": `var(--hiw-ink-${note.ink})` }), rotate: `${note.rot}deg`, ...style }}
+        >
+            <div className="hiw-paper">
+                <div className="hiw-content">{inner}</div>
+                {note.mark && (
+                    <div className="hiw-mark" style={{ rotate: `${note.markRot}deg` }}>
+                        <PixelStamp name={note.mark} press={note.press} />
+                    </div>
+                )}
+            </div>
+            {note.fastener === "tape" && <i className="hiw-tape" />}
+            {note.fastener === "pin" && <i className="hiw-pin" style={vars({ "--pin-c": note.pinColor })} />}
         </div>
     );
 }
 
-/** Crisp translucent pill link anchored at the foot of each sticky note. */
-function SectionLink({ href, children }: { href: string; children: React.ReactNode }) {
-    return (
-        <a
-            href={href}
-            className="group/link mt-auto inline-flex w-fit items-center gap-2 rounded-full pl-3 pr-1 py-1 text-[13px] font-medium text-ink bg-white/80 ring-1 ring-black/[0.07] shadow-[0_1px_2px_rgb(20_20_20/0.06)] transition-[background-color,box-shadow,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white hover:ring-black/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2"
-        >
-            {children}
-            <span
-                aria-hidden="true"
-                className="w-5 h-5 rounded-full bg-ink/[0.07] text-ink flex items-center justify-center transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/link:bg-ink/[0.12] group-active/link:bg-ink/[0.17]"
-            >
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 5v14" />
-                    <path d="m19 12-7 7-7-7" />
-                </svg>
-            </span>
-        </a>
-    );
-}
+const CURL = (
+    <svg className="hiw-curl" viewBox="0 0 236 236" aria-hidden="true" focusable="false">
+        <path className="hiw-cast" />
+        <path className="hiw-under" />
+        <path className="hiw-back" />
+        <path className="hiw-shade" />
+    </svg>
+);
 
-function Lines({ lines, className }: { lines: string[]; className: string }) {
+function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWall: boolean }) {
+    const style: CSSProperties = {
+        ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})` }),
+        rotate: `${s.pos[2]}deg`,
+        ...(onWall ? { left: s.pos[0], top: s.pos[1], zIndex: 50 + i } : {}),
+    };
     return (
-        <span className={className}>
-            {lines.map((line) => (
-                <span key={line} className="block">
-                    {line}
-                </span>
-            ))}
-        </span>
+        <li className="hiw-note hiw-step" style={style}>
+            <div className="hiw-paper">
+                <div className="hiw-content">
+                    <div className="hiw-step-head">
+                        <span>{s.step}</span>
+                        <span className="hiw-step-art" style={{ rotate: `${s.stampRot}deg` }}>
+                            <PixelStamp name={s.stamp} frame={s.frame} press={i} />
+                        </span>
+                    </div>
+                    <h3>{s.title}</h3>
+                    <p>{s.body}</p>
+                    <span className="hiw-hand" aria-hidden="true">
+                        {s.hand}
+                    </span>
+                </div>
+            </div>
+            {onWall && CURL}
+            <i className="hiw-tape hiw-tape-wide" />
+        </li>
     );
 }
 
@@ -236,46 +251,43 @@ export default function HowItWorksSection() {
                 From choosing your companion to seeing your progress grow.
             </SectionSubtitle>
 
-            {/* Top-down felt desk mat with a stitched edge */}
-            <div className="relative w-full mt-4 overflow-hidden rounded-[28px] felt px-5 pt-28 pb-32 sm:px-8 md:pt-36 md:pb-40 xl:px-8 xl:pt-[160px] xl:pb-[190px] shadow-[inset_0_2px_0_rgb(255_255_255/0.7),inset_0_-1px_0_rgb(20_20_20/0.04),0_1px_3px_rgb(20_20_20/0.05)]">
-                <div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-[20px] border-2 border-dashed border-[rgb(70_105_140/0.28)]" />
+            <div className="hiw">
+                <StampFilters />
 
-                {/* Props and handwritten desk notes, behind the step notes */}
-                <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 select-none">
-                    <DeskProps />
-                    {DESK_NOTES.map((note, idx) => (
-                        <div
-                            key={idx}
-                            className={`absolute w-24 h-24 md:w-28 md:h-28 xl:w-32 xl:h-32 p-3 xl:p-3.5 rounded-[2px] font-hand text-[19px] md:text-[21px] xl:text-[23px] font-medium leading-[1.05] text-ink/80 shadow-[0_1px_2px_rgb(20_20_20/0.05),0_6px_14px_-6px_rgb(20_20_20/0.12)] [&_s]:decoration-2 [&_s]:decoration-accent-strong/70 [&_s]:text-ink/55 ${note.color} ${note.className}`}
-                        >
-                            {note.content}
+                {/* lg+: the wall, scaled to fit */}
+                <WallFit width={BOARD_W} className="hiw-wall hidden lg:block">
+                    <div className="hiw-board">
+                        <div className="hiw-small" aria-hidden="true">
+                            {WALL.map((n, idx) => (
+                                <SmallNote key={idx} note={n} style={{ left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }} />
+                            ))}
                         </div>
-                    ))}
-                </div>
+                        <ol className="hiw-steps">
+                            {STEPS.map((s, i) => (
+                                <StepNote key={s.step} s={s} i={i} onWall />
+                            ))}
+                        </ol>
+                    </div>
+                </WallFit>
 
-                {/* Vertical flow on phones → 2×2 board on tablets → staggered 4-note row from xl */}
-                <ol className="relative z-10 w-full flex flex-col items-center gap-4 md:grid md:grid-cols-2 md:gap-8 md:max-w-[560px] md:mx-auto xl:max-w-none xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] xl:items-center xl:gap-3">
-                    {STEPS.map((step) => (
-                        <li key={step.href} className="contents">
-                            <StickyNote
-                                step={step.step}
-                                color={step.color}
-                                className={`w-[244px] sm:w-[256px] md:w-full ${step.pose}`}
-                            >
-                                <div className="flex flex-1 flex-col gap-2">
-                                    <h3 className="min-h-[2lh] text-[17px] font-semibold text-ink-strong leading-snug tracking-[-0.005em]">
-                                        <Lines lines={step.title} className="block whitespace-nowrap" />
-                                    </h3>
-                                    <p className="w-full min-h-[3lh] text-[13.5px] sm:text-body-sm text-ink/85 leading-[1.48]">
-                                        <Lines lines={step.narrow} className="block" />
-                                    </p>
-                                    <SectionLink href={step.href}>{step.link}</SectionLink>
-                                </div>
-                            </StickyNote>
-                            {step.connector && <StepConnector kind={step.connector} />}
-                        </li>
-                    ))}
-                </ol>
+                {/* Below lg: the steps stacked between two rows of small notes */}
+                <div className="hiw-stack flex flex-col items-center gap-7 lg:hidden">
+                    <div className="hiw-strip" aria-hidden="true">
+                        {STRIP_TOP.map((n, idx) => (
+                            <SmallNote key={idx} note={n} />
+                        ))}
+                    </div>
+                    <ol className="hiw-steps grid grid-cols-1 justify-items-center gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12">
+                        {STEPS.map((s, i) => (
+                            <StepNote key={s.step} s={s} i={i} onWall={false} />
+                        ))}
+                    </ol>
+                    <div className="hiw-strip" aria-hidden="true">
+                        {STRIP_BOTTOM.map((n, idx) => (
+                            <SmallNote key={idx} note={n} />
+                        ))}
+                    </div>
+                </div>
             </div>
         </Section>
     );

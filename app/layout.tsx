@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Caveat, Inter, Pixelify_Sans } from "next/font/google";
+import { Inter, Pixelify_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -19,10 +20,15 @@ const pixelifySans = Pixelify_Sans({
   subsets: ["latin"],
 });
 
-// Handwriting for decorative desk notes only (How It Works); never for UI or body copy.
-const caveat = Caveat({
-  variable: "--font-caveat",
-  subsets: ["latin"],
+// Handwriting for the How It Works wall notes only; never for UI or body copy.
+// Self-hosted Latin slice of Gaegu Bold (SIL OFL): the Google build of this Korean
+// font is ~240 files, and only the Latin one at 700 is ever used.
+const gaegu = localFont({
+  src: "./fonts/gaegu-700-latin.woff2",
+  weight: "700",
+  variable: "--font-gaegu",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -73,7 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       // The visitor's time of day; the head script below replaces it before the first paint
       data-sky={DEFAULT_SKY_PHASE}
       suppressHydrationWarning // This is to prevent hydration mismatch errors when using server-side rendering with Next.js
-      className={`${inter.variable} ${pixelifySans.variable} ${caveat.variable} h-full antialiased scroll-smooth`}
+      className={`${inter.variable} ${pixelifySans.variable} ${gaegu.variable} h-full antialiased scroll-smooth`}
     >
       <head>
         {/* Per-phase sky colours, switched by <html data-sky> */}
