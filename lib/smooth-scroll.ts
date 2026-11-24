@@ -7,8 +7,29 @@ let activeCleanup: (() => void) | null = null;
 // through it while it runs; writing window.scrollTo underneath it would fight its easing.
 let lenis: Lenis | null = null;
 
+// Scroll-driven effects that must move in the same frame as the page (see onSmoothScroll).
+const scrollListeners = new Set<() => void>();
+let detachListeners: (() => void) | null = null;
+
 export function setLenis(instance: Lenis | null) {
+    detachListeners?.();
+    detachListeners = null;
     lenis = instance;
+    if (instance) detachListeners = instance.on("scroll", () => scrollListeners.forEach((fn) => fn()));
+}
+
+/**
+ * Calls `fn` right after Lenis moves the page, in the same animation frame.
+ * A plain "scroll" listener only hears about it after that frame has painted, so
+ * anything it positions trails the page by a frame and visibly jitters against it.
+ * Returns an unsubscribe function. Without Lenis (reduced motion) it never fires,
+ * so keep a native scroll listener too.
+ */
+export function onSmoothScroll(fn: () => void): () => void {
+    scrollListeners.add(fn);
+    return () => {
+        scrollListeners.delete(fn);
+    };
 }
 
 /** Jump to the very top with no animation (used on page changes). */
