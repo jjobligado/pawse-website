@@ -33,9 +33,9 @@ export default function HomePage() {
             <StructuredData />
             <HeroSection />
             <HowItWorksSection />
-            {/* The feature tour: two cats walk in from the screen's edges, down the sides, and off again in the middle of Progress */}
+            {/* The feature tour: two cats walk in from the screen's edges, down the sides, and off again at the end of Progress */}
             <div className="relative">
-                <PawTrail endSelector="#progress" endFraction={0.5} />
+                <PawTrail endSelector="#progress" endFraction={0.88} />
                 <CompanionsSection />
                 <FocusSection />
                 <BreakSection />
