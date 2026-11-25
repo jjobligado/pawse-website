@@ -124,7 +124,32 @@ export const BACKGROUND = {
 };
 
 /* ------------------------------------------------------------------------ */
-/* 3. The side notes (only visible where the page is wider than the         */
+/* 3. Cat photos: taped instant-photo prints on the wall                    */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Files live in public/images/cat-memes/. Each print takes the place of one
+ * background note, picked automatically: notes that stay fully visible, as
+ * far from the steps and from each other as possible (the outer ring).
+ * Order matters: if there are fewer good spots than photos, the last ones
+ * are left out. Remove a row to drop a photo; `caption` is optional and
+ * handwritten under the photo (keep it short, ~14 characters).
+ */
+export const PHOTOS: { src: string; caption?: string; tilt?: number }[] = [
+    { src: "/images/cat-memes/lock-in.jpg", tilt: -4 },
+    { src: "/images/cat-memes/thinking-cat.jpg", caption: "break time?", tilt: 5 },
+    { src: "/images/cat-memes/banana-cat.jpg", caption: "snack o’clock", tilt: -6 },
+    { src: "/images/cat-memes/table-cat.jpg", caption: "no phones.", tilt: 3 },
+    { src: "/images/cat-memes/throne-kitten.jpg", caption: "4 sessions in", tilt: -3 },
+    { src: "/images/cat-memes/standing-kitten.jpg", caption: "5 more min?", tilt: 6 },
+    { src: "/images/cat-memes/muejeje.jpg", caption: "one more tab", tilt: -5 },
+];
+
+/** Prints are this much taller than wide (the white strip at the foot). */
+export const PRINT_RATIO = 1.18;
+
+/* ------------------------------------------------------------------------ */
+/* 4. The side notes (only visible where the page is wider than the         */
 /*    section; they spread out to the header's edges)                       */
 /* ------------------------------------------------------------------------ */
 
