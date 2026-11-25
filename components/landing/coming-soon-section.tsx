@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Bend } from "./paper-bends";
-import { BentPaper, S, SmallNote, T, vars, writing, type Item, type SmallNoteData } from "./paper-note";
+import { BentPaper, S, SmallNote, T, vars, type Item, type SmallNoteData } from "./paper-note";
 import PixelStamp from "./pixel-stamp";
 import type { StampName } from "./pixel-stamps";
 import Section from "./section";
@@ -10,8 +10,7 @@ import type { Ink, Paper } from "./how-it-works-tuning";
 /**
  * What's next, on the same paper as How It Works, but as drafts rather than a
  * finished wall: three notes hung from one crooked strip of masking tape, the
- * drawing only half-inked inside a pencilled box, a red SOON stamp pressed on
- * each, and a few loose notes tucked behind. No dense background, so the
+ * drawing only half-inked, a red SOON stamp pressed on each, and a few loose notes tucked behind. No dense background, so the
  * section reads as a quieter corner of the same wall.
  *
  * Layout is plain CSS (no scaled board), so it reflows with the screen:
@@ -31,7 +30,6 @@ const ITEMS: {
     paper: Paper;
     ink: Ink;
     stamp: StampName;
-    hand: string;
     tilt: number;
     bend: Bend;
     /** The masking tape: px off centre and its tilt. */
@@ -49,7 +47,6 @@ const ITEMS: {
         paper: "sky",
         ink: "blue",
         stamp: "cloud",
-        hand: "~~poof~~ saved",
         tilt: -2.6,
         bend: "bow",
         tape: [-14, -4],
@@ -63,7 +60,6 @@ const ITEMS: {
         paper: "yellow",
         ink: "red",
         stamp: "sliders",
-        hand: "~~25~~ 40 min",
         tilt: 2,
         bend: "curl-r-sm",
         tape: [12, 3],
@@ -77,7 +73,6 @@ const ITEMS: {
         paper: "lavender",
         ink: "violet",
         stamp: "note",
-        hand: "more purrs",
         tilt: -1.4,
         bend: "cup",
         tape: [4, -2],
@@ -168,9 +163,6 @@ export default function ComingSoonSection() {
                                         </div>
                                         <h3>{it.title}</h3>
                                         <p>{it.body}</p>
-                                        <span className="hiw-hand" aria-hidden="true">
-                                            {writing(it.hand)}
-                                        </span>
                                     </div>
                                     <SoonStamp tilt={it.soon} press={i} />
                                 </BentPaper>
