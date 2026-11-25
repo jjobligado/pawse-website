@@ -126,7 +126,51 @@ export const BACKGROUND = {
 };
 
 /* ------------------------------------------------------------------------ */
-/* 3. Cat photos: printed photos taped on the wall                          */
+/* 3. What's written on the background notes                               */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * One entry per note. New line = "\n". Marks: ~~crossed out~~, **big**.
+ * Notes with 3 or more lines are written smaller on a slightly bigger note,
+ * like a jotted list. Keep one-liners under ~30 characters. Anything also
+ * used on a side note (section 5) is left off the wall so it doesn't repeat.
+ * The pixel-stamp notes are separate (STAMPS in how-it-works-section.tsx).
+ */
+export const NOTES: string[] = [
+    "Tux knocked my pen off the desk. again.",
+    "Ginger did zoomies at 3am",
+    "Void was here",
+    "a group of cats is a \"clowder\"",
+    "pet the cat (non-negotiable)",
+    "cats sleep ~70% of their lives. goals.",
+    "a cat's nose print is unique, like a fingerprint",
+    "I'm not procrastinating, I'm loafing",
+    "**25:00**\nthen 5:00",
+    "finish the essay",
+    "~~check email~~",
+    "locked in. do not disturb.",
+    "you got this :)",
+    "small steps still count",
+    "done > perfect",
+    "rest is productive too",
+    "drink water!",
+    "deep breath",
+    "to do:\n~~read ch. 4~~\n~~lab report~~\nmath problem set\nemail prof",
+    "sat:\n9am vet (Ginger)\n2pm study @ library\n6pm feed the cats",
+    "the cat already ate.\ndo NOT believe her.",
+    "**4** days\nuntil finals",
+    "meow meow meow",
+    "sunday:\n~~laundry~~\n~~groceries~~\n~~clean desk~~\n~~call mom~~\ndone!!",
+    "~~buy cat food~~\n~~litter~~\nreturn library books\n~~pay phone bill~~",
+    "HIST 101 essay\ndue fri 11:59pm\n1,500 words\n(0 written)",
+    "today:\n~~3 focus sessions~~\nflashcards\n~~outline essay~~",
+];
+
+/** List notes (3+ lines) are this much bigger than the others. */
+export const LIST_NOTE_SCALE = 1.25;
+
+/* ------------------------------------------------------------------------ */
+/* 4. Cat photos: printed photos taped on the wall                          */
 /* ------------------------------------------------------------------------ */
 
 /**
@@ -151,7 +195,7 @@ export const PHOTOS: { src: string; tilt?: number; tuck?: number }[] = [
 ];
 
 /* ------------------------------------------------------------------------ */
-/* 4. The side notes (only visible where the page is wider than the         */
+/* 5. The side notes (only visible where the page is wider than the         */
 /*    section; they spread out to the header's edges)                       */
 /* ------------------------------------------------------------------------ */
 
@@ -178,12 +222,12 @@ type SideNote = {
  * Add or remove rows freely.
  */
 export const SIDE_NOTES: SideNote[] = [
-    { side: "left", inset: 10, y: 74, size: 110, tilt: -7, text: "stretch your back", paper: "white", ink: "blue", taped: true },
+    { side: "left", inset: 10, y: 74, size: 110, tilt: -7, text: "drink water!", paper: "white", ink: "blue", taped: true },
     { side: "left", inset: 6, y: 222, size: 120, tilt: 5, stamp: "paw", paper: "pink", ink: "red", taped: false },
     { side: "left", inset: 22, y: 372, size: 104, tilt: -4, text: "deep breath", paper: "cream", ink: "black", taped: true },
-    { side: "left", inset: 8, y: 516, size: 114, tilt: 6, stamp: "fish", frame: "round", paper: "sky", ink: "blue", taped: false },
-    { side: "right", inset: 12, y: 104, size: 116, tilt: 6, stamp: "star", paper: "lavender", ink: "violet", taped: true },
-    { side: "right", inset: 24, y: 262, size: 104, tilt: -5, text: "lo-fi on", paper: "peach", ink: "black", taped: false },
+    { side: "left", inset: 8, y: 516, size: 114, tilt: 6, stamp: "fish", caption: "x4", frame: "round", paper: "sky", ink: "blue", taped: false },
+    { side: "right", inset: 12, y: 104, size: 116, tilt: 6, stamp: "star", caption: "nice!", paper: "lavender", ink: "violet", taped: true },
+    { side: "right", inset: 24, y: 262, size: 104, tilt: -5, text: "meow meow meow", paper: "peach", ink: "black", taped: false },
     { side: "right", inset: 6, y: 408, size: 120, tilt: 4, stamp: "mug", frame: "square", paper: "mint", ink: "green", taped: true },
-    { side: "right", inset: 18, y: 532, size: 100, tilt: -6, text: "purr purr", paper: "yellow", ink: "black", taped: false },
+    { side: "right", inset: 18, y: 532, size: 100, tilt: -6, text: "Void was here", paper: "yellow", ink: "black", taped: false },
 ];

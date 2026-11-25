@@ -1431,8 +1431,10 @@ body {
 .hiw-content { position: absolute; inset: 0; padding: 12px 12px 10px; display: flex; flex-direction: column; gap: 2px; font: 700 21px/1.05 var(--font-hand); color: var(--hiw-graphite); }
 .hiw-content s { text-decoration-color: rgb(88 93 100 / 0.75); text-decoration-thickness: 2px; color: var(--hiw-graphite-soft); }
 .hiw-big { font-size: 1.45em; }
-.hiw-timer { font-size: 26px; line-height: 1; }
-.hiw-timer small { display: block; font-size: 16px; color: var(--hiw-graphite-soft); margin-top: 2px; }
+/* Lists and schedules: smaller writing, packed like a jotted list */
+.hiw-content.hiw-list { font-size: 14.5px; line-height: 1.14; padding: 10px 10px 6px; }
+.hiw-content.hiw-dense { font-size: 13px; line-height: 1.12; padding: 9px 10px 6px; }
+.hiw-content.hiw-long { font-size: 17px; line-height: 1.1; }
 .hiw-art { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
 .hiw-stamp-box { display: grid; place-items: center; }
 
@@ -1501,7 +1503,6 @@ body {
 .hiw-strip { display: flex; justify-content: center; gap: 6px; }
 .hiw-strip .hiw-note { width: 104px; height: 104px; }
 .hiw-strip .hiw-content { padding: 10px; font-size: 18px; }
-.hiw-strip .hiw-timer { font-size: 22px; }
 @media (min-width: 48rem) {
   .hiw-strip { gap: 20px; }
   .hiw-strip .hiw-note { width: 124px; height: 124px; }

@@ -1,12 +1,12 @@
 import Image from "next/image";
-import type { CSSProperties, ReactNode } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
 import { backClip, bendClip, hasBack, PaperBends, type Bend } from "./paper-bends";
 import PixelStamp, { StampFilters } from "./pixel-stamp";
 import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 import WallFit from "./wall-fit";
-import { BACKGROUND as BG, PHOTOS, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from "./how-it-works-tuning";
+import { BACKGROUND as BG, LIST_NOTE_SCALE, NOTES, PHOTOS, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from "./how-it-works-tuning";
 
 /**
  * The PAWSE loop as four paper step notes on a wall of small notes. Every
@@ -37,22 +37,48 @@ const STEPS: {
     { step: "04", title: "Watch Your Progress Build", body: "Every session gets logged. Small sessions, big streaks.", paper: "lavender", stamp: "chart", frame: "square", ink: "green", hand: "day 12" },
 ];
 
-type Item = { text: ReactNode } | { stamp: StampName; caption?: string };
-const T = (text: ReactNode): Item => ({ text });
+type Item = { text: ReactNode; size?: "list" | "dense" | "long" } | { stamp: StampName; caption?: string };
+
+/** Renders one written note: "\n" breaks a line, ~~x~~ crosses out, **x** writes big. */
+function writing(text: string): ReactNode {
+    return text.split("\n").map((line, i) => (
+        <Fragment key={i}>
+            {i > 0 && <br />}
+            {line.split(/(~~[^~]+~~|\*\*[^*]+\*\*)/).map((part, j) =>
+                part.startsWith("~~") ? (
+                    <s key={j}>{part.slice(2, -2)}</s>
+                ) : part.startsWith("**") ? (
+                    <span key={j} className="hiw-big">
+                        {part.slice(2, -2)}
+                    </span>
+                ) : (
+                    part
+                ),
+            )}
+        </Fragment>
+    ));
+}
+/** 3+ lines: written small, like a list (6+: smaller still). A long line or two: a size down so it fits. */
+function T(text: string): Item {
+    const lines = text.split("\n").length;
+    const long = text.replace(/~~|\*\*/g, "").length > 24;
+    // one span, so the lines flow as text inside the note's flex column
+    return { text: <span>{writing(text)}</span>, size: lines >= 6 ? "dense" : lines >= 3 ? "list" : long ? "long" : undefined };
+}
+const isList = (item: Item) => "size" in item && (item.size === "list" || item.size === "dense");
 const S = (stamp: StampName, caption?: string): Item => ({ stamp, caption });
 
-const ITEMS: Item[] = [
-    T("drink water!"), T(<s>37 open tabs</s>), T(<s>check email</s>),
-    T(<span className="hiw-timer">25:00<small>then 5:00</small></span>),
-    T("Tux needs a coffee refill"), T(<><s>doomscroll</s><br />nope.</>),
-    T(<>streak:<br /><span className="hiw-big">day 12</span></>),
-    T("Ginger did zoomies again"), T("Void was here"), T("4 fish today!"), T("stretch your back"), T("you got this :)"),
-    T("one tab only"), T("lo-fi on"), T("nap break?"), T("finish the essay"), T("pet the cat"), T("phone in the drawer"),
-    T("deep breath"), T(<s>quick scroll</s>), T("snack o’clock"), T("3 sessions done"), T("be kind to you"), T("purr purr"),
+const STAMPS: Item[] = [
     S("cat"), S("loaf", "zzz"), S("fish", "x4"), S("heart"), S("star", "nice!"), S("mug"),
     S("paw"), S("yarn"), S("tux", "hi!"), S("loaf"), S("fish"), S("sparkle"), S("phone", "away"),
     S("heart", "focus"), S("zzz"), S("clock", "25 min"),
 ];
+const SIDE_TEXT = new Set(SIDE_NOTES.flatMap((n) => ("text" in n ? [n.text] : [])));
+const ITEMS: Item[] = [...NOTES.filter((t) => !SIDE_TEXT.has(t)).map(T), ...STAMPS];
+/** Walk the items in steps that share no factor with their count, so every one shows before any repeats. */
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+let ITEM_STEP = 11;
+while (gcd(ITEM_STEP, ITEMS.length) !== 1) ITEM_STEP++;
 
 const INKS: Ink[] = ["blue", "red", "violet", "green", "black"];
 const MARKS: StampName[] = ["star", "heart", "paw", "sparkle", "fish"];
@@ -107,7 +133,8 @@ const BOARD_H = 600;
  * kept whole on the 1120×600 core. Layout and stamp styling draw from separate
  * random streams so either can change without moving the other.
  */
-type WallNote = SmallNoteData & { x: number; y: number; size: number; z: number };
+/** `base` is the note's size before list notes are scaled up. */
+type WallNote = SmallNoteData & { x: number; y: number; size: number; base: number; z: number };
 const WALL: WallNote[] = (() => {
     const r = rng(BG.seed);
     const r2 = rng(97);
@@ -132,15 +159,18 @@ const WALL: WallNote[] = (() => {
         const markRot = (r2() - 0.5) * 30;
         const blank = r2() < BG.blankShare;
         const bend = pickBend(r2());
+        const item = ITEMS[((blank ? k : k++) * ITEM_STEP) % ITEMS.length];
+        const base = size;
+        if (!blank && isList(item)) size *= LIST_NOTE_SCALE;
         const m = size * 0.6 + 4; // keeps the tilted note and its tape whole
         const x = Math.min(BOARD_W - m, Math.max(m, px));
         const y = Math.min(BOARD_H - m, Math.max(m, py));
-        const item = ITEMS[((blank ? k : k++) * 11) % ITEMS.length]; // 11 shares no factor with the list length, so every item shows before any repeats
         boxes.push([x, y, size / 2]);
         out.push({
             x: x - size / 2,
             y: y - size / 2,
             size,
+            base,
             // blank notes sit at the very back (0-2); written ones above them. Notes
             // stuck over a photo's corner (z 26+) keep their place on top.
             z: z >= 26 ? z : blank ? z % 3 : Math.max(z, 3),
@@ -171,6 +201,15 @@ const WALL: WallNote[] = (() => {
             if (w > 0 && h > 0) a += w * h;
         }
         return Math.min(1, a / (size * size));
+    };
+
+    /** Resizes a placed note around its centre, kept whole on the board. */
+    const resize = (n: WallNote, size: number) => {
+        const m = size * 0.6 + 4;
+        const c = [n.x + n.size / 2, n.y + n.size / 2];
+        n.size = size;
+        n.x = Math.min(BOARD_W - m, Math.max(m, c[0])) - size / 2;
+        n.y = Math.min(BOARD_H - m, Math.max(m, c[1])) - size / 2;
     };
 
     // 1. The radial scatter. A note is skipped when it would mostly hide under
@@ -260,6 +299,47 @@ const WALL: WallNote[] = (() => {
             placed++;
         }
     });
+    // 5. Every list gets one of the most visible seats: written notes that the
+    //    steps, the photos and the notes over the photos cover least (judged
+    //    at list size). Seats take the lists, resized to match and placed on
+    //    top of the other notes; a note that held a list elsewhere takes over
+    //    a seat's one-liner.
+    const isListNote = (n: WallNote) => !n.blank && isList(n.item);
+    const written = out.filter((n) => !n.blank && !n.photo && "text" in n.item && n.z < 24);
+    const top = out.filter((n) => n.z >= 24);
+    const seen = (n: WallNote) => {
+        const size = n.base * LIST_NOTE_SCALE;
+        const x0 = n.x + n.size / 2 - size / 2;
+        const y0 = n.y + n.size / 2 - size / 2;
+        let open = 0;
+        for (let gy = 0.1; gy < 1; gy += 0.2) {
+            for (let gx = 0.1; gx < 1; gx += 0.2) {
+                const px = x0 + gx * size;
+                const py = y0 + gy * size;
+                const hidden =
+                    steps.some((s) => px > s.left && px < s.left + 236 && py > s.top && py < s.top + 236) ||
+                    top.some((o) => px > o.x && px < o.x + o.size && py > o.y && py < o.y + o.size);
+                open += +!hidden;
+            }
+        }
+        return open / 25;
+    };
+    const listItems = ITEMS.filter(isList);
+    const seats = [...written].sort((a, b) => seen(b) - seen(a)).slice(0, listItems.length);
+    const freed = seats.filter((n) => !isListNote(n)).map((n) => n.item);
+    for (const n of written) {
+        if (seats.includes(n) || !isListNote(n)) continue;
+        const item = freed.shift();
+        if (item) n.item = item;
+        else [n.blank, n.z] = [true, n.z % 3]; // back of the pile, like other blanks
+        resize(n, n.base);
+    }
+    seats.forEach((n, i) => {
+        n.item = listItems[i];
+        n.mark = null;
+        resize(n, n.base * LIST_NOTE_SCALE);
+        n.z = 23; // above every regular note, below the photos
+    });
     return out;
 })();
 
@@ -296,11 +376,11 @@ const STRIP_NOTE = (item: Item, paper: Paper, ink: Ink, rot: number, frame: Stam
 const STRIP_TOP = [
     STRIP_NOTE(T("drink water!"), "pink", "blue", -6, "none", "curl-r-sm"),
     STRIP_NOTE(S("fish", "x4"), "cream", "blue", 4, "round"),
-    STRIP_NOTE(T(<s>37 open tabs</s>), "peach", "red", -3, "none", "bow"),
+    STRIP_NOTE(T("~~check email~~"), "peach", "red", -3, "none", "bow"),
 ];
 const STRIP_BOTTOM = [
     STRIP_NOTE(S("heart", "focus"), "white", "red", 5, "none", "cup"),
-    STRIP_NOTE(T(<>streak:<br /><span className="hiw-big">day 12</span></>), "lavender", "violet", -4),
+    STRIP_NOTE(T("**4** days\nuntil finals"), "lavender", "violet", -4),
     STRIP_NOTE(S("loaf", "zzz"), "sky", "violet", 6, "square", "curl-l-sm"),
 ];
 
@@ -342,6 +422,7 @@ function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style
     } else {
         inner = item.text;
     }
+    const textSize = !note.blank && "size" in item ? item.size : undefined; // list | dense | long
     if (note.photo) {
         return (
             <div className={`hiw-note hiw-print ${className}`} style={{ rotate: `${note.rot}deg`, ...style }}>
@@ -358,7 +439,7 @@ function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style
             style={{ ...vars({ "--paper": `var(--hiw-${note.paper})`, "--ink-c": `var(--hiw-ink-${note.ink})` }), rotate: `${note.rot}deg`, ...style }}
         >
             <BentPaper bend={note.bend}>
-                <div className="hiw-content">{inner}</div>
+                <div className={textSize ? `hiw-content hiw-${textSize}` : "hiw-content"}>{inner}</div>
                 {note.mark && (
                     <div className="hiw-mark" style={{ rotate: `${note.markRot}deg` }}>
                         <PixelStamp name={note.mark} press={note.press} />
