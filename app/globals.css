@@ -1411,7 +1411,6 @@ body {
 
 .hiw-tape { position: absolute; width: 58px; height: 18px; top: -8px; left: calc(50% - 29px); z-index: 3; background: var(--hiw-tape); box-shadow: 0 1px 1px rgb(0 0 0 / 0.05); }
 .hiw-tape-wide { width: 84px; height: 22px; top: -10px; left: calc(50% - 42px); }
-.hiw-pin { position: absolute; top: 7px; left: calc(50% - 6px); width: 12px; height: 12px; border-radius: 50%; z-index: 3; background: radial-gradient(circle at 35% 35%, #fff8 0 25%, transparent 30%), var(--pin-c); box-shadow: 0 2px 2px rgb(0 0 0 / 0.25); }
 
 /* Stamps: ink in the note's --ink-c, multiplied into the paper */
 .hiw-stamp { display: block; width: 100%; height: 100%; overflow: visible; color: var(--ink-c); mix-blend-mode: multiply; }
@@ -1421,8 +1420,8 @@ body {
 .hiw-step { width: 236px; height: 236px; }
 .hiw-stack .hiw-step { width: 256px; height: 256px; }
 .hiw-step .hiw-content { padding: 22px 22px 18px; gap: 0; font: 400 14.5px/1.48 var(--font-inter), sans-serif; color: rgb(35 35 35 / 0.85); }
-.hiw-step-head { display: flex; justify-content: space-between; align-items: flex-start; font: 600 13px/1 var(--font-pixelify), monospace; letter-spacing: 0.08em; color: rgb(35 35 35 / 0.6); }
-.hiw-step-art { width: 62px; height: 62px; margin: -10px -8px 0 0; flex: none; }
+.hiw-step-head { min-height: 52px; display: flex; justify-content: space-between; align-items: flex-start; font: 600 13px/1 var(--font-pixelify), monospace; letter-spacing: 0.08em; color: rgb(35 35 35 / 0.6); }
+.hiw-step-art { flex: none; } /* size and offset per step, inline */
 .hiw-step h3 { margin: 10px 0 8px; font: 600 19px/1.25 var(--font-inter), sans-serif; letter-spacing: -0.005em; color: var(--color-ink-strong, #141414); }
 .hiw-step p { margin: 0; }
 .hiw-hand { margin-top: auto; align-self: flex-start; rotate: -4deg; font: 700 22px/1 var(--font-hand); color: var(--hiw-graphite); }
