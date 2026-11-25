@@ -71,10 +71,10 @@ export const BACKGROUND = {
      *   messiness:    0 = tidy spiral, 1 = very scattered
      *   raggedEdge:   share of notes dropped near the rim, for an uneven outline
      */
-    count: 46,
+    count: 30,
     radiusX: 545,
-    radiusY: 260,
-    centerPile: 1.5,
+    radiusY: 280,
+    centerPile: 0.8,
     messiness: 0.7,
     raggedEdge: 0.3,
     /**

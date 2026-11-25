@@ -158,8 +158,8 @@ const WALL: WallNote[] = (() => {
         Object.values(STEP_LAYOUT).some((s) => px > s.left + 6 && px < s.left + 230 && py > s.top + 6 && py < s.top + 230);
     const pad = BG.gapPad;
     for (const s of Object.values(STEP_LAYOUT)) {
-        for (let py = s.top - pad; py <= s.top + 236 + pad; py += 22) {
-            for (let px = s.left - pad; px <= s.left + 236 + pad; px += 22) {
+        for (let py = s.top - pad; py <= s.top + 236 + pad; py += 30) {
+            for (let px = s.left - pad; px <= s.left + 236 + pad; px += 30) {
                 if (covered(px, py)) continue;
                 add(px + (r() - 0.5) * 30, py + (r() - 0.5) * 30, noteSize(), 8 + Math.floor(r() * 10));
             }
