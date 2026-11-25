@@ -120,10 +120,11 @@ export default function Header() {
                                 href={`/#${link.id}`}
                                 onClick={(e) => handleNavClick(e, link.id)}
                                 aria-current={isActive ? "location" : undefined}
-                                className={`whitespace-nowrap text-sm tracking-[0.02em] transition-colors duration-200 ${
+                                // Current section gets a 4px square "pixel" dot under the label; it fades in and out with the scrollspy.
+                                className={`relative whitespace-nowrap text-sm tracking-[0.02em] rounded-sm transition-[color,opacity] duration-(--duration-micro) active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-4 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-2 after:size-1 after:bg-current after:transition-opacity after:duration-(--duration-short) ${
                                     isActive
-                                        ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
-                                        : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"
+                                        ? "text-black [-webkit-text-stroke:0.35px_currentColor] after:opacity-100"
+                                        : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor] after:opacity-0"
                                 }`}
                             >
                                 {link.label}
