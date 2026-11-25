@@ -102,7 +102,7 @@ export default function Header() {
                         alt="Pawse Logo"
                         width={216}
                         height={156}
-                        className="h-[20px] sm:h-[26px] w-auto object-contain [image-rendering:pixelated]"
+                        className="h-[17px] sm:h-[21px] w-auto object-contain [image-rendering:pixelated]"
                         priority
                     />
                     <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
