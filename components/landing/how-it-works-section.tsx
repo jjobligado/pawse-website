@@ -116,7 +116,7 @@ const WALL: WallNote[] = (() => {
         const m = size * 0.6 + 4; // keeps the tilted note and its tape whole
         const x = Math.min(BOARD_W - m, Math.max(m, px));
         const y = Math.min(BOARD_H - m, Math.max(m, py));
-        const item = ITEMS[(press * 7 + Math.floor(press / ITEMS.length)) % ITEMS.length];
+        const item = ITEMS[(press * 11) % ITEMS.length]; // 11 shares no factor with the list length, so every item shows before any repeats
         boxes.push([x, y, size / 2]);
         out.push({
             x: x - size / 2,
