@@ -283,7 +283,7 @@ function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWa
     const style: CSSProperties = {
         ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})` }),
         rotate: `${l.tilt}deg`,
-        ...(onWall ? { left: l.left, top: l.top, zIndex: 50 + i } : {}),
+        ...(onWall ? { left: l.left, top: l.top, ...vars({ "--z": String(50 + i) }) } : {}),
     };
     return (
         <li className="hiw-note hiw-step" style={style}>
