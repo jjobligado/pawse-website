@@ -6,7 +6,7 @@ import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 import WallFit from "./wall-fit";
-import { BACKGROUND as BG, PHOTOS, PRINT_RATIO, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from "./how-it-works-tuning";
+import { BACKGROUND as BG, PHOTOS, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from "./how-it-works-tuning";
 
 /**
  * The PAWSE loop as four paper step notes on a wall of small notes. Every
@@ -72,7 +72,7 @@ type SmallNoteData = {
     /** No writing, at most a small doodle: gives the eye somewhere to rest. */
     blank?: boolean;
     bend?: Bend;
-    /** A taped photo print instead of a sticky note. */
+    /** A taped printed photo instead of a sticky note. */
     photo?: (typeof PHOTOS)[number];
 };
 
@@ -210,7 +210,7 @@ const WALL: WallNote[] = (() => {
         }
     }
 
-    // 3. Photo prints take the spots of notes that stay fully visible, picked
+    // 3. Printed photos take the spots of notes that stay fully visible, picked
     //    one by one as far as possible from the steps and from each other.
     const taken: [number, number][] = steps.map((s) => [s.left + 118, s.top + 118]);
     const spots = out.filter((n) => hiddenShare(n.x + n.size / 2, n.y + n.size / 2, n.size) < 0.12);
@@ -226,10 +226,6 @@ const WALL: WallNote[] = (() => {
         }
         if (!best || bestD < 110) break;
         Object.assign(best, { photo, rot: photo.tilt ?? best.rot, z: 30, taped: true, bend: "flat" as Bend });
-        // prints are taller than notes: keep the whole print (and its tape) on the board
-        const half = (best.size * PRINT_RATIO) / 2 + best.size * 0.1 + 10;
-        const cy = Math.min(BOARD_H - half, Math.max(half, best.y + best.size / 2));
-        best.y = cy - best.size / 2;
         taken.push([best.x + best.size / 2, best.y + best.size / 2]);
     }
     return out;
@@ -317,11 +313,8 @@ function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style
     if (note.photo) {
         return (
             <div className={`hiw-note hiw-print ${className}`} style={{ rotate: `${note.rot}deg`, ...style }}>
-                <div className="hiw-print-frame">
-                    <div className="hiw-print-img">
-                        <Image src={note.photo.src} alt="" fill sizes="160px" />
-                    </div>
-                    {note.photo.caption && <span>{note.photo.caption}</span>}
+                <div className="hiw-print-img">
+                    <Image src={note.photo.src} alt="" fill sizes="160px" />
                 </div>
                 <i className="hiw-tape" />
             </div>
@@ -400,15 +393,7 @@ export default function HowItWorksSection() {
                         <div className="hiw-core">
                             <div className="hiw-small" aria-hidden="true">
                                 {WALL.map((n, idx) => (
-                                    <SmallNote
-                                        key={idx}
-                                        note={n}
-                                        style={
-                                            n.photo
-                                                ? { left: n.x, top: n.y - (n.size * (PRINT_RATIO - 1)) / 2, width: n.size, height: n.size * PRINT_RATIO, zIndex: n.z }
-                                                : { left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }
-                                        }
-                                    />
+                                    <SmallNote key={idx} note={n} style={{ left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }} />
                                 ))}
                             </div>
                             <ol className="hiw-steps">

@@ -124,7 +124,7 @@ export const BACKGROUND = {
 };
 
 /* ------------------------------------------------------------------------ */
-/* 3. Cat photos: taped instant-photo prints on the wall                    */
+/* 3. Cat photos: printed photos taped on the wall                          */
 /* ------------------------------------------------------------------------ */
 
 /**
@@ -132,21 +132,17 @@ export const BACKGROUND = {
  * background note, picked automatically: notes that stay fully visible, as
  * far from the steps and from each other as possible (the outer ring).
  * Order matters: if there are fewer good spots than photos, the last ones
- * are left out. Remove a row to drop a photo; `caption` is optional and
- * handwritten under the photo (keep it short, ~14 characters).
+ * are left out. Remove a row to drop a photo.
  */
-export const PHOTOS: { src: string; caption?: string; tilt?: number }[] = [
+export const PHOTOS: { src: string; tilt?: number }[] = [
     { src: "/images/cat-memes/lock-in.jpg", tilt: -4 },
-    { src: "/images/cat-memes/thinking-cat.jpg", caption: "break time?", tilt: 5 },
-    { src: "/images/cat-memes/banana-cat.jpg", caption: "snack o’clock", tilt: -6 },
-    { src: "/images/cat-memes/table-cat.jpg", caption: "no phones.", tilt: 3 },
-    { src: "/images/cat-memes/throne-kitten.jpg", caption: "4 sessions in", tilt: -3 },
-    { src: "/images/cat-memes/standing-kitten.jpg", caption: "5 more min?", tilt: 6 },
-    { src: "/images/cat-memes/muejeje.jpg", caption: "one more tab", tilt: -5 },
+    { src: "/images/cat-memes/thinking-cat.jpg", tilt: 5 },
+    { src: "/images/cat-memes/banana-cat.jpg", tilt: -6 },
+    { src: "/images/cat-memes/table-cat.jpg", tilt: 3 },
+    { src: "/images/cat-memes/throne-kitten.jpg", tilt: -3 },
+    { src: "/images/cat-memes/standing-kitten.jpg", tilt: 6 },
+    { src: "/images/cat-memes/muejeje.jpg", tilt: -5 },
 ];
-
-/** Prints are this much taller than wide (the white strip at the foot). */
-export const PRINT_RATIO = 1.18;
 
 /* ------------------------------------------------------------------------ */
 /* 4. The side notes (only visible where the page is wider than the         */
@@ -179,8 +175,8 @@ export const SIDE_NOTES: SideNote[] = [
     { side: "left", inset: 10, y: 74, size: 110, tilt: -7, text: "stretch your back", paper: "white", ink: "blue", taped: true },
     { side: "left", inset: 6, y: 222, size: 120, tilt: 5, stamp: "paw", paper: "pink", ink: "red", taped: false },
     { side: "left", inset: 22, y: 372, size: 104, tilt: -4, text: "deep breath", paper: "cream", ink: "black", taped: true },
-    { side: "left", inset: 8, y: 516, size: 114, tilt: 6, stamp: "fish", caption: "x4", frame: "round", paper: "sky", ink: "blue", taped: false },
-    { side: "right", inset: 12, y: 104, size: 116, tilt: 6, stamp: "star", caption: "nice!", paper: "lavender", ink: "violet", taped: true },
+    { side: "left", inset: 8, y: 516, size: 114, tilt: 6, stamp: "fish", frame: "round", paper: "sky", ink: "blue", taped: false },
+    { side: "right", inset: 12, y: 104, size: 116, tilt: 6, stamp: "star", paper: "lavender", ink: "violet", taped: true },
     { side: "right", inset: 24, y: 262, size: 104, tilt: -5, text: "lo-fi on", paper: "peach", ink: "black", taped: false },
     { side: "right", inset: 6, y: 408, size: 120, tilt: 4, stamp: "mug", frame: "square", paper: "mint", ink: "green", taped: true },
     { side: "right", inset: 18, y: 532, size: 100, tilt: -6, text: "purr purr", paper: "yellow", ink: "black", taped: false },
