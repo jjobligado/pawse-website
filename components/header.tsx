@@ -95,13 +95,14 @@ export default function Header() {
         >
             <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
-                <HomeLink className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+                {/* Logo + wordmark move as one: lift on hover, press in on click */}
+                <HomeLink className="flex items-center gap-2 sm:gap-2.5 shrink-0 rounded origin-left transition-transform duration-200 ease-out motion-safe:hover:scale-105 motion-safe:active:scale-[0.97] motion-safe:active:duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-4">
                     <Image
                         src="/images/logo.png"
                         alt="Pawse Logo"
                         width={216}
                         height={156}
-                        className="h-[24px] sm:h-[30px] w-auto object-contain [image-rendering:pixelated] group-hover:scale-110 transition-transform duration-300 ease-in-out"
+                        className="h-[20px] sm:h-[26px] w-auto object-contain [image-rendering:pixelated]"
                         priority
                     />
                     <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
