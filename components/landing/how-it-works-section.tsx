@@ -6,7 +6,7 @@ import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 import WallFit from "./wall-fit";
-import { BACKGROUND, BOARDS, LIST_NOTE_SCALE, NOTES, PHOTOS, SIDE_NOTES, STEP_STYLE, type BoardName, type Ink, type Paper, type StepPlace } from "./how-it-works-tuning";
+import { BACKGROUND, BOARDS, LIST_NOTE_SCALE, NOTES, PHOTOS, SIDE_NOTES, STEP_STYLE, type BoardName, type Ink, type Paper, type PlacedNote, type StepPlace } from "./how-it-works-tuning";
 
 /**
  * The PAWSE loop as four paper step notes on a wall of small notes. Every
@@ -138,6 +138,7 @@ function buildWall(board: (typeof BOARDS)[BoardName]): WallNote[] {
     const BG = { ...BACKGROUND, ...board.background };
     const BOARD_W = board.width;
     const BOARD_H = board.height;
+    if ("placed" in board) return placeByHand(board.placed, BOARD_W, BOARD_H);
     const r = rng(BG.seed);
     const r2 = rng(97);
     const cx = BOARD_W / 2;
@@ -367,6 +368,35 @@ function buildWall(board: (typeof BOARDS)[BoardName]): WallNote[] {
         above.push(n);
     }
     return out;
+}
+
+/** A board's hand-placed notes (see PlacedNote in the tuning file), kept whole on the board. */
+function placeByHand(placed: PlacedNote[], w: number, h: number): WallNote[] {
+    return placed.map((n, i) => {
+        const m = n.size * 0.55;
+        const x = Math.min(w - m, Math.max(m, n.x));
+        const y = Math.min(h - m, Math.max(m, n.y));
+        const photo = "photo" in n ? (PHOTOS.find((p) => p.src === n.photo) ?? { src: n.photo }) : undefined;
+        return {
+            x: x - n.size / 2,
+            y: y - n.size / 2,
+            size: n.size,
+            z: photo ? 2 : 3 + i,
+            item: "text" in n ? T(n.text) : "stamp" in n ? S(n.stamp, n.caption) : S("cat"),
+            paper: n.paper ?? "yellow",
+            ink: n.ink ?? "black",
+            rot: n.tilt,
+            frame: "stamp" in n ? (n.frame ?? "none") : "none",
+            stampRot: n.tilt * -1.5,
+            ghost: false,
+            mark: null,
+            markRot: 0,
+            press: i,
+            taped: photo ? true : (n.taped ?? false),
+            bend: photo ? "flat" : (n.bend ?? "flat"),
+            photo,
+        };
+    });
 }
 
 /**

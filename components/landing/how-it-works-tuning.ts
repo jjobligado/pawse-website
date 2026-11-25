@@ -42,6 +42,18 @@ export const STEP_STYLE: Record<StepId, { stamp: { size: number; top: number; ri
 export type StepPlace = { left: number; top: number; tilt: number };
 
 /**
+ * A background note placed by hand (used by the tall board instead of the
+ * scatter). `x` / `y` are its centre on the board; it's kept whole on the
+ * board. Give it `text`, a `stamp`, or a `photo` (a file in
+ * public/images/cat-memes/).
+ */
+export type PlacedNote = { x: number; y: number; size: number; tilt: number; paper?: Paper; ink?: Ink; taped?: boolean; bend?: Bend } & (
+    | { text: string }
+    | { stamp: StampName; caption?: string; frame?: StampFrame }
+    | { photo: string }
+);
+
+/**
  * The wall comes in three shapes, one per screen size. Each is a fixed board
  * that scales to fit the section (down as far as needed, up to `maxScale`).
  *   wide:   1200px and up. Four steps in a row (the original wall).
@@ -88,22 +100,35 @@ export const BOARDS = {
     },
     tall: {
         width: 340,
-        // extra room above the column, where a cat photo goes
-        height: 1210,
+        height: 1350,
         maxScale: 1.1,
+        // a zig-zag column with a clear gap between steps
         steps: {
-            "01": { left: 16, top: 128, tilt: -3 },
-            "02": { left: 88, top: 392, tilt: 2.2 },
-            "03": { left: 14, top: 656, tilt: -1.8 },
-            "04": { left: 86, top: 920, tilt: 2.8 },
+            "01": { left: 14, top: 150, tilt: -3 },
+            "02": { left: 90, top: 424, tilt: 2.2 },
+            "03": { left: 14, top: 698, tilt: -1.8 },
+            "04": { left: 90, top: 972, tilt: 2.8 },
         },
-        // fewer, more spaced-out notes so a phone screen stays calm
-        background: { count: 26, radiusX: 190, radiusY: 610, noteSize: { min: 96, max: 116 }, minSpacing: 108, edgeNotes: 1, fillGaps: false },
+        background: {},
+        // Hand-placed instead of scattered, so a phone screen stays calm: a
+        // photo and a note above the steps, one note tucked into each step's
+        // empty side, and a list and a photo below.
+        placed: [
+            { x: 96, y: 76, size: 118, tilt: -5, photo: "/images/cat-memes/lock-in.jpg" },
+            { x: 250, y: 74, size: 104, tilt: 6, text: "**4** days\nuntil finals", paper: "lavender", ink: "violet", taped: true, bend: "curl-r-sm" },
+            // tucked beside the steps: small, so they stay whole in the narrow gap
+            { x: 290, y: 262, size: 84, tilt: 7, stamp: "loaf", caption: "zzz", paper: "sky", ink: "violet" },
+            { x: 50, y: 536, size: 84, tilt: -6, text: "you got\nthis :)", paper: "mint", ink: "green", taped: true },
+            { x: 290, y: 812, size: 84, tilt: 5, stamp: "heart", caption: "focus", paper: "white", ink: "red", bend: "cup" },
+            { x: 50, y: 1086, size: 84, tilt: -4, text: "small\nsteps!", paper: "peach", ink: "black", bend: "curl-l-sm" },
+            { x: 98, y: 1266, size: 124, tilt: -3, text: "to do:\n~~read ch. 4~~\n~~lab report~~\nmath problem set\nemail prof", paper: "yellow", ink: "black", taped: true },
+            { x: 258, y: 1270, size: 112, tilt: 5, photo: "/images/cat-memes/banana-cat.jpg" },
+        ],
         sideSpacing: 230,
-        photos: 2,
-        lists: 2,
+        photos: 0,
+        lists: 0,
     },
-} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number; sideSpacing?: number }>;
+} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number; sideSpacing?: number; placed?: PlacedNote[] }>;
 export type BoardName = keyof typeof BOARDS;
 
 /* ------------------------------------------------------------------------ */
