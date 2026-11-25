@@ -94,6 +94,14 @@ export const BACKGROUND = {
     maxTilt: 7,
     /** Share of notes with washi tape, 0 to 1. */
     tapedShare: 0.38,
+    /**
+     * Calmer background, so the steps stand out without blurring anything.
+     *   inkStrength: how strong the writing and stamps on background notes
+     *                are (1 = full, like the steps; lower = quieter)
+     *   blankShare:  share of background notes left blank (some keep a doodle)
+     */
+    inkStrength: 0.55,
+    blankShare: 0.4,
 };
 
 /* ------------------------------------------------------------------------ */

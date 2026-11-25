@@ -68,6 +68,8 @@ type SmallNoteData = {
     markRot: number;
     press: number;
     taped: boolean;
+    /** No writing, at most a small doodle: gives the eye somewhere to rest. */
+    blank?: boolean;
 };
 
 /** Seeded random, so the wall is the same on every render. */
@@ -101,6 +103,7 @@ const WALL: WallNote[] = (() => {
     // [centre x, centre y, half size] of every note placed, for the gap check
     const boxes: [number, number, number][] = [];
     let press = 0;
+    let k = 0; // item counter; blank notes skip it so every item still shows
 
     const add = (px: number, py: number, size: number, z: number) => {
         const rot = (r() - 0.5) * 2 * BG.maxTilt;
@@ -113,10 +116,11 @@ const WALL: WallNote[] = (() => {
         const markRoll = r2();
         const markName = MARKS[Math.floor(r2() * MARKS.length)];
         const markRot = (r2() - 0.5) * 30;
+        const blank = r2() < BG.blankShare;
         const m = size * 0.6 + 4; // keeps the tilted note and its tape whole
         const x = Math.min(BOARD_W - m, Math.max(m, px));
         const y = Math.min(BOARD_H - m, Math.max(m, py));
-        const item = ITEMS[(press * 11) % ITEMS.length]; // 11 shares no factor with the list length, so every item shows before any repeats
+        const item = ITEMS[((blank ? k : k++) * 11) % ITEMS.length]; // 11 shares no factor with the list length, so every item shows before any repeats
         boxes.push([x, y, size / 2]);
         out.push({
             x: x - size / 2,
@@ -130,10 +134,11 @@ const WALL: WallNote[] = (() => {
             frame: fr < 0.3 ? "square" : fr < 0.5 ? "round" : "none",
             stampRot,
             ghost,
-            mark: !("stamp" in item) && markRoll < 0.24 ? markName : null,
+            mark: blank ? (markRoll < 0.4 ? markName : null) : !("stamp" in item) && markRoll < 0.24 ? markName : null,
             markRot,
             press: press++,
             taped,
+            blank,
         });
     };
     const noteSize = () => BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
@@ -236,7 +241,9 @@ const vars = (v: Record<string, string>) => v as CSSProperties;
 function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style?: CSSProperties; className?: string }) {
     const { item } = note;
     let inner: ReactNode;
-    if ("stamp" in item) {
+    if (note.blank) {
+        inner = null;
+    } else if ("stamp" in item) {
         const scale = note.frame === "none" ? (item.caption ? 78 : 86) : item.caption ? 92 : 100;
         inner = (
             <>
@@ -314,7 +321,7 @@ export default function HowItWorksSection() {
 
                 {/* lg+: the wall, scaled to fit */}
                 <WallFit width={BOARD_W} className="hiw-wall hidden lg:block">
-                    <div className="hiw-board">
+                    <div className="hiw-board" style={vars({ "--hiw-bg-ink": String(BG.inkStrength) })}>
                         <div className="hiw-sides" aria-hidden="true">
                             {SIDE.map((n, idx) => (
                                 <SmallNote key={idx} note={n} style={{ [n.side]: n.inset, top: n.y, width: n.size, height: n.size }} />

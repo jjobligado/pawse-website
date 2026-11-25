@@ -1380,8 +1380,10 @@ body {
   --hiw-graphite: #585D64;
   --hiw-graphite-soft: rgb(88 93 100 / 0.6);
   --hiw-tape: rgb(236 232 220 / 0.75);
-  --hiw-lift-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --hiw-lift-ms: 300ms;
+  --hiw-lift-ms: 420ms; /* picking a step note up */
+  --hiw-lift-ease: cubic-bezier(0.34, 1.5, 0.64, 1); /* springs a touch past, then settles */
+  --hiw-drop-ms: 480ms; /* setting it back down */
+  --hiw-drop-ease: linear(0, 0.55 22%, 0.9 42%, 1.025 60%, 1.005 78%, 1); /* soft landing */
   position: relative;
 }
 
@@ -1437,24 +1439,40 @@ body {
 .hiw-step p { margin: 0; }
 .hiw-hand { margin-top: auto; align-self: flex-start; rotate: -4deg; font: 700 22px/1 var(--font-hand); color: var(--hiw-graphite); }
 
-/* The lift (wall only): the note comes off the wall toward you. It grows a
-   little, its shadow drops further and softens, its tilt eases halfway to
-   straight, and the loose bottom edge (sticky strip at the top) tips forward. */
+/* Background notes: quieter ink (strength set in how-it-works-tuning.ts) so the steps lead */
+.hiw-small .hiw-content, .hiw-small .hiw-mark, .hiw-sides .hiw-content, .hiw-sides .hiw-mark { opacity: var(--hiw-bg-ink, 1); }
+
+/* The lift (wall only), like pinching a sticky note off the board. The glued
+   top stays put and the loose bottom swings out toward you; the shadow spreads
+   a beat after the paper moves and the tilt eases toward straight last.
+   Picking up springs slightly past and settles; setting down is a little
+   slower, with a soft landing. */
 .hiw-step { rotate: var(--tilt, 0deg); }
 .hiw-board .hiw-step {
   z-index: var(--z); transform-origin: 50% 0;
-  transition: transform var(--hiw-lift-ms) var(--hiw-lift-ease), rotate var(--hiw-lift-ms) var(--hiw-lift-ease), filter var(--hiw-lift-ms) var(--hiw-lift-ease), z-index 0s linear var(--hiw-lift-ms);
+  /* setting down */
+  transition:
+    transform var(--hiw-drop-ms) var(--hiw-drop-ease),
+    rotate var(--hiw-drop-ms) var(--hiw-drop-ease),
+    filter calc(var(--hiw-drop-ms) - 80ms) ease-out,
+    z-index 0s linear var(--hiw-drop-ms);
 }
 /* Moving straight from one step to another: the one left behind drops back at once, so the new one is on top right away.
-   (Leaving the steps altogether, z-index waits until the note has settled, so it never slips under a neighbour mid-way.) */
-.hiw-board .hiw-steps:has(.hiw-step:hover) .hiw-step { transition-delay: 0s; }
-.hiw-board .hiw-step .hiw-paper::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(to bottom, transparent 55%, rgb(20 30 40 / 0.05) 100%); transition: opacity var(--hiw-lift-ms) var(--hiw-lift-ease); }
+   (Leaving the steps altogether, z-index waits until the note has landed, so it never slips under a neighbour mid-way.) */
+.hiw-board .hiw-steps:has(.hiw-step:hover) .hiw-step:not(:hover) { transition-delay: 0s; }
+.hiw-board .hiw-step .hiw-paper::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(to bottom, transparent 50%, rgb(20 30 40 / 0.06) 100%); transition: opacity 360ms ease-out; }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .hiw-board .hiw-step:hover {
     z-index: 60;
     rotate: calc(var(--tilt, 0deg) * 0.5);
-    transform: perspective(1000px) translateY(-6px) scale(1.035) rotateX(4deg);
-    filter: drop-shadow(0 4px 4px rgb(20 20 20 / 0.07)) drop-shadow(0 24px 20px rgb(20 20 20 / 0.16));
+    transform: perspective(900px) rotateX(9deg) scale(1.025);
+    filter: drop-shadow(0 3px 3px rgb(20 20 20 / 0.07)) drop-shadow(0 22px 18px rgb(20 20 20 / 0.17));
+    /* picking up */
+    transition:
+      transform var(--hiw-lift-ms) var(--hiw-lift-ease),
+      rotate calc(var(--hiw-lift-ms) + 100ms) var(--hiw-lift-ease) 70ms,
+      filter calc(var(--hiw-lift-ms) - 60ms) ease-out 50ms,
+      z-index 0s;
   }
   .hiw-board .hiw-step:hover .hiw-paper::after { opacity: 1; }
 }
