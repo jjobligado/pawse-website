@@ -99,9 +99,9 @@ export default function Header() {
                     <Image
                         src="/images/logo.png"
                         alt="Pawse Logo"
-                        width={30}
-                        height={28}
-                        className="h-[22px] sm:h-[28px] w-auto object-contain group-hover:scale-110 transition-transform duration-300 ease-in-out"
+                        width={216}
+                        height={156}
+                        className="h-[24px] sm:h-[30px] w-auto object-contain [image-rendering:pixelated] group-hover:scale-110 transition-transform duration-300 ease-in-out"
                         priority
                     />
                     <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
