@@ -33,7 +33,7 @@ export default function HomePage() {
             <StructuredData />
             <HeroSection />
             <HowItWorksSection />
-            {/* The feature tour: a paw-print trail walks down the sides, past the middle of Progress, and fades into its blue */}
+            {/* The feature tour: a paw-print trail walks down the sides, and fades out partway into Progress */}
             <div className="relative">
                 <PawTrail endSelector="#progress" endFraction={0.6} className="[mask-image:linear-gradient(180deg,#000_calc(100%_-_280px),transparent)]" />
                 <CompanionsSection />
