@@ -85,64 +85,84 @@ const BOARD_W = 1120;
 const BOARD_H = 600;
 
 /**
- * The small notes behind the steps: an 11×6 jittered grid fanned out from the
- * centre and thinning toward the edges, every note kept whole on the
- * 1120×600 core. Layout and stamp styling draw from
- * separate random streams so either can change without moving the other.
+ * The small notes behind the steps, scattered radially: a shuffled golden-angle
+ * spiral in an oval, piled up in the middle and loosening toward a ragged rim.
+ * A second pass then plugs any bare spot right around the steps. Every note is
+ * kept whole on the 1120×600 core. Layout and stamp styling draw from separate
+ * random streams so either can change without moving the other.
  */
-const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[] = (() => {
+type WallNote = SmallNoteData & { x: number; y: number; size: number; z: number };
+const WALL: WallNote[] = (() => {
     const r = rng(BG.seed);
     const r2 = rng(97);
-    const cols = 11;
-    const rows = 6;
-    const cw = BOARD_W / cols;
-    const ch = BOARD_H / rows;
-    const out: (SmallNoteData & { x: number; y: number; size: number; z: number })[] = [];
-    let k = 0;
+    const cx = BOARD_W / 2;
+    const cy = BOARD_H / 2;
+    const out: WallNote[] = [];
+    // [centre x, centre y, half size] of every note placed, for the gap check
+    const boxes: [number, number, number][] = [];
     let press = 0;
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const size = BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
-            let x = BOARD_W / 2 + ((col + 0.5) * cw + (r() - 0.5) * 40 - BOARD_W / 2) * BG.spreadX;
-            let y = BOARD_H / 2 + ((row + 0.5) * ch + (r() - 0.5) * 34 - BOARD_H / 2) * BG.spreadY;
-            const e = Math.max((Math.abs(x - BOARD_W / 2) / (BOARD_W / 2)) * BG.sideWeight, (Math.abs(y - BOARD_H / 2) / (BOARD_H / 2)) * BG.topBottomWeight);
-            const keep = e < BG.denseCore ? 1 : 1 - (e - BG.denseCore) * BG.fadeRate;
-            const skip = r() > keep;
-            const rot = (r() - 0.5) * 2 * BG.maxTilt;
-            const paper = PAPERS[Math.floor(r() * PAPERS.length)];
-            const f = r();
-            r(); // was the pin colour; still drawn so the seeded layout stays put
-            const z = Math.floor(r() * 20);
-            const ink = INKS[Math.floor(r2() * INKS.length)];
-            const fr = r2();
-            const stampRot = (r2() - 0.5) * 18;
-            const ghost = r2() < 0.16;
-            const markRoll = r2();
-            const markName = MARKS[Math.floor(r2() * MARKS.length)];
-            const markRot = (r2() - 0.5) * 30;
-            if (skip) continue;
-            const m = size * 0.6 + 4;
-            x = Math.min(BOARD_W - m, Math.max(m, x));
-            y = Math.min(BOARD_H - m, Math.max(m, y));
-            const item = ITEMS[(k++ * 7 + row) % ITEMS.length];
-            const isStamp = "stamp" in item;
-            out.push({
-                x: x - size / 2,
-                y: y - size / 2,
-                size,
-                z,
-                item,
-                paper,
-                ink,
-                rot,
-                frame: fr < 0.3 ? "square" : fr < 0.5 ? "round" : "none",
-                stampRot,
-                ghost,
-                mark: !isStamp && markRoll < 0.24 ? markName : null,
-                markRot,
-                press: press++,
-                taped: f < BG.tapedShare,
-            });
+
+    const add = (px: number, py: number, size: number, z: number) => {
+        const rot = (r() - 0.5) * 2 * BG.maxTilt;
+        const paper = PAPERS[Math.floor(r() * PAPERS.length)];
+        const taped = r() < BG.tapedShare;
+        const ink = INKS[Math.floor(r2() * INKS.length)];
+        const fr = r2();
+        const stampRot = (r2() - 0.5) * 18;
+        const ghost = r2() < 0.16;
+        const markRoll = r2();
+        const markName = MARKS[Math.floor(r2() * MARKS.length)];
+        const markRot = (r2() - 0.5) * 30;
+        const m = size * 0.6 + 4; // keeps the tilted note and its tape whole
+        const x = Math.min(BOARD_W - m, Math.max(m, px));
+        const y = Math.min(BOARD_H - m, Math.max(m, py));
+        const item = ITEMS[(press * 7 + Math.floor(press / ITEMS.length)) % ITEMS.length];
+        boxes.push([x, y, size / 2]);
+        out.push({
+            x: x - size / 2,
+            y: y - size / 2,
+            size,
+            z,
+            item,
+            paper,
+            ink,
+            rot,
+            frame: fr < 0.3 ? "square" : fr < 0.5 ? "round" : "none",
+            stampRot,
+            ghost,
+            mark: !("stamp" in item) && markRoll < 0.24 ? markName : null,
+            markRot,
+            press: press++,
+            taped,
+        });
+    };
+    const noteSize = () => BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
+
+    // 1. The radial scatter
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < BG.count; i++) {
+        const t = (i + 0.5) / BG.count;
+        const rad = Math.min(1.06, Math.pow(t, 1 / BG.centerPile) + (r() - 0.5) * 0.22 * BG.messiness);
+        const ang = i * golden + (r() - 0.5) * 1.4 * BG.messiness;
+        const size = noteSize();
+        const drop = rad > 0.78 && r() < BG.raggedEdge;
+        if (drop) continue;
+        // inner notes sit higher in the pile, so the middle looks most layered
+        const z = Math.round((1 - Math.max(0, rad)) * 14 + r() * 8);
+        add(cx + Math.cos(ang) * BG.radiusX * rad, cy + Math.sin(ang) * BG.radiusY * rad, size, z);
+    }
+
+    // 2. Plug any bare spot within gapPad of a step
+    const covered = (px: number, py: number) =>
+        boxes.some(([bx, by, h]) => Math.abs(px - bx) < h - 4 && Math.abs(py - by) < h - 4) ||
+        Object.values(STEP_LAYOUT).some((s) => px > s.left + 6 && px < s.left + 230 && py > s.top + 6 && py < s.top + 230);
+    const pad = BG.gapPad;
+    for (const s of Object.values(STEP_LAYOUT)) {
+        for (let py = s.top - pad; py <= s.top + 236 + pad; py += 22) {
+            for (let px = s.left - pad; px <= s.left + 236 + pad; px += 22) {
+                if (covered(px, py)) continue;
+                add(px + (r() - 0.5) * 30, py + (r() - 0.5) * 30, noteSize(), 8 + Math.floor(r() * 10));
+            }
         }
     }
     return out;

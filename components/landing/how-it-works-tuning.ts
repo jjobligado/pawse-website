@@ -61,20 +61,27 @@ export const BACKGROUND = {
     seed: 11,
     /** Each note's size is picked between these. */
     noteSize: { min: 112, max: 144 },
-    /** How far the notes fan out from the centre. 1 = no fan, 1.2 = 20% wider. */
-    spreadX: 1.2,
-    spreadY: 1.05,
     /**
-     * Density. Notes in the inner part of the board are always kept; past that
-     * they thin out toward the edges.
-     *   denseCore: how far out (0 = centre, 1 = edge) the wall stays full
-     *   fadeRate:  how quickly it thins after that (higher = emptier edges)
+     * The notes are scattered in a rough oval (a spiral, shuffled), piled up in
+     * the middle and loosening toward the rim, so the wall reads as a radial
+     * cluster rather than a box.
+     *   count:        how many notes in the scatter
+     *   radiusX / Y:  half the oval's width / height (the board is 1120 × 600)
+     *   centerPile:   1 = even spread; higher = more piled up in the middle
+     *   messiness:    0 = tidy spiral, 1 = very scattered
+     *   raggedEdge:   share of notes dropped near the rim, for an uneven outline
      */
-    denseCore: 0.60,
-    fadeRate: 1.5,
-    /** Lower = keeps more notes toward that edge. */
-    sideWeight: 0.88, // left / right edges
-    topBottomWeight: 0.9, // top / bottom edges
+    count: 46,
+    radiusX: 545,
+    radiusY: 260,
+    centerPile: 1.5,
+    messiness: 0.7,
+    raggedEdge: 0.3,
+    /**
+     * No paper should show through right around the four steps. Every spot
+     * within `gapPad` px of a step is checked; any uncovered spot gets a note.
+     */
+    gapPad: 46,
     /** Each note tilts up to this many degrees either way. */
     maxTilt: 7,
     /** Share of notes with washi tape, 0 to 1. */
