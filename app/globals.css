@@ -1483,7 +1483,7 @@ body {
    Picking up springs slightly past and settles; setting down is a little
    slower, with a soft landing. */
 .hiw-step { rotate: var(--tilt, 0deg); }
-.hiw-board .hiw-step {
+.hiw-board .hiw-step, .cs-wall .hiw-step {
   z-index: var(--z); transform-origin: 50% 0;
   /* setting down */
   transition:
@@ -1495,9 +1495,9 @@ body {
 /* Moving straight from one step to another: the one left behind drops back at once, so the new one is on top right away.
    (Leaving the steps altogether, z-index waits until the note has landed, so it never slips under a neighbour mid-way.) */
 .hiw-board .hiw-steps:has(.hiw-step:hover) .hiw-step:not(:hover) { transition-delay: 0s; }
-.hiw-board .hiw-step .hiw-paper::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(to bottom, transparent 50%, rgb(20 30 40 / 0.06) 100%); transition: opacity 360ms ease-out; }
+.hiw-board .hiw-step .hiw-paper::after, .cs-wall .hiw-step .hiw-paper::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(to bottom, transparent 50%, rgb(20 30 40 / 0.06) 100%); transition: opacity 360ms ease-out; }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .hiw-board .hiw-step:hover {
+  .hiw-board .hiw-step:hover, .cs-wall .hiw-step:hover {
     z-index: 60;
     rotate: calc(var(--tilt, 0deg) * 0.5);
     transform: perspective(900px) rotateX(9deg) scale(1.025);
@@ -1509,6 +1509,59 @@ body {
       filter calc(var(--hiw-lift-ms) - 60ms) ease-out 50ms,
       z-index 0s;
   }
-  .hiw-board .hiw-step:hover .hiw-paper::after { opacity: 1; }
+  .hiw-board .hiw-step:hover .hiw-paper::after, .cs-wall .hiw-step:hover .hiw-paper::after { opacity: 1; }
+}
+
+/* ==================================================================
+   Coming Soon: the same paper, as drafts (components/landing/coming-soon-section.tsx).
+   Plain flow layout instead of a scaled board: a zig-zag column on phones,
+   two-and-one from 36rem, a row of three from 64rem, side notes from 75rem.
+   Each note's tucked companion sits at --tcx/--tcy (column) or --trx/--try (row).
+   ================================================================== */
+.cs-wall { padding-block: 8px 4px; }
+.cs-notes {
+  position: relative; z-index: 1; margin: 0 auto; padding: 20px 0 8px; list-style: none;
+  display: flex; flex-direction: column; gap: 44px; width: min(100%, 330px);
+}
+.cs-item { position: relative; width: 236px; height: 236px; flex: none; }
+/* the zig-zag: every other note to the far side, its tucked note in the empty side */
+.cs-item:nth-child(even) { align-self: flex-end; }
+.cs-note { z-index: var(--z); }
+.cs-tuck { position: absolute; left: var(--tcx); top: var(--tcy); width: 100px; height: 100px; z-index: 0; }
+.cs-tuck .hiw-content { opacity: 0.85; }
+/* too narrow to show beside the notes: they'd only be cut off at the screen's edge */
+@media (max-width: 23.74rem) { .cs-tuck { display: none; } }
+
+@media (min-width: 36rem) {
+  .cs-notes { width: 100%; flex-flow: row wrap; justify-content: center; column-gap: clamp(36px, 6vw, 72px); row-gap: 64px; padding-block: 40px 36px; }
+  .cs-item:nth-child(even) { align-self: auto; translate: 0 22px; }
+  .cs-tuck { left: var(--trx); top: var(--try); }
+}
+@media (min-width: 64rem) { .cs-item:nth-child(3) { translate: 0 -6px; } }
+/* small tablets: the first two notes span the column, so their tucked notes would be cut off at the screen's edge */
+@media (min-width: 36rem) and (max-width: 47.99rem) { .cs-item:nth-child(-n + 2) .cs-tuck { display: none; } }
+/* two-and-one: the third note sits alone below, so its tucked note goes out to its open side */
+@media (min-width: 36rem) and (max-width: 63.99rem) { .cs-item:nth-child(3) .cs-tuck { left: var(--tcx); top: var(--tcy); } }
+
+/* Wide screens: the wall reaches out past the column for a few loose notes at the sides */
+.cs-sides { display: none; }
+@media (min-width: 75rem) {
+  .cs-wall { --cs-w: min(1280px, 100cqw - 160px); width: var(--cs-w); margin-inline: calc((100% - var(--cs-w)) / 2); }
+  .cs-sides { display: block; position: absolute; inset: 0; z-index: 0; }
+  .cs-sides .hiw-note { position: absolute; }
+  .cs-sides .hiw-content { opacity: 0.85; }
+}
+
+/* Draft touches: the drawing half-inked in a pencilled box, a red SOON stamp, masking tape */
+.cs-art { width: 56px; height: 56px; padding: 7px; margin: -6px -4px 0 0; rotate: 3deg; border-radius: 3px; outline: 1.5px dashed var(--hiw-graphite-soft); outline-offset: -1px; }
+.cs-art .hiw-stamp { opacity: 0.55; }
+.cs-soon { position: absolute; right: 14px; bottom: 16px; width: 80px; height: 32px; overflow: visible; color: var(--hiw-ink-red); mix-blend-mode: multiply; opacity: 0.88; pointer-events: none; }
+.cs-soon text { font: 600 7.4px var(--font-pixelify), monospace; letter-spacing: 0.7px; }
+.cs-tape {
+  position: absolute; top: -12px; left: calc(50% - 42px); z-index: 3; width: 84px; height: 24px;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.18), transparent 60%), rgb(231 219 190 / 0.88);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.06);
+  /* torn ends */
+  clip-path: polygon(0 0, 100% 0, 97% 18%, 100% 36%, 96% 54%, 100% 72%, 97% 88%, 100% 100%, 0 100%, 3% 84%, 0 66%, 4% 48%, 0 30%, 3% 14%);
 }
 
