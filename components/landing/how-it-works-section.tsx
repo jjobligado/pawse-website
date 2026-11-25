@@ -74,7 +74,10 @@ const STAMPS: Item[] = [
     S("heart", "focus"), S("zzz"), S("clock", "25 min"),
 ];
 const SIDE_TEXT = new Set(SIDE_NOTES.flatMap((n) => ("text" in n ? [n.text] : [])));
-const ITEMS: Item[] = [...NOTES.filter((t) => !SIDE_TEXT.has(t)).map(T), ...STAMPS];
+const WALL_NOTES = NOTES.filter((t) => !SIDE_TEXT.has(t)).map(T);
+/** Lists get their own open spots (see WALL step 6); everything else cycles through the notes. */
+const LISTS = WALL_NOTES.filter(isList);
+const ITEMS: Item[] = [...WALL_NOTES.filter((i) => !isList(i)), ...STAMPS];
 /** Walk the items in steps that share no factor with their count, so every one shows before any repeats. */
 const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
 let ITEM_STEP = 11;
@@ -133,8 +136,7 @@ const BOARD_H = 600;
  * kept whole on the 1120×600 core. Layout and stamp styling draw from separate
  * random streams so either can change without moving the other.
  */
-/** `base` is the note's size before list notes are scaled up. */
-type WallNote = SmallNoteData & { x: number; y: number; size: number; base: number; z: number };
+type WallNote = SmallNoteData & { x: number; y: number; size: number; z: number };
 const WALL: WallNote[] = (() => {
     const r = rng(BG.seed);
     const r2 = rng(97);
@@ -160,8 +162,6 @@ const WALL: WallNote[] = (() => {
         const blank = r2() < BG.blankShare;
         const bend = pickBend(r2());
         const item = ITEMS[((blank ? k : k++) * ITEM_STEP) % ITEMS.length];
-        const base = size;
-        if (!blank && isList(item)) size *= LIST_NOTE_SCALE;
         const m = size * 0.6 + 4; // keeps the tilted note and its tape whole
         const x = Math.min(BOARD_W - m, Math.max(m, px));
         const y = Math.min(BOARD_H - m, Math.max(m, py));
@@ -170,7 +170,6 @@ const WALL: WallNote[] = (() => {
             x: x - size / 2,
             y: y - size / 2,
             size,
-            base,
             // blank notes sit at the very back (0-2); written ones above them. Notes
             // stuck over a photo's corner (z 26+) keep their place on top.
             z: z >= 26 ? z : blank ? z % 3 : Math.max(z, 3),
@@ -201,15 +200,6 @@ const WALL: WallNote[] = (() => {
             if (w > 0 && h > 0) a += w * h;
         }
         return Math.min(1, a / (size * size));
-    };
-
-    /** Resizes a placed note around its centre, kept whole on the board. */
-    const resize = (n: WallNote, size: number) => {
-        const m = size * 0.6 + 4;
-        const c = [n.x + n.size / 2, n.y + n.size / 2];
-        n.size = size;
-        n.x = Math.min(BOARD_W - m, Math.max(m, c[0])) - size / 2;
-        n.y = Math.min(BOARD_H - m, Math.max(m, c[1])) - size / 2;
     };
 
     // 1. The radial scatter. A note is skipped when it would mostly hide under
@@ -251,7 +241,31 @@ const WALL: WallNote[] = (() => {
         }
     }
 
-    // 3. Printed photos take the spots of notes that stay fully visible, picked
+    // 3. Behind the seams between neighbouring steps: their tilts open thin
+    //    wedges that the gap check above can't see, so each seam gets a note
+    //    near its top and one near its foot.
+    const byLeft = [...steps].sort((a, b) => a.left - b.left);
+    for (let i = 0; i + 1 < byLeft.length; i++) {
+        const [a, b] = [byLeft[i], byLeft[i + 1]];
+        const x = (a.left + 236 + b.left) / 2;
+        const top = Math.min(a.top, b.top);
+        for (const y of [top + 74, top + 178]) add(x + (r() - 0.5) * 10, y, noteSize(), 6 + Math.floor(r() * 6));
+    }
+
+    // 4. A few more notes along the very top and bottom of the wall, spaced
+    //    across with some jitter and skipped where a note already sits.
+    for (const edge of [0, 1]) {
+        for (let i = 0; i < BG.edgeNotes; i++) {
+            const size = noteSize();
+            const m = size * 0.6 + 4;
+            const x = 150 + ((BOARD_W - 300) * (i + 0.5)) / BG.edgeNotes + (r() - 0.5) * 60;
+            const y = edge ? BOARD_H - m - r() * 18 : m + r() * 18;
+            if (boxes.some(([bx, by]) => Math.hypot(x - bx, y - by) < 72)) continue;
+            add(x, y, size, 3 + Math.floor(r() * 10));
+        }
+    }
+
+    // 5. Printed photos take the spots of notes that stay fully visible, picked
     //    one by one as far as possible from the steps and from each other.
     const taken: [number, number][] = steps.map((s) => [s.left + 118, s.top + 118]);
     const spots = out.filter((n) => hiddenShare(n.x + n.size / 2, n.y + n.size / 2, n.size) < 0.15);
@@ -270,7 +284,7 @@ const WALL: WallNote[] = (() => {
         taken.push([best.x + best.size / 2, best.y + best.size / 2]);
     }
 
-    // 4. Tuck each photo in: sit it high in the pile, then stick a note or two
+    // 6. Tuck each photo in: sit it high in the pile, then stick a note or two
     //    over its corners on the side facing the middle of the wall, as if it
     //    was pinned up first and covered over time. Together they hide about
     //    `tuck` of the photo; the middle, where the cat is, stays clear.
@@ -299,47 +313,48 @@ const WALL: WallNote[] = (() => {
             placed++;
         }
     });
-    // 5. Every list gets one of the most visible seats: written notes that the
-    //    steps, the photos and the notes over the photos cover least (judged
-    //    at list size). Seats take the lists, resized to match and placed on
-    //    top of the other notes; a note that held a list elsewhere takes over
-    //    a seat's one-liner.
-    const isListNote = (n: WallNote) => !n.blank && isList(n.item);
-    const written = out.filter((n) => !n.blank && !n.photo && "text" in n.item && n.z < 24);
-    const top = out.filter((n) => n.z >= 24);
-    const seen = (n: WallNote) => {
-        const size = n.base * LIST_NOTE_SCALE;
-        const x0 = n.x + n.size / 2 - size / 2;
-        const y0 = n.y + n.size / 2 - size / 2;
-        let open = 0;
-        for (let gy = 0.1; gy < 1; gy += 0.2) {
-            for (let gx = 0.1; gx < 1; gx += 0.2) {
-                const px = x0 + gx * size;
-                const py = y0 + gy * size;
-                const hidden =
-                    steps.some((s) => px > s.left && px < s.left + 236 && py > s.top && py < s.top + 236) ||
-                    top.some((o) => px > o.x && px < o.x + o.size && py > o.y && py < o.y + o.size);
-                open += +!hidden;
+    // 7. Each list gets its own open spot: the place on the wall where the
+    //    most of it shows (not under the steps, the photos, the notes over the
+    //    photos or another list) without covering much of any photo. It sits
+    //    on top of the regular notes.
+    const listSize = ((BG.noteSize.min + BG.noteSize.max) / 2) * LIST_NOTE_SCALE;
+    const above: WallNote[] = out.filter((n) => n.z >= 24);
+    const photosOnly = out.filter((n) => n.photo);
+    const inside = (px: number, py: number, o: { x: number; y: number; size: number }) =>
+        px > o.x && px < o.x + o.size && py > o.y && py < o.y + o.size;
+    const overlap = (x: number, y: number, size: number, o: WallNote) =>
+        (Math.max(0, Math.min(x + size, o.x + o.size) - Math.max(x, o.x)) * Math.max(0, Math.min(y + size, o.y + o.size) - Math.max(y, o.y))) /
+        (o.size * o.size);
+    for (const item of LISTS) {
+        const size = listSize * (0.94 + r() * 0.12);
+        const m = size * 0.6 + 4;
+        let best = [cx, cy];
+        let bestScore = -Infinity;
+        for (let py = m; py <= BOARD_H - m; py += 20) {
+            for (let px = m; px <= BOARD_W - m; px += 20) {
+                const x0 = px - size / 2;
+                const y0 = py - size / 2;
+                let open = 0;
+                for (let gy = 0.1; gy < 1; gy += 0.2) {
+                    for (let gx = 0.1; gx < 1; gx += 0.2) {
+                        const qx = x0 + gx * size;
+                        const qy = y0 + gy * size;
+                        const hid =
+                            steps.some((s) => qx > s.left && qx < s.left + 236 && qy > s.top && qy < s.top + 236) ||
+                            above.some((o) => inside(qx, qy, o));
+                        open += hid ? 0 : gy < 0.6 ? 2 : 1; // the writing starts at the top, so that counts double
+                    }
+                }
+                const covers = photosOnly.reduce((sum, o) => sum + overlap(x0, y0, size, o), 0);
+                const score = open / 40 - covers * 2;
+                if (score > bestScore) [best, bestScore] = [[px, py], score];
             }
         }
-        return open / 25;
-    };
-    const listItems = ITEMS.filter(isList);
-    const seats = [...written].sort((a, b) => seen(b) - seen(a)).slice(0, listItems.length);
-    const freed = seats.filter((n) => !isListNote(n)).map((n) => n.item);
-    for (const n of written) {
-        if (seats.includes(n) || !isListNote(n)) continue;
-        const item = freed.shift();
-        if (item) n.item = item;
-        else [n.blank, n.z] = [true, n.z % 3]; // back of the pile, like other blanks
-        resize(n, n.base);
+        add(best[0], best[1], size, 23);
+        const n = out[out.length - 1];
+        Object.assign(n, { item, blank: false, mark: null, z: 23 });
+        above.push(n);
     }
-    seats.forEach((n, i) => {
-        n.item = listItems[i];
-        n.mark = null;
-        resize(n, n.base * LIST_NOTE_SCALE);
-        n.z = 23; // above every regular note, below the photos
-    });
     return out;
 })();
 

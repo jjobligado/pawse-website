@@ -113,6 +113,8 @@ export const BACKGROUND = {
      * Paper colours the background notes draw from. Listing a colour twice
      * makes it twice as common; white and cream are the palest.
      */
+    /** Extra notes along the very top and the very bottom of the wall, each. */
+    edgeNotes: 7,
     /** How much of each cat photo tucks under other notes (0 = on top of everything). */
     photoTuck: 0.2,
     papers: ["yellow", "sky", "mint", "lavender", "pink", "peach", "yellow", "sky", "pink", "mint", "lavender", "cream", "white"] as Paper[],
@@ -131,8 +133,8 @@ export const BACKGROUND = {
 
 /**
  * One entry per note. New line = "\n". Marks: ~~crossed out~~, **big**.
- * Notes with 3 or more lines are written smaller on a slightly bigger note,
- * like a jotted list. Keep one-liners under ~30 characters. Anything also
+ * Notes with 3 or more lines are lists: written smaller on a slightly bigger
+ * note, each given its own open spot on the wall so it can be read. Keep one-liners under ~30 characters. Anything also
  * used on a side note (section 5) is left off the wall so it doesn't repeat.
  * The pixel-stamp notes are separate (STAMPS in how-it-works-section.tsx).
  */
@@ -151,7 +153,7 @@ export const NOTES: string[] = [
     "locked in. do not disturb.",
     "you got this :)",
     "small steps still count",
-    "done > perfect",
+    "done is better than perfect",
     "rest is productive too",
     "drink water!",
     "deep breath",
@@ -167,7 +169,7 @@ export const NOTES: string[] = [
 ];
 
 /** List notes (3+ lines) are this much bigger than the others. */
-export const LIST_NOTE_SCALE = 1.25;
+export const LIST_NOTE_SCALE = 1.1;
 
 /* ------------------------------------------------------------------------ */
 /* 4. Cat photos: printed photos taped on the wall                          */
