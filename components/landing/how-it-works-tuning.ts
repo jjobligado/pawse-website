@@ -14,6 +14,7 @@
  * Colours live in app/globals.css (search for --hiw-).
  */
 
+import type { Bend } from "./paper-bends";
 import type { StampFrame, StampName } from "./pixel-stamps";
 
 export type Paper = "yellow" | "sky" | "mint" | "lavender" | "pink" | "peach" | "cream" | "white";
@@ -31,26 +32,32 @@ export const STEP_LAYOUT = {
         // The stamp in the top-right corner. `top` / `right` nudge it:
         // negative pulls it further up / further right.
         stamp: { size: 62, top: -10, right: -8, tilt: 6 },
+        // How the paper bends: "flat", "bow" (bottom edge lifts), "cup" (sides
+        // curl), "curl-r" / "curl-l" (a bottom corner curls up; "-sm" = smaller)
+        bend: "bow",
     },
     "02": {
         left: 340,
         top: 168,
         tilt: 2.2,
         stamp: { size: 50, top: -4, right: 2, tilt: -4 },
+        bend: "curl-r-sm",
     },
     "03": {
         left: 575,
         top: 200,
         tilt: -1.8,
         stamp: { size: 56, top: -6, right: -2, tilt: 4 },
+        bend: "cup",
     },
     "04": {
         left: 824,
         top: 172,
         tilt: 2.8,
         stamp: { size: 50, top: -4, right: 2, tilt: -4 },
+        bend: "curl-l-sm",
     },
-} as const;
+} as const satisfies Record<string, { bend: Bend } & Record<string, unknown>>;
 
 /* ------------------------------------------------------------------------ */
 /* 2. The background notes behind the steps (generated, not hand-placed)    */
@@ -102,6 +109,13 @@ export const BACKGROUND = {
      */
     inkStrength: 0.55,
     blankShare: 0.4,
+    /**
+     * How the background notes bend (real notes curl, especially stacked).
+     * Relative weights: a higher number means more notes bend that way.
+     *   bow: bottom edge lifts   cup: sides curl
+     *   curl-r / curl-l: a bottom corner curls up ("-sm" = smaller curl)
+     */
+    bends: { flat: 3, bow: 3, cup: 2, "curl-r": 2, "curl-l": 2, "curl-r-sm": 2, "curl-l-sm": 2 } satisfies Record<Bend, number>,
 };
 
 /* ------------------------------------------------------------------------ */
@@ -120,6 +134,7 @@ type SideNote = {
     paper: Paper;
     ink: Ink;
     taped: boolean;
+    bend?: Bend;
 } & (
     | { text: string }
     | { stamp: StampName; caption?: string; frame?: StampFrame }

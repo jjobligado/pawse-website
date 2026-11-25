@@ -1414,6 +1414,20 @@ body {
     linear-gradient(to top, rgb(255 255 255 / 0.22), transparent 35%),
     var(--paper);
 }
+/* Bends (shapes in components/landing/paper-bends.tsx). Light comes from the top left:
+   a lifted edge catches it, the crease behind it falls into shade. */
+.hiw-bend { position: absolute; inset: 0; pointer-events: none; }
+.hiw-bend[data-bend="bow"] { background: linear-gradient(to bottom, transparent 50%, rgb(20 30 40 / 0.085) 73%, rgb(255 255 255 / 0.3) 93%, rgb(20 30 40 / 0.07) 100%); }
+.hiw-bend[data-bend="cup"] { background: linear-gradient(to right, rgb(255 255 255 / 0.32) 0, transparent 14%, rgb(20 30 40 / 0.055) 50%, transparent 84%, rgb(20 30 40 / 0.11) 100%); }
+.hiw-bend[data-bend="curl-r"] { background: radial-gradient(circle at 100% 100%, rgb(20 30 40 / 0.13), transparent 34%), linear-gradient(to top left, rgb(20 30 40 / 0.05), transparent 45%); }
+.hiw-bend[data-bend="curl-l"] { background: radial-gradient(circle at 0 100%, rgb(20 30 40 / 0.13), transparent 34%), linear-gradient(to top right, rgb(20 30 40 / 0.05), transparent 45%); }
+.hiw-bend[data-bend="curl-r-sm"] { background: radial-gradient(circle at 100% 100%, rgb(20 30 40 / 0.1), transparent 22%), linear-gradient(to top left, rgb(20 30 40 / 0.035), transparent 35%); }
+.hiw-bend[data-bend="curl-l-sm"] { background: radial-gradient(circle at 0 100%, rgb(20 30 40 / 0.1), transparent 22%), linear-gradient(to top right, rgb(20 30 40 / 0.035), transparent 35%); }
+/* The curled-over back of the paper: paler, lit along the fold, darker toward the tip */
+.hiw-curl-back { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.hiw-curl-back[data-bend^="curl-r"] { background: linear-gradient(to bottom right, color-mix(in srgb, var(--paper) 62%, white) 80%, color-mix(in srgb, var(--paper) 90%, black) 100%); }
+.hiw-curl-back[data-bend^="curl-l"] { background: linear-gradient(to bottom left, color-mix(in srgb, var(--paper) 62%, white) 80%, color-mix(in srgb, var(--paper) 90%, black) 100%); }
+
 .hiw-content { position: absolute; inset: 0; padding: 12px 12px 10px; display: flex; flex-direction: column; gap: 2px; font: 700 21px/1.05 var(--font-hand); color: var(--hiw-graphite); }
 .hiw-content s { text-decoration-color: rgb(88 93 100 / 0.75); text-decoration-thickness: 2px; color: var(--hiw-graphite-soft); }
 .hiw-big { font-size: 1.45em; }

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { backClip, bendClip, hasBack, PaperBends, type Bend } from "./paper-bends";
 import PixelStamp, { StampFilters } from "./pixel-stamp";
 import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
@@ -70,7 +71,18 @@ type SmallNoteData = {
     taped: boolean;
     /** No writing, at most a small doodle: gives the eye somewhere to rest. */
     blank?: boolean;
+    bend?: Bend;
 };
+
+/** Picks a bend from the tuning weights. */
+const BEND_TOTAL = Object.values(BG.bends).reduce((a, b) => a + b, 0);
+function pickBend(roll: number): Bend {
+    let t = roll * BEND_TOTAL;
+    for (const [b, w] of Object.entries(BG.bends) as [Bend, number][]) {
+        if ((t -= w) < 0) return b;
+    }
+    return "flat";
+}
 
 /** Seeded random, so the wall is the same on every render. */
 function rng(seed: number) {
@@ -117,6 +129,7 @@ const WALL: WallNote[] = (() => {
         const markName = MARKS[Math.floor(r2() * MARKS.length)];
         const markRot = (r2() - 0.5) * 30;
         const blank = r2() < BG.blankShare;
+        const bend = pickBend(r2());
         const m = size * 0.6 + 4; // keeps the tilted note and its tape whole
         const x = Math.min(BOARD_W - m, Math.max(m, px));
         const y = Math.min(BOARD_H - m, Math.max(m, py));
@@ -139,6 +152,7 @@ const WALL: WallNote[] = (() => {
             press: press++,
             taped,
             blank,
+            bend,
         });
     };
     const noteSize = () => BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
@@ -219,24 +233,41 @@ const SIDE: (SmallNoteData & { side: "left" | "right"; inset: number; y: number;
     mark: null,
     markRot: 0,
     press: i,
+    bend: n.bend ?? (["bow", "curl-r-sm", "cup", "curl-l-sm"] as const)[i % 4],
 }));
 
 /** Small notes above and below the stacked steps (below lg). */
-const STRIP_NOTE = (item: Item, paper: Paper, ink: Ink, rot: number, frame: StampFrame = "none"): SmallNoteData => ({
-    item, paper, ink, rot, frame, stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: 0, taped: false,
+const STRIP_NOTE = (item: Item, paper: Paper, ink: Ink, rot: number, frame: StampFrame = "none", bend: Bend = "flat"): SmallNoteData => ({
+    item, paper, ink, rot, frame, stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: 0, taped: false, bend,
 });
 const STRIP_TOP = [
-    STRIP_NOTE(T("drink water!"), "pink", "blue", -6),
+    STRIP_NOTE(T("drink water!"), "pink", "blue", -6, "none", "curl-r-sm"),
     STRIP_NOTE(S("fish", "x4"), "cream", "blue", 4, "round"),
-    STRIP_NOTE(T(<s>37 open tabs</s>), "peach", "red", -3),
+    STRIP_NOTE(T(<s>37 open tabs</s>), "peach", "red", -3, "none", "bow"),
 ];
 const STRIP_BOTTOM = [
-    STRIP_NOTE(S("heart", "focus"), "white", "red", 5),
+    STRIP_NOTE(S("heart", "focus"), "white", "red", 5, "none", "cup"),
     STRIP_NOTE(T(<>streak:<br /><span className="hiw-big">day 12</span></>), "lavender", "violet", -4),
-    STRIP_NOTE(S("loaf", "zzz"), "sky", "violet", 6, "square"),
+    STRIP_NOTE(S("loaf", "zzz"), "sky", "violet", 6, "square", "curl-l-sm"),
 ];
 
 const vars = (v: Record<string, string>) => v as CSSProperties;
+
+/**
+ * The note's paper, bent: clipped to the bend's shape, with its light and
+ * shade on top and, for a corner curl, the curled-over back of the paper.
+ */
+function BentPaper({ bend = "flat", children }: { bend?: Bend; children: ReactNode }) {
+    return (
+        <>
+            <div className="hiw-paper" style={{ clipPath: bendClip(bend) }}>
+                {children}
+                {bend !== "flat" && <i className="hiw-bend" data-bend={bend} />}
+            </div>
+            {hasBack(bend) && <i className="hiw-curl-back" data-bend={bend} style={{ clipPath: backClip(bend) }} />}
+        </>
+    );
+}
 
 function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style?: CSSProperties; className?: string }) {
     const { item } = note;
@@ -263,14 +294,14 @@ function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style
             className={`hiw-note ${className}`}
             style={{ ...vars({ "--paper": `var(--hiw-${note.paper})`, "--ink-c": `var(--hiw-ink-${note.ink})` }), rotate: `${note.rot}deg`, ...style }}
         >
-            <div className="hiw-paper">
+            <BentPaper bend={note.bend}>
                 <div className="hiw-content">{inner}</div>
                 {note.mark && (
                     <div className="hiw-mark" style={{ rotate: `${note.markRot}deg` }}>
                         <PixelStamp name={note.mark} press={note.press} />
                     </div>
                 )}
-            </div>
+            </BentPaper>
             {note.taped && <i className="hiw-tape" />}
         </div>
     );
@@ -285,7 +316,7 @@ function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWa
     };
     return (
         <li className="hiw-note hiw-step" style={style}>
-            <div className="hiw-paper">
+            <BentPaper bend={l.bend}>
                 <div className="hiw-content">
                     <div className="hiw-step-head">
                         <span>{s.step}</span>
@@ -302,7 +333,7 @@ function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWa
                         {s.hand}
                     </span>
                 </div>
-            </div>
+            </BentPaper>
             <i className="hiw-tape hiw-tape-wide" />
         </li>
     );
@@ -318,6 +349,7 @@ export default function HowItWorksSection() {
 
             <div className="hiw">
                 <StampFilters />
+                <PaperBends />
 
                 {/* lg+: the wall, scaled to fit */}
                 <WallFit width={BOARD_W} className="hiw-wall hidden lg:block">
