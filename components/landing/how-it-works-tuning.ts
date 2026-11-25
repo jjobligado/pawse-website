@@ -108,7 +108,7 @@ export const BACKGROUND = {
      *   blankShare:  share of background notes left blank (some keep a doodle)
      */
     inkStrength: 0.85,
-    blankShare: 0.3,
+    blankShare: 0,
     /**
      * Paper colours the background notes draw from. Listing a colour twice
      * makes it twice as common; white and cream are the palest.
