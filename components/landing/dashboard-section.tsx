@@ -40,8 +40,8 @@ export default function DashboardSection() {
                     ))}
                 </div>
 
-                {/* The app's Dashboard cards (a display), scaled as one piece; the max width keeps desktop type sensible */}
-                <Parallax depth={0.05} className="w-full max-w-[480px] lg:flex-1">
+                {/* The app's Dashboard cards (a display), scaled as one piece; at most 1.25x the app's size */}
+                <Parallax depth={0.05} className="w-full max-w-[616px] lg:flex-1">
                     <DashboardCards />
                 </Parallax>
             </div>

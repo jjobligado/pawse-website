@@ -12,7 +12,8 @@ import { useSyncExternalStore, type CSSProperties } from "react";
  * settings.js (educ-jkescritor/Pawse, test-branch): same colours, fonts, icons
  * (public/app/*), states and copy; numbers use the app's Pixeloid Sans.
  *
- * Scaling (see .dc- in app/globals.css): laid out once at 320px and sized in
+ * Scaling (see .dc- in app/globals.css): laid out at the app's real size
+ * (its 492px main column) and sized in
  * --u, a fraction of the container's width, so it scales like a picture:
  * height follows width, the three cards always sit in one row.
  *
