@@ -1,5 +1,5 @@
 /**
- * Pixel-art drawings for the How It Works wall, cut as rubber stamps.
+ * Pixel-art drawings for the How It Works wall and Coming Soon, cut as rubber stamps.
  *
  * One character per grid cell: `k` outline, `e` eyes, `d` / `x` / `z` dark
  * detail. All of those print solid; other letters are fills, left uninked
@@ -21,7 +21,10 @@ export type StampName =
     | "chart"
     | "zzz"
     | "sparkle"
-    | "phone";
+    | "phone"
+    | "cloud"
+    | "sliders"
+    | "note";
 
 export type StampFrame = "none" | "square" | "round";
 
@@ -178,6 +181,49 @@ const SPRITES: Record<StampName, Sprite> = {
                 [5, 10, "k"], [6, 10, "k"],
             ],
         ),
+    },
+    // Coming Soon: a cloud with an upload arrow (Save Your Progress)
+    cloud: {
+        rows: [
+            "......kkkk......",
+            "....kk....kk....",
+            "...k...dd...k...",
+            ".kk...dddd...kk.",
+            "k....dddddd....k",
+            "k......dd......k",
+            "k......dd......k",
+            ".kkkkkkkkkkkkkk.",
+        ],
+    },
+    // Coming Soon: three mixer sliders (Custom Sessions)
+    sliders: {
+        rows: [
+            ".k...k...k.",
+            "kkk..k...k.",
+            "kkk..k...k.",
+            ".k...k..kkk",
+            ".k...k..kkk",
+            ".k..kkk..k.",
+            ".k..kkk..k.",
+            ".k...k...k.",
+            ".k...k...k.",
+        ],
+    },
+    // Coming Soon: a pair of beamed music notes (Expanded Audio)
+    note: {
+        rows: [
+            "...kkkkkkk",
+            "...kkkkkkk",
+            "...k.....k",
+            "...k.....k",
+            "...k.....k",
+            "...k.....k",
+            "...k..kkkk",
+            ".kkk.kkkkk",
+            "kkkk.kkkkk",
+            "kkkk..kkk.",
+            ".kk.......",
+        ],
     },
 };
 
