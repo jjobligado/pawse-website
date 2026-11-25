@@ -1,14 +1,15 @@
 /**
  * HOW IT WORKS: TUNING
  * ---------------------------------------------------------------------------
- * Every layout number for the wall of notes (lg and up) lives here, so the
- * design can be adjusted without touching the component.
+ * Every layout number for the wall of notes lives here, so the design can
+ * be adjusted without touching the component.
  *
  * How to use: run `npm run dev`, open http://localhost:3000/#how-it-works,
  * change a number below and save. The page updates by itself.
  *
- * Units: px on the wall's core board, which is 1120 wide × 600 tall. The
- * whole board scales down on smaller screens, so these are "full-size" px.
+ * Units: px on the wall's board. There is one board per screen size (wide
+ * 1120 × 600, square, tall; see BOARDS) and each scales to fit the screen,
+ * so these are "full-size" px.
  * Tilt is in degrees: negative leans left (counter-clockwise), positive right.
  *
  * Colours live in app/globals.css (search for --hiw-).
@@ -24,43 +25,85 @@ export type Ink = "blue" | "red" | "violet" | "green" | "black";
 /* 1. The four step notes (each is 236 × 236)                               */
 /* ------------------------------------------------------------------------ */
 
-export const STEP_LAYOUT = {
-    "01": {
-        left: 88, //  distance from the board's left edge
-        top: 196, //  distance from the board's top edge
-        tilt: -3,
-        // The stamp in the top-right corner. `top` / `right` nudge it:
-        // negative pulls it further up / further right.
-        stamp: { size: 62, top: -10, right: -8, tilt: 6 },
-        // How the paper bends: "flat", "bow" (bottom edge lifts), "cup" (sides
-        // curl), "curl-r" / "curl-l" (a bottom corner curls up; "-sm" = smaller)
-        bend: "bow",
+type StepId = "01" | "02" | "03" | "04";
+
+/** How each step note looks, the same on every board. */
+export const STEP_STYLE: Record<StepId, { stamp: { size: number; top: number; right: number; tilt: number }; bend: Bend }> = {
+    // `stamp` is the drawing in the top-right corner. `top` / `right` nudge it:
+    // negative pulls it further up / further right.
+    // `bend` is how the paper bends: "flat", "bow" (bottom edge lifts), "cup"
+    // (sides curl), "curl-r" / "curl-l" (a bottom corner curls up; "-sm" = smaller)
+    "01": { stamp: { size: 62, top: -10, right: -8, tilt: 6 }, bend: "bow" },
+    "02": { stamp: { size: 50, top: -4, right: 2, tilt: -4 }, bend: "curl-r-sm" },
+    "03": { stamp: { size: 56, top: -6, right: -2, tilt: 4 }, bend: "cup" },
+    "04": { stamp: { size: 50, top: -4, right: 2, tilt: -4 }, bend: "curl-l-sm" },
+};
+
+export type StepPlace = { left: number; top: number; tilt: number };
+
+/**
+ * The wall comes in three shapes, one per screen size. Each is a fixed board
+ * that scales to fit the section (down as far as needed, up to `maxScale`).
+ *   wide:   1200px and up. Four steps in a row (the original wall).
+ *   square: tablets and small laptops (768 to 1199px). Steps in a 2×2 grid.
+ *   tall:   phones (under 768px). Steps in one zig-zag column.
+ *
+ * `steps`: where each step sits on that board, in px from the board's
+ * top-left corner (`left`, `top`), and its tilt.
+ * `background`: overrides for that board on top of BACKGROUND (section 2).
+ * `photos` / `lists`: how many cat photos (from the top of PHOTOS) and list
+ * notes that board shows; smaller boards get fewer so they don't crowd.
+ */
+export const BOARDS = {
+    wide: {
+        width: 1120,
+        height: 600,
+        maxScale: 1,
+        steps: {
+            "01": { left: 88, top: 196, tilt: -3 },
+            "02": { left: 340, top: 168, tilt: 2.2 },
+            "03": { left: 575, top: 200, tilt: -1.8 },
+            "04": { left: 824, top: 172, tilt: 2.8 },
+        },
+        background: {},
+        photos: 7,
+        lists: 6,
     },
-    "02": {
-        left: 340,
-        top: 168,
-        tilt: 2.2,
-        stamp: { size: 50, top: -4, right: 2, tilt: -4 },
-        bend: "curl-r-sm",
+    square: {
+        width: 720,
+        height: 700,
+        maxScale: 1.2,
+        steps: {
+            "01": { left: 104, top: 96, tilt: -3 },
+            "02": { left: 372, top: 84, tilt: 2.2 },
+            "03": { left: 112, top: 366, tilt: -1.8 },
+            "04": { left: 380, top: 356, tilt: 2.8 },
+        },
+        background: { count: 30, radiusX: 380, radiusY: 380, edgeNotes: 4 },
+        photos: 4,
+        lists: 4,
     },
-    "03": {
-        left: 575,
-        top: 200,
-        tilt: -1.8,
-        stamp: { size: 56, top: -6, right: -2, tilt: 4 },
-        bend: "cup",
+    tall: {
+        width: 340,
+        // extra room above and below the column, where the cat photos go
+        height: 1290,
+        maxScale: 1.1,
+        steps: {
+            "01": { left: 16, top: 128, tilt: -3 },
+            "02": { left: 88, top: 392, tilt: 2.2 },
+            "03": { left: 14, top: 656, tilt: -1.8 },
+            "04": { left: 86, top: 920, tilt: 2.8 },
+        },
+        background: { count: 26, radiusX: 200, radiusY: 590, noteSize: { min: 96, max: 122 }, minSpacing: 86, edgeNotes: 2, gapPad: 40 },
+        photos: 2,
+        lists: 2,
     },
-    "04": {
-        left: 824,
-        top: 172,
-        tilt: 2.8,
-        stamp: { size: 50, top: -4, right: 2, tilt: -4 },
-        bend: "curl-l-sm",
-    },
-} as const satisfies Record<string, { bend: Bend } & Record<string, unknown>>;
+} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number }>;
+export type BoardName = keyof typeof BOARDS;
 
 /* ------------------------------------------------------------------------ */
 /* 2. The background notes behind the steps (generated, not hand-placed)    */
+/*    These are for the wide board; BOARDS.<name>.background overrides them */
 /* ------------------------------------------------------------------------ */
 
 export const BACKGROUND = {
@@ -198,14 +241,18 @@ export const PHOTOS: { src: string; tilt?: number; tuck?: number }[] = [
 
 /* ------------------------------------------------------------------------ */
 /* 5. The side notes (only visible where the page is wider than the         */
-/*    section; they spread out to the header's edges)                       */
+/*    board; they spread out toward the page's edges)                       */
 /* ------------------------------------------------------------------------ */
 
 type SideNote = {
     side: "left" | "right";
     /** Gap from that outer edge. Keep it 4 or more so nothing gets cut. */
     inset: number;
-    /** Where the note's centre sits, from the top (0 to 600). */
+    /**
+     * Where the note's centre sits, from the top (0 to 600) on the wide board.
+     * The square and tall boards repeat each side's notes evenly down their
+     * full height instead.
+     */
     y: number;
     size: number;
     tilt: number;

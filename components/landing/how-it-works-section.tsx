@@ -6,16 +6,16 @@ import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 import WallFit from "./wall-fit";
-import { BACKGROUND as BG, LIST_NOTE_SCALE, NOTES, PHOTOS, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from "./how-it-works-tuning";
+import { BACKGROUND, BOARDS, LIST_NOTE_SCALE, NOTES, PHOTOS, SIDE_NOTES, STEP_STYLE, type BoardName, type Ink, type Paper, type StepPlace } from "./how-it-works-tuning";
 
 /**
  * The PAWSE loop as four paper step notes on a wall of small notes. Every
- * drawing is a pixel-art rubber stamp pressed into the paper. From lg the
- * wall's core is a fixed 1120×600 board scaled to fit the section, with
- * sparser notes out to the header's edges where the page is wider; hovering a step note
- * lifts it off the wall, above any step it overlaps. Below lg the steps stack (one column on phones,
- * 2×2 on tablets) between two short rows of small notes. Everything except
- * the four step notes is decorative and hidden from assistive tech.
+ * drawing is a pixel-art rubber stamp pressed into the paper. The wall's core
+ * is a fixed board scaled to fit the section, in one of three shapes by screen
+ * size (four steps in a row, a 2×2 grid, or a zig-zag column on phones), with
+ * sparser notes out toward the page's edges where there is room. Hovering a
+ * step note lifts it off the wall, above any step it overlaps. Everything
+ * except the four step notes is decorative and hidden from assistive tech.
  *
  * Layout numbers (positions, sizes, spread, side notes) are in
  * how-it-works-tuning.ts.
@@ -75,7 +75,7 @@ const STAMPS: Item[] = [
 ];
 const SIDE_TEXT = new Set(SIDE_NOTES.flatMap((n) => ("text" in n ? [n.text] : [])));
 const WALL_NOTES = NOTES.filter((t) => !SIDE_TEXT.has(t)).map(T);
-/** Lists get their own open spots (see WALL step 6); everything else cycles through the notes. */
+/** Lists get their own open spots (see buildWall step 7); everything else cycles through the notes. */
 const LISTS = WALL_NOTES.filter(isList);
 const ITEMS: Item[] = [...WALL_NOTES.filter((i) => !isList(i)), ...STAMPS];
 /** Walk the items in steps that share no factor with their count, so every one shows before any repeats. */
@@ -106,10 +106,10 @@ type SmallNoteData = {
 };
 
 /** Picks a bend from the tuning weights. */
-const BEND_TOTAL = Object.values(BG.bends).reduce((a, b) => a + b, 0);
+const BEND_TOTAL = Object.values(BACKGROUND.bends).reduce((a, b) => a + b, 0);
 function pickBend(roll: number): Bend {
     let t = roll * BEND_TOTAL;
-    for (const [b, w] of Object.entries(BG.bends) as [Bend, number][]) {
+    for (const [b, w] of Object.entries(BACKGROUND.bends) as [Bend, number][]) {
         if ((t -= w) < 0) return b;
     }
     return "flat";
@@ -126,18 +126,18 @@ function rng(seed: number) {
     };
 }
 
-const BOARD_W = 1120;
-const BOARD_H = 600;
-
 /**
  * The small notes behind the steps, scattered radially: a shuffled golden-angle
  * spiral in an oval, piled up in the middle and loosening toward a ragged rim.
  * A second pass then plugs any bare spot right around the steps. Every note is
- * kept whole on the 1120×600 core. Layout and stamp styling draw from separate
+ * kept whole on the board. Layout and stamp styling draw from separate
  * random streams so either can change without moving the other.
  */
 type WallNote = SmallNoteData & { x: number; y: number; size: number; z: number };
-const WALL: WallNote[] = (() => {
+function buildWall(board: (typeof BOARDS)[BoardName]): WallNote[] {
+    const BG = { ...BACKGROUND, ...board.background };
+    const BOARD_W = board.width;
+    const BOARD_H = board.height;
     const r = rng(BG.seed);
     const r2 = rng(97);
     const cx = BOARD_W / 2;
@@ -190,7 +190,7 @@ const WALL: WallNote[] = (() => {
     };
     const noteSize = () => BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
 
-    const steps = Object.values(STEP_LAYOUT);
+    const steps: StepPlace[] = Object.values(board.steps);
     /** Share of a note (centre x, y, side size) that sits under the steps, 0 to 1. */
     const hiddenShare = (x: number, y: number, size: number) => {
         let a = 0;
@@ -243,13 +243,22 @@ const WALL: WallNote[] = (() => {
 
     // 3. Behind the seams between neighbouring steps: their tilts open thin
     //    wedges that the gap check above can't see, so each seam gets a note
-    //    near its top and one near its foot.
-    const byLeft = [...steps].sort((a, b) => a.left - b.left);
-    for (let i = 0; i + 1 < byLeft.length; i++) {
-        const [a, b] = [byLeft[i], byLeft[i + 1]];
-        const x = (a.left + 236 + b.left) / 2;
-        const top = Math.min(a.top, b.top);
-        for (const y of [top + 74, top + 178]) add(x + (r() - 0.5) * 10, y, noteSize(), 6 + Math.floor(r() * 6));
+    //    near each end. Side by side, that's its top and foot; one above the
+    //    other, its left and right.
+    for (const a of steps) {
+        for (const b of steps) {
+            const gapX = b.left - (a.left + 236);
+            const gapY = b.top - (a.top + 236);
+            if (gapX > -20 && gapX < 80 && Math.abs(a.top - b.top) < 120) {
+                const x = (a.left + 236 + b.left) / 2;
+                const top = Math.min(a.top, b.top);
+                for (const y of [top + 74, top + 178]) add(x + (r() - 0.5) * 10, y, noteSize(), 6 + Math.floor(r() * 6));
+            } else if (gapY > -20 && gapY < 80 && Math.abs(a.left - b.left) < 120) {
+                const y = (a.top + 236 + b.top) / 2;
+                const left = Math.min(a.left, b.left);
+                for (const x of [left + 74, left + 178]) add(x, y + (r() - 0.5) * 10, noteSize(), 6 + Math.floor(r() * 6));
+            }
+        }
     }
 
     // 4. A few more notes along the very top and bottom of the wall, spaced
@@ -258,7 +267,8 @@ const WALL: WallNote[] = (() => {
         for (let i = 0; i < BG.edgeNotes; i++) {
             const size = noteSize();
             const m = size * 0.6 + 4;
-            const x = 150 + ((BOARD_W - 300) * (i + 0.5)) / BG.edgeNotes + (r() - 0.5) * 60;
+            const em = (BOARD_W * 150) / 1120; // left clear at each end
+            const x = em + ((BOARD_W - 2 * em) * (i + 0.5)) / BG.edgeNotes + (r() - 0.5) * 60;
             const y = edge ? BOARD_H - m - r() * 18 : m + r() * 18;
             if (boxes.some(([bx, by]) => Math.hypot(x - bx, y - by) < 72)) continue;
             add(x, y, size, 3 + Math.floor(r() * 10));
@@ -269,14 +279,15 @@ const WALL: WallNote[] = (() => {
     //    one by one as far as possible from the steps and from each other.
     const taken: [number, number][] = steps.map((s) => [s.left + 118, s.top + 118]);
     const spots = out.filter((n) => hiddenShare(n.x + n.size / 2, n.y + n.size / 2, n.size) < 0.15);
-    for (const photo of PHOTOS) {
+    // gaps along the board's short side count a bit more
+    const [wx, wy] = BOARD_W >= BOARD_H ? [1, 1.4] : [1.4, 1];
+    for (const photo of PHOTOS.slice(0, board.photos)) {
         let best: WallNote | null = null;
         let bestD = 0;
         for (const n of spots) {
             if (n.photo) continue;
             const c = [n.x + n.size / 2, n.y + n.size / 2];
-            // vertical gaps count a bit more, since the board is wider than tall
-            const d = Math.min(...taken.map(([tx, ty]) => Math.hypot(c[0] - tx, (c[1] - ty) * 1.4)));
+            const d = Math.min(...taken.map(([tx, ty]) => Math.hypot((c[0] - tx) * wx, (c[1] - ty) * wy)));
             if (d > bestD) [best, bestD] = [n, d];
         }
         if (!best || bestD < 110) break;
@@ -325,7 +336,7 @@ const WALL: WallNote[] = (() => {
     const overlap = (x: number, y: number, size: number, o: WallNote) =>
         (Math.max(0, Math.min(x + size, o.x + o.size) - Math.max(x, o.x)) * Math.max(0, Math.min(y + size, o.y + o.size) - Math.max(y, o.y))) /
         (o.size * o.size);
-    for (const item of LISTS) {
+    for (const item of LISTS.slice(0, board.lists)) {
         const size = listSize * (0.94 + r() * 0.12);
         const m = size * 0.6 + 4;
         let best = [cx, cy];
@@ -356,48 +367,61 @@ const WALL: WallNote[] = (() => {
         above.push(n);
     }
     return out;
-})();
+}
 
 /**
- * Where the page is wider than the section, the wall reaches out to the
- * header's edges. These notes sit along those outer edges, sparser than the
+ * Where the page is wider than the board, the wall reaches out toward the
+ * page's edges. These notes sit along those outer edges, sparser than the
  * core and beneath it, so the wall thins out as it spreads. Each is anchored
  * to its own edge (inset in px), so it stays whole at any width; when there is
- * no extra room it simply tucks under the core's outer notes.
+ * no extra room it simply tucks under the core's outer notes. The wide board
+ * uses SIDE_NOTES as placed; taller boards repeat each side's notes evenly
+ * down their full height.
  */
-const SIDE: (SmallNoteData & { side: "left" | "right"; inset: number; y: number; size: number })[] = SIDE_NOTES.map((n, i) => ({
-    side: n.side,
-    inset: n.inset,
-    y: n.y - n.size / 2,
-    size: n.size,
-    item: "text" in n ? T(n.text) : S(n.stamp, n.caption),
-    paper: n.paper,
-    ink: n.ink,
-    rot: n.tilt,
-    frame: "stamp" in n ? (n.frame ?? "none") : "none",
-    taped: n.taped,
-    stampRot: n.tilt * -1.5,
-    ghost: false,
-    mark: null,
-    markRot: 0,
-    press: i,
-    bend: n.bend ?? (["bow", "curl-r-sm", "cup", "curl-l-sm"] as const)[i % 4],
-}));
+type SideNote = SmallNoteData & { side: "left" | "right"; inset: number; y: number; size: number };
+function buildSides(board: (typeof BOARDS)[BoardName], name: BoardName): SideNote[] {
+    const place = (n: (typeof SIDE_NOTES)[number], i: number, y: number, stamp?: Item): SideNote => ({
+        side: n.side,
+        inset: n.inset,
+        y: y - n.size / 2,
+        size: n.size,
+        item: stamp ?? ("text" in n ? T(n.text) : S(n.stamp, n.caption)),
+        paper: n.paper,
+        ink: n.ink,
+        rot: n.tilt,
+        frame: stamp ? (i % 3 === 0 ? "round" : "none") : "stamp" in n ? (n.frame ?? "none") : "none",
+        taped: n.taped,
+        stampRot: n.tilt * -1.5,
+        ghost: false,
+        mark: null,
+        markRot: 0,
+        press: i,
+        bend: n.bend ?? (["bow", "curl-r-sm", "cup", "curl-l-sm"] as const)[i % 4],
+    });
+    if (name === "wide") return SIDE_NOTES.map((n, i) => place(n, i, n.y));
+    const out: SideNote[] = [];
+    for (const side of ["left", "right"] as const) {
+        const own = SIDE_NOTES.filter((n) => n.side === side);
+        const count = Math.max(own.length, Math.round(board.height / 150));
+        // the right side starts half a step lower, so the two sides don't mirror
+        const offset = side === "right" ? 0.75 : 0.5;
+        for (let i = 0; i < count; i++) {
+            const n = own[i % own.length];
+            const y = Math.min(board.height - n.size * 0.6, Math.max(n.size * 0.6, ((i + offset) * board.height) / count));
+            // once a side's own notes run out, the rest carry a stamp instead so no writing repeats
+            const stamp = i < own.length ? undefined : STAMPS[(i * 5 + (side === "right" ? 7 : 0)) % STAMPS.length];
+            out.push(place(n, out.length, y, stamp));
+        }
+    }
+    return out;
+}
 
-/** Small notes above and below the stacked steps (below lg). */
-const STRIP_NOTE = (item: Item, paper: Paper, ink: Ink, rot: number, frame: StampFrame = "none", bend: Bend = "flat"): SmallNoteData => ({
-    item, paper, ink, rot, frame, stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: 0, taped: false, bend,
-});
-const STRIP_TOP = [
-    STRIP_NOTE(T("drink water!"), "pink", "blue", -6, "none", "curl-r-sm"),
-    STRIP_NOTE(S("fish", "x4"), "cream", "blue", 4, "round"),
-    STRIP_NOTE(T("~~check email~~"), "peach", "red", -3, "none", "bow"),
-];
-const STRIP_BOTTOM = [
-    STRIP_NOTE(S("heart", "focus"), "white", "red", 5, "none", "cup"),
-    STRIP_NOTE(T("**4** days\nuntil finals"), "lavender", "violet", -4),
-    STRIP_NOTE(S("loaf", "zzz"), "sky", "violet", 6, "square", "curl-l-sm"),
-];
+const WALLS = (Object.keys(BOARDS) as BoardName[]).map((name) => ({
+    name,
+    board: BOARDS[name],
+    notes: buildWall(BOARDS[name]),
+    sides: buildSides(BOARDS[name], name),
+}));
 
 const vars = (v: Record<string, string>) => v as CSSProperties;
 
@@ -466,12 +490,13 @@ function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style
     );
 }
 
-function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWall: boolean }) {
-    const l = STEP_LAYOUT[s.step as keyof typeof STEP_LAYOUT];
+function StepNote({ s, i, place }: { s: (typeof STEPS)[number]; i: number; place: StepPlace }) {
+    const l = STEP_STYLE[s.step as keyof typeof STEP_STYLE];
     const style: CSSProperties = {
         // tilt goes through a variable so the hover can ease it toward straight
-        ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})`, "--tilt": `${l.tilt}deg` }),
-        ...(onWall ? { left: l.left, top: l.top, ...vars({ "--z": String(50 + i) }) } : {}),
+        ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})`, "--tilt": `${place.tilt}deg`, "--z": String(50 + i) }),
+        left: place.left,
+        top: place.top,
     };
     return (
         <li className="hiw-note hiw-step" style={style}>
@@ -510,47 +535,35 @@ export default function HowItWorksSection() {
                 <StampFilters />
                 <PaperBends />
 
-                {/* lg+: the wall, scaled to fit */}
-                <WallFit width={BOARD_W} className="hiw-wall hidden lg:block">
-                    <div className="hiw-board" style={vars({ "--hiw-bg-ink": String(BG.inkStrength) })}>
-                        <div className="hiw-sides" aria-hidden="true">
-                            {SIDE.map((n, idx) => (
-                                <SmallNote key={idx} note={n} style={{ [n.side]: n.inset, top: n.y, width: n.size, height: n.size }} />
-                            ))}
-                        </div>
-                        <div className="hiw-core">
-                            <div className="hiw-small" aria-hidden="true">
-                                {WALL.map((n, idx) => (
-                                    <SmallNote key={idx} note={n} style={{ left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }} />
+                {WALLS.map(({ name, board, notes, sides }) => (
+                    <WallFit
+                        key={name}
+                        width={board.width}
+                        maxScale={board.maxScale}
+                        className={`hiw-wall hiw-wall-${name}`}
+                        style={vars({ "--bw0": String(board.width), "--bh0": String(board.height), "--max": String(board.maxScale) })}
+                    >
+                        <div className="hiw-board" style={vars({ "--hiw-bg-ink": String({ ...BACKGROUND, ...board.background }.inkStrength) })}>
+                            <div className="hiw-sides" aria-hidden="true">
+                                {sides.map((n, idx) => (
+                                    <SmallNote key={idx} note={n} style={{ [n.side]: n.inset, top: n.y, width: n.size, height: n.size }} />
                                 ))}
                             </div>
-                            <ol className="hiw-steps">
-                                {STEPS.map((s, i) => (
-                                    <StepNote key={s.step} s={s} i={i} onWall />
-                                ))}
-                            </ol>
+                            <div className="hiw-core">
+                                <div className="hiw-small" aria-hidden="true">
+                                    {notes.map((n, idx) => (
+                                        <SmallNote key={idx} note={n} style={{ left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }} />
+                                    ))}
+                                </div>
+                                <ol className="hiw-steps">
+                                    {STEPS.map((s, i) => (
+                                        <StepNote key={s.step} s={s} i={i} place={board.steps[s.step as keyof typeof board.steps]} />
+                                    ))}
+                                </ol>
+                            </div>
                         </div>
-                    </div>
-                </WallFit>
-
-                {/* Below lg: the steps stacked between two rows of small notes */}
-                <div className="hiw-stack flex flex-col items-center gap-7 lg:hidden">
-                    <div className="hiw-strip" aria-hidden="true">
-                        {STRIP_TOP.map((n, idx) => (
-                            <SmallNote key={idx} note={n} />
-                        ))}
-                    </div>
-                    <ol className="hiw-steps grid grid-cols-1 justify-items-center gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-12">
-                        {STEPS.map((s, i) => (
-                            <StepNote key={s.step} s={s} i={i} onWall={false} />
-                        ))}
-                    </ol>
-                    <div className="hiw-strip" aria-hidden="true">
-                        {STRIP_BOTTOM.map((n, idx) => (
-                            <SmallNote key={idx} note={n} />
-                        ))}
-                    </div>
-                </div>
+                    </WallFit>
+                ))}
             </div>
         </Section>
     );

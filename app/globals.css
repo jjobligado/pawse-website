@@ -1360,7 +1360,7 @@ body {
 /* ==================================================================
    How It Works: a wall of paper notes, every drawing a pixel stamp
    (components/landing/how-it-works-section.tsx, pixel-stamp.tsx).
-   The wall's core is a fixed 1120×600 board scaled by WallFit (--hiw-s).
+   The wall's core is a fixed board (one per screen size) scaled by WallFit (--hiw-s).
    ================================================================== */
 .hiw {
   --hiw-yellow: #FFEFA1;
@@ -1388,18 +1388,29 @@ body {
 }
 
 /*
-  The wall reaches past the section's 1120px column out to the header's edges
-  (the same lg:px-20 inside max-w-chrome, measured on <main>, an @container).
-  Its height follows the section column so the core keeps its size.
+  The wall reaches past the section's column out toward the page's edges
+  (measured on <main>, an @container): almost to the screen's edge on phones,
+  the header's edges from lg. --bw0 / --bh0 are the board's size and --max how
+  far it may scale up (set per board in how-it-works-tuning.ts). Its height
+  follows the section column so nothing shifts while WallFit waits to run.
 */
 .hiw-wall {
-  --hiw-core-w: min(1120px, 100cqw - 160px);
-  --hiw-wall-w: min(1280px, 100cqw - 160px);
+  --hiw-pad: 48px; /* the section's side gutters, both sides */
+  --hiw-wall-w: calc(100cqw - 16px);
+  --hiw-core-w: min(var(--bw0) * var(--max, 1) * 1px, 100cqw - var(--hiw-pad));
   position: relative; width: var(--hiw-wall-w); margin-inline: calc((100% - var(--hiw-wall-w)) / 2);
-  height: calc(var(--hiw-core-w) * 600 / 1120); overflow: clip;
+  height: calc(var(--hiw-core-w) * var(--bh0) / var(--bw0)); overflow: clip;
 }
-.hiw-board { position: absolute; top: 0; left: 50%; width: var(--hiw-bw, var(--hiw-wall-w)); height: 600px; transform-origin: 50% 0; transform: translateX(-50%) scale(var(--hiw-s, 1)); }
-.hiw-core { position: absolute; top: 0; left: calc(50% - 560px); width: 1120px; height: 600px; }
+/* Which board shows: tall on phones, square from md, wide from 1200px */
+.hiw-wall-square, .hiw-wall-wide { display: none; }
+@media (min-width: 48rem) { .hiw-wall-tall { display: none; } .hiw-wall-square { display: block; } }
+@media (min-width: 75rem) { .hiw-wall-square { display: none; } .hiw-wall-wide { display: block; } }
+@media (min-width: 48rem) { .hiw-wall { --hiw-pad: 96px; --hiw-wall-w: calc(100cqw - 56px); } }
+@media (min-width: 64rem) { .hiw-wall { --hiw-pad: 160px; --hiw-wall-w: min(1280px, 100cqw - 160px); } }
+/* the section stops growing at 1280px, so its column does too */
+@media (min-width: 80rem) { .hiw-wall { --hiw-core-w: min(var(--bw0) * var(--max, 1) * 1px, 1120px); } }
+.hiw-board { position: absolute; top: 0; left: 50%; width: var(--hiw-bw, var(--hiw-wall-w)); height: calc(var(--bh0) * 1px); transform-origin: 50% 0; transform: translateX(-50%) scale(var(--hiw-s, 1)); }
+.hiw-core { position: absolute; top: 0; left: calc(50% - var(--bw0) * 0.5px); width: calc(var(--bw0) * 1px); height: calc(var(--bh0) * 1px); }
 .hiw-sides, .hiw-small { position: absolute; inset: 0; }
 .hiw-steps { margin: 0; padding: 0; list-style: none; }
 .hiw-board .hiw-note { position: absolute; }
@@ -1452,7 +1463,6 @@ body {
 
 /* The four step notes */
 .hiw-step { width: 236px; height: 236px; }
-.hiw-stack .hiw-step { width: 256px; height: 256px; }
 .hiw-step .hiw-content { padding: 22px 22px 18px; gap: 0; font: 400 14.5px/1.48 var(--font-inter), sans-serif; color: rgb(35 35 35 / 0.85); }
 .hiw-step-head { min-height: 52px; display: flex; justify-content: space-between; align-items: flex-start; font: 600 13px/1 var(--font-pixelify), monospace; letter-spacing: 0.08em; color: rgb(35 35 35 / 0.6); }
 .hiw-step-art { flex: none; } /* size and offset per step, inline */
@@ -1498,13 +1508,3 @@ body {
   .hiw-board .hiw-step:hover .hiw-paper::after { opacity: 1; }
 }
 
-/* Below lg: rows of small notes above and below the stacked steps */
-.hiw-stack { padding-top: 12px; } /* layout in Tailwind, so lg:hidden wins */
-.hiw-strip { display: flex; justify-content: center; gap: 6px; }
-.hiw-strip .hiw-note { width: 104px; height: 104px; }
-.hiw-strip .hiw-content { padding: 10px; font-size: 18px; }
-@media (min-width: 48rem) {
-  .hiw-strip { gap: 20px; }
-  .hiw-strip .hiw-note { width: 124px; height: 124px; }
-  .hiw-strip .hiw-content { padding: 12px; font-size: 21px; }
-}
