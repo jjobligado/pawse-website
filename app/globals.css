@@ -1228,7 +1228,7 @@ body {
   background: var(--at-topbar);
 }
 .at-title { display: flex; align-items: center; gap: 8px; }
-.at-logo { width: 24px; height: 24px; image-rendering: pixelated; }
+.at-logo { width: 24px; height: 24px; object-fit: contain; image-rendering: pixelated; }
 .at-name { font: 700 16px/16px var(--at-pixel); }
 .at-ctls { display: flex; gap: 8px; align-items: center; }
 .at-ctl { position: relative; width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background-color 150ms ease, transform 150ms ease; }
