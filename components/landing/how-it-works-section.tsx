@@ -432,6 +432,10 @@ function buildSides(board: (typeof BOARDS)[BoardName], name: BoardName): SideNot
     const out: SideNote[] = [];
     for (const side of ["left", "right"] as const) {
         const own = SIDE_NOTES.filter((n) => n.side === side);
+        if ("sideYs" in board) {
+            board.sideYs[side].forEach(([y, i]) => out.push(place(own[i % own.length], out.length, y)));
+            continue;
+        }
         const count = Math.round(board.height / ("sideSpacing" in board ? board.sideSpacing : 150));
         // the right side starts half a step lower, so the two sides don't mirror
         const offset = side === "right" ? 0.75 : 0.5;

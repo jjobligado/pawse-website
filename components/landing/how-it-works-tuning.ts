@@ -65,8 +65,8 @@ export type PlacedNote = { x: number; y: number; size: number; tilt: number; pap
  * `background`: overrides for that board on top of BACKGROUND (section 2).
  * `photos` / `lists`: how many cat photos (from the top of PHOTOS) and list
  * notes that board shows; smaller boards get fewer so they don't crowd.
- * `sideSpacing` (square and tall): px between side notes down each outer edge;
- * higher = sparser.
+ * `sideSpacing` (square): px between side notes down each outer edge;
+ * higher = sparser. `sideYs` (tall): the side notes' heights, set by hand.
  */
 export const BOARDS = {
     wide: {
@@ -124,11 +124,15 @@ export const BOARDS = {
             { x: 98, y: 1266, size: 124, tilt: -3, text: "to do:\n~~read ch. 4~~\n~~lab report~~\nmath problem set\nemail prof", paper: "yellow", ink: "black", taped: true },
             { x: 258, y: 1270, size: 112, tilt: 5, photo: "/images/cat-memes/banana-cat.jpg" },
         ],
-        sideSpacing: 230,
+        // Side notes (wider phones only), placed by hand clear of the notes
+        // tucked beside the steps: [height, which of that side's SIDE_NOTES].
+        // Beside a step that sits on that side, use a stamp: a written note
+        // would hide behind it.
+        sideYs: { left: [[330, 0], [850, 1], [1290, 2]], right: [[120, 0], [560, 2]] },
         photos: 0,
         lists: 0,
     },
-} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number; sideSpacing?: number; placed?: PlacedNote[] }>;
+} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number; sideSpacing?: number; sideYs?: { left: [number, number][]; right: [number, number][] }; placed?: PlacedNote[] }>;
 export type BoardName = keyof typeof BOARDS;
 
 /* ------------------------------------------------------------------------ */

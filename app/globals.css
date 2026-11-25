@@ -1402,6 +1402,8 @@ body {
   height: calc(var(--hiw-core-w) * var(--bh0) / var(--bw0)); overflow: clip;
 }
 /* Which board shows: tall on phones, square from md, wide from 1200px */
+/* the tall board's side notes stay close to the steps instead of drifting to the screen's edges */
+.hiw-wall-tall { --hiw-wall-w: min(100cqw - 16px, var(--hiw-core-w) + 140px); }
 /* narrow phones have no room beside the tall board, so its side notes would only peek through */
 @media (max-width: 34.99rem) { .hiw-wall-tall .hiw-sides { display: none; } }
 .hiw-wall-square, .hiw-wall-wide { display: none; }
