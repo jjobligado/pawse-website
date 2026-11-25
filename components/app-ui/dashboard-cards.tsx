@@ -12,11 +12,9 @@ import { useSyncExternalStore, type CSSProperties } from "react";
  * settings.js (educ-jkescritor/Pawse, test-branch): same colours, fonts, icons
  * (public/app/*), states and copy; numbers use the app's Pixeloid Sans.
  *
- * Scaling (see .dc- in app/globals.css): every size is in --u, a fraction of
- * the container's width, so text, icons, radii, gaps and heights all shrink or
- * grow together instead of only the width changing. Two layouts:
- *   wide (container 500px+): roomy cards above the chart
- *   narrow (phones): still one row of three, compact cards with wrapping text
+ * Scaling (see .dc- in app/globals.css): laid out once at 320px and sized in
+ * --u, a fraction of the container's width, so it scales like a picture:
+ * height follows width, the three cards always sit in one row.
  *
  * Static on purpose (no entrance animation); the app's hover states remain:
  * bars darken and lift with a time tooltip, the day label goes bold.

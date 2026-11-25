@@ -20,10 +20,10 @@ export default function DashboardSection() {
                 kept right on your device.
             </SectionSubtitle>
 
-            {/* Side by side only from xl: below that the cards would be squeezed into their phone layout */}
-            <div className="w-full flex flex-col xl:flex-row justify-center items-center gap-8 xl:gap-12 mt-2">
+            {/* Side by side from lg; stacked (checklist first) below */}
+            <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-12 mt-2">
                 {/* Feature Checklist */}
-                <div className="w-fit max-w-full xl:w-[400px] xl:shrink-0 flex flex-col items-stretch gap-3.5">
+                <div className="w-fit max-w-full lg:w-[400px] lg:shrink-0 flex flex-col items-stretch gap-3.5">
                     {FEATURES.map((item) => (
                         <div key={item} className="w-full flex items-center gap-3.5">
                             <div className="w-6 h-6 shrink-0 relative">
@@ -40,8 +40,8 @@ export default function DashboardSection() {
                     ))}
                 </div>
 
-                {/* The app's Dashboard cards (a display), scaled as one piece */}
-                <Parallax depth={0.05} className="w-full max-w-[640px] xl:flex-1">
+                {/* The app's Dashboard cards (a display), scaled as one piece; the max width keeps desktop type sensible */}
+                <Parallax depth={0.05} className="w-full max-w-[480px] lg:flex-1">
                     <DashboardCards />
                 </Parallax>
             </div>
