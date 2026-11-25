@@ -53,6 +53,8 @@ export type StepPlace = { left: number; top: number; tilt: number };
  * `background`: overrides for that board on top of BACKGROUND (section 2).
  * `photos` / `lists`: how many cat photos (from the top of PHOTOS) and list
  * notes that board shows; smaller boards get fewer so they don't crowd.
+ * `sideSpacing` (square and tall): px between side notes down each outer edge;
+ * higher = sparser.
  */
 export const BOARDS = {
     wide: {
@@ -79,14 +81,15 @@ export const BOARDS = {
             "03": { left: 112, top: 366, tilt: -1.8 },
             "04": { left: 380, top: 356, tilt: 2.8 },
         },
-        background: { count: 30, radiusX: 380, radiusY: 380, edgeNotes: 4 },
+        background: { count: 24, radiusX: 380, radiusY: 380, minSpacing: 112, edgeNotes: 3, gapPad: 34 },
+        sideSpacing: 170,
         photos: 4,
         lists: 4,
     },
     tall: {
         width: 340,
-        // extra room above and below the column, where the cat photos go
-        height: 1290,
+        // extra room above the column, where a cat photo goes
+        height: 1210,
         maxScale: 1.1,
         steps: {
             "01": { left: 16, top: 128, tilt: -3 },
@@ -94,11 +97,13 @@ export const BOARDS = {
             "03": { left: 14, top: 656, tilt: -1.8 },
             "04": { left: 86, top: 920, tilt: 2.8 },
         },
-        background: { count: 26, radiusX: 200, radiusY: 590, noteSize: { min: 96, max: 122 }, minSpacing: 86, edgeNotes: 2, gapPad: 40 },
+        // fewer, more spaced-out notes so a phone screen stays calm
+        background: { count: 26, radiusX: 190, radiusY: 610, noteSize: { min: 96, max: 116 }, minSpacing: 108, edgeNotes: 1, fillGaps: false },
+        sideSpacing: 230,
         photos: 2,
         lists: 2,
     },
-} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number }>;
+} satisfies Record<string, { width: number; height: number; maxScale: number; steps: Record<StepId, StepPlace>; background: Partial<typeof BACKGROUND>; photos: number; lists: number; sideSpacing?: number }>;
 export type BoardName = keyof typeof BOARDS;
 
 /* ------------------------------------------------------------------------ */
@@ -140,6 +145,12 @@ export const BACKGROUND = {
      * within `gapPad` px of a step is checked; any uncovered spot gets a note.
      */
     gapPad: 46,
+    /**
+     * Plug every bare spot around the steps (and the seams between them) with
+     * extra notes. Off = a little wall shows through, which reads calmer on
+     * small boards.
+     */
+    fillGaps: true,
     /** Each note tilts up to this many degrees either way. */
     maxTilt: 7,
     /** Share of notes with washi tape, 0 to 1. */

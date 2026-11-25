@@ -227,7 +227,7 @@ function buildWall(board: (typeof BOARDS)[BoardName]): WallNote[] {
         boxes.some(([bx, by, h]) => Math.abs(px - bx) < h && Math.abs(py - by) < h) ||
         steps.some((s) => px > s.left + 6 && px < s.left + 230 && py > s.top + 6 && py < s.top + 230);
     const pad = BG.gapPad;
-    for (const s of steps) {
+    for (const s of BG.fillGaps ? steps : []) {
         const sx = s.left + 118;
         const sy = s.top + 118;
         for (let py = s.top - pad; py <= s.top + 236 + pad; py += 36) {
@@ -245,7 +245,7 @@ function buildWall(board: (typeof BOARDS)[BoardName]): WallNote[] {
     //    wedges that the gap check above can't see, so each seam gets a note
     //    near each end. Side by side, that's its top and foot; one above the
     //    other, its left and right.
-    for (const a of steps) {
+    for (const a of BG.fillGaps ? steps : []) {
         for (const b of steps) {
             const gapX = b.left - (a.left + 236);
             const gapY = b.top - (a.top + 236);
@@ -402,7 +402,7 @@ function buildSides(board: (typeof BOARDS)[BoardName], name: BoardName): SideNot
     const out: SideNote[] = [];
     for (const side of ["left", "right"] as const) {
         const own = SIDE_NOTES.filter((n) => n.side === side);
-        const count = Math.max(own.length, Math.round(board.height / 150));
+        const count = Math.round(board.height / ("sideSpacing" in board ? board.sideSpacing : 150));
         // the right side starts half a step lower, so the two sides don't mirror
         const offset = side === "right" ? 0.75 : 0.5;
         for (let i = 0; i < count; i++) {
