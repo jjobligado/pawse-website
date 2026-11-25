@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Parallax from "@/components/parallax";
-import { DashboardSpreadSection } from "@/components/pixel-divider";
-import DashboardWindow from "@/components/app-ui/dashboard-window";
+import DashboardCards from "@/components/app-ui/dashboard-cards";
+import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 
 const FEATURES = [
@@ -13,41 +13,38 @@ const FEATURES = [
 
 export default function DashboardSection() {
     return (
-        <DashboardSpreadSection id="progress">
+        <Section id="progress" className="flex flex-col items-center gap-6">
             <SectionTitle>Watch Your Focus Habit Grow</SectionTitle>
             <SectionSubtitle className="text-center text-balance">
                 Every session adds to the bigger picture, tracked automatically and
                 kept right on your device.
             </SectionSubtitle>
 
-            <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 mt-2">
+            {/* Side by side from lg; stacked (checklist first) below */}
+            <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-12 mt-2">
                 {/* Feature Checklist */}
-                <div className="w-fit max-w-full lg:w-[440px] flex flex-col items-stretch gap-4">
-                    <div className="w-full flex flex-col items-stretch gap-3.5">
-                        {FEATURES.map((item) => (
-                            <div key={item} className="w-full flex items-center gap-3.5">
-                                <div className="w-6 h-6 shrink-0 relative">
-                                    <Image
-                                        src="/images/check-account.png"
-                                        alt=""
-                                        width={24}
-                                        height={24}
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                                <p className="flex-1 text-base md:text-lg text-ink text-left">
-                                    {item}
-                                </p>
+                <div className="w-fit max-w-full lg:w-[400px] lg:shrink-0 flex flex-col items-stretch gap-3.5">
+                    {FEATURES.map((item) => (
+                        <div key={item} className="w-full flex items-center gap-3.5">
+                            <div className="w-6 h-6 shrink-0 relative">
+                                <Image
+                                    src="/images/check-account.png"
+                                    alt=""
+                                    width={24}
+                                    height={24}
+                                    className="w-full h-full object-contain"
+                                />
                             </div>
-                        ))}
-                    </div>
+                            <p className="flex-1 text-base md:text-lg text-ink text-left">{item}</p>
+                        </div>
+                    ))}
                 </div>
 
-                {/* The app's Dashboard, rebuilt from the desktop app and scaled as one piece */}
-                <Parallax depth={0.05} className="w-full max-w-[600px] lg:flex-1 shrink-0">
-                    <DashboardWindow />
+                {/* The app's Dashboard cards (a display), scaled as one piece; at most 1.25x the app's size */}
+                <Parallax depth={0.05} className="w-full max-w-[616px] lg:flex-1">
+                    <DashboardCards />
                 </Parallax>
             </div>
-        </DashboardSpreadSection>
+        </Section>
     );
 }
