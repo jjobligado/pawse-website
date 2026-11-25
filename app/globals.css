@@ -1360,7 +1360,7 @@ body {
 /* ==================================================================
    How It Works: a wall of paper notes, every drawing a pixel stamp
    (components/landing/how-it-works-section.tsx, pixel-stamp.tsx).
-   The wall is a fixed 1120×600 board scaled by WallFit (--hiw-s).
+   The wall's core is a fixed 1120×600 board scaled by WallFit (--hiw-s).
    ================================================================== */
 .hiw {
   --hiw-yellow: #FFEFA1;
@@ -1385,9 +1385,20 @@ body {
   position: relative;
 }
 
-.hiw-wall { position: relative; width: 100%; max-width: 1120px; margin-inline: auto; aspect-ratio: 1120 / 600; overflow: clip; }
-.hiw-board { position: absolute; top: 0; left: 50%; width: 1120px; height: 600px; transform-origin: 50% 0; transform: translateX(-50%) scale(var(--hiw-s, 1)); }
-.hiw-small { position: absolute; inset: 0; }
+/*
+  The wall reaches past the section's 1120px column out to the header's edges
+  (the same lg:px-20 inside max-w-chrome, measured on <main>, an @container).
+  Its height follows the section column so the core keeps its size.
+*/
+.hiw-wall {
+  --hiw-core-w: min(1120px, 100cqw - 160px);
+  --hiw-wall-w: min(1280px, 100cqw - 160px);
+  position: relative; width: var(--hiw-wall-w); margin-inline: calc((100% - var(--hiw-wall-w)) / 2);
+  height: calc(var(--hiw-core-w) * 600 / 1120); overflow: clip;
+}
+.hiw-board { position: absolute; top: 0; left: 50%; width: var(--hiw-bw, var(--hiw-wall-w)); height: 600px; transform-origin: 50% 0; transform: translateX(-50%) scale(var(--hiw-s, 1)); }
+.hiw-core { position: absolute; top: 0; left: calc(50% - 560px); width: 1120px; height: 600px; }
+.hiw-sides, .hiw-small { position: absolute; inset: 0; }
 .hiw-steps { margin: 0; padding: 0; list-style: none; }
 .hiw-board .hiw-note { position: absolute; }
 

@@ -8,7 +8,8 @@ import WallFit from "./wall-fit";
 /**
  * The PAWSE loop as four paper step notes on a wall of small notes. Every
  * drawing is a pixel-art rubber stamp pressed into the paper. From lg the
- * wall is a fixed 1120×600 board scaled to fit, and hovering a step note
+ * wall's core is a fixed 1120×600 board scaled to fit the section, with
+ * sparser notes out to the header's edges where the page is wider; hovering a step note
  * peels its lower corner. Below lg the steps stack (one column on phones,
  * 2×2 on tablets) between two short rows of small notes. Everything except
  * the four step notes is decorative and hidden from assistive tech.
@@ -89,13 +90,11 @@ const BOARD_H = 600;
 /** How far the small notes fan out from the centre (1 = the plain grid). */
 const SPREAD_X = 1.1;
 const SPREAD_Y = 1.04;
-/** Share of a side note allowed past the wall's left/right edge; the wall clips it at the section padding. */
-const PEEK = 0.4;
 
 /**
- * The small notes: an 11×6 jittered grid fanned out from the centre, thinning
- * toward the top and bottom. Notes stay whole top and bottom, but the side
- * columns run off the left and right edges so they peek in from outside. Layout and stamp styling draw from
+ * The small notes behind the steps: an 11×6 jittered grid fanned out from the
+ * centre and thinning toward the edges, every note kept whole on the
+ * 1120×600 core. Layout and stamp styling draw from
  * separate random streams so either can change without moving the other.
  */
 const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[] = (() => {
@@ -130,8 +129,7 @@ const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[
             const markRot = (r2() - 0.5) * 30;
             if (skip) continue;
             const m = size * 0.6 + 4;
-            const mx = size * (0.5 - PEEK);
-            x = Math.min(BOARD_W - mx, Math.max(mx, x));
+            x = Math.min(BOARD_W - m, Math.max(m, x));
             y = Math.min(BOARD_H - m, Math.max(m, y));
             const item = ITEMS[(k++ * 7 + row) % ITEMS.length];
             const isStamp = "stamp" in item;
@@ -154,23 +152,31 @@ const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[
             });
         }
     }
-    // A few notes fixed half off each side so both edges always peek, whatever the seed
-    // keeps. Stamps on the left (their middle shows), text on the right (it reads from the left).
-    const peek: [side: -1 | 1, y: number, size: number, rot: number, item: Item, paper: Paper, ink: Ink, frame: StampFrame][] = [
-        [-1, 128, 124, -5, S("paw"), "pink", "red", "none"],
-        [-1, 352, 132, 4, S("fish"), "sky", "blue", "round"],
-        [1, 214, 126, 5, T("lo-fi on"), "cream", "black", "none"],
-        [1, 452, 120, -4, S("mug"), "mint", "green", "square"],
-    ];
-    for (const [side, cy, size, rot, item, paper, ink, frame] of peek) {
-        const cx = side < 0 ? size * (0.5 - PEEK - 0.05) : BOARD_W - size * (0.5 - PEEK - 0.05);
-        out.push({
-            x: cx - size / 2, y: cy - size / 2, size, z: 1, item, paper, ink, rot, frame,
-            stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: press++, taped: side > 0,
-        });
-    }
     return out;
 })();
+
+/**
+ * Where the page is wider than the section, the wall reaches out to the
+ * header's edges. These notes sit along those outer edges, sparser than the
+ * core and beneath it, so the wall thins out as it spreads. Each is anchored
+ * to its own edge (inset in px), so it stays whole at any width; when there is
+ * no extra room it simply tucks under the core's outer notes.
+ */
+const SIDE: (SmallNoteData & { side: "left" | "right"; inset: number; y: number; size: number })[] = (
+    [
+        ["left", 10, 74, 110, -7, T("stretch your back"), "white", "blue", "none", true],
+        ["left", 6, 222, 120, 5, S("paw"), "pink", "red", "none", false],
+        ["left", 22, 372, 104, -4, T("deep breath"), "cream", "black", "none", true],
+        ["left", 8, 516, 114, 6, S("fish", "x4"), "sky", "blue", "round", false],
+        ["right", 12, 104, 116, 6, S("star", "nice!"), "lavender", "violet", "none", true],
+        ["right", 24, 262, 104, -5, T("lo-fi on"), "peach", "black", "none", false],
+        ["right", 6, 408, 120, 4, S("mug"), "mint", "green", "square", true],
+        ["right", 18, 532, 100, -6, T("purr purr"), "yellow", "black", "none", false],
+    ] as const
+).map(([side, inset, y, size, rot, item, paper, ink, frame, taped], i) => ({
+    side, inset, y: y - size / 2, size, item, paper, ink, rot, frame, taped,
+    stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: i,
+}));
 
 /** Small notes above and below the stacked steps (below lg). */
 const STRIP_NOTE = (item: Item, paper: Paper, ink: Ink, rot: number, frame: StampFrame = "none"): SmallNoteData => ({
@@ -280,16 +286,23 @@ export default function HowItWorksSection() {
                 {/* lg+: the wall, scaled to fit */}
                 <WallFit width={BOARD_W} className="hiw-wall hidden lg:block">
                     <div className="hiw-board">
-                        <div className="hiw-small" aria-hidden="true">
-                            {WALL.map((n, idx) => (
-                                <SmallNote key={idx} note={n} style={{ left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }} />
+                        <div className="hiw-sides" aria-hidden="true">
+                            {SIDE.map((n, idx) => (
+                                <SmallNote key={idx} note={n} style={{ [n.side]: n.inset, top: n.y, width: n.size, height: n.size }} />
                             ))}
                         </div>
-                        <ol className="hiw-steps">
-                            {STEPS.map((s, i) => (
-                                <StepNote key={s.step} s={s} i={i} onWall />
-                            ))}
-                        </ol>
+                        <div className="hiw-core">
+                            <div className="hiw-small" aria-hidden="true">
+                                {WALL.map((n, idx) => (
+                                    <SmallNote key={idx} note={n} style={{ left: n.x, top: n.y, width: n.size, height: n.size, zIndex: n.z }} />
+                                ))}
+                            </div>
+                            <ol className="hiw-steps">
+                                {STEPS.map((s, i) => (
+                                    <StepNote key={s.step} s={s} i={i} onWall />
+                                ))}
+                            </ol>
+                        </div>
                     </div>
                 </WallFit>
 
