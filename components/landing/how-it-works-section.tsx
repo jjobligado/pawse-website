@@ -213,7 +213,7 @@ const WALL: WallNote[] = (() => {
     // 3. Printed photos take the spots of notes that stay fully visible, picked
     //    one by one as far as possible from the steps and from each other.
     const taken: [number, number][] = steps.map((s) => [s.left + 118, s.top + 118]);
-    const spots = out.filter((n) => hiddenShare(n.x + n.size / 2, n.y + n.size / 2, n.size) < 0.12);
+    const spots = out.filter((n) => hiddenShare(n.x + n.size / 2, n.y + n.size / 2, n.size) < 0.15);
     for (const photo of PHOTOS) {
         let best: WallNote | null = null;
         let bestD = 0;
@@ -225,9 +225,39 @@ const WALL: WallNote[] = (() => {
             if (d > bestD) [best, bestD] = [n, d];
         }
         if (!best || bestD < 110) break;
-        Object.assign(best, { photo, rot: photo.tilt ?? best.rot, z: 30, taped: true, bend: "flat" as Bend });
+        Object.assign(best, { photo, rot: photo.tilt ?? best.rot, taped: true, bend: "flat" as Bend });
         taken.push([best.x + best.size / 2, best.y + best.size / 2]);
     }
+
+    // 4. Tuck each photo in: sit it high in the pile, then stick a note or two
+    //    over its corners on the side facing the middle of the wall, as if it
+    //    was pinned up first and covered over time. Together they hide about
+    //    `tuck` of the photo; the middle, where the cat is, stays clear.
+    out.filter((p) => p.photo).forEach((p, i) => {
+        p.z = 24;
+        const tuck = p.photo!.tuck ?? BG.photoTuck;
+        if (tuck <= 0) return;
+        const corners = i % 2 === 0 ? 2 : 1;
+        const a = Math.sqrt(tuck / corners) * p.size; // overlap per corner, px
+        const sx = p.x + p.size / 2 < cx ? 1 : -1; // toward the middle
+        const sy = p.y + p.size / 2 < cy ? 1 : -1;
+        // a note that would have to be pushed back onto the board would slide
+        // over the cat, so corners near the board's edge are skipped
+        const fits = (x: number, y: number, size: number) => {
+            const m = size * 0.6 + 4;
+            return x >= m && x <= BOARD_W - m && y >= m && y <= BOARD_H - m;
+        };
+        let placed = 0;
+        for (const [dx, dy] of [[sx, sy], [sx, -sy], [-sx, sy], [-sx, -sy]]) {
+            if (placed === corners) break;
+            const size = BG.noteSize.min + r() * 12;
+            const nx = dx > 0 ? p.x + p.size - a + size / 2 : p.x + a - size / 2;
+            const ny = dy > 0 ? p.y + p.size - a + size / 2 : p.y + a - size / 2;
+            if (!fits(nx, ny, size)) continue;
+            add(nx, ny, size, 26 + Math.floor(r() * 4));
+            placed++;
+        }
+    });
     return out;
 })();
 

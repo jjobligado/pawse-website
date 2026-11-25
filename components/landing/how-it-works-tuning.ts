@@ -113,6 +113,8 @@ export const BACKGROUND = {
      * Paper colours the background notes draw from. Listing a colour twice
      * makes it twice as common; white and cream are the palest.
      */
+    /** How much of each cat photo tucks under other notes (0 = on top of everything). */
+    photoTuck: 0.2,
     papers: ["yellow", "sky", "mint", "lavender", "pink", "peach", "yellow", "sky", "pink", "mint", "lavender", "cream", "white"] as Paper[],
     /**
      * How the background notes bend (real notes curl, especially stacked).
@@ -133,8 +135,12 @@ export const BACKGROUND = {
  * far from the steps and from each other as possible (the outer ring).
  * Order matters: if there are fewer good spots than photos, the last ones
  * are left out. Remove a row to drop a photo.
+ *
+ * `tuck` (0 to 1) is how much of a photo hides under neighbouring notes,
+ * like it was pinned up first and covered over time; it defaults to
+ * BACKGROUND.photoTuck. The middle of the photo is always kept clear.
  */
-export const PHOTOS: { src: string; tilt?: number }[] = [
+export const PHOTOS: { src: string; tilt?: number; tuck?: number }[] = [
     { src: "/images/cat-memes/lock-in.jpg", tilt: -4 },
     { src: "/images/cat-memes/thinking-cat.jpg", tilt: 5 },
     { src: "/images/cat-memes/banana-cat.jpg", tilt: -6 },
