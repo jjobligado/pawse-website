@@ -11,7 +11,7 @@ import { BACKGROUND as BG, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from 
  * drawing is a pixel-art rubber stamp pressed into the paper. From lg the
  * wall's core is a fixed 1120×600 board scaled to fit the section, with
  * sparser notes out to the header's edges where the page is wider; hovering a step note
- * peels its lower corner. Below lg the steps stack (one column on phones,
+ * lifts it off the wall, above any step it overlaps. Below lg the steps stack (one column on phones,
  * 2×2 on tablets) between two short rows of small notes. Everything except
  * the four step notes is decorative and hidden from assistive tech.
  *
@@ -269,20 +269,11 @@ function SmallNote({ note, style, className = "" }: { note: SmallNoteData; style
     );
 }
 
-const CURL = (
-    <svg className="hiw-curl" viewBox="0 0 236 236" aria-hidden="true" focusable="false">
-        <path className="hiw-cast" />
-        <path className="hiw-under" />
-        <path className="hiw-back" />
-        <path className="hiw-shade" />
-    </svg>
-);
-
 function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWall: boolean }) {
     const l = STEP_LAYOUT[s.step as keyof typeof STEP_LAYOUT];
     const style: CSSProperties = {
-        ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})` }),
-        rotate: `${l.tilt}deg`,
+        // tilt goes through a variable so the hover can ease it toward straight
+        ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})`, "--tilt": `${l.tilt}deg` }),
         ...(onWall ? { left: l.left, top: l.top, ...vars({ "--z": String(50 + i) }) } : {}),
     };
     return (
@@ -305,7 +296,6 @@ function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWa
                     </span>
                 </div>
             </div>
-            {onWall && CURL}
             <i className="hiw-tape hiw-tape-wide" />
         </li>
     );
