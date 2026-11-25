@@ -141,7 +141,9 @@ const WALL: WallNote[] = (() => {
             x: x - size / 2,
             y: y - size / 2,
             size,
-            z,
+            // blank notes sit at the very back (0-2); written ones above them. Notes
+            // stuck over a photo's corner (z 26+) keep their place on top.
+            z: z >= 26 ? z : blank ? z % 3 : Math.max(z, 3),
             item,
             paper,
             ink,
