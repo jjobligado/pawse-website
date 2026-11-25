@@ -99,7 +99,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScrollProvider />
         <ScrollToTop />
         <Header />
-        <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+        <main id="main-content" tabIndex={-1} className="@container flex-1 focus:outline-none">
           {children}
         </main>
         <Footer />
