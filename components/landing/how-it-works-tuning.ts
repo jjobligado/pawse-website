@@ -25,7 +25,7 @@ export type Ink = "blue" | "red" | "violet" | "green" | "black";
 
 export const STEP_LAYOUT = {
     "01": {
-        left: 78, //  distance from the board's left edge
+        left: 88, //  distance from the board's left edge
         top: 196, //  distance from the board's top edge
         tilt: -3,
         // The stamp in the top-right corner. `top` / `right` nudge it:
@@ -33,19 +33,19 @@ export const STEP_LAYOUT = {
         stamp: { size: 62, top: -10, right: -8, tilt: 6 },
     },
     "02": {
-        left: 330,
+        left: 340,
         top: 168,
         tilt: 2.2,
         stamp: { size: 50, top: -4, right: 2, tilt: -4 },
     },
     "03": {
-        left: 582,
+        left: 575,
         top: 200,
         tilt: -1.8,
         stamp: { size: 56, top: -6, right: -2, tilt: 4 },
     },
     "04": {
-        left: 834,
+        left: 824,
         top: 172,
         tilt: 2.8,
         stamp: { size: 50, top: -4, right: 2, tilt: -4 },
@@ -62,15 +62,15 @@ export const BACKGROUND = {
     /** Each note's size is picked between these. */
     noteSize: { min: 112, max: 144 },
     /** How far the notes fan out from the centre. 1 = no fan, 1.2 = 20% wider. */
-    spreadX: 1.1,
-    spreadY: 1.04,
+    spreadX: 1.2,
+    spreadY: 1.05,
     /**
      * Density. Notes in the inner part of the board are always kept; past that
      * they thin out toward the edges.
      *   denseCore: how far out (0 = centre, 1 = edge) the wall stays full
      *   fadeRate:  how quickly it thins after that (higher = emptier edges)
      */
-    denseCore: 0.55,
+    denseCore: 0.60,
     fadeRate: 1.5,
     /** Lower = keeps more notes toward that edge. */
     sideWeight: 0.88, // left / right edges
