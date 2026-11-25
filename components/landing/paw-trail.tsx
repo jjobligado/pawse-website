@@ -29,7 +29,7 @@ import { PAW, PixelArt } from "./hero-scene";
  * once (grey); with reduced motion the whole trail is simply there.
  *
  * Margins only, pointer-events none, aria-hidden. The layer is absolutely
- * positioned at the top of its parent and runs to `endFraction` of the way into
+ * positioned at the top of its parent; the cats walk off `endFraction` of the way into
  * the `endSelector` element (see app/page.tsx). Prints land as they reach the
  * middle of the screen, so the newest one is always around the centre. Prints
  * inside the end element (Progress) take a light blue tint.
@@ -59,13 +59,17 @@ type Mood = "stroll" | "zigzag" | "pause" | "hurry";
 
 // Each side walks differently: its own seed, start, step length and habits.
 // The left cat zigzags more; the right one dawdles, then hurries to catch up.
-// `leaveEarly`: how far above the trail's end this side walks off.
-const WALKS: Record<Side, { seed: number; start: number; stride: number; leaveEarly: number; moods: [Mood, number][] }> = {
-    left: { seed: 7, start: 120, stride: 96, leaveEarly: 0, moods: [["stroll", 0.5], ["zigzag", 0.36], ["pause", 0.14]] },
-    right: { seed: 23, start: 210, stride: 88, leaveEarly: 170, moods: [["stroll", 0.46], ["zigzag", 0.16], ["pause", 0.38]] },
+// `exitShift`: where this side's last print lands, from the exit point (px,
+// + below), so the two cats leave a little apart, around the exit point.
+const WALKS: Record<Side, { seed: number; start: number; stride: number; exitShift: number; moods: [Mood, number][] }> = {
+    left: { seed: 7, start: 120, stride: 96, exitShift: 60, moods: [["stroll", 0.5], ["zigzag", 0.36], ["pause", 0.14]] },
+    right: { seed: 23, start: 210, stride: 88, exitShift: -60, moods: [["stroll", 0.46], ["zigzag", 0.16], ["pause", 0.38]] },
 };
 
-function walk(side: Side, height: number): Print[] {
+/** Room below the exit point for the last prints (the trail layer runs this far past it). */
+const EXIT_ROOM = 120;
+
+function walk(side: Side, exit: number): Print[] {
     const w = WALKS[side];
     const r = rng(w.seed);
     const between = (min: number, max: number) => min + r() * (max - min);
@@ -82,7 +86,14 @@ function walk(side: Side, height: number): Print[] {
     let left = RAMP.length + 1; // steps left in the current mood (a calm stroll while walking in)
     let i = 0;
 
-    while (top < height - 40 - w.leaveEarly) {
+    // The walk-off lands at fixed places: its last print exactly at this
+    // side's exit, the ones before it a steady step apart
+    const k = RAMP.length;
+    const outStep = w.stride * 0.9;
+    const last = exit + w.exitShift;
+    const outFrom = last - (k - 1) * outStep;
+
+    while (top < outFrom - w.stride * 0.6) {
         if (left <= 0) {
             // After a pause, the cat hurries to catch up
             mood = mood === "pause" ? "hurry" : pickMood();
@@ -118,27 +129,26 @@ function walk(side: Side, height: number): Print[] {
 
     // Walk in from the edge, walk off past it: a smooth curve between the edge
     // and the lane the cat walks in on (or leaves from), with no wander of its own
-    const n = prints.length;
-    const k = RAMP.length;
-    if (n >= k * 2 + 1) {
-        const inLane = prints[k].drift;
-        const outLane = prints[n - 1 - k].drift;
-        RAMP.forEach((off, j) => {
-            Object.assign(prints[j], { off, drift: inLane });
-            Object.assign(prints[n - 1 - j], { off, drift: outLane });
-        });
-    }
+    if (prints.length < k + 1) return prints;
+    const inLane = prints[k].drift;
+    const outLane = prints[prints.length - 1].drift;
+    RAMP.forEach((off, j) => Object.assign(prints[j], { off, drift: inLane }));
+    [...RAMP].reverse().forEach((off, j) => {
+        const lane = (i % 2) as 0 | 1;
+        prints.push({ side, top: Math.round(outFrom + j * outStep), lane, drift: outLane, tilt: 0, off });
+        i++;
+    });
     return prints;
 }
 
 export default function PawTrail({
     endSelector,
-    endFraction = 0.6,
+    endFraction = 0.5,
     className = "",
 }: {
-    /** The trail ends partway into this element (e.g. "#progress")... */
+    /** The cats walk off partway into this element (e.g. "#progress")... */
     endSelector: string;
-    /** ...at this fraction of its height (0.6 = just past its middle). */
+    /** ...at this fraction of its height (0.5 = its middle). */
     endFraction?: number;
     className?: string;
 }) {
@@ -157,7 +167,7 @@ export default function PawTrail({
         const measure = () => {
             const p = parent.getBoundingClientRect();
             const e = end.getBoundingClientRect();
-            setHeight(Math.max(0, Math.round(e.top - p.top + e.height * endFraction)));
+            setHeight(Math.max(0, Math.round(e.top - p.top + e.height * endFraction + EXIT_ROOM)));
             setBlueFrom(Math.round(e.top - p.top + e.height * 0.12));
         };
         measure();
@@ -246,7 +256,7 @@ export default function PawTrail({
         return () => window.removeEventListener("resize", aim);
     }, [height]);
 
-    const prints = height > 0 ? [...walk("left", height), ...walk("right", height)] : [];
+    const prints = height > 0 ? [...walk("left", height - EXIT_ROOM), ...walk("right", height - EXIT_ROOM)] : [];
 
     return (
         <div
