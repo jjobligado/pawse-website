@@ -5,7 +5,7 @@ import { PAW, PixelArt } from "./hero-scene";
 
 /**
  * A cat's paw prints walking down both sides of the feature tour (Companions →
- * Focus → Break), ending as they step into the Progress section's blue.
+ * Focus → Break), ending as they walk off partway into Progress.
  *
  * The walk is messy on purpose. Each side is its own seeded walk that switches
  * between moods: a stroll (uneven steps, a path that drifts), a zigzag (cutting
@@ -14,6 +14,12 @@ import { PAW, PixelArt } from "./hero-scene";
  * seeds, rhythms and habits, so they never mirror. Seeded, so the trail is the
  * same on every visit. It walks in the real side margin: its distance from the
  * edge and how far it wanders scale with the margin (see .paw-trail in globals.css).
+ *
+ * Each cat walks in and walks off: its first few prints come in from the
+ * screen's edge and curve into the lane, and its last few curve back out past
+ * the edge (RAMP). The two sides start and leave at different heights. Ramp
+ * prints point along the path they really take on screen (measured after
+ * layout), so they turn into the curve at every width.
  *
  * Tracks stay: each print appears once, the first time it comes into view, and
  * is never hidden again. The newest print on each side is blue (where the cat
@@ -26,13 +32,16 @@ import { PAW, PixelArt } from "./hero-scene";
  * positioned at the top of its parent and runs to `endFraction` of the way into
  * the `endSelector` element (see app/page.tsx). Prints land as they reach the
  * middle of the screen, so the newest one is always around the centre. Prints
- * inside the end element (Progress, with its sky-blue background) take a blue
- * tint close to it, so the last steps sink into the blue before fading out.
+ * inside the end element (Progress) take a light blue tint.
  * Shown from lg only: below that the side margins are too narrow.
  */
 
 type Side = "left" | "right";
-type Print = { side: Side; top: number; lane: 0 | 1; drift: number; tilt: number };
+/** `off`: how far a print has moved from its lane to just past the screen's edge (0 = in the lane). */
+type Print = { side: Side; top: number; lane: 0 | 1; drift: number; tilt: number; off: number };
+
+/** The walk-in, from the edge to the lane; reversed, it's the walk-off. */
+const RAMP = [0.9, 0.64, 0.38, 0.16];
 
 /** Small, fast, seeded PRNG (mulberry32): same trail every time. */
 function rng(seed: number) {
@@ -50,9 +59,10 @@ type Mood = "stroll" | "zigzag" | "pause" | "hurry";
 
 // Each side walks differently: its own seed, start, step length and habits.
 // The left cat zigzags more; the right one dawdles, then hurries to catch up.
-const WALKS: Record<Side, { seed: number; start: number; stride: number; moods: [Mood, number][] }> = {
-    left: { seed: 7, start: 120, stride: 96, moods: [["stroll", 0.5], ["zigzag", 0.36], ["pause", 0.14]] },
-    right: { seed: 23, start: 210, stride: 88, moods: [["stroll", 0.46], ["zigzag", 0.16], ["pause", 0.38]] },
+// `leaveEarly`: how far above the trail's end this side walks off.
+const WALKS: Record<Side, { seed: number; start: number; stride: number; leaveEarly: number; moods: [Mood, number][] }> = {
+    left: { seed: 7, start: 120, stride: 96, leaveEarly: 0, moods: [["stroll", 0.5], ["zigzag", 0.36], ["pause", 0.14]] },
+    right: { seed: 23, start: 210, stride: 88, leaveEarly: 170, moods: [["stroll", 0.46], ["zigzag", 0.16], ["pause", 0.38]] },
 };
 
 function walk(side: Side, height: number): Print[] {
@@ -69,10 +79,10 @@ function walk(side: Side, height: number): Print[] {
     let top = w.start;
     let drift = r(); // 0..1 across the side margin's wander range
     let mood: Mood = "stroll";
-    let left = 3; // steps left in the current mood
+    let left = RAMP.length + 1; // steps left in the current mood (a calm stroll while walking in)
     let i = 0;
 
-    while (top < height - 40) {
+    while (top < height - 40 - w.leaveEarly) {
         if (left <= 0) {
             // After a pause, the cat hurries to catch up
             mood = mood === "pause" ? "hurry" : pickMood();
@@ -92,7 +102,7 @@ function walk(side: Side, height: number): Print[] {
         // Paws turn into the direction of travel (strongly in a zigzag), plus their own wobble
         const turn = (drift - prev) * (mood === "zigzag" ? 70 : 40) * (side === "left" ? -1 : 1);
         const tilt = (lane ? 9 : -9) + turn + (r() - 0.5) * 10;
-        prints.push({ side, top: Math.round(top), lane, drift, tilt });
+        prints.push({ side, top: Math.round(top), lane, drift, tilt, off: 0 });
 
         // Step length by mood; a pause leaves a long gap before the next print
         top +=
@@ -104,6 +114,19 @@ function walk(side: Side, height: number): Print[] {
         if (mood === "pause") top += between(110, 190);
         left--;
         i++;
+    }
+
+    // Walk in from the edge, walk off past it: a smooth curve between the edge
+    // and the lane the cat walks in on (or leaves from), with no wander of its own
+    const n = prints.length;
+    const k = RAMP.length;
+    if (n >= k * 2 + 1) {
+        const inLane = prints[k].drift;
+        const outLane = prints[n - 1 - k].drift;
+        RAMP.forEach((off, j) => {
+            Object.assign(prints[j], { off, drift: inLane });
+            Object.assign(prints[n - 1 - j], { off, drift: outLane });
+        });
     }
     return prints;
 }
@@ -184,8 +207,9 @@ export default function PawTrail({
                 });
             },
             // A print lands as it reaches the middle of the screen, so the newest
-            // (blue) print is always around the centre of the view
-            { rootMargin: "0px 0px -50% 0px" }
+            // (blue) print is always around the centre of the view. Widened
+            // sideways so ramp prints past the screen's edge still land.
+            { rootMargin: "0px 120px -50% 120px" }
         );
         for (const p of prints) {
             if (p.dataset.shown !== undefined) continue;
@@ -194,6 +218,32 @@ export default function PawTrail({
             else io.observe(p);
         }
         return () => io.disconnect();
+    }, [height]);
+
+    // Ramp prints point along their path on screen: from the print before to
+    // the one after on the same side (both on the same lane, so the step
+    // between paws cancels out). Re-aimed on resize, as the margins change.
+    useEffect(() => {
+        const el = rootRef.current;
+        if (!el || height === 0) return;
+        const aim = () => {
+            for (const side of ["left", "right"] as const) {
+                const list = Array.from(el.querySelectorAll<HTMLElement>(`[data-paw][data-side="${side}"]`));
+                list.forEach((p, i) => {
+                    if (p.dataset.ramp === undefined) return;
+                    const a = list[Math.max(0, i - 1)];
+                    const b = list[Math.min(list.length - 1, i + 1)];
+                    const dx = b.offsetLeft - a.offsetLeft;
+                    const dy = b.offsetTop - a.offsetTop;
+                    const wobble = p.dataset.lane === "1" ? 6 : -6;
+                    const tilt = 180 - (Math.atan2(dx, dy) * 180) / Math.PI + wobble;
+                    p.style.setProperty("--paw-tilt", `${tilt.toFixed(1)}deg`);
+                });
+            }
+        };
+        aim();
+        window.addEventListener("resize", aim);
+        return () => window.removeEventListener("resize", aim);
     }, [height]);
 
     const prints = height > 0 ? [...walk("left", height), ...walk("right", height)] : [];
@@ -211,13 +261,17 @@ export default function PawTrail({
                     data-paw=""
                     data-side={p.side}
                     data-top={p.top}
+                    data-lane={p.lane}
+                    data-ramp={p.off ? "" : undefined}
                     data-blue={p.top >= blueFrom ? "" : undefined}
                     className="paw-print"
                     style={
                         {
-                            [p.side]: `calc(var(--paw-edge) + ${p.drift.toFixed(3)} * var(--paw-wander) + ${p.lane ? "var(--paw-lane)" : "0px"})`,
+                            // In the lane, or `off` of the way from it to just past the screen's edge
+                            [p.side]: `calc(${(1 - p.off).toFixed(2)} * (var(--paw-edge) + ${p.drift.toFixed(3)} * var(--paw-wander) + ${p.lane ? "var(--paw-lane)" : "0px"}) - ${p.off.toFixed(2)} * 1.3 * var(--paw-size))`,
                             top: `${p.top}px`,
-                            "--paw-tilt": `${(180 + p.tilt).toFixed(1)}deg`,
+                            // Ramp prints are aimed after layout (see above), so React leaves their tilt alone
+                            ...(p.off ? {} : { "--paw-tilt": `${(180 + p.tilt).toFixed(1)}deg` }),
                         } as React.CSSProperties
                     }
                 >
