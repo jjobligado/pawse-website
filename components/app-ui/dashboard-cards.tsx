@@ -15,8 +15,8 @@ import { useSyncExternalStore, type CSSProperties } from "react";
  * Scaling (see .dc- in app/globals.css): every size is in --u, a fraction of
  * the container's width, so text, icons, radii, gaps and heights all shrink or
  * grow together instead of only the width changing. Two layouts:
- *   wide (container 500px+): the three cards in a row above the chart
- *   narrow (phones): the cards stacked, the chart below, sized for a 330px column
+ *   wide (container 500px+): roomy cards above the chart
+ *   narrow (phones): still one row of three, compact cards with wrapping text
  *
  * Static on purpose (no entrance animation); the app's hover states remain:
  * bars darken and lift with a time tooltip, the day label goes bold.

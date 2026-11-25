@@ -876,8 +876,7 @@ body {
    Scaled as one piece: every size is in --u, a fraction of the container's
    width, so type, icons, radii, gaps and heights move together.
    - wide (container 500px+): laid out at 600px, cards in a row
-   - narrow (phones): laid out at 330px, cards stacked; --u capped at 1.2px
-     so a wide phone in landscape doesn't blow the type up
+   - narrow (phones): laid out at 320px, still one row, compact cards
    ================================================================== */
 @font-face {
   font-family: "Pixeloid Sans";
@@ -922,16 +921,35 @@ body {
   text-align: left;
   -webkit-font-smoothing: antialiased;
 }
+/* Phones: still one row of three, laid out at 320px with tighter padding,
+   a smaller icon and wrapping text, so the type stays readable instead of
+   shrinking the wide layout down. --u is capped so it never outgrows wide. */
 @container (max-width: 499.98px) {
   .dc {
-    --u: min(calc(100cqw / 330), 1.2px);
-    --dc-card-h: 100;
-    --dc-graph-h: 270;
+    --u: min(calc(100cqw / 320), 1.4px);
+    --dc-card-h: 112;
+    --dc-graph-h: 280;
     --dc-bar-gap: 8;
-    --dc-avg-room: 66;
-    gap: calc(14 * var(--u));
+    --dc-avg-room: 64;
+    gap: calc(10 * var(--u));
   }
-  .dc .dc-cards { grid-template-columns: 1fr; gap: calc(12 * var(--u)); }
+  .dc .dc-cards { gap: calc(6 * var(--u)); }
+  .dc .dc-card { padding: calc(8 * var(--u)); border-radius: calc(9 * var(--u)); }
+  .dc .dc-card-title { width: calc(100% - 22 * var(--u)); font-size: calc(11 * var(--u)); }
+  .dc .dc-icon {
+    right: calc(7 * var(--u)); top: calc(7 * var(--u));
+    width: calc(20 * var(--u)); height: calc(20 * var(--u)); padding: calc(3.5 * var(--u)); border-radius: calc(6 * var(--u));
+  }
+  .dc .dc-card-body { gap: calc(5 * var(--u)); }
+  .dc .dc-value { gap: calc(6 * var(--u)); font-size: calc(21 * var(--u)); }
+  .dc .dc-num { font-size: calc(17.5 * var(--u)); }
+  .dc .dc-sub { font-size: calc(10 * var(--u)); line-height: 1.25; white-space: normal; min-height: 2.5em; } /* two lines kept for every card so the values line up */
+  .dc .dc-graph { padding: calc(10 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u)); border-radius: calc(10 * var(--u)); }
+  .dc .dc-h2 { font-size: calc(15 * var(--u)); }
+  .dc .dc-arrow { font-size: calc(18 * var(--u)); padding: calc(3 * var(--u)); }
+  .dc .dc-range { min-width: calc(84 * var(--u)); font-size: calc(11 * var(--u)); }
+  .dc .dc-legend { font-size: calc(10 * var(--u)); }
+  .dc .dc-day, .dc .dc-tip, .dc .dc-avg-label { font-size: calc(11 * var(--u)); }
 }
 .dc p { margin: 0; }
 .dc img { display: block; max-width: none; }
