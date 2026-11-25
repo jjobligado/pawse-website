@@ -4,6 +4,7 @@ import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
 import { SectionSubtitle, SectionTitle } from "./section-heading";
 import WallFit from "./wall-fit";
+import { BACKGROUND as BG, SIDE_NOTES, STEP_LAYOUT, type Ink, type Paper } from "./how-it-works-tuning";
 
 /**
  * The PAWSE loop as four paper step notes on a wall of small notes. Every
@@ -13,10 +14,10 @@ import WallFit from "./wall-fit";
  * peels its lower corner. Below lg the steps stack (one column on phones,
  * 2×2 on tablets) between two short rows of small notes. Everything except
  * the four step notes is decorative and hidden from assistive tech.
+ *
+ * Layout numbers (positions, sizes, spread, side notes) are in
+ * how-it-works-tuning.ts.
  */
-
-type Paper = "yellow" | "sky" | "mint" | "lavender" | "pink" | "peach" | "cream" | "white";
-type Ink = "blue" | "red" | "violet" | "green" | "black";
 
 const STEPS: {
     step: string;
@@ -27,16 +28,11 @@ const STEPS: {
     frame: StampFrame;
     ink: Ink;
     hand: string;
-    /** left, top, rotation on the 1120×600 board */
-    pos: [number, number, number];
-    stampRot: number;
-    /** Stamp box: size and top/right margin in px. Square frames read bigger than round ones, so they sit smaller and further in. */
-    art: [size: number, top: number, right: number];
 }[] = [
-    { step: "01", title: "Pick Your Companion", body: "Three cats, three paces. Pick who focuses with you.", paper: "yellow", stamp: "tux", frame: "round", ink: "blue", hand: "Tux!", pos: [78, 196, -3], stampRot: 6, art: [62, -10, -8] },
-    { step: "02", title: "Focus with Your Companion", body: "Work alongside your cat’s routine. Zero distractions.", paper: "sky", stamp: "clock", frame: "square", ink: "red", hand: "25:00", pos: [330, 168, 2.2], stampRot: -4, art: [50, -4, 2] },
-    { step: "03", title: "Time to Play and Recharge", body: "Take a breather, play, and see what they have to say.", paper: "mint", stamp: "yarn", frame: "round", ink: "violet", hand: "zoomies", pos: [582, 200, -1.8], stampRot: 4, art: [56, -6, -2] },
-    { step: "04", title: "Watch Your Progress Build", body: "Every session gets logged. Small sessions, big streaks.", paper: "lavender", stamp: "chart", frame: "square", ink: "green", hand: "day 12", pos: [834, 172, 2.8], stampRot: -4, art: [50, -4, 2] },
+    { step: "01", title: "Pick Your Companion", body: "Three cats, three paces. Pick who focuses with you.", paper: "yellow", stamp: "tux", frame: "round", ink: "blue", hand: "Tux!" },
+    { step: "02", title: "Focus with Your Companion", body: "Work alongside your cat’s routine. Zero distractions.", paper: "sky", stamp: "clock", frame: "square", ink: "red", hand: "25:00" },
+    { step: "03", title: "Time to Play and Recharge", body: "Take a breather, play, and see what they have to say.", paper: "mint", stamp: "yarn", frame: "round", ink: "violet", hand: "zoomies" },
+    { step: "04", title: "Watch Your Progress Build", body: "Every session gets logged. Small sessions, big streaks.", paper: "lavender", stamp: "chart", frame: "square", ink: "green", hand: "day 12" },
 ];
 
 type Item = { text: ReactNode } | { stamp: StampName; caption?: string };
@@ -87,9 +83,6 @@ function rng(seed: number) {
 
 const BOARD_W = 1120;
 const BOARD_H = 600;
-/** How far the small notes fan out from the centre (1 = the plain grid). */
-const SPREAD_X = 1.1;
-const SPREAD_Y = 1.04;
 
 /**
  * The small notes behind the steps: an 11×6 jittered grid fanned out from the
@@ -98,7 +91,7 @@ const SPREAD_Y = 1.04;
  * separate random streams so either can change without moving the other.
  */
 const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[] = (() => {
-    const r = rng(11);
+    const r = rng(BG.seed);
     const r2 = rng(97);
     const cols = 11;
     const rows = 6;
@@ -109,13 +102,13 @@ const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[
     let press = 0;
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            const size = 112 + r() * 32;
-            let x = BOARD_W / 2 + ((col + 0.5) * cw + (r() - 0.5) * 40 - BOARD_W / 2) * SPREAD_X;
-            let y = BOARD_H / 2 + ((row + 0.5) * ch + (r() - 0.5) * 34 - BOARD_H / 2) * SPREAD_Y;
-            const e = Math.max((Math.abs(x - BOARD_W / 2) / (BOARD_W / 2)) * 0.88, (Math.abs(y - BOARD_H / 2) / (BOARD_H / 2)) * 0.9);
-            const keep = e < 0.55 ? 1 : 1 - (e - 0.55) * 1.5;
+            const size = BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
+            let x = BOARD_W / 2 + ((col + 0.5) * cw + (r() - 0.5) * 40 - BOARD_W / 2) * BG.spreadX;
+            let y = BOARD_H / 2 + ((row + 0.5) * ch + (r() - 0.5) * 34 - BOARD_H / 2) * BG.spreadY;
+            const e = Math.max((Math.abs(x - BOARD_W / 2) / (BOARD_W / 2)) * BG.sideWeight, (Math.abs(y - BOARD_H / 2) / (BOARD_H / 2)) * BG.topBottomWeight);
+            const keep = e < BG.denseCore ? 1 : 1 - (e - BG.denseCore) * BG.fadeRate;
             const skip = r() > keep;
-            const rot = (r() - 0.5) * 14;
+            const rot = (r() - 0.5) * 2 * BG.maxTilt;
             const paper = PAPERS[Math.floor(r() * PAPERS.length)];
             const f = r();
             r(); // was the pin colour; still drawn so the seeded layout stays put
@@ -148,7 +141,7 @@ const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[
                 mark: !isStamp && markRoll < 0.24 ? markName : null,
                 markRot,
                 press: press++,
-                taped: f < 0.38,
+                taped: f < BG.tapedShare,
             });
         }
     }
@@ -162,20 +155,22 @@ const WALL: (SmallNoteData & { x: number; y: number; size: number; z: number })[
  * to its own edge (inset in px), so it stays whole at any width; when there is
  * no extra room it simply tucks under the core's outer notes.
  */
-const SIDE: (SmallNoteData & { side: "left" | "right"; inset: number; y: number; size: number })[] = (
-    [
-        ["left", 10, 74, 110, -7, T("stretch your back"), "white", "blue", "none", true],
-        ["left", 6, 222, 120, 5, S("paw"), "pink", "red", "none", false],
-        ["left", 22, 372, 104, -4, T("deep breath"), "cream", "black", "none", true],
-        ["left", 8, 516, 114, 6, S("fish", "x4"), "sky", "blue", "round", false],
-        ["right", 12, 104, 116, 6, S("star", "nice!"), "lavender", "violet", "none", true],
-        ["right", 24, 262, 104, -5, T("lo-fi on"), "peach", "black", "none", false],
-        ["right", 6, 408, 120, 4, S("mug"), "mint", "green", "square", true],
-        ["right", 18, 532, 100, -6, T("purr purr"), "yellow", "black", "none", false],
-    ] as const
-).map(([side, inset, y, size, rot, item, paper, ink, frame, taped], i) => ({
-    side, inset, y: y - size / 2, size, item, paper, ink, rot, frame, taped,
-    stampRot: rot * -1.5, ghost: false, mark: null, markRot: 0, press: i,
+const SIDE: (SmallNoteData & { side: "left" | "right"; inset: number; y: number; size: number })[] = SIDE_NOTES.map((n, i) => ({
+    side: n.side,
+    inset: n.inset,
+    y: n.y - n.size / 2,
+    size: n.size,
+    item: "text" in n ? T(n.text) : S(n.stamp, n.caption),
+    paper: n.paper,
+    ink: n.ink,
+    rot: n.tilt,
+    frame: "stamp" in n ? (n.frame ?? "none") : "none",
+    taped: n.taped,
+    stampRot: n.tilt * -1.5,
+    ghost: false,
+    mark: null,
+    markRot: 0,
+    press: i,
 }));
 
 /** Small notes above and below the stacked steps (below lg). */
@@ -241,10 +236,11 @@ const CURL = (
 );
 
 function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWall: boolean }) {
+    const l = STEP_LAYOUT[s.step as keyof typeof STEP_LAYOUT];
     const style: CSSProperties = {
         ...vars({ "--paper": `var(--hiw-${s.paper})`, "--ink-c": `var(--hiw-ink-${s.ink})` }),
-        rotate: `${s.pos[2]}deg`,
-        ...(onWall ? { left: s.pos[0], top: s.pos[1], zIndex: 50 + i } : {}),
+        rotate: `${l.tilt}deg`,
+        ...(onWall ? { left: l.left, top: l.top, zIndex: 50 + i } : {}),
     };
     return (
         <li className="hiw-note hiw-step" style={style}>
@@ -254,7 +250,7 @@ function StepNote({ s, i, onWall }: { s: (typeof STEPS)[number]; i: number; onWa
                         <span>{s.step}</span>
                         <span
                             className="hiw-step-art"
-                            style={{ rotate: `${s.stampRot}deg`, width: s.art[0], height: s.art[0], margin: `${s.art[1]}px ${s.art[2]}px 0 0` }}
+                            style={{ rotate: `${l.stamp.tilt}deg`, width: l.stamp.size, height: l.stamp.size, margin: `${l.stamp.top}px ${l.stamp.right}px 0 0` }}
                         >
                             <PixelStamp name={s.stamp} frame={s.frame} press={i} />
                         </span>
