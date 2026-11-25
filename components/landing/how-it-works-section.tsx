@@ -138,7 +138,20 @@ const WALL: WallNote[] = (() => {
     };
     const noteSize = () => BG.noteSize.min + r() * (BG.noteSize.max - BG.noteSize.min);
 
-    // 1. The radial scatter
+    const steps = Object.values(STEP_LAYOUT);
+    /** Share of a note (centre x, y, side size) that sits under the steps, 0 to 1. */
+    const hiddenShare = (x: number, y: number, size: number) => {
+        let a = 0;
+        for (const s of steps) {
+            const w = Math.min(x + size / 2, s.left + 236) - Math.max(x - size / 2, s.left);
+            const h = Math.min(y + size / 2, s.top + 236) - Math.max(y - size / 2, s.top);
+            if (w > 0 && h > 0) a += w * h;
+        }
+        return Math.min(1, a / (size * size));
+    };
+
+    // 1. The radial scatter. A note is skipped when it would mostly hide under
+    //    the steps (only a sliver would show) or sit too close to another one.
     const golden = Math.PI * (3 - Math.sqrt(5));
     for (let i = 0; i < BG.count; i++) {
         const t = (i + 0.5) / BG.count;
@@ -146,22 +159,32 @@ const WALL: WallNote[] = (() => {
         const ang = i * golden + (r() - 0.5) * 1.4 * BG.messiness;
         const size = noteSize();
         const drop = rad > 0.78 && r() < BG.raggedEdge;
-        if (drop) continue;
         // inner notes sit higher in the pile, so the middle looks most layered
         const z = Math.round((1 - Math.max(0, rad)) * 14 + r() * 8);
-        add(cx + Math.cos(ang) * BG.radiusX * rad, cy + Math.sin(ang) * BG.radiusY * rad, size, z);
+        if (drop) continue;
+        const x = cx + Math.cos(ang) * BG.radiusX * rad;
+        const y = cy + Math.sin(ang) * BG.radiusY * rad;
+        if (hiddenShare(x, y, size) > BG.maxHidden) continue;
+        if (boxes.some(([bx, by]) => Math.hypot(x - bx, y - by) < BG.minSpacing)) continue;
+        add(x, y, size, z);
     }
 
-    // 2. Plug any bare spot within gapPad of a step
+    // 2. Plug any bare spot within gapPad of a step. The filler note is nudged
+    //    away from that step so most of it shows instead of tucking underneath.
     const covered = (px: number, py: number) =>
-        boxes.some(([bx, by, h]) => Math.abs(px - bx) < h - 4 && Math.abs(py - by) < h - 4) ||
-        Object.values(STEP_LAYOUT).some((s) => px > s.left + 6 && px < s.left + 230 && py > s.top + 6 && py < s.top + 230);
+        boxes.some(([bx, by, h]) => Math.abs(px - bx) < h && Math.abs(py - by) < h) ||
+        steps.some((s) => px > s.left + 6 && px < s.left + 230 && py > s.top + 6 && py < s.top + 230);
     const pad = BG.gapPad;
-    for (const s of Object.values(STEP_LAYOUT)) {
-        for (let py = s.top - pad; py <= s.top + 236 + pad; py += 30) {
-            for (let px = s.left - pad; px <= s.left + 236 + pad; px += 30) {
+    for (const s of steps) {
+        const sx = s.left + 118;
+        const sy = s.top + 118;
+        for (let py = s.top - pad; py <= s.top + 236 + pad; py += 36) {
+            for (let px = s.left - pad; px <= s.left + 236 + pad; px += 36) {
                 if (covered(px, py)) continue;
-                add(px + (r() - 0.5) * 30, py + (r() - 0.5) * 30, noteSize(), 8 + Math.floor(r() * 10));
+                const size = noteSize();
+                const d = Math.hypot(px - sx, py - sy) || 1;
+                const push = size * 0.28;
+                add(px + ((px - sx) / d) * push + (r() - 0.5) * 16, py + ((py - sy) / d) * push + (r() - 0.5) * 16, size, 8 + Math.floor(r() * 10));
             }
         }
     }

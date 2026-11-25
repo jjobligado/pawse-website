@@ -78,6 +78,14 @@ export const BACKGROUND = {
     messiness: 0.7,
     raggedEdge: 0.3,
     /**
+     * Breathing room, so the middle doesn't look cramped.
+     *   minSpacing: closest two note centres may be, in px (notes are ~128)
+     *   maxHidden:  a note this much under the steps (0 to 1) is left out,
+     *               since only a sliver of it would show
+     */
+    minSpacing: 104,
+    maxHidden: 0.5,
+    /**
      * No paper should show through right around the four steps. Every spot
      * within `gapPad` px of a step is checked; any uncovered spot gets a note.
      */
