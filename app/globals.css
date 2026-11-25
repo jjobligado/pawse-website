@@ -1554,6 +1554,8 @@ body {
 
 /* Draft touches: the drawing half-inked, a red SOON stamp, masking tape */
 .cs-art { width: 46px; height: 46px; margin: -4px 0 0 0; rotate: 3deg; }
+/* the cloud is wide and short, so it gets more room to read at the same weight */
+.cs-art[data-stamp="cloud"] { width: 58px; height: 58px; margin: -9px -4px 0 0; }
 .cs-art .hiw-stamp { opacity: 0.55; }
 .cs-soon { position: absolute; right: 14px; bottom: 16px; width: 80px; height: 32px; overflow: visible; color: var(--hiw-ink-red); mix-blend-mode: multiply; opacity: 0.88; pointer-events: none; }
 .cs-soon text { font: 600 7.4px var(--font-pixelify), monospace; letter-spacing: 0.7px; }

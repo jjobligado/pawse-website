@@ -157,7 +157,7 @@ export default function ComingSoonSection() {
                                     <div className="hiw-content">
                                         <div className="hiw-step-head">
                                             <span>NEXT · 0{i + 1}</span>
-                                            <span className="hiw-step-art cs-art" aria-hidden="true">
+                                            <span className="hiw-step-art cs-art" data-stamp={it.stamp} aria-hidden="true">
                                                 <PixelStamp name={it.stamp} press={i + 1} ghost />
                                             </span>
                                         </div>
