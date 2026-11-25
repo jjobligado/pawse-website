@@ -107,8 +107,13 @@ export const BACKGROUND = {
      *                are (1 = full, like the steps; lower = quieter)
      *   blankShare:  share of background notes left blank (some keep a doodle)
      */
-    inkStrength: 0.55,
-    blankShare: 0.4,
+    inkStrength: 0.85,
+    blankShare: 0.3,
+    /**
+     * Paper colours the background notes draw from. Listing a colour twice
+     * makes it twice as common; white and cream are the palest.
+     */
+    papers: ["yellow", "sky", "mint", "lavender", "pink", "peach", "yellow", "sky", "pink", "mint", "lavender", "cream", "white"] as Paper[],
     /**
      * How the background notes bend (real notes curl, especially stacked).
      * Relative weights: a higher number means more notes bend that way.

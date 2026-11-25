@@ -53,7 +53,6 @@ const ITEMS: Item[] = [
     S("heart", "focus"), S("zzz"), S("clock", "25 min"),
 ];
 
-const PAPERS: Paper[] = ["yellow", "sky", "mint", "lavender", "pink", "peach", "cream", "white", "yellow", "white", "cream"];
 const INKS: Ink[] = ["blue", "red", "violet", "green", "black"];
 const MARKS: StampName[] = ["star", "heart", "paw", "sparkle", "fish"];
 
@@ -119,7 +118,7 @@ const WALL: WallNote[] = (() => {
 
     const add = (px: number, py: number, size: number, z: number) => {
         const rot = (r() - 0.5) * 2 * BG.maxTilt;
-        const paper = PAPERS[Math.floor(r() * PAPERS.length)];
+        const paper = BG.papers[Math.floor(r() * BG.papers.length)];
         const taped = r() < BG.tapedShare;
         const ink = INKS[Math.floor(r2() * INKS.length)];
         const fr = r2();
