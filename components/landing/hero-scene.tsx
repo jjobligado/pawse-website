@@ -115,11 +115,6 @@ const PLANE = [
     "......BB.....",
 ] as const;
 
-/** One tile of rain: a few one-pixel streaks, scattered (repeats in both directions). */
-const RAIN_TILE = `url("data:image/svg+xml,${encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="96" shape-rendering="crispEdges" fill="white"><rect x="6" y="4" width="2" height="10"/><rect x="34" y="30" width="2" height="10"/><rect x="18" y="58" width="2" height="10"/><rect x="48" y="76" width="2" height="10"/><rect x="26" y="88" width="2" height="8"/></svg>',
-)}")`;
-
 const BIRD_UP = ["B...B", ".B.B.", "..B.."] as const;
 const BIRD_DOWN = [".....", "BB.BB", "..B.."] as const;
 
@@ -553,9 +548,6 @@ export function WindowSky({
                     style={{ opacity: "var(--golden, 0)" }}
                 />
 
-                {/* Rain days: the sky greys over a little */}
-                <div className="absolute inset-x-0 -top-[20%] -bottom-[20%] bg-[rgb(110_125_150/0.2)] opacity-0 transition-opacity duration-1000 in-data-[rain=1]:opacity-100" />
-
                 <Stars />
                 {/* Now and then a shooting star, at night */}
                 <div className={`${fade} ${show("night")}`}>
@@ -598,18 +590,6 @@ export function WindowSky({
 
             <SkylineLayer part="hills" />
             <SkylineLayer part="town" />
-
-            {/* Light rain on some days (lib/sky-phase.ts), nearest of all: two sheets
-                at different speeds, so it has some depth */}
-            <div className="absolute inset-0" style={depth(1.5)}>
-                <div className="hidden in-data-[rain=1]:block absolute inset-0 overflow-hidden">
-                    <div className="sky-rain absolute inset-x-0 -top-[96px] bottom-0 opacity-45" style={{ background: RAIN_TILE }} />
-                    <div
-                        className="sky-rain sky-rain-slow absolute inset-x-0 -top-[96px] bottom-0 opacity-25"
-                        style={{ background: `${RAIN_TILE} 30px 40px/45px 72px` }}
-                    />
-                </div>
-            </div>
 
             {/* Soft shade under the head of the frame */}
             <div className="absolute inset-0 shadow-[inset_0_14px_28px_-16px_rgb(16_60_100/0.35)]" />

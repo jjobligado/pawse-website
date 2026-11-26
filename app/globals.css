@@ -338,8 +338,8 @@ body {
 /*
  * Rare visitors in the window's sky: a plane every two and a half minutes
  * (crossing in about 25 s, then gone), shooting stars that flash for under a
- * second now and then, and the rain on rain days. Not `animate-` classes: under
- * reduced motion they are simply not there, rather than frozen in view.
+ * second now and then at night. Not `animate-` classes: under reduced motion
+ * they are simply not there, rather than frozen in view.
  */
 @keyframes sky-plane-cross {
   0% {
@@ -366,15 +366,8 @@ body {
   }
 }
 
-@keyframes sky-rain-fall {
-  to {
-    transform: translateY(96px);
-  }
-}
-
 .sky-plane,
-.sky-shooting-star,
-.sky-rain {
+.sky-shooting-star {
   display: none;
 }
 
@@ -387,13 +380,6 @@ body {
     display: block;
     opacity: 0;
     animation: sky-shooting-star 27s ease-in infinite;
-  }
-  .sky-rain {
-    display: block;
-    animation: sky-rain-fall 0.6s linear infinite;
-  }
-  .sky-rain-slow {
-    animation-duration: 0.9s;
   }
 }
 

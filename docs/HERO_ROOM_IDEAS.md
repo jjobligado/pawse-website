@@ -20,7 +20,7 @@ birds, the hills, the town and each visitor moves on its own depth and curve, so
 | W2 | **Wider sun path along the top:** the sun crosses the top of the window from right to left over the day, staying above the headline | Built (`feat/sky-sun-top-arc`) |
 | W3 | **Golden hour:** when the sun is low, warm the bottom of the sky and tint the edges of the clouds | Built (`feat/sky-golden-hour`) |
 | W4 | **The town at night:** lit windows switch on one by one at dusk and off after midnight | Built (`feat/sky-town-lights`) |
-| W5 | **Occasional visitors:** a rare plane by day, a shooting star at night, light pixel rain on some days | Built (`feat/sky-visitors`) |
+| W5 | **Occasional visitors:** a rare plane by day, a shooting star at night, light pixel rain on some days | Built: plane by day, shooting stars at night. Rain dropped: no weather (decided Nov 27) |
 | W6 | **Glass that reacts to the sky:** the glare on the open panels follows the sun; the wall light below the window shifts with it | Built (`feat/sky-glass-light`) |
 | W7 | **Cats that notice:** the sill cat turns its head to follow a passing bird | Parked |
 
@@ -54,4 +54,5 @@ birds, the hills, the town and each visitor moves on its own depth and curve, so
 | 15 | **A working timer on the screen:** a real, tiny 25-minute timer you can start; if you are still on the page when it ends, a cat stretches on the sill | Interaction |
 | 16 | **Cursor as a cat paw:** over the laptop only, with paw prints that fade off the keyboard | Interaction |
 | 17 | **The download as part of the scene:** pressing Download plays a pixel progress bar on the laptop screen and a cat dragging a box across the desk | Story and launch |
-| 18 | **Seasons:** snow on the sill in December, petals in spring, a tiny pumpkin on the desk in October, seeded by date | Story and launch |
+
+> **Note:** idea 18 (**Seasons:** snow on the sill in December, petals in spring, a pumpkin in October) is off the list. No weather/snow in the window (decided Nov 27).
