@@ -6,7 +6,7 @@ export default function CompanionsSection() {
     return (
         <section
             id="companions"
-            className={`scroll-mt-20 relative w-full ${SECTION_SPACING.default} px-6 md:px-12 lg:px-20 flex flex-col items-center`}
+            className={`scroll-mt-20 relative w-full ${SECTION_SPACING} px-6 md:px-12 lg:px-20 flex flex-col items-center`}
         >
             <div className={`relative z-10 w-full max-w-[1140px] flex flex-col items-center ${SECTION_GAP}`}>
                 <SectionHeader>
