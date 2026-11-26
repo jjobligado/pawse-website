@@ -166,7 +166,8 @@ const SHOW_IN: Record<SkyPhase, string> = {
     night: "in-data-[sky=night]:opacity-100",
 };
 
-const CLOUD_PALETTE = { W: "var(--sky-cloud-w)", S: "var(--sky-cloud-s)" } as const;
+/** Cloud colours for the phase, warmed at golden hour (lib/sky-phase.ts). */
+const CLOUD_PALETTE = { W: "var(--sky-cloud-face)", S: "var(--sky-cloud-edge)" } as const;
 
 function subscribePhase(onChange: () => void) {
     const observer = new MutationObserver(onChange);
@@ -483,6 +484,12 @@ export function WindowSky({
                         }}
                     />
                 ))}
+
+                {/* Golden hour: the low sun warms the bottom of the sky */}
+                <div
+                    className="absolute -inset-x-[5%] -top-[20%] -bottom-[20%] bg-[linear-gradient(180deg,transparent_40%,rgb(255_170_120/0.42)_78%,rgb(255_196_150/0.55))] transition-opacity duration-1000"
+                    style={{ opacity: "var(--golden, 0)" }}
+                />
 
                 <Stars />
             </ViewPlane>

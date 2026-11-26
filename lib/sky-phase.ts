@@ -201,8 +201,20 @@ const WALL_LIGHT: Record<SkyPhase, { rgb: string; alpha: number }> = {
     night: { rgb: "168 184 236", alpha: 0.22 },
 };
 
+/*
+ * Golden hour: --golden (0..1) is how low the sun is, strongest at sunrise and
+ * sunset and gone by mid-morning (the square of 1 - 4t(1 - t), so it falls off
+ * fast), and 0 at night. It warms the bottom of the sky and the clouds: their
+ * shaded underside (--sky-cloud-edge) turns apricot, their face a touch peach.
+ * Pure CSS on --sun-t, so it is right from the first paint.
+ */
+const GOLDEN_CSS =
+    "html{--sun-up:1;--sun-low:calc(1 - 4 * var(--sun-t, 0.5) * (1 - var(--sun-t, 0.5)));--golden:calc(var(--sun-up) * var(--sun-low) * var(--sun-low));" +
+    "--sky-cloud-edge:color-mix(in srgb,var(--sky-cloud-s),#F39A6E calc(var(--golden) * 65%));--sky-cloud-face:color-mix(in srgb,var(--sky-cloud-w),#FFDCC0 calc(var(--golden) * 40%))}" +
+    'html[data-sky="night"]{--sun-up:0}';
+
 /** Per-phase CSS variables on <html>, rendered into <head> by the root layout. */
-export const SKY_PHASE_CSS = SKY_PHASES.map((p) => {
+export const SKY_PHASE_CSS = GOLDEN_CSS + SKY_PHASES.map((p) => {
     const t = THEMES[p];
     return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--fish-eye:${FISH_EYE[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
 }).join("");
