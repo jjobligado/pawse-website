@@ -676,9 +676,17 @@ function CasementPanel({ side, alwaysOpen }: { side: "left" | "right"; alwaysOpe
             className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} ${phone} sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
-            {/* Glass: a cool tint, one broad glint and one thin one */}
+            {/* Glass: a cool tint, one broad glint and one thin one. The glints slide
+                across the pane with the sun or moon (--body-t) and are brightest on
+                the panel on its side of the sky. */}
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(205_232_255/0.16),rgb(255_255_255/0.05))]" />
-            <div className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.26)_0%,rgb(255_255_255/0.07)_30%,transparent_31%,transparent_58%,rgb(255_255_255/0.14)_59%,transparent_66%)]" />
+            <div
+                className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.26)_0%,rgb(255_255_255/0.07)_15%,transparent_16%,transparent_29%,rgb(255_255_255/0.14)_30%,transparent_33%)] bg-size-[200%_100%] transition-[opacity,background-position] duration-1000"
+                style={{
+                    backgroundPositionX: "calc(100% - var(--body-t, 0.5) * 100%)",
+                    opacity: `calc(0.45 + 0.55 * ${left ? "var(--body-t, 0.5)" : "(1 - var(--body-t, 0.5))"})`,
+                }}
+            />
 
             {/* Paw prints on the glass */}
             <div aria-hidden="true" className="hidden lg:block absolute inset-0">

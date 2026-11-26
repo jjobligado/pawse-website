@@ -248,7 +248,9 @@ const WALL_LIGHT: Record<SkyPhase, { rgb: string; alpha: number }> = {
 const GOLDEN_CSS =
     "html{--sun-up:1;--sun-low:calc(1 - 4 * var(--sun-t, 0.5) * (1 - var(--sun-t, 0.5)));--golden:calc(var(--sun-up) * var(--sun-low) * var(--sun-low));" +
     "--sky-cloud-edge:color-mix(in srgb,var(--sky-cloud-s),#F39A6E calc(var(--golden) * 65%));--sky-cloud-face:color-mix(in srgb,var(--sky-cloud-w),#FFDCC0 calc(var(--golden) * 40%))}" +
-    'html[data-sky="night"]{--sun-up:0}';
+    'html[data-sky="night"]{--sun-up:0}' +
+    /* --body-t: where the light comes from, the sun by day and the moon at night (0 right, 1 left) */
+    'html{--body-t:var(--sun-t, 0.5)}html[data-sky="night"]{--body-t:var(--moon-t, 0.5)}';
 
 /** Per-phase CSS variables on <html>, rendered into <head> by the root layout. */
 export const SKY_PHASE_CSS = GOLDEN_CSS + SKY_PHASES.map((p) => {
