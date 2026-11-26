@@ -36,8 +36,9 @@ export function isSkyPhase(value: unknown): value is SkyPhase {
 
 /**
  * The sun is up from 5:00 (morning starts) to 20:00 (night starts); the moon
- * has the rest. Each crosses the window on a slow arc, so its spot in the sky
- * tells the time: --sun-t and --moon-t (0 at rise, 1 at set) go on <html>.
+ * has the rest. Each rises on the right of the window, crosses its top right to
+ * left and sets on the left, so its spot in the sky tells the time: --sun-t and
+ * --moon-t (0 at rise, 1 at set) go on <html>.
  */
 const SUNRISE = PHASE_STARTS[0][1];
 const SUNSET = PHASE_STARTS[PHASE_STARTS.length - 1][1];

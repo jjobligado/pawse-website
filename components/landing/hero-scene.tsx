@@ -218,21 +218,25 @@ const STARS = [
 ] as const;
 
 /*
- * Where the sun and moon sit: a point on a low arc over the right of the
- * window, driven by --sun-t / --moon-t (0 at rise, 1 at set; lib/sky-phase.ts).
- * They climb from low on the right edge, peak around the middle of their time
- * up, and sink again, drifting a little rightward the whole way, so over a
- * visit the visitor sees them creep. The right side keeps them clear of the
- * copy. `a` is the arc's height (0 at rise and set, 1 at the peak).
+ * Where the sun and moon sit: a point on a wide, flat-topped arc across the top
+ * of the window, driven by --sun-t / --moon-t (0 at rise, 1 at set;
+ * lib/sky-phase.ts). Each rises low on the right, climbs quickly, crosses the
+ * top of the glass right to left over the hours, and sinks on the left, so its
+ * place tells the time. Its height goes with the sixth power of the distance
+ * from the middle of its time up (u = 2t - 1), so it only drops low near the
+ * sides (by the open panels, clear of the copy). Around the middle it rides up
+ * under the head of the frame, its top tucked behind it as a high sun is from
+ * indoors, which keeps it above the headline at every size.
  */
-const SUN_PATH = {
-    right: "calc(13% - 9% * var(--sun-t, 0.5))",
-    top: "calc(54% - 38% * 4 * var(--sun-t, 0.5) * (1 - var(--sun-t, 0.5)))",
-};
-const MOON_PATH = {
-    right: "calc(14% - 9% * var(--moon-t, 0.5))",
-    top: "calc(50% - 34% * 4 * var(--moon-t, 0.5) * (1 - var(--moon-t, 0.5)))",
-};
+const arcPath = (t: string): React.CSSProperties =>
+    ({
+        "--u": `calc(2 * var(${t}, 0.5) - 1)`,
+        "--u2": "calc(var(--u) * var(--u))",
+        left: `calc(92% - 84% * var(${t}, 0.5))`,
+        top: "calc(5% + 45% * var(--u2) * var(--u2) * var(--u2))",
+    }) as React.CSSProperties;
+const SUN_PATH = arcPath("--sun-t");
+const MOON_PATH = arcPath("--moon-t");
 
 /** Centres its children on a point of the sky. */
 const CENTRED = "absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2";
