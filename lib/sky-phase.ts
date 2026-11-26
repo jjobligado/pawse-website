@@ -90,6 +90,23 @@ export function lightsForHour(hour: number): number {
 const LIGHTS_JS =
     "function(h){var x=h<12?h+24:h;return x<17?0:x<19.5?Math.sqrt((x-17)/2.5):x<23?1:x<26?1-0.2*(x-23):x<29?0.4:x<30.5?0.4*(30.5-x)/1.5:0}";
 
+/*
+ * Light rain on about one day in nine, the same all day for everyone (seeded
+ * by the date), shown as <html data-rain="1">. The head script carries a copy
+ * (RAIN_JS); keep the two in step. Dev: ?rain=1 / ?rain=0 force it.
+ */
+const RAIN_JS =
+    "function(d){var k=d.getFullYear()*372+d.getMonth()*31+d.getDate();return(Math.imul(k,2654435761)>>>0)%9===0}";
+
+export function isRainyDay(date: Date): boolean {
+    if (process.env.NODE_ENV === "development") {
+        const forced = new URLSearchParams(window.location.search).get("rain");
+        if (forced === "1" || forced === "0") return forced === "1";
+    }
+    const k = date.getFullYear() * 372 + date.getMonth() * 31 + date.getDate();
+    return (Math.imul(k, 2654435761) >>> 0) % 9 === 0;
+}
+
 /** The phase for right now, including the development-only overrides. */
 export function currentSkyPhase(): SkyPhase {
     if (process.env.NODE_ENV === "development") {
@@ -104,6 +121,8 @@ export function applySkyPhase() {
     const phase = currentSkyPhase();
     const root = document.documentElement;
     if (root.dataset.sky !== phase) root.dataset.sky = phase;
+    const rain = isRainyDay(new Date()) ? "1" : "0";
+    if (root.dataset.rain !== rain) root.dataset.rain = rain;
     const hour = currentHour();
     const { sun, moon } = arcsForHour(hour);
     root.style.setProperty("--sun-t", sun.toFixed(4));
@@ -243,6 +262,6 @@ export const SKY_PHASE_CSS = GOLDEN_CSS + SKY_PHASES.map((p) => {
  */
 export const SKY_PHASE_SCRIPT = `(function(){try{var d=new Date(),h=d.getHours()+d.getMinutes()/60,p,s=${JSON.stringify(PHASE_STARTS)},r=document.documentElement;${
     process.env.NODE_ENV === "development"
-        ? `var q=new URLSearchParams(location.search),f=q.get("sky"),x=parseFloat(q.get("hour")),m=${JSON.stringify(PHASE_MIDDAY)};if(x>=0&&x<24)h=x;else if(m[f]!=null)h=m[f];if(m[f]!=null)p=f;`
-        : ""
-}if(!p){p="night";for(var i=0;i<s.length;i++)if(Math.floor(h)>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(1,Math.max(0,n))};r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((((h-${SUNSET})%24)+24)%24/${24 - SUNSET + SUNRISE}).toFixed(4));r.style.setProperty("--lights-on",(${LIGHTS_JS})(h).toFixed(4))}catch(e){}})()`;
+        ? `var q=new URLSearchParams(location.search),f=q.get("sky"),x=parseFloat(q.get("hour")),m=${JSON.stringify(PHASE_MIDDAY)};if(x>=0&&x<24)h=x;else if(m[f]!=null)h=m[f];if(m[f]!=null)p=f;var w=q.get("rain");`
+        : "var w=null;"
+}if(!p){p="night";for(var i=0;i<s.length;i++)if(Math.floor(h)>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(1,Math.max(0,n))};r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((((h-${SUNSET})%24)+24)%24/${24 - SUNSET + SUNRISE}).toFixed(4));r.style.setProperty("--lights-on",(${LIGHTS_JS})(h).toFixed(4));r.setAttribute("data-rain",w==="1"||w==="0"?w:(${RAIN_JS})(d)?"1":"0")}catch(e){}})()`;

@@ -335,6 +335,68 @@ body {
   }
 }
 
+/*
+ * Rare visitors in the window's sky: a plane every two and a half minutes
+ * (crossing in about 25 s, then gone), shooting stars that flash for under a
+ * second now and then, and the rain on rain days. Not `animate-` classes: under
+ * reduced motion they are simply not there, rather than frozen in view.
+ */
+@keyframes sky-plane-cross {
+  0% {
+    transform: translateX(-140px);
+  }
+  17%,
+  100% {
+    transform: translateX(calc(min(100vw, 1440px) + 140px));
+  }
+}
+
+@keyframes sky-shooting-star {
+  0%,
+  97% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  97.5% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(220px);
+  }
+}
+
+@keyframes sky-rain-fall {
+  to {
+    transform: translateY(96px);
+  }
+}
+
+.sky-plane,
+.sky-shooting-star,
+.sky-rain {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sky-plane {
+    display: block;
+    animation: sky-plane-cross 150s linear -120s infinite;
+  }
+  .sky-shooting-star {
+    display: block;
+    opacity: 0;
+    animation: sky-shooting-star 27s ease-in infinite;
+  }
+  .sky-rain {
+    display: block;
+    animation: sky-rain-fall 0.6s linear infinite;
+  }
+  .sky-rain-slow {
+    animation-duration: 0.9s;
+  }
+}
+
 /* Night stars: a slow, uneven twinkle (delays vary per star). */
 @keyframes twinkle {
   0%, 100% {
