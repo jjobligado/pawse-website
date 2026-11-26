@@ -61,7 +61,7 @@ export default function DownloadBanner() {
                     <WindowSky entrance={false} />
                     <WindowFrame alwaysOpen />
 
-                    <div className="relative z-10 flex flex-col items-center text-center gap-5 px-8 sm:px-16 pt-14 sm:pt-20 lg:pt-24 pb-28 sm:pb-36 lg:pb-44">
+                    <div className="relative z-10 flex flex-col items-center text-center gap-3 md:gap-4 px-8 sm:px-16 pt-14 sm:pt-20 lg:pt-24 pb-28 sm:pb-36 lg:pb-44">
                         {/* Soft light behind the copy, so it reads on every sky */}
                         <div
                             aria-hidden="true"
@@ -75,7 +75,7 @@ export default function DownloadBanner() {
                             Free to download. No account needed. Your companions are waiting.
                         </p>
 
-                        <div className="mt-1 flex flex-col items-center gap-3">
+                        <div className="mt-5 md:mt-6 flex flex-col items-center gap-3">
                             {isMobile ? (
                                 <button
                                     type="button"

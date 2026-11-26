@@ -26,7 +26,7 @@ export default function SplitFeature({
     spacing,
 }: SplitFeatureProps) {
     const copy = (
-        <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
+        <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4 md:gap-5">
             <SectionTitle className="text-center lg:text-left">
                 <span className="block">{titleLines[0]}</span>
                 <span className="block">{titleLines[1]}</span>
@@ -49,7 +49,7 @@ export default function SplitFeature({
             <div
                 className={`w-full flex ${
                     mediaFirst ? "flex-col-reverse" : "flex-col"
-                } lg:flex-row items-center justify-between gap-10 lg:gap-14`}
+                } lg:flex-row items-center justify-between gap-10 md:gap-12 lg:gap-16`}
             >
                 {mediaFirst ? (
                     <>
