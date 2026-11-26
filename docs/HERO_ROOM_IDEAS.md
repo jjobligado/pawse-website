@@ -35,7 +35,7 @@ on stacked `feat/sky-*` branches (Nov 27).
 | 5 | **The window light moves across the desk:** the window's rectangle of light (with the shadow of the bars between the panes) sits on the desk, slides with the sun's position, and turns blue-white at night | Motion · pairs with W6 |
 | 6 | **Desk props that follow the time of day:** a mug that steams in the morning and turns into tea at night; a small desk lamp that switches on at dusk; a sticky note on the bezel whose text changes by time ("drink water", "go to bed") | Design and props |
 | 7 | **Things that show progress:** a stack of pixel notebooks that grows as you scroll; a small desk plant that sprouts a new leaf with each completed section | Design and props |
-| 11 | **Lean to look for the desk:** the same mouse lean as W1, so the desk and the window move as one room and it feels like a 3D space | Perspective · builds on W1 |
+| 11 | **Lean to look for the desk (scroll-driven):** the desk's viewing angle follows the scroll position, like the window view, so the desk and the window feel like one room in 3D. Not mouse-driven (decided Nov 27). The desk's parts (laptop, mat, props, light) each move on their own, not as one block | Perspective · uses the window's scroll perspective |
 
 ### Not chosen (for reference)
 
