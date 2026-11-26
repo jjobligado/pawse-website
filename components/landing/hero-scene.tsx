@@ -284,7 +284,7 @@ function SunAndMoon() {
     return (
         <>
             {/* Sun: one body on its arc, its colour warming at morning and dusk (crossfaded) */}
-            <div className="absolute w-0 h-0" style={SUN_PATH}>
+            <div className="absolute w-0 h-0" style={{ ...SUN_PATH, ...depth(15, "early") }}>
                 {(["morning", "day", "dusk"] as const).map(glow)}
                 {(["morning", "day", "dusk"] as const).map((p) => (
                     <PixelArt
@@ -297,7 +297,7 @@ function SunAndMoon() {
             </div>
 
             {/* Night: the moon on its own arc */}
-            <div className="absolute w-0 h-0" style={MOON_PATH}>
+            <div className="absolute w-0 h-0" style={{ ...MOON_PATH, ...depth(14, "lag") }}>
                 {glow("night")}
                 <div className={`${fade} ${show("night")}`}>
                     <PixelArt
@@ -335,50 +335,75 @@ function Stars() {
  * 1 as it scrolls up and away (you look up at it, from below) and falling to -1
  * while it is still low on the screen (you look down into it, from above).
  *
- * Seen through a near frame, the farther a thing is the more it shifts as your
- * eye moves, so the view is built from depth planes (ViewPlane), each shifted
- * by its own share of the window's height at full look. Looking up, the horizon
- * sinks and more sky shows; looking down, the town comes up into view, and the
- * clouds and the sun or moon slide against the rooftops as they would outside.
+ * The sky itself holds still (it is the backdrop), and everything in front of
+ * it moves on its own: each cloud, the birds, the sun, the moon, the hills, the
+ * town and any visitor gets its own depth (how far it shifts, in cqh of the
+ * window, at full look), its own response curve and, for a few, a small
+ * sideways drift, so nothing slides as one block. Overall it still reads as
+ * perspective: the farther a thing is, the more it shifts (the sun and the high
+ * clouds most, the hills and town least, so the ground stays put).
  *
- * Everything seen through the glass belongs in a plane, farthest first, so it
- * takes part in the effect: the sky (with the stars), the sun and moon, the far
- * clouds, birds and planes, the big clouds, the hills, the town, then the rain
- * falling in front of it all. Things on the glass itself (prints, glints) are
- * not in the view and do not shift.
+ * The curves (see useWindowLook):
+ * - even:  the plain look, in step with the scroll;
+ * - early: reacts mostly while the window is near the middle of the screen;
+ * - late:  hardly moves at first, then catches up toward the edges;
+ * - lag:   the plain look, eased, so it trails the scroll a little and settles.
+ *
+ * Anything new in the view should take a `depth()` of its own. Things on the
+ * glass itself (prints, glints) are not in the view and do not shift.
  */
-const DEPTH = { sky: 16, celestial: 16, farClouds: 13, nearClouds: 10, hills: 7, town: 4, rain: 2 } as const;
-type Depth = keyof typeof DEPTH;
+type Curve = "even" | "early" | "late" | "lag";
+const CURVE_VAR: Record<Curve, string> = {
+    even: "--look",
+    early: "--look-early",
+    late: "--look-late",
+    lag: "--look-lag",
+};
 
-/** A window-sized layer of the view, shifted with --look by its depth. */
-function ViewPlane({ depth, children }: { depth: Depth; children: React.ReactNode }) {
-    return (
-        <div
-            data-depth={depth}
-            className="absolute inset-0 will-change-[translate]"
-            style={{ translate: `0 calc(var(--look, 0) * ${DEPTH[depth]}%)` }}
-        >
-            {children}
-        </div>
-    );
+/** The style that shifts one thing in the view by its depth (cqh), curve and sideways drift (cqw). */
+function depth(d: number, curve: Curve = "even", drift = 0): React.CSSProperties {
+    const look = `var(${CURVE_VAR[curve]}, 0)`;
+    return {
+        translate: `${drift ? `calc(${look} * ${drift}cqw)` : "0"} calc(${look} * ${d}cqh)`,
+        willChange: "translate",
+    };
 }
 
-/** Keeps --look on `ref` in step with the window's place on the screen. */
+/**
+ * Keeps the look variables on `ref` in step with the window's place on the
+ * screen: --look and its two curves are written in the frame the page moves,
+ * and --look-lag eases after them in one rAF loop that stops once it has
+ * caught up, so a still page costs nothing.
+ */
 function useWindowLook(ref: React.RefObject<HTMLDivElement | null>) {
     useEffect(() => {
         const el = ref.current;
         if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         let frame = 0;
+        let lagFrame = 0;
         let visible = false;
+        let look = 0;
+        let lag = 0;
+        const ease = () => {
+            lag += (look - lag) * 0.09;
+            const settled = Math.abs(look - lag) < 0.0005;
+            if (settled) lag = look;
+            el.style.setProperty("--look-lag", lag.toFixed(4));
+            lagFrame = settled ? 0 : requestAnimationFrame(ease);
+        };
         const apply = () => {
             frame = 0;
             if (!visible) return;
             const rect = el.getBoundingClientRect();
             const half = window.innerHeight / 2;
             // -1 just below the screen, 0 centred, 1 just above it
-            const look = (half - (rect.top + rect.height / 2)) / (half + rect.height / 2);
-            el.style.setProperty("--look", Math.min(1, Math.max(-1, look)).toFixed(4));
+            look = Math.min(1, Math.max(-1, (half - (rect.top + rect.height / 2)) / (half + rect.height / 2)));
+            const out = 1 - (1 - Math.abs(look)) ** 2;
+            el.style.setProperty("--look", look.toFixed(4));
+            el.style.setProperty("--look-early", (Math.sign(look) * out).toFixed(4));
+            el.style.setProperty("--look-late", (look ** 3).toFixed(4));
+            if (!lagFrame) lagFrame = requestAnimationFrame(ease);
         };
         const schedule = () => {
             if (!frame) frame = requestAnimationFrame(apply);
@@ -404,6 +429,7 @@ function useWindowLook(ref: React.RefObject<HTMLDivElement | null>) {
             window.removeEventListener("scroll", schedule);
             window.removeEventListener("resize", schedule);
             if (frame) cancelAnimationFrame(frame);
+            if (lagFrame) cancelAnimationFrame(lagFrame);
         };
     }, [ref]);
 }
@@ -430,7 +456,7 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
     const town = part === "town";
     const fill = town ? "var(--sky-roof)" : "var(--sky-hill)";
     return (
-        <ViewPlane depth={part}>
+        <div className="absolute inset-0" style={town ? depth(3) : depth(5)}>
             <div className="absolute inset-x-0 bottom-[var(--sky-lift,0px)]">
                 <svg
                     viewBox={`0 0 ${SKY_COLS} ${SKY_ROWS}`}
@@ -480,13 +506,14 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
                     )}
                 </div>
             </div>
-        </ViewPlane>
+        </div>
     );
 }
 
 /**
- * Everything seen through the glass, for the visitor's time of day, shifting
- * with where you look from as the page scrolls (see DEPTH).
+ * Everything seen through the glass, for the visitor's time of day, each part
+ * shifting on its own with where you look from as the page scrolls (see depth()).
+ * The root is a size container, so depths are in cqh/cqw of this window.
  */
 export function WindowSky({
     entrance = true,
@@ -503,11 +530,11 @@ export function WindowSky({
         <div
             ref={ref}
             aria-hidden="true"
-            className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}
+            className={`absolute inset-0 overflow-hidden [container-type:size] ${entrance ? "animate-hero-sky" : ""}`}
             style={lift ? ({ "--sky-lift": lift } as React.CSSProperties) : undefined}
         >
-            {/* Farthest: the sky itself, with the stars */}
-            <ViewPlane depth="sky">
+            {/* The backdrop: the sky itself, with the stars. It barely moves (under 1%). */}
+            <div className="absolute inset-0" style={depth(0.8)}>
                 {/* Sky gradients, crossfaded when the phase changes. Each is padded above
                     and below with its end colours, so a shifted view never runs out of sky. */}
                 {SKY_PHASES.map((p) => (
@@ -535,52 +562,46 @@ export function WindowSky({
                     <ShootingStar className="top-[10%] left-[76%]" cycle={27} delay={-17} />
                     <ShootingStar className="hidden sm:block top-[22%] left-[34%]" cycle={43} delay={-8} />
                 </div>
-            </ViewPlane>
+            </div>
 
-            <ViewPlane depth="celestial">
-                <SunAndMoon />
-            </ViewPlane>
+            <SunAndMoon />
 
-            {/* Far layer: small clouds + birds */}
-            <ViewPlane depth="farClouds">
-                <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]">
-                    <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
+            {/* Far: small clouds, the plane and the birds */}
+            <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]" style={depth(12.5, "late", 2.5)}>
+                <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
+            </div>
+            <div className="absolute top-[46%] left-[62%] animate-cloud-drift-slow [animation-delay:-150s]" style={depth(11, "lag", -1.5)}>
+                <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[80px] h-auto opacity-80" />
+            </div>
+            {/* Now and then a plane crosses, high up (not at night) */}
+            <div className="sky-plane absolute top-[9%] left-0 in-data-[sky=night]:hidden" style={depth(13)}>
+                <div className="relative">
+                    <span className="absolute right-full top-[45%] mr-[2px] h-[2px] w-[90px] bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.75))]" />
+                    <PixelArt rows={PLANE} palette={{ B: "#7E98B8", W: "#DCE8F5" }} className="w-[30px] h-auto" />
                 </div>
-                <div className="absolute top-[46%] left-[62%] animate-cloud-drift-slow [animation-delay:-150s]">
-                    <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[80px] h-auto opacity-80" />
+            </div>
+            {/* Birds: morning to dusk, none at night */}
+            <div className="absolute top-[22%] left-[30%] animate-bird-flight in-data-[sky=night]:hidden" style={depth(11.5, "early", 3)}>
+                <div className="flex gap-3 items-start">
+                    <Bird className="w-[15px]" />
+                    <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
                 </div>
-                {/* Now and then a plane crosses, high up (not at night) */}
-                <div className="sky-plane absolute top-[9%] left-0 in-data-[sky=night]:hidden">
-                    <div className="relative">
-                        <span className="absolute right-full top-[45%] mr-[2px] h-[2px] w-[90px] bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.75))]" />
-                        <PixelArt rows={PLANE} palette={{ B: "#7E98B8", W: "#DCE8F5" }} className="w-[30px] h-auto" />
-                    </div>
-                </div>
-                {/* Birds: morning to dusk, none at night */}
-                <div className="absolute top-[22%] left-[30%] animate-bird-flight in-data-[sky=night]:hidden">
-                    <div className="flex gap-3 items-start">
-                        <Bird className="w-[15px]" />
-                        <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
-                    </div>
-                </div>
-            </ViewPlane>
+            </div>
 
-            {/* Near layer: big clouds (still behind the hills and town, so they shift more than those) */}
-            <ViewPlane depth="nearClouds">
-                <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]">
-                    <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
-                </div>
-                <div className="absolute top-[58%] left-[74%] animate-cloud-drift [animation-delay:-75s]">
-                    <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[140px] lg:w-[168px] h-auto" />
-                </div>
-            </ViewPlane>
+            {/* Nearer: the big clouds (still behind the hills and town, so they shift more than those) */}
+            <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]" style={depth(9, "lag", -2)}>
+                <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
+            </div>
+            <div className="absolute top-[58%] left-[74%] animate-cloud-drift [animation-delay:-75s]" style={depth(8, "late", 1.5)}>
+                <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[140px] lg:w-[168px] h-auto" />
+            </div>
 
             <SkylineLayer part="hills" />
             <SkylineLayer part="town" />
 
             {/* Light rain on some days (lib/sky-phase.ts), nearest of all: two sheets
                 at different speeds, so it has some depth */}
-            <ViewPlane depth="rain">
+            <div className="absolute inset-0" style={depth(1.5)}>
                 <div className="hidden in-data-[rain=1]:block absolute inset-0 overflow-hidden">
                     <div className="sky-rain absolute inset-x-0 -top-[96px] bottom-0 opacity-45" style={{ background: RAIN_TILE }} />
                     <div
@@ -588,7 +609,7 @@ export function WindowSky({
                         style={{ background: `${RAIN_TILE} 30px 40px/45px 72px` }}
                     />
                 </div>
-            </ViewPlane>
+            </div>
 
             {/* Soft shade under the head of the frame */}
             <div className="absolute inset-0 shadow-[inset_0_14px_28px_-16px_rgb(16_60_100/0.35)]" />
