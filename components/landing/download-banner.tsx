@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { OS_LABELS, otherDownloads, usePlatform, type DesktopOs } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
 import { SECTION_SPACING } from "./section";
@@ -26,26 +25,6 @@ export default function DownloadBanner() {
     const others = otherDownloads(platformInfo.downloadId ?? "windows");
     const otherOses = [...new Set(others.map((d) => d.os))] as DesktopOs[];
 
-    // The cats hop onto the sill when the window scrolls into view, not on page load.
-    const sceneRef = useRef<HTMLDivElement>(null);
-    const [arrived, setArrived] = useState(false);
-    useEffect(() => {
-        const el = sceneRef.current;
-        if (!el) return;
-        const io = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setArrived(true);
-                    io.disconnect();
-                }
-            },
-            { threshold: 0.35 },
-        );
-        io.observe(el);
-        return () => io.disconnect();
-    }, []);
-    const hop = (delay: string) => (arrived ? `animate-cat-hop ${delay}` : "opacity-0");
-
     // Meta text sits on the sky: a darker ink than `muted` keeps it readable on every phase.
     const metaText = "text-[#33404D] transition-colors duration-1000 in-data-[sky=night]:text-ink";
 
@@ -54,7 +33,6 @@ export default function DownloadBanner() {
         // hero's exact width formula (--wm/--ww in hero-section.tsx) and match it at every size.
         <section id="download" className={`scroll-mt-20 w-full bg-white ${SECTION_SPACING}`}>
             <div
-                ref={sceneRef}
                 className="@container relative w-full flex flex-col items-center [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--so:clamp(8px,2cqw,32px)]"
             >
                 <div className="relative w-[var(--ww)] flex flex-col items-center">
@@ -159,16 +137,16 @@ export default function DownloadBanner() {
 
                 {/* The sill, with all three companions together for the first time */}
                 <WindowSill className="z-20">
-                    <div className={`${ON_SILL} left-[2%] ${hop("[animation-delay:0.05s]")}`}>
+                    <div className={`${ON_SILL} left-[2%]`}>
                         <SillShadow />
                         <SpriteCat {...CATS.ginger} interactive={false} className={GINGER_SIZE} />
                     </div>
-                    <div className={`hidden sm:block ${ON_SILL} left-[17%] lg:left-[15%] ${hop("[animation-delay:0.2s]")}`}>
+                    <div className={`hidden sm:block ${ON_SILL} left-[17%] lg:left-[15%]`}>
                         <SillShadow />
                         <SpriteCat {...CATS.void} interactive={false} className={CAT_SIZE} />
                     </div>
                     <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
-                    <div className={`${ON_SILL} right-[3%] xl:right-[6.5%] ${hop("[animation-delay:0.35s]")}`}>
+                    <div className={`${ON_SILL} right-[3%] xl:right-[6.5%]`}>
                         <SillShadow />
                         <SpriteCat {...CATS.tux} interactive={false} className={CAT_SIZE} />
                     </div>
