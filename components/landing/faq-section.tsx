@@ -26,9 +26,9 @@ function ContactNote({ className = "" }: { className?: string }) {
 export default function FaqSection() {
     return (
         <Section id="faq" className="flex flex-col items-stretch">
-            <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 lg:gap-14">
+            <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 md:gap-12 lg:gap-16">
                 {/* Left column (static, scrolls with the page): heading, subtitle, and understated contact link */}
-                <div className="w-full lg:w-[36%] flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
+                <div className="w-full lg:w-[36%] flex flex-col items-center lg:items-start text-center lg:text-left gap-3 md:gap-4">
                     <SectionTitle className="text-center lg:text-left text-balance">
                         Frequently Asked Questions
                     </SectionTitle>
@@ -36,15 +36,15 @@ export default function FaqSection() {
                         Everything you need to know before you download.
                     </SectionSubtitle>
 
-                    <ContactNote className="hidden lg:block pt-1" />
+                    <ContactNote className="hidden lg:block pt-2" />
                 </div>
 
                 {/* Right column: all 9 tactile accordion cards visible at once, grouped by topic */}
-                <div className="w-full lg:w-[60%] max-w-[760px] mx-auto lg:mx-0 flex flex-col gap-7">
+                <div className="w-full lg:w-[60%] max-w-[760px] mx-auto lg:mx-0 flex flex-col gap-8 md:gap-10">
                     {FAQ_GROUPS.map((group) => {
                         const items = FAQS.filter((faq) => faq.category === group.id);
                         return (
-                            <div key={group.id} className="flex flex-col gap-3">
+                            <div key={group.id} className="flex flex-col gap-4">
                                 <h3 className="px-1 text-xs font-semibold uppercase tracking-[0.08em] text-ink-soft">
                                     {group.label}
                                 </h3>

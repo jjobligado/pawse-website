@@ -4,7 +4,7 @@ import { PaperBends, type Bend } from "./paper-bends";
 import PixelStamp, { StampFilters } from "./pixel-stamp";
 import type { StampFrame, StampName } from "./pixel-stamps";
 import Section from "./section";
-import { SectionSubtitle, SectionTitle } from "./section-heading";
+import { SectionHeader, SectionSubtitle, SectionTitle } from "./section-heading";
 import WallFit from "./wall-fit";
 import { BACKGROUND, BOARDS, LIST_NOTE_SCALE, NOTES, PHOTOS, SIDE_NOTES, STEP_STYLE, type BoardName, type Ink, type Paper, type PlacedNote, type StepPlace } from "./how-it-works-tuning";
 
@@ -443,10 +443,12 @@ function StepNote({ s, i, place }: { s: (typeof STEPS)[number]; i: number; place
 export default function HowItWorksSection() {
     return (
         <Section id="how-it-works">
-            <SectionTitle>How It Works</SectionTitle>
-            <SectionSubtitle className="text-center text-balance">
-                From choosing your companion to seeing your progress grow.
-            </SectionSubtitle>
+            <SectionHeader>
+                <SectionTitle>How It Works</SectionTitle>
+                <SectionSubtitle className="text-center text-balance">
+                    From choosing your companion to seeing your progress grow.
+                </SectionSubtitle>
+            </SectionHeader>
 
             <div className="hiw">
                 <StampFilters />

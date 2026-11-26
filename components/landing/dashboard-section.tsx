@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Parallax from "@/components/parallax";
 import DashboardCards from "@/components/app-ui/dashboard-cards";
-import Section from "./section";
-import { SectionSubtitle, SectionTitle } from "./section-heading";
+import Section, { SECTION_GAP } from "./section";
+import { SectionHeader, SectionSubtitle, SectionTitle } from "./section-heading";
 
 const FEATURES = [
     "Every minute you focus, tracked automatically.",
@@ -13,15 +13,17 @@ const FEATURES = [
 
 export default function DashboardSection() {
     return (
-        <Section id="progress" className="flex flex-col items-center gap-6">
-            <SectionTitle>Watch Your Focus Habit Grow</SectionTitle>
-            <SectionSubtitle className="text-center text-balance">
-                Every session adds to the bigger picture, tracked automatically and
-                kept right on your device.
-            </SectionSubtitle>
+        <Section id="progress" className={`flex flex-col items-center ${SECTION_GAP}`}>
+            <SectionHeader>
+                <SectionTitle>Watch Your Focus Habit Grow</SectionTitle>
+                <SectionSubtitle className="text-center text-balance">
+                    Every session adds to the bigger picture, tracked automatically and
+                    kept right on your device.
+                </SectionSubtitle>
+            </SectionHeader>
 
             {/* Side by side from lg; stacked (checklist first) below */}
-            <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-12 mt-2">
+            <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-10 lg:gap-16">
                 {/* Feature Checklist */}
                 <div className="w-fit max-w-full lg:w-[400px] lg:shrink-0 flex flex-col items-stretch gap-3.5">
                     {FEATURES.map((item) => (

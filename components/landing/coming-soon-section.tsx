@@ -4,7 +4,7 @@ import { BentPaper, S, SmallNote, T, vars, type Item, type SmallNoteData } from 
 import PixelStamp from "./pixel-stamp";
 import type { StampName } from "./pixel-stamps";
 import Section from "./section";
-import { SectionSubtitle, SectionTitle } from "./section-heading";
+import { SectionHeader, SectionSubtitle, SectionTitle } from "./section-heading";
 import type { Ink, Paper } from "./how-it-works-tuning";
 
 /**
@@ -123,11 +123,13 @@ function SoonStamp({ tilt, press }: { tilt: number; press: number }) {
 export default function ComingSoonSection() {
     return (
         <Section id="coming-soon">
-            <SectionTitle>Coming Soon</SectionTitle>
-            <SectionSubtitle className="text-center text-balance">
-                We&apos;re just getting started. Here&apos;s a sneak peek at what&apos;s
-                next for PAWSE.
-            </SectionSubtitle>
+            <SectionHeader>
+                <SectionTitle>Coming Soon</SectionTitle>
+                <SectionSubtitle className="text-center text-balance">
+                    We&apos;re just getting started. Here&apos;s a sneak peek at what&apos;s
+                    next for PAWSE.
+                </SectionSubtitle>
+            </SectionHeader>
 
             <div className="hiw cs-wall">
                 <div className="cs-sides" aria-hidden="true">

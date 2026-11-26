@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import Section from "./section";
 import Parallax from "@/components/parallax";
 import { SectionTitle } from "./section-heading";
@@ -13,7 +13,6 @@ interface SplitFeatureProps {
     media: ReactNode;
     /** Put the media on the left on desktop (it always stacks below the copy on mobile). */
     mediaFirst?: boolean;
-    spacing?: ComponentProps<typeof Section>["spacing"];
 }
 
 /** Two-column copy + media row used by the Focus and Break sections. */
@@ -23,10 +22,9 @@ export default function SplitFeature({
     children,
     media,
     mediaFirst = false,
-    spacing,
 }: SplitFeatureProps) {
     const copy = (
-        <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4">
+        <div className="w-full lg:w-[40%] flex flex-col justify-center items-stretch gap-4 md:gap-5">
             <SectionTitle className="text-center lg:text-left">
                 <span className="block">{titleLines[0]}</span>
                 <span className="block">{titleLines[1]}</span>
@@ -45,11 +43,11 @@ export default function SplitFeature({
     );
 
     return (
-        <Section id={id} spacing={spacing} className="flex flex-col items-stretch">
+        <Section id={id} className="flex flex-col items-stretch">
             <div
                 className={`w-full flex ${
                     mediaFirst ? "flex-col-reverse" : "flex-col"
-                } lg:flex-row items-center justify-between gap-10 lg:gap-14`}
+                } lg:flex-row items-center justify-between gap-10 md:gap-12 lg:gap-16`}
             >
                 {mediaFirst ? (
                     <>

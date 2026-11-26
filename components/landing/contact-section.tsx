@@ -135,9 +135,9 @@ export default function ContactSection() {
 
     return (
         <Section id="contact" className="flex flex-col items-stretch">
-            <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 lg:gap-14">
+            <div className="w-full flex flex-col lg:flex-row lg:items-start justify-between gap-10 md:gap-12 lg:gap-16">
                 {/* Left column (static, scrolls with the page): heading, subtitle, and understated direct email */}
-                <div className="w-full lg:w-[36%] flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
+                <div className="w-full lg:w-[36%] flex flex-col items-center lg:items-start text-center lg:text-left gap-3 md:gap-4">
                     <SectionTitle className="text-center lg:text-left text-balance">
                         Contact Us
                     </SectionTitle>
@@ -146,12 +146,12 @@ export default function ContactSection() {
                         team will get back to you.
                     </SectionSubtitle>
 
-                    <EmailNote className="hidden lg:block pt-1" />
+                    <EmailNote className="hidden lg:block pt-2" />
                 </div>
 
                 {/* Right column: contact form encapsulated in a FAQ-style bordered card */}
-                <div className="w-full lg:w-[60%] max-w-[760px] mx-auto lg:mx-0 flex flex-col gap-7">
-                    <div className="flex flex-col gap-3">
+                <div className="w-full lg:w-[60%] max-w-[760px] mx-auto lg:mx-0 flex flex-col gap-8 md:gap-10">
+                    <div className="flex flex-col gap-4">
                         <h3 className="px-1 text-xs font-semibold uppercase tracking-[0.08em] text-ink-soft">
                             Send a message
                         </h3>

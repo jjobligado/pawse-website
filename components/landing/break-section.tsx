@@ -8,7 +8,6 @@ export default function BreakSection() {
             titleLines={["Time to Play", "and Recharge"]}
             media={<BreakDemo />}
             mediaFirst
-            spacing="pair-end"
         >
             When the interval ends, the quiet time is over. Your companion wakes up
             ready for energetic playtime. Trigger unique animations, read their
