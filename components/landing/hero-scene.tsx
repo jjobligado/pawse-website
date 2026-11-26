@@ -160,6 +160,7 @@ const LIT_WINDOWS = ROOFS.flatMap((h, x) =>
 
 /** Shows a per-phase layer only in its phase (crossfading when the phase changes). */
 const SHOW_IN: Record<SkyPhase, string> = {
+    dawn: "in-data-[sky=dawn]:opacity-100",
     morning: "in-data-[sky=morning]:opacity-100",
     day: "in-data-[sky=day]:opacity-100",
     dusk: "in-data-[sky=dusk]:opacity-100",
@@ -238,6 +239,7 @@ const MOON_PATH = {
 const CENTRED = "absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2";
 
 const SUN_PALETTES: Partial<Record<SkyPhase, Palette>> = {
+    dawn: { Y: "#FFB88E", H: "#FFDCC6", O: "#F2906E" },
     morning: { Y: "#FFD69C", H: "#FFF1D9", O: "#FFBC80" },
     day: { Y: "#FFE59A", H: "#FFF6D6", O: "#FFD27A" },
     dusk: { Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" },
@@ -257,8 +259,8 @@ function Celestial() {
         <>
             {/* Sun: one body on its arc, its colour warming at morning and dusk (crossfaded) */}
             <div className="absolute w-0 h-0" style={SUN_PATH}>
-                {(["morning", "day", "dusk"] as const).map(glow)}
-                {(["morning", "day", "dusk"] as const).map((p) => (
+                {(["dawn", "morning", "day", "dusk"] as const).map(glow)}
+                {(["dawn", "morning", "day", "dusk"] as const).map((p) => (
                     <PixelArt
                         key={p}
                         rows={SUN}
@@ -268,10 +270,11 @@ function Celestial() {
                 ))}
             </div>
 
-            {/* Night: moon on its own arc, and twinkling stars */}
+            {/* Night: moon on its own arc, and twinkling stars. At dawn the moon is
+                setting and the stars fade with the first light. */}
             <div className="absolute w-0 h-0" style={MOON_PATH}>
                 {glow("night")}
-                <div className={`${fade} ${show("night")}`}>
+                <div className={`${fade} ${show("night")} ${SHOW_IN.dawn}`}>
                     <PixelArt
                         rows={MOON}
                         palette={{ M: "#FFF3C9", S: "#EBD99E" }}
@@ -279,7 +282,7 @@ function Celestial() {
                     />
                 </div>
             </div>
-            <div className={`${fade} ${show("night")}`}>
+            <div className={`${fade} ${show("night")} in-data-[sky=dawn]:opacity-40`}>
                 {STARS.map((s, i) => (
                     <span
                         key={i}

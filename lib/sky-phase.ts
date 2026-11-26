@@ -9,19 +9,28 @@
  * shows from the very first frame instead of "day" turning into the real one.
  */
 
-export type SkyPhase = "morning" | "day" | "dusk" | "night";
+export type SkyPhase = "dawn" | "morning" | "day" | "dusk" | "night";
 
-export const SKY_PHASES: readonly SkyPhase[] = ["morning", "day", "dusk", "night"];
+export const SKY_PHASES: readonly SkyPhase[] = ["dawn", "morning", "day", "dusk", "night"];
 
 /** Rendered on <html> by the server; the head script replaces it before paint. */
 export const DEFAULT_SKY_PHASE: SkyPhase = "day";
 
-/** Local hour each phase starts at, in order (night runs past midnight to morning). */
+/**
+ * Local time (fractional hours) each phase starts at, in order; night runs
+ * past midnight to dawn.
+ *   dawn     5:00–6:30   first light, the sun low over the rooftops, the moon setting
+ *   morning  6:30–10:00
+ *   day     10:00–17:30
+ *   dusk    17:30–19:00  sunset at 18:30
+ *   night   19:00–5:00
+ */
 const PHASE_STARTS: readonly [SkyPhase, number][] = [
-    ["morning", 5],
-    ["day", 9],
-    ["dusk", 17],
-    ["night", 20],
+    ["dawn", 5],
+    ["morning", 6.5],
+    ["day", 10],
+    ["dusk", 17.5],
+    ["night", 19],
 ];
 
 export function phaseForHour(hour: number): SkyPhase {
@@ -35,15 +44,19 @@ export function isSkyPhase(value: unknown): value is SkyPhase {
 }
 
 /**
- * The sun is up from 5:00 (morning starts) to 20:00 (night starts); the moon
- * has the rest. Each crosses the window on a slow arc, so its spot in the sky
- * tells the time: --sun-t and --moon-t (0 at rise, 1 at set) go on <html>.
+ * The sun is up from 6:00 (mid-dawn) to 18:30 (mid-dusk); the moon has the
+ * rest. Each crosses the window on a slow arc, so its spot in the sky tells
+ * the time: --sun-t and --moon-t (0 at rise, 1 at set) go on <html>. Either
+ * side of that they run a little past 0 and 1 (ARC_OVERRUN), so in the
+ * twilight around sunrise and sunset the body sits lower, down near
+ * the rooftops, instead of waiting at its rising point.
  */
-const SUNRISE = PHASE_STARTS[0][1];
-const SUNSET = PHASE_STARTS[PHASE_STARTS.length - 1][1];
+const SUNRISE = 6;
+const SUNSET = 18.5;
+const ARC_OVERRUN = 0.12;
 
 /** Middle of each phase, for the development-only `?sky=` override. */
-const PHASE_MIDDAY: Record<SkyPhase, number> = { morning: 7, day: 13, dusk: 18.5, night: 0.5 };
+const PHASE_MIDDAY: Record<SkyPhase, number> = { dawn: 5.9, morning: 8, day: 13, dusk: 18.2, night: 0.5 };
 
 /** Local time as a fractional hour, including the development-only `?sky=` / `?hour=` overrides. */
 function currentHour(): number {
@@ -60,10 +73,13 @@ function currentHour(): number {
 
 /** How far the sun and moon are across their arcs (0 = rising, 1 = setting). */
 export function arcsForHour(hour: number) {
-    const clamp = (n: number) => Math.min(1, Math.max(0, n));
+    const clamp = (n: number) => Math.min(1 + ARC_OVERRUN, Math.max(-ARC_OVERRUN, n));
+    // Hours since sunset, 0–24, so the overnight arc counts on past midnight.
+    const sinceSunset = (((hour - SUNSET) % 24) + 24) % 24;
     return {
         sun: clamp((hour - SUNRISE) / (SUNSET - SUNRISE)),
-        moon: clamp((((hour - SUNSET) % 24) + 24) % 24 / (24 - SUNSET + SUNRISE)),
+        // Hours after sunrise read as "before moonrise" (negative), not as late night.
+        moon: clamp((sinceSunset > 18 ? sinceSunset - 24 : sinceSunset) / (24 - SUNSET + SUNRISE)),
     };
 }
 
@@ -73,7 +89,7 @@ export function currentSkyPhase(): SkyPhase {
         const forced = new URLSearchParams(window.location.search).get("sky");
         if (isSkyPhase(forced)) return forced;
     }
-    return phaseForHour(Math.floor(currentHour()));
+    return phaseForHour(currentHour());
 }
 
 /** Sets <html data-sky> to the current phase (only when it changed) and moves the sun and moon. */
@@ -111,6 +127,17 @@ export interface PhaseTheme {
  * copy stays ≥4.5:1 wherever it sits.
  */
 export const THEMES: Record<SkyPhase, PhaseTheme> = {
+    // First light: periwinkle overhead, lilac, then a rose-peach band on the horizon
+    dawn: {
+        gradient: "linear-gradient(180deg,#7F8DCB 0%,#A3A8DC 32%,#D2B7DA 60%,#F6CCC2 82%,#FFE3D2 100%)",
+        top: "#7F8DCB",
+        horizon: "#FFE3D2",
+        glow: "radial-gradient(circle,rgb(255 200 180/0.85) 0%,rgb(255 200 180/0.35) 35%,transparent 68%)",
+        cloud: { W: "#F6E6EE", S: "#C9B4D8" },
+        hill: "#B3AED8",
+        roof: "#928FC4",
+        lights: 0.55,
+    },
     morning: {
         gradient: "linear-gradient(180deg,#B9DDFB 0%,#D6E8FA 40%,#FBE4D4 80%,#FFF2E8 100%)",
         top: "#B9DDFB",
@@ -160,6 +187,7 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
  * wide) and well above that on the white wall where phones show the copy.
  */
 const DONE_COLOR: Record<SkyPhase, string> = {
+    dawn: "#1A3480",
     morning: "#17679C",
     day: "#16639A",
     dusk: "#14578A",
@@ -176,12 +204,14 @@ const DONE_COLOR: Record<SkyPhase, string> = {
  * shadow keep them readable.
  */
 const FISH_COLORS: Record<SkyPhase, [string, string, string]> = {
+    dawn: ["#FFE9BC", "#DDF0A4", "#ECC8FF"],
     morning: ["#F7C77C", "#B3D266", "#D39AF4"],
     day: ["#F5C377", "#AFCF60", "#D095F2"],
     dusk: ["#FFEDC6", "#E3F2AE", "#C98AF0"],
     night: ["#FFE9BC", "#DDF0A4", "#ECC8FF"],
 };
 const FISH_EYE: Record<SkyPhase, string> = {
+    dawn: "#232421",
     morning: "#232421",
     day: "#232421",
     dusk: "#232421",
@@ -194,6 +224,7 @@ const FISH_EYE: Record<SkyPhase, string> = {
  * amber-rose at dusk, faint cool moonlight at night.
  */
 const WALL_LIGHT: Record<SkyPhase, { rgb: string; alpha: number }> = {
+    dawn: { rgb: "246 196 206", alpha: 0.24 },
     morning: { rgb: "255 214 178", alpha: 0.34 },
     day: { rgb: "255 232 178", alpha: 0.32 },
     dusk: { rgb: "255 178 140", alpha: 0.3 },
@@ -214,4 +245,4 @@ export const SKY_PHASE_SCRIPT = `(function(){try{var d=new Date(),h=d.getHours()
     process.env.NODE_ENV === "development"
         ? `var q=new URLSearchParams(location.search),f=q.get("sky"),x=parseFloat(q.get("hour")),m=${JSON.stringify(PHASE_MIDDAY)};if(x>=0&&x<24)h=x;else if(m[f]!=null)h=m[f];if(m[f]!=null)p=f;`
         : ""
-}if(!p){p="night";for(var i=0;i<s.length;i++)if(Math.floor(h)>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(1,Math.max(0,n))};r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((((h-${SUNSET})%24)+24)%24/${24 - SUNSET + SUNRISE}).toFixed(4))}catch(e){}})()`;
+}if(!p){p="night";for(var i=0;i<s.length;i++)if(h>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(${1 + ARC_OVERRUN},Math.max(${-ARC_OVERRUN},n))},n=(((h-${SUNSET})%24)+24)%24;r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((n>18?n-24:n)/${24 - SUNSET + SUNRISE}).toFixed(4))}catch(e){}})()`;

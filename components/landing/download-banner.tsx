@@ -26,7 +26,7 @@ export default function DownloadBanner() {
     const otherOses = [...new Set(others.map((d) => d.os))] as DesktopOs[];
 
     // Meta text sits on the sky: a darker ink than `muted` keeps it readable on every phase.
-    const metaText = "text-[#33404D] transition-colors duration-1000 in-data-[sky=night]:text-ink";
+    const metaText = "text-[#33404D] transition-colors duration-1000 in-data-[sky=night]:text-ink in-data-[sky=dawn]:text-ink";
 
     return (
         // Full width (not the shared Section's padded column) so the window can use the
@@ -45,7 +45,7 @@ export default function DownloadBanner() {
                         {/* Soft light behind the copy, so it reads on every sky */}
                         <div
                             aria-hidden="true"
-                            className="pointer-events-none absolute -z-10 left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-[min(900px,130%)] h-[80%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl opacity-85 transition-opacity duration-1000 in-data-[sky=night]:opacity-100"
+                            className="pointer-events-none absolute -z-10 left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-[min(900px,130%)] h-[80%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl opacity-85 transition-opacity duration-1000 in-data-[sky=night]:opacity-100 in-data-[sky=dawn]:opacity-100"
                         />
 
                         <SectionTitle className="text-center text-balance">
