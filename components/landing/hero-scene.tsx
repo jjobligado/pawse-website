@@ -216,46 +216,69 @@ const STARS = [
     { x: 81, y: 24, d: 2.3 }, { x: 88, y: 40, d: 0.3 }, { x: 4, y: 38, d: 1.9 }, { x: 52, y: 32, d: 2.9 },
 ] as const;
 
+/*
+ * Where the sun and moon sit: a point on a low arc over the right of the
+ * window, driven by --sun-t / --moon-t (0 at rise, 1 at set; lib/sky-phase.ts).
+ * They climb from low on the right edge, peak around the middle of their time
+ * up, and sink again, drifting a little rightward the whole way, so over a
+ * visit the visitor sees them creep. The right side keeps them clear of the
+ * copy. `a` is the arc's height (0 at rise and set, 1 at the peak).
+ */
+const SUN_PATH = {
+    right: "calc(13% - 9% * var(--sun-t, 0.5))",
+    top: "calc(54% - 38% * 4 * var(--sun-t, 0.5) * (1 - var(--sun-t, 0.5)))",
+};
+const MOON_PATH = {
+    right: "calc(14% - 9% * var(--moon-t, 0.5))",
+    top: "calc(50% - 34% * 4 * var(--moon-t, 0.5) * (1 - var(--moon-t, 0.5)))",
+};
+
+/** Centres its children on a point of the sky. */
+const CENTRED = "absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2";
+
+const SUN_PALETTES: Partial<Record<SkyPhase, Palette>> = {
+    morning: { Y: "#FFD69C", H: "#FFF1D9", O: "#FFBC80" },
+    day: { Y: "#FFE59A", H: "#FFF6D6", O: "#FFD27A" },
+    dusk: { Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" },
+};
+
 function Celestial() {
     const show = (p: SkyPhase) => `opacity-0 ${SHOW_IN[p]}`;
     const fade = "transition-opacity duration-1000 ease-out";
+    const glow = (p: SkyPhase) => (
+        <div
+            key={p}
+            className={`${CENTRED} w-[420px] h-[420px] rounded-full ${fade} ${show(p)}`}
+            style={{ background: THEMES[p].glow }}
+        />
+    );
     return (
         <>
-            {/* Glows (one per phase, crossfaded) */}
-            {SKY_PHASES.map((p) => (
-                <div
-                    key={p}
-                    className={`absolute w-[420px] h-[420px] rounded-full ${fade} ${show(p)} ${
-                        p === "dusk" ? "top-[18%] -right-24" : p === "morning" ? "-top-6 -right-24" : "-top-28 -right-24"
-                    }`}
-                    style={{ background: THEMES[p].glow }}
-                />
-            ))}
+            {/* Sun: one body on its arc, its colour warming at morning and dusk (crossfaded) */}
+            <div className="absolute w-0 h-0" style={SUN_PATH}>
+                {(["morning", "day", "dusk"] as const).map(glow)}
+                {(["morning", "day", "dusk"] as const).map((p) => (
+                    <PixelArt
+                        key={p}
+                        rows={SUN}
+                        palette={SUN_PALETTES[p]!}
+                        className={`hidden sm:block ${CENTRED} w-[65px] xl:w-[78px] h-auto ${fade} ${show(p)}`}
+                    />
+                ))}
+            </div>
 
-            {/* Sun: high at day, lower and warmer at morning and dusk */}
-            <PixelArt
-                rows={SUN}
-                palette={{ Y: "#FFE59A", H: "#FFF6D6", O: "#FFD27A" }}
-                className={`hidden sm:block absolute top-20 lg:top-28 right-[7%] lg:right-[5.5%] w-[65px] xl:w-[78px] h-auto ${fade} ${show("day")}`}
-            />
-            <PixelArt
-                rows={SUN}
-                palette={{ Y: "#FFD69C", H: "#FFF1D9", O: "#FFBC80" }}
-                className={`hidden sm:block absolute top-[26%] right-[7%] lg:right-[5.5%] w-[65px] xl:w-[78px] h-auto ${fade} ${show("morning")}`}
-            />
-            <PixelArt
-                rows={SUN}
-                palette={{ Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" }}
-                className={`hidden sm:block absolute top-[44%] right-[7%] lg:right-[5.5%] w-[65px] xl:w-[78px] h-auto ${fade} ${show("dusk")}`}
-            />
-
-            {/* Night: moon and twinkling stars */}
+            {/* Night: moon on its own arc, and twinkling stars */}
+            <div className="absolute w-0 h-0" style={MOON_PATH}>
+                {glow("night")}
+                <div className={`${fade} ${show("night")}`}>
+                    <PixelArt
+                        rows={MOON}
+                        palette={{ M: "#FFF3C9", S: "#EBD99E" }}
+                        className={`hidden sm:block ${CENTRED} w-[46px] lg:w-[56px] h-auto`}
+                    />
+                </div>
+            </div>
             <div className={`${fade} ${show("night")}`}>
-                <PixelArt
-                    rows={MOON}
-                    palette={{ M: "#FFF3C9", S: "#EBD99E" }}
-                    className="hidden sm:block absolute top-20 lg:top-28 right-[8%] lg:right-[6.5%] w-[46px] lg:w-[56px] h-auto"
-                />
                 {STARS.map((s, i) => (
                     <span
                         key={i}
