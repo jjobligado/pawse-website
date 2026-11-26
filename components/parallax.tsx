@@ -27,14 +27,22 @@ export default function Parallax({ children, depth = 0.06, className = "" }: Par
         const el = ref.current;
         if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+        // Only drift when the visual sits beside its copy (lg+). Below that it stacks under the copy with a
+        // 32-40px gap, and the drift would slide it right up against the text.
+        const sideBySide = window.matchMedia("(min-width: 64rem)");
+
         let frame = 0;
         let visible = false;
 
         const apply = () => {
             frame = 0;
+            if (!sideBySide.matches) {
+                el.style.translate = "";
+                return;
+            }
             const rect = el.getBoundingClientRect();
             // Offset from the viewport centre; the layout box is used, so the drift itself doesn't feed back in
-            const fromCentre = rect.top - (parseFloat(el.style.translate.split(" ")[1]) || 0) + rect.height / 2 - window.innerHeight / 2;
+            const fromCentre = rect.top - (parseFloat((el.style.translate || "").split(" ")[1]) || 0) + rect.height / 2 - window.innerHeight / 2;
             // Capped so a tall visual never slides into the copy or the next section
             const drift = Math.max(-MAX_DRIFT, Math.min(MAX_DRIFT, fromCentre * depth));
             el.style.translate = `0 ${drift.toFixed(1)}px`;
