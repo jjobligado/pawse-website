@@ -8,8 +8,9 @@
  * crisp SVG rects, so it stays sharp at any size.
  */
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { DEFAULT_SKY_PHASE, SKY_PHASES, THEMES, isSkyPhase, type SkyPhase } from "@/lib/sky-phase";
+import { onSmoothScroll } from "@/lib/smooth-scroll";
 
 type Palette = Record<string, string>;
 
@@ -294,60 +295,171 @@ function Celestial() {
     );
 }
 
-/** Distant hills and a low town, on the bottom edge of the glass. */
-function Skyline({ className }: { className?: string }) {
+/*
+ * Looking through the window from where you stand. Each window tracks --look on
+ * its sky: 0 when the window is level with the middle of the screen, rising to
+ * 1 as it scrolls up and away (you look up at it, from below) and falling to -1
+ * while it is still low on the screen (you look down into it, from above).
+ *
+ * Seen through a near frame, far things shift with your eye and near things
+ * hardly at all, so each layer moves by its own share of the window's height:
+ * looking up, the horizon sinks and more sky shows; looking down, the town
+ * comes up into view. The sky, sun, moon and stars are farthest and shift most.
+ */
+const DEPTH = { sky: 14, farClouds: 11, hills: 10, town: 8, nearClouds: 6 } as const;
+
+/** Shifts a window-sized layer by `percent` of the window's height at full look. */
+const lookShift = (percent: number): React.CSSProperties => ({ translate: `0 calc(var(--look, 0) * ${percent}%)` });
+
+/** Keeps --look on `ref` in step with the window's place on the screen. */
+function useWindowLook(ref: React.RefObject<HTMLDivElement | null>) {
+    useEffect(() => {
+        const el = ref.current;
+        if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        let frame = 0;
+        let visible = false;
+        const apply = () => {
+            frame = 0;
+            if (!visible) return;
+            const rect = el.getBoundingClientRect();
+            const half = window.innerHeight / 2;
+            // -1 just below the screen, 0 centred, 1 just above it
+            const look = (half - (rect.top + rect.height / 2)) / (half + rect.height / 2);
+            el.style.setProperty("--look", Math.min(1, Math.max(-1, look)).toFixed(4));
+        };
+        const schedule = () => {
+            if (!frame) frame = requestAnimationFrame(apply);
+        };
+
+        // Only track while near the screen
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                visible = entry.isIntersecting;
+                schedule();
+            },
+            { rootMargin: "100px 0px" },
+        );
+        observer.observe(el);
+
+        // Move in the same frame as Lenis moves the page, so the view never lags the frame
+        const unsubscribe = onSmoothScroll(apply);
+        window.addEventListener("scroll", schedule, { passive: true });
+        window.addEventListener("resize", schedule);
+        return () => {
+            unsubscribe();
+            observer.disconnect();
+            window.removeEventListener("scroll", schedule);
+            window.removeEventListener("resize", schedule);
+            if (frame) cancelAnimationFrame(frame);
+        };
+    }, [ref]);
+}
+
+const SKYLINE_HEIGHT = "h-[72px] sm:h-[88px] lg:h-[104px]";
+
+/*
+ * Window panes on the town's lower floors (below the drawn rooftops), as two
+ * offset grids of one-pixel squares. --u is one skyline pixel. Faint glass by
+ * day; at dusk and night some of them light up.
+ */
+const pane = (color: string, w: number, h: number, x: number, y: number) =>
+    `conic-gradient(from 270deg at var(--u) var(--u),${color} 25%,transparent 0) calc(var(--u)*${x}) calc(var(--u)*${y})/calc(var(--u)*${w}) calc(var(--u)*${h})`;
+const PANES = [pane("rgb(40 60 120/0.1)", 7, 6, 2, 3), pane("rgb(40 60 120/0.1)", 11, 5, 6, 1)].join(",");
+const LIT_PANES = pane("#FFE08A", 7, 6, 2, 3);
+
+/**
+ * One row of the skyline: the hills behind, or the town in front. It stands
+ * --sky-lift above the bottom of the glass (the hero raises the town clear of
+ * the laptop), and its ground carries on below, down past the sill, so no
+ * shift of the view ever opens a gap under it.
+ */
+function SkylineLayer({ part }: { part: "hills" | "town" }) {
+    const town = part === "town";
+    const fill = town ? "var(--sky-roof)" : "var(--sky-hill)";
     return (
-        <svg
-            viewBox={`0 0 ${SKY_COLS} ${SKY_ROWS}`}
-            preserveAspectRatio="xMidYMax slice"
-            shapeRendering="crispEdges"
-            className={className}
-            aria-hidden="true"
-        >
-            {HILLS.map((h, x) => (
-                <rect key={`h${x}`} x={x} y={SKY_ROWS - h - 4} width={1.02} height={h + 4} style={{ fill: "var(--sky-hill)" }} />
-            ))}
-            {ROOFS.map((h, x) => (
-                <rect key={`r${x}`} x={x} y={SKY_ROWS - h} width={1.02} height={h} style={{ fill: "var(--sky-roof)" }} />
-            ))}
-            <g style={{ opacity: "var(--sky-lights)" }} className="transition-opacity duration-1000">
-                {LIT_WINDOWS.map(({ x, y }) => (
-                    <rect key={`w${x}`} x={x} y={y} width={1} height={1} fill="#FFE08A" />
-                ))}
-            </g>
-        </svg>
+        <div className="absolute inset-0 will-change-[translate]" style={lookShift(town ? DEPTH.town : DEPTH.hills)}>
+            <div className="absolute inset-x-0 bottom-[var(--sky-lift,0px)]">
+                <svg
+                    viewBox={`0 0 ${SKY_COLS} ${SKY_ROWS}`}
+                    preserveAspectRatio="xMidYMax slice"
+                    shapeRendering="crispEdges"
+                    className={`block w-full ${SKYLINE_HEIGHT}`}
+                    aria-hidden="true"
+                >
+                    {town
+                        ? ROOFS.map((h, x) => (
+                              <rect key={x} x={x} y={SKY_ROWS - h} width={1.02} height={h + 0.1} style={{ fill }} />
+                          ))
+                        : HILLS.map((h, x) => (
+                              <rect key={x} x={x} y={SKY_ROWS - h - 4} width={1.02} height={h + 4.1} style={{ fill }} />
+                          ))}
+                    {town && (
+                        <g style={{ opacity: "var(--sky-lights)" }} className="transition-opacity duration-1000">
+                            {LIT_WINDOWS.map(({ x, y }) => (
+                                <rect key={`w${x}`} x={x} y={y} width={1} height={1} fill="#FFE08A" />
+                            ))}
+                        </g>
+                    )}
+                </svg>
+                {/* The ground under it, carried on past the bottom of the glass */}
+                <div
+                    className="absolute inset-x-0 top-[calc(100%_-_1px)] h-[calc(var(--sky-lift,0px)_+_45vh)] [--u:calc(72px/22)] sm:[--u:calc(88px/22)] lg:[--u:calc(104px/22)]"
+                    style={{ background: town ? `${PANES},${fill}` : fill }}
+                >
+                    {town && (
+                        <div
+                            className="absolute inset-0 transition-opacity duration-1000"
+                            style={{ background: LIT_PANES, opacity: "var(--sky-lights)" }}
+                        />
+                    )}
+                </div>
+            </div>
+        </div>
     );
 }
 
 /**
- * Everything seen through the glass, for the visitor's time of day. Parallax
- * refs are attached by the hero (far layers move less than near ones).
+ * Everything seen through the glass, for the visitor's time of day, shifting
+ * with where you look from as the page scrolls (see DEPTH).
  */
 export function WindowSky({
-    farRef,
-    nearRef,
     entrance = true,
+    lift,
 }: {
-    farRef?: React.Ref<HTMLDivElement>;
-    nearRef?: React.Ref<HTMLDivElement>;
     /** Play the load-in settle (hero only; scenes further down skip it). */
     entrance?: boolean;
+    /** How far to raise the skyline off the bottom of the glass (a CSS length), e.g. clear of the laptop. */
+    lift?: string;
 }) {
+    const ref = useRef<HTMLDivElement>(null);
+    useWindowLook(ref);
     return (
-        <div aria-hidden="true" className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}>
-            {/* Sky gradients, crossfaded when the phase changes */}
-            {SKY_PHASES.map((p) => (
-                <div
-                    key={p}
-                    className={`absolute inset-0 opacity-0 transition-opacity duration-1000 ease-out ${SHOW_IN[p]}`}
-                    style={{ background: THEMES[p].gradient }}
-                />
-            ))}
+        <div
+            ref={ref}
+            aria-hidden="true"
+            className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}
+            style={lift ? ({ "--sky-lift": lift } as React.CSSProperties) : undefined}
+        >
+            {/* Farthest: the sky itself with the sun, moon and stars */}
+            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.sky)}>
+                {/* Sky gradients, crossfaded when the phase changes. Each is padded above
+                    and below with its end colours, so a shifted view never runs out of sky. */}
+                {SKY_PHASES.map((p) => (
+                    <div
+                        key={p}
+                        className={`absolute inset-x-0 -top-[20%] -bottom-[20%] opacity-0 transition-opacity duration-1000 ease-out ${SHOW_IN[p]}`}
+                        style={{
+                            background: `${THEMES[p].gradient} center/100% calc(100% / 1.4) no-repeat,linear-gradient(${THEMES[p].top},${THEMES[p].top}) top/100% 50% no-repeat,linear-gradient(${THEMES[p].horizon},${THEMES[p].horizon}) bottom/100% 50% no-repeat`,
+                        }}
+                    />
+                ))}
 
-            <Celestial />
+                <Celestial />
+            </div>
 
-            {/* Far layer: small clouds + birds, slow */}
-            <div ref={farRef} className="absolute inset-0 will-change-transform">
+            {/* Far layer: small clouds + birds */}
+            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.farClouds)}>
                 <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]">
                     <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
                 </div>
@@ -363,8 +475,8 @@ export function WindowSky({
                 </div>
             </div>
 
-            {/* Near layer: big clouds, a little faster */}
-            <div ref={nearRef} className="absolute inset-0 will-change-transform">
+            {/* Near layer: big clouds, which shift least (still behind the town) */}
+            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.nearClouds)}>
                 <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]">
                     <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
                 </div>
@@ -373,7 +485,8 @@ export function WindowSky({
                 </div>
             </div>
 
-            <Skyline className="absolute inset-x-0 bottom-0 w-full h-[72px] sm:h-[88px] lg:h-[104px]" />
+            <SkylineLayer part="hills" />
+            <SkylineLayer part="town" />
 
             {/* Soft shade under the head of the frame */}
             <div className="absolute inset-0 shadow-[inset_0_14px_28px_-16px_rgb(16_60_100/0.35)]" />

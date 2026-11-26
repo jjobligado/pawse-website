@@ -12,14 +12,6 @@ import DoneWord from "./done-word";
 import { OsIcon } from "./download-options";
 import { onSmoothScroll } from "@/lib/smooth-scroll";
 
-// Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
-const PARALLAX_MAX_SCROLL = 700;
-// Positive = lags behind the page (reads as far away); negative = moves ahead (near).
-const PARALLAX_SPEED = {
-    skyFar: 0.16,
-    skyNear: 0.08,
-} as const;
-
 /**
  * Desk landing, with no hard stops: every speed change is gradual (see smoothRamp).
  * L = the section's `--land`. Two equal sin² ramps, offset by half:
@@ -64,6 +56,9 @@ const LAND_SHRINK = 0.04;
 const DESK_PITCH_FROM = 76;
 const DESK_PITCH_TO = 68;
 const WINDOW_LAG = 0.3;
+
+/** How much of the skyline's height stands above the laptop's lid at rest. */
+const TOWN_PEEK = 0.6;
 /** --cam as a multiple of the laptop's width (keep in step with the section's --cam). */
 const CAM_PER_WIDTH = 2.4;
 /** Approximate height (px) of the deck's front face, which hangs below its front edge. */
@@ -97,8 +92,7 @@ export default function HeroSection() {
     const deskRef = useRef<HTMLDivElement>(null);
     const deskEdgeRef = useRef<HTMLDivElement>(null);
     const windowRef = useRef<HTMLDivElement>(null);
-    const skyFarRef = useRef<HTMLDivElement>(null);
-    const skyNearRef = useRef<HTMLDivElement>(null);
+    const glassRef = useRef<HTMLDivElement>(null);
     const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const platformsTriggerRef = useRef<HTMLButtonElement>(null);
@@ -169,11 +163,6 @@ export default function HeroSection() {
         // deck is still fitted to the desk below.
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-        const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
-            [skyFarRef, PARALLAX_SPEED.skyFar],
-            [skyNearRef, PARALLAX_SPEED.skyNear],
-        ];
-
         let frame = 0;
         let lastScroll = -1;
         // How far the laptop is lowered onto the desk (the section's --land; 0 on phones).
@@ -219,6 +208,8 @@ export default function HeroSection() {
                 const deskTransform = desk?.style.transform ?? "";
                 const sectionPitch = section?.style.getPropertyValue("--pitch") ?? "";
                 laptop.style.transform = "none";
+                const windowTransform = windowRef.current?.style.transform ?? "";
+                if (windowRef.current) windowRef.current.style.transform = "none";
                 if (desk) desk.style.transform = "none";
 
                 // Always lower the laptop far enough that you can see it travel onto the desk.
@@ -244,6 +235,15 @@ export default function HeroSection() {
 
                 section?.style.setProperty("--pitch", `${pitchTo}deg`);
                 const rect = laptop.getBoundingClientRect();
+
+                // Raise the town until the top of the skyline (TOWN_PEEK of its height)
+                // stands above the laptop's lid instead of behind it.
+                const glass = glassRef.current?.getBoundingClientRect();
+                const skyline = glassRef.current?.querySelector("svg[viewBox='0 0 240 22']")?.getBoundingClientRect();
+                if (section && glass && skyline) {
+                    const lift = Math.max(glass.bottom - rect.top - skyline.height * (1 - TOWN_PEEK), 0);
+                    section.style.setProperty("--town-lift", `${lift.toFixed(1)}px`);
+                }
                 const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
                 const deskRect = desk?.getBoundingClientRect();
                 const footprint = laptopShadowRef.current?.getBoundingClientRect();
@@ -286,6 +286,7 @@ export default function HeroSection() {
                 }
 
                 laptop.style.transform = laptopTransform;
+                if (windowRef.current) windowRef.current.style.transform = windowTransform;
                 if (desk) desk.style.transform = deskTransform;
                 if (sectionPitch) section?.style.setProperty("--pitch", sectionPitch);
                 else section?.style.removeProperty("--pitch");
@@ -306,12 +307,6 @@ export default function HeroSection() {
             const raw = Math.max(window.scrollY, 0);
             if (raw === lastScroll) return;
             lastScroll = raw;
-            const scroll = Math.min(raw, PARALLAX_MAX_SCROLL);
-            for (const [ref, speed] of layers) {
-                if (ref.current && !reduceMotion) {
-                    ref.current.style.transform = `translate3d(0, ${(scroll * speed).toFixed(2)}px, 0)`;
-                }
-            }
 
             // Desk landing: the laptop eases to a near-standstill mid-screen while the
             // window scrolls away, then eases back into the scroll as the desk meets it.
@@ -426,8 +421,10 @@ export default function HeroSection() {
                           shadow, a mid one, and a long soft one falling down the wall), so
                           it sits on the wall instead of looking pasted on.
                         */}
-                        <div className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
-                            <WindowSky farRef={skyFarRef} nearRef={skyNearRef} />
+                        <div ref={glassRef} className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
+                            {/* The town is raised so its rooftops show above the laptop's lid (--town-lift is
+                                measured; the fallback is a close guess for the first paint) */}
+                            <WindowSky lift="var(--town-lift, max(0px, calc(var(--lw) * var(--ov) * 0.68 - 40px)))" />
                             <WindowFrame />
                         </div>
 
