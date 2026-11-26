@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { OS_LABELS, otherDownloads, usePlatform, type DesktopOs } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
-import Section from "./section";
+import { SECTION_SPACING } from "./section";
 import { SectionTitle } from "./section-heading";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
 import SpriteCat from "./sprite-cat";
@@ -50,12 +50,14 @@ export default function DownloadBanner() {
     const metaText = "text-[#33404D] transition-colors duration-1000 in-data-[sky=night]:text-ink";
 
     return (
-        <Section id="download" className="flex flex-col items-stretch">
+        // Full width (not the shared Section's padded column) so the window can use the
+        // hero's exact width formula (--wm/--ww in hero-section.tsx) and match it at every size.
+        <section id="download" className={`scroll-mt-20 w-full bg-white ${SECTION_SPACING}`}>
             <div
                 ref={sceneRef}
-                className="@container relative w-full flex flex-col items-center [--so:clamp(8px,2cqw,32px)]"
+                className="@container relative w-full flex flex-col items-center [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--so:clamp(8px,2cqw,32px)]"
             >
-                <div className="relative w-[calc(100%_-_2*var(--so))] flex flex-col items-center">
+                <div className="relative w-[var(--ww)] flex flex-col items-center">
                 {/* The window, with the copy on its glass */}
                 <div className="relative w-full overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
                     <WindowSky entrance={false} />
@@ -173,6 +175,6 @@ export default function DownloadBanner() {
                 </WindowSill>
                 </div>
             </div>
-        </Section>
+        </section>
     );
 }
