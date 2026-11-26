@@ -243,9 +243,11 @@ const SUN_PALETTES: Partial<Record<SkyPhase, Palette>> = {
     dusk: { Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" },
 };
 
-function Celestial() {
-    const show = (p: SkyPhase) => `opacity-0 ${SHOW_IN[p]}`;
-    const fade = "transition-opacity duration-1000 ease-out";
+const show = (p: SkyPhase) => `opacity-0 ${SHOW_IN[p]}`;
+const fade = "transition-opacity duration-1000 ease-out";
+
+/** The sun (morning to dusk) and the moon (night), each on its arc, with its glow. */
+function SunAndMoon() {
     const glow = (p: SkyPhase) => (
         <div
             key={p}
@@ -268,7 +270,7 @@ function Celestial() {
                 ))}
             </div>
 
-            {/* Night: moon on its own arc, and twinkling stars */}
+            {/* Night: the moon on its own arc */}
             <div className="absolute w-0 h-0" style={MOON_PATH}>
                 {glow("night")}
                 <div className={`${fade} ${show("night")}`}>
@@ -279,19 +281,25 @@ function Celestial() {
                     />
                 </div>
             </div>
-            <div className={`${fade} ${show("night")}`}>
-                {STARS.map((s, i) => (
-                    <span
-                        key={i}
-                        // Phones: only the stars near the edges, so none land on the headline.
-                        className={`absolute animate-twinkle ${s.x > 14 && s.x < 86 ? "hidden sm:block" : ""}`}
-                        style={{ left: `${s.x}%`, top: `${s.y}%`, animationDelay: `${s.d}s` }}
-                    >
-                        <PixelArt rows={STAR} palette={{ S: "#FFFBEA" }} className={i % 3 === 0 ? "w-[9px] h-auto" : "w-[6px] h-auto"} />
-                    </span>
-                ))}
-            </div>
         </>
+    );
+}
+
+/** Twinkling stars at night. */
+function Stars() {
+    return (
+        <div className={`${fade} ${show("night")}`}>
+            {STARS.map((s, i) => (
+                <span
+                    key={i}
+                    // Phones: only the stars near the edges, so none land on the headline.
+                    className={`absolute animate-twinkle ${s.x > 14 && s.x < 86 ? "hidden sm:block" : ""}`}
+                    style={{ left: `${s.x}%`, top: `${s.y}%`, animationDelay: `${s.d}s` }}
+                >
+                    <PixelArt rows={STAR} palette={{ S: "#FFFBEA" }} className={i % 3 === 0 ? "w-[9px] h-auto" : "w-[6px] h-auto"} />
+                </span>
+            ))}
+        </div>
     );
 }
 
@@ -301,15 +309,32 @@ function Celestial() {
  * 1 as it scrolls up and away (you look up at it, from below) and falling to -1
  * while it is still low on the screen (you look down into it, from above).
  *
- * Seen through a near frame, far things shift with your eye and near things
- * hardly at all, so each layer moves by its own share of the window's height:
- * looking up, the horizon sinks and more sky shows; looking down, the town
- * comes up into view. The sky, sun, moon and stars are farthest and shift most.
+ * Seen through a near frame, the farther a thing is the more it shifts as your
+ * eye moves, so the view is built from depth planes (ViewPlane), each shifted
+ * by its own share of the window's height at full look. Looking up, the horizon
+ * sinks and more sky shows; looking down, the town comes up into view, and the
+ * clouds and the sun or moon slide against the rooftops as they would outside.
+ *
+ * Everything seen through the glass belongs in a plane, farthest first, so it
+ * takes part in the effect: the sky (with the stars), the sun and moon, the far
+ * clouds and birds, the big clouds, the hills, then the town. Things on the
+ * glass itself (prints, glints) are not in the view and do not shift.
  */
-const DEPTH = { sky: 14, farClouds: 11, hills: 10, town: 8, nearClouds: 6 } as const;
+const DEPTH = { sky: 16, celestial: 16, farClouds: 13, nearClouds: 10, hills: 7, town: 4 } as const;
+type Depth = keyof typeof DEPTH;
 
-/** Shifts a window-sized layer by `percent` of the window's height at full look. */
-const lookShift = (percent: number): React.CSSProperties => ({ translate: `0 calc(var(--look, 0) * ${percent}%)` });
+/** A window-sized layer of the view, shifted with --look by its depth. */
+function ViewPlane({ depth, children }: { depth: Depth; children: React.ReactNode }) {
+    return (
+        <div
+            data-depth={depth}
+            className="absolute inset-0 will-change-[translate]"
+            style={{ translate: `0 calc(var(--look, 0) * ${DEPTH[depth]}%)` }}
+        >
+            {children}
+        </div>
+    );
+}
 
 /** Keeps --look on `ref` in step with the window's place on the screen. */
 function useWindowLook(ref: React.RefObject<HTMLDivElement | null>) {
@@ -378,7 +403,7 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
     const town = part === "town";
     const fill = town ? "var(--sky-roof)" : "var(--sky-hill)";
     return (
-        <div className="absolute inset-0 will-change-[translate]" style={lookShift(town ? DEPTH.town : DEPTH.hills)}>
+        <ViewPlane depth={part}>
             <div className="absolute inset-x-0 bottom-[var(--sky-lift,0px)]">
                 <svg
                     viewBox={`0 0 ${SKY_COLS} ${SKY_ROWS}`}
@@ -415,7 +440,7 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
                     )}
                 </div>
             </div>
-        </div>
+        </ViewPlane>
     );
 }
 
@@ -441,8 +466,8 @@ export function WindowSky({
             className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}
             style={lift ? ({ "--sky-lift": lift } as React.CSSProperties) : undefined}
         >
-            {/* Farthest: the sky itself with the sun, moon and stars */}
-            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.sky)}>
+            {/* Farthest: the sky itself, with the stars */}
+            <ViewPlane depth="sky">
                 {/* Sky gradients, crossfaded when the phase changes. Each is padded above
                     and below with its end colours, so a shifted view never runs out of sky. */}
                 {SKY_PHASES.map((p) => (
@@ -455,11 +480,15 @@ export function WindowSky({
                     />
                 ))}
 
-                <Celestial />
-            </div>
+                <Stars />
+            </ViewPlane>
+
+            <ViewPlane depth="celestial">
+                <SunAndMoon />
+            </ViewPlane>
 
             {/* Far layer: small clouds + birds */}
-            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.farClouds)}>
+            <ViewPlane depth="farClouds">
                 <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]">
                     <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
                 </div>
@@ -473,17 +502,17 @@ export function WindowSky({
                         <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
                     </div>
                 </div>
-            </div>
+            </ViewPlane>
 
-            {/* Near layer: big clouds, which shift least (still behind the town) */}
-            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.nearClouds)}>
+            {/* Near layer: big clouds (still behind the hills and town, so they shift more than those) */}
+            <ViewPlane depth="nearClouds">
                 <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]">
                     <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
                 </div>
                 <div className="absolute top-[58%] left-[74%] animate-cloud-drift [animation-delay:-75s]">
                     <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[140px] lg:w-[168px] h-auto" />
                 </div>
-            </div>
+            </ViewPlane>
 
             <SkylineLayer part="hills" />
             <SkylineLayer part="town" />
