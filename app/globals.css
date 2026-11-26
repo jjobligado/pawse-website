@@ -318,6 +318,23 @@ body {
   animation: cloud-drift 60s linear -25s infinite;
 }
 
+/*
+ * Town windows switch on one by one as the page loads (each delayed by its own
+ * threshold), flicking rather than fading. Not an `animate-` class: under
+ * reduced motion the windows keep their own opacity (most are off by day).
+ */
+@keyframes town-light-on {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .town-light {
+    animation: town-light-on 0.3s steps(2) backwards;
+  }
+}
+
 /* Night stars: a slow, uneven twinkle (delays vary per star). */
 @keyframes twinkle {
   0%, 100% {

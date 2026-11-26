@@ -68,6 +68,28 @@ export function arcsForHour(hour: number) {
     };
 }
 
+/*
+ * How much of the town has its lights on (0..1, --lights-on on <html>): none
+ * by day; from 17:00 windows switch on one by one, quickly at first (more than
+ * half are lit by 18:00) until all are lit at 19:30;
+ * from 23:00 people go to bed and it thins to 40% by 2:00; the last of those go
+ * out between 5:00 and 6:30. Each lit window has its own threshold on this
+ * (hero-scene.tsx), so the town fills in and empties gradually. The head
+ * script carries a copy of this (LIGHTS_JS); keep the two in step.
+ */
+export function lightsForHour(hour: number): number {
+    const x = hour < 12 ? hour + 24 : hour;
+    if (x < 17) return 0;
+    if (x < 19.5) return Math.sqrt((x - 17) / 2.5);
+    if (x < 23) return 1;
+    if (x < 26) return 1 - 0.2 * (x - 23);
+    if (x < 29) return 0.4;
+    if (x < 30.5) return (0.4 * (30.5 - x)) / 1.5;
+    return 0;
+}
+const LIGHTS_JS =
+    "function(h){var x=h<12?h+24:h;return x<17?0:x<19.5?Math.sqrt((x-17)/2.5):x<23?1:x<26?1-0.2*(x-23):x<29?0.4:x<30.5?0.4*(30.5-x)/1.5:0}";
+
 /** The phase for right now, including the development-only overrides. */
 export function currentSkyPhase(): SkyPhase {
     if (process.env.NODE_ENV === "development") {
@@ -77,14 +99,16 @@ export function currentSkyPhase(): SkyPhase {
     return phaseForHour(Math.floor(currentHour()));
 }
 
-/** Sets <html data-sky> to the current phase (only when it changed) and moves the sun and moon. */
+/** Sets <html data-sky> to the current phase (only when it changed), moves the sun and moon and sets the town's lights. */
 export function applySkyPhase() {
     const phase = currentSkyPhase();
     const root = document.documentElement;
     if (root.dataset.sky !== phase) root.dataset.sky = phase;
-    const { sun, moon } = arcsForHour(currentHour());
+    const hour = currentHour();
+    const { sun, moon } = arcsForHour(hour);
     root.style.setProperty("--sun-t", sun.toFixed(4));
     root.style.setProperty("--moon-t", moon.toFixed(4));
+    root.style.setProperty("--lights-on", lightsForHour(hour).toFixed(4));
 }
 
 /* ------------------------------------------------------------------ */
@@ -102,8 +126,6 @@ export interface PhaseTheme {
     cloud: { W: string; S: string };
     hill: string;
     roof: string;
-    /** Opacity of the lit town windows */
-    lights: number;
 }
 
 /*
@@ -120,7 +142,6 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
         cloud: { W: "#FFFFFF", S: "#F6DCCD" },
         hill: "#D8DEF0",
         roof: "#C0CAE6",
-        lights: 0,
     },
     day: {
         gradient: "linear-gradient(180deg,#9FD6FF 0%,#C6E8FF 42%,#E6F5FF 78%,#F3FAFF 100%)",
@@ -130,7 +151,6 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
         cloud: { W: "#FFFFFF", S: "#DDEFFC" },
         hill: "#C4E4FA",
         roof: "#A9D6F5",
-        lights: 0,
     },
     dusk: {
         gradient: "linear-gradient(180deg,#F0A79C 0%,#F6C2A6 40%,#FCDDC2 75%,#FFEEDF 100%)",
@@ -140,7 +160,6 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
         cloud: { W: "#FFF1E7", S: "#EFB8A8" },
         hill: "#E2B3B0",
         roof: "#C6939C",
-        lights: 0.75,
     },
     night: {
         gradient: "linear-gradient(180deg,#5E73B8 0%,#8597D2 30%,#B9C5EC 55%,#D3DAF3 80%,#E4E8F8 100%)",
@@ -150,7 +169,6 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
         cloud: { W: "#DDE3F7", S: "#AEB9E0" },
         hill: "#8F9ED1",
         roof: "#6E7EB9",
-        lights: 1,
     },
 };
 
@@ -216,7 +234,7 @@ const GOLDEN_CSS =
 /** Per-phase CSS variables on <html>, rendered into <head> by the root layout. */
 export const SKY_PHASE_CSS = GOLDEN_CSS + SKY_PHASES.map((p) => {
     const t = THEMES[p];
-    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--sky-lights:${t.lights};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--fish-eye:${FISH_EYE[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
+    return `html[data-sky="${p}"]{--sky-top:${t.top};--sky-cloud-w:${t.cloud.W};--sky-cloud-s:${t.cloud.S};--sky-hill:${t.hill};--sky-roof:${t.roof};--hero-done-sky:${DONE_COLOR[p]};--fish-1:${FISH_COLORS[p][0]};--fish-2:${FISH_COLORS[p][1]};--fish-3:${FISH_COLORS[p][2]};--fish-eye:${FISH_EYE[p]};--wall-light:${WALL_LIGHT[p].rgb};--wall-a:${WALL_LIGHT[p].alpha}}`;
 }).join("");
 
 /**
@@ -227,4 +245,4 @@ export const SKY_PHASE_SCRIPT = `(function(){try{var d=new Date(),h=d.getHours()
     process.env.NODE_ENV === "development"
         ? `var q=new URLSearchParams(location.search),f=q.get("sky"),x=parseFloat(q.get("hour")),m=${JSON.stringify(PHASE_MIDDAY)};if(x>=0&&x<24)h=x;else if(m[f]!=null)h=m[f];if(m[f]!=null)p=f;`
         : ""
-}if(!p){p="night";for(var i=0;i<s.length;i++)if(Math.floor(h)>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(1,Math.max(0,n))};r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((((h-${SUNSET})%24)+24)%24/${24 - SUNSET + SUNRISE}).toFixed(4))}catch(e){}})()`;
+}if(!p){p="night";for(var i=0;i<s.length;i++)if(Math.floor(h)>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(1,Math.max(0,n))};r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((((h-${SUNSET})%24)+24)%24/${24 - SUNSET + SUNRISE}).toFixed(4));r.style.setProperty("--lights-on",(${LIGHTS_JS})(h).toFixed(4))}catch(e){}})()`;

@@ -143,9 +143,16 @@ const SKY_ROWS = 22;
 const HILLS = silhouette(SKY_COLS, 9, 3, 11);
 const ROOFS = rooftops(SKY_COLS, 7);
 
-/** Lit windows on the taller buildings (shown at dusk and night). Deterministic. */
+/**
+ * Lit windows on the taller buildings. Deterministic. Each has its own `on`
+ * threshold, scattered through 0..1: it shows once --lights-on (the share of
+ * the town that is home and awake, lib/sky-phase.ts) passes it, so windows come
+ * on one at a time through the evening and go out one at a time after midnight.
+ */
 const LIT_WINDOWS = ROOFS.flatMap((h, x) =>
-    h >= 8 && x % 3 === 1 && (x * 7) % 5 !== 0 ? [{ x, y: SKY_ROWS - h + 2 + ((x * 5) % 3) * 2 }] : [],
+    h >= 8 && x % 3 === 1 && (x * 7) % 5 !== 0
+        ? [{ x, y: SKY_ROWS - h + 2 + ((x * 5) % 3) * 2, on: 0.02 + (((x * 37 + 11) % 97) / 97) * 0.96 }]
+        : [],
 );
 
 /* ------------------------------------------------------------------ */
@@ -391,7 +398,7 @@ const SKYLINE_HEIGHT = "h-[72px] sm:h-[88px] lg:h-[104px]";
 /*
  * Window panes on the town's lower floors (below the drawn rooftops), as two
  * offset grids of one-pixel squares. --u is one skyline pixel. Faint glass by
- * day; at dusk and night some of them light up.
+ * day; in the evening some of them light up, as brightly as the town is lit.
  */
 const pane = (color: string, w: number, h: number, x: number, y: number) =>
     `conic-gradient(from 270deg at var(--u) var(--u),${color} 25%,transparent 0) calc(var(--u)*${x}) calc(var(--u)*${y})/calc(var(--u)*${w}) calc(var(--u)*${h})`;
@@ -425,9 +432,22 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
                               <rect key={x} x={x} y={SKY_ROWS - h - 4} width={1.02} height={h + 4.1} style={{ fill }} />
                           ))}
                     {town && (
-                        <g style={{ opacity: "var(--sky-lights)" }} className="transition-opacity duration-1000">
-                            {LIT_WINDOWS.map(({ x, y }) => (
-                                <rect key={`w${x}`} x={x} y={y} width={1} height={1} fill="#FFE08A" />
+                        <g>
+                            {/* On load they also switch on in threshold order (town-light, globals.css) */}
+                            {LIT_WINDOWS.map(({ x, y, on }) => (
+                                <rect
+                                    key={`w${x}`}
+                                    x={x}
+                                    y={y}
+                                    width={1}
+                                    height={1}
+                                    fill="#FFE08A"
+                                    className="town-light transition-opacity duration-1000"
+                                    style={{
+                                        opacity: `clamp(0, (var(--lights-on, 0) - ${on.toFixed(3)}) * 25, 1)`,
+                                        animationDelay: `${(0.6 + on * 4).toFixed(2)}s`,
+                                    }}
+                                />
                             ))}
                         </g>
                     )}
@@ -440,7 +460,7 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
                     {town && (
                         <div
                             className="absolute inset-0 transition-opacity duration-1000"
-                            style={{ background: LIT_PANES, opacity: "var(--sky-lights)" }}
+                            style={{ background: LIT_PANES, opacity: "var(--lights-on, 0)" }}
                         />
                     )}
                 </div>
