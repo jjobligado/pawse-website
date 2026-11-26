@@ -34,20 +34,56 @@ export function isSkyPhase(value: unknown): value is SkyPhase {
     return typeof value === "string" && (SKY_PHASES as readonly string[]).includes(value);
 }
 
-/** The phase for right now, including the development-only `?sky=` override. */
+/**
+ * The sun is up from 5:00 (morning starts) to 20:00 (night starts); the moon
+ * has the rest. Each crosses the window on a slow arc, so its spot in the sky
+ * tells the time: --sun-t and --moon-t (0 at rise, 1 at set) go on <html>.
+ */
+const SUNRISE = PHASE_STARTS[0][1];
+const SUNSET = PHASE_STARTS[PHASE_STARTS.length - 1][1];
+
+/** Middle of each phase, for the development-only `?sky=` override. */
+const PHASE_MIDDAY: Record<SkyPhase, number> = { morning: 7, day: 13, dusk: 18.5, night: 0.5 };
+
+/** Local time as a fractional hour, including the development-only `?sky=` / `?hour=` overrides. */
+function currentHour(): number {
+    if (process.env.NODE_ENV === "development") {
+        const params = new URLSearchParams(window.location.search);
+        const hour = Number.parseFloat(params.get("hour") ?? "");
+        if (hour >= 0 && hour < 24) return hour;
+        const forced = params.get("sky");
+        if (isSkyPhase(forced)) return PHASE_MIDDAY[forced];
+    }
+    const now = new Date();
+    return now.getHours() + now.getMinutes() / 60;
+}
+
+/** How far the sun and moon are across their arcs (0 = rising, 1 = setting). */
+export function arcsForHour(hour: number) {
+    const clamp = (n: number) => Math.min(1, Math.max(0, n));
+    return {
+        sun: clamp((hour - SUNRISE) / (SUNSET - SUNRISE)),
+        moon: clamp((((hour - SUNSET) % 24) + 24) % 24 / (24 - SUNSET + SUNRISE)),
+    };
+}
+
+/** The phase for right now, including the development-only overrides. */
 export function currentSkyPhase(): SkyPhase {
     if (process.env.NODE_ENV === "development") {
         const forced = new URLSearchParams(window.location.search).get("sky");
         if (isSkyPhase(forced)) return forced;
     }
-    return phaseForHour(new Date().getHours());
+    return phaseForHour(Math.floor(currentHour()));
 }
 
-/** Sets <html data-sky> to the current phase (only when it changed). */
+/** Sets <html data-sky> to the current phase (only when it changed) and moves the sun and moon. */
 export function applySkyPhase() {
     const phase = currentSkyPhase();
     const root = document.documentElement;
     if (root.dataset.sky !== phase) root.dataset.sky = phase;
+    const { sun, moon } = arcsForHour(currentHour());
+    root.style.setProperty("--sun-t", sun.toFixed(4));
+    root.style.setProperty("--moon-t", moon.toFixed(4));
 }
 
 /* ------------------------------------------------------------------ */
@@ -168,8 +204,8 @@ export const SKY_PHASE_CSS = SKY_PHASES.map((p) => {
  * Runs synchronously in <head>, before the first paint: the same logic as
  * currentSkyPhase(), as a plain string the browser can run before React loads.
  */
-export const SKY_PHASE_SCRIPT = `(function(){try{var p,h=new Date().getHours(),s=${JSON.stringify(PHASE_STARTS)};${
+export const SKY_PHASE_SCRIPT = `(function(){try{var d=new Date(),h=d.getHours()+d.getMinutes()/60,p,s=${JSON.stringify(PHASE_STARTS)},r=document.documentElement;${
     process.env.NODE_ENV === "development"
-        ? `var f=new URLSearchParams(location.search).get("sky");if(${JSON.stringify(SKY_PHASES)}.indexOf(f)>-1)p=f;`
+        ? `var q=new URLSearchParams(location.search),f=q.get("sky"),x=parseFloat(q.get("hour")),m=${JSON.stringify(PHASE_MIDDAY)};if(x>=0&&x<24)h=x;else if(m[f]!=null)h=m[f];if(m[f]!=null)p=f;`
         : ""
-}if(!p){p="night";for(var i=0;i<s.length;i++)if(h>=s[i][1])p=s[i][0];}document.documentElement.setAttribute("data-sky",p)}catch(e){}})()`;
+}if(!p){p="night";for(var i=0;i<s.length;i++)if(Math.floor(h)>=s[i][1])p=s[i][0];}r.setAttribute("data-sky",p);var c=function(n){return Math.min(1,Math.max(0,n))};r.style.setProperty("--sun-t",c((h-${SUNRISE})/${SUNSET - SUNRISE}).toFixed(4));r.style.setProperty("--moon-t",c((((h-${SUNSET})%24)+24)%24/${24 - SUNSET + SUNRISE}).toFixed(4))}catch(e){}})()`;
