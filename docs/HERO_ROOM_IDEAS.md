@@ -18,8 +18,8 @@ birds, the hills, the town and each visitor moves on its own depth and curve, so
 |---|------|--------|
 | W1 | **Lean to look:** on desktop, the mouse nudges the view sideways a few percent, as if leaning toward the glass | Dropped: the view follows scroll only, not the cursor |
 | W2 | **Wider sun path along the top:** the sun crosses the top of the window from right to left over the day, staying above the headline | Built (`feat/sky-sun-top-arc`) |
-| W3 | **Golden hour:** when the sun is low, warm the bottom of the sky and tint the edges of the clouds | Built (`feat/sky-golden-hour`) |
-| W4 | **The town at night:** lit windows switch on one by one at dusk and off after midnight | Built (`feat/sky-town-lights`) |
+| W3 | **Golden hour:** when the sun is low, warm the bottom of the sky and tint the edges of the clouds | Dropped (user decision, Nov 27) |
+| W4 | **The town at night:** lit windows switch on one by one at dusk, stay on all night and go out through dawn (no late-night thinning, user decision Nov 27) | Built (`feat/sky-town-lights`, changed on `experiment/sky-updates`) |
 | W5 | **Occasional visitors:** a rare plane by day, a shooting star at night, light pixel rain on some days | Built: plane by day, shooting stars at night. Rain dropped: no weather (decided Nov 27) |
 | W6 | **Glass that reacts to the sky:** the glare on the open panels follows the sun; the wall light below the window shifts with it | Built (`feat/sky-glass-light`) |
 | W7 | **Cats that notice:** the sill cat turns its head to follow a passing bird | Parked |

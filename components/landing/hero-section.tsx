@@ -432,7 +432,7 @@ export default function HeroSection() {
             <div className={`relative z-30 col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-7 sm:gap-6 sm:px-12 md:px-14 pt-12 pb-12 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
                 <div
                     aria-hidden="true"
-                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 in-data-[sky=night]:opacity-100"
+                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 in-data-[sky=night]:opacity-100 in-data-[sky=dawn]:opacity-100"
                 />
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.8rem,calc(10.7vw_-_5px),2.9rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
@@ -448,7 +448,7 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:in-data-[sky=night]:text-ink">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:in-data-[sky=night]:text-ink sm:in-data-[sky=dawn]:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -532,7 +532,7 @@ export default function HeroSection() {
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:in-data-[sky=night]:text-ink"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:in-data-[sky=night]:text-ink sm:in-data-[sky=dawn]:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>

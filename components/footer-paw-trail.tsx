@@ -17,6 +17,7 @@ const STAMP_LIFE_MS = 1500;
 const PAW_PATTERN = [".X..X.", "X....X", "..XX..", ".XXXX.", ".XXXX.", "..XX.."] as const;
 
 const PAW_STYLES: Record<SkyPhase, { rgb: string; alpha: number }> = {
+    dawn: { rgb: "36,34,72", alpha: 0.18 },
     morning: { rgb: "35,35,35", alpha: 0.14 },
     day: { rgb: "26,116,174", alpha: 0.16 },
     dusk: { rgb: "35,35,35", alpha: 0.15 },

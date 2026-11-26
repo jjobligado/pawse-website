@@ -176,14 +176,14 @@ const LIT_WINDOWS = ROOFS.flatMap((h, x) =>
 
 /** Shows a per-phase layer only in its phase (crossfading when the phase changes). */
 const SHOW_IN: Record<SkyPhase, string> = {
+    dawn: "in-data-[sky=dawn]:opacity-100",
     morning: "in-data-[sky=morning]:opacity-100",
     day: "in-data-[sky=day]:opacity-100",
     dusk: "in-data-[sky=dusk]:opacity-100",
     night: "in-data-[sky=night]:opacity-100",
 };
 
-/** Cloud colours for the phase, warmed at golden hour (lib/sky-phase.ts). */
-const CLOUD_PALETTE = { W: "var(--sky-cloud-face)", S: "var(--sky-cloud-edge)" } as const;
+const CLOUD_PALETTE = { W: "var(--sky-cloud-w)", S: "var(--sky-cloud-s)" } as const;
 
 function subscribePhase(onChange: () => void) {
     const observer = new MutationObserver(onChange);
@@ -259,6 +259,7 @@ const MOON_PATH = arcPath("--moon-t");
 const CENTRED = "absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2";
 
 const SUN_PALETTES: Partial<Record<SkyPhase, Palette>> = {
+    dawn: { Y: "#FFB88E", H: "#FFDCC6", O: "#F2906E" },
     morning: { Y: "#FFD69C", H: "#FFF1D9", O: "#FFBC80" },
     day: { Y: "#FFE59A", H: "#FFF6D6", O: "#FFD27A" },
     dusk: { Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" },
@@ -280,8 +281,8 @@ function SunAndMoon() {
         <>
             {/* Sun: one body on its arc, its colour warming at morning and dusk (crossfaded) */}
             <div className="absolute w-0 h-0" style={{ ...SUN_PATH, ...depth(15, "early") }}>
-                {(["morning", "day", "dusk"] as const).map(glow)}
-                {(["morning", "day", "dusk"] as const).map((p) => (
+                {(["dawn", "morning", "day", "dusk"] as const).map(glow)}
+                {(["dawn", "morning", "day", "dusk"] as const).map((p) => (
                     <PixelArt
                         key={p}
                         rows={SUN}
@@ -291,10 +292,10 @@ function SunAndMoon() {
                 ))}
             </div>
 
-            {/* Night: the moon on its own arc */}
+            {/* Night: the moon on its own arc (at dawn it is setting) */}
             <div className="absolute w-0 h-0" style={{ ...MOON_PATH, ...depth(14, "lag") }}>
                 {glow("night")}
-                <div className={`${fade} ${show("night")}`}>
+                <div className={`${fade} ${show("night")} ${SHOW_IN.dawn}`}>
                     <PixelArt
                         rows={MOON}
                         palette={{ M: "#FFF3C9", S: "#EBD99E" }}
@@ -306,10 +307,10 @@ function SunAndMoon() {
     );
 }
 
-/** Twinkling stars at night. */
+/** Twinkling stars at night, fading with the first light at dawn. */
 function Stars() {
     return (
-        <div className={`${fade} ${show("night")}`}>
+        <div className={`${fade} ${show("night")} in-data-[sky=dawn]:opacity-40`}>
             {STARS.map((s, i) => (
                 <span
                     key={i}
@@ -541,12 +542,6 @@ export function WindowSky({
                         }}
                     />
                 ))}
-
-                {/* Golden hour: the low sun warms the bottom of the sky */}
-                <div
-                    className="absolute inset-x-0 -top-[20%] -bottom-[20%] bg-[linear-gradient(180deg,transparent_40%,rgb(255_170_120/0.42)_78%,rgb(255_196_150/0.55))] transition-opacity duration-1000"
-                    style={{ opacity: "var(--golden, 0)" }}
-                />
 
                 <Stars />
                 {/* Now and then a shooting star, at night */}
