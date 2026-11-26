@@ -95,6 +95,8 @@ export interface PhaseTheme {
     gradient: string;
     /** The sky's top stop (the footer's dithered edge meets it). */
     top: string;
+    /** The bottom stop (pads the sky below the horizon when the view shifts). */
+    horizon: string;
     glow: string;
     cloud: { W: string; S: string };
     hill: string;
@@ -112,6 +114,7 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
     morning: {
         gradient: "linear-gradient(180deg,#B9DDFB 0%,#D6E8FA 40%,#FBE4D4 80%,#FFF2E8 100%)",
         top: "#B9DDFB",
+        horizon: "#FFF2E8",
         glow: "radial-gradient(circle,rgb(255 220 180/0.9) 0%,rgb(255 220 180/0.35) 35%,transparent 68%)",
         cloud: { W: "#FFFFFF", S: "#F6DCCD" },
         hill: "#D8DEF0",
@@ -121,6 +124,7 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
     day: {
         gradient: "linear-gradient(180deg,#9FD6FF 0%,#C6E8FF 42%,#E6F5FF 78%,#F3FAFF 100%)",
         top: "#9FD6FF",
+        horizon: "#F3FAFF",
         glow: "radial-gradient(circle,rgb(255 244 204/0.85) 0%,rgb(255 244 204/0.35) 35%,transparent 68%)",
         cloud: { W: "#FFFFFF", S: "#DDEFFC" },
         hill: "#C4E4FA",
@@ -130,6 +134,7 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
     dusk: {
         gradient: "linear-gradient(180deg,#F0A79C 0%,#F6C2A6 40%,#FCDDC2 75%,#FFEEDF 100%)",
         top: "#F0A79C",
+        horizon: "#FFEEDF",
         glow: "radial-gradient(circle,rgb(255 196 140/0.9) 0%,rgb(255 196 140/0.4) 35%,transparent 68%)",
         cloud: { W: "#FFF1E7", S: "#EFB8A8" },
         hill: "#E2B3B0",
@@ -139,6 +144,7 @@ export const THEMES: Record<SkyPhase, PhaseTheme> = {
     night: {
         gradient: "linear-gradient(180deg,#5E73B8 0%,#8597D2 30%,#B9C5EC 55%,#D3DAF3 80%,#E4E8F8 100%)",
         top: "#5E73B8",
+        horizon: "#E4E8F8",
         glow: "radial-gradient(circle,rgb(226 232 255/0.6) 0%,rgb(226 232 255/0.2) 35%,transparent 68%)",
         cloud: { W: "#DDE3F7", S: "#AEB9E0" },
         hill: "#8F9ED1",
