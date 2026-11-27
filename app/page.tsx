@@ -42,7 +42,7 @@ export default function HomePage() {
                 <BreakSection />
                 <DashboardSection />
             </div>
-            <TestimonialsSection />
+            <TestimonialsSection variant="cards" />
             <ComingSoonSection />
             <FaqSection />
             <DownloadBanner />

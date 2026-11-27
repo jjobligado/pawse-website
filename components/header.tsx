@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { usePlatform } from "@/hooks/use-platform";
 import { smoothScrollTo } from "@/lib/smooth-scroll";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
+import { SHOW_TESTIMONIALS } from "@/components/landing/testimonials-data";
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
@@ -53,9 +54,11 @@ export default function Header() {
     }, [pathname]);
 
     // "/#id" so the links also work from About / Privacy / Terms (they go back to the homepage).
+    // In page order. Testimonials only while that section shows (see testimonials-data.ts).
     const navLinks = [
         { label: "How It Works", id: "how-it-works" },
         { label: "Features", id: "companions" },
+        ...(SHOW_TESTIMONIALS ? [{ label: "Testimonials", id: "testimonials" }] : []),
         { label: "Coming Soon", id: "coming-soon" },
         { label: "FAQ", id: "faq" },
         { label: "Contact Us", id: "contact" },
@@ -111,7 +114,7 @@ export default function Header() {
                 </HomeLink>
 
                 {/* Nav Links (Visible on laptops & desktops where space permits) */}
-                <nav aria-label="Main" className="hidden lg:flex items-center gap-7 xl:gap-9">
+                <nav aria-label="Main" className="hidden lg:flex items-center gap-5 xl:gap-8">
                     {navLinks.map((link) => {
                         const isActive = isHome && activeSection === link.id;
                         return (

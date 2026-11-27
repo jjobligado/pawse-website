@@ -4,7 +4,7 @@ import Section from "./section";
 import { SectionHeader, SectionSubtitle, SectionTitle } from "./section-heading";
 import {
     COMPANIONS,
-    SAMPLE,
+    SHOW_TESTIMONIALS,
     TESTIMONIALS,
     TESTIMONIALS_COPY,
     type Companion,
@@ -19,9 +19,9 @@ import {
  *
  * Four design directions share the same data (see /dev/testimonials to compare
  * them side by side):
- *   postcards  postcards pegged to a line of twine (default)
+ *   postcards  postcards pegged to a line of twine
  *   guestbook  an open guestbook, signed with each tester's companion
- *   cards      plain white cards, like the FAQ and contact cards
+ *   cards      plain white cards, like the FAQ and contact cards (in use)
  *   log        entries in an app-style session log
  *
  * While the quotes are samples (SAMPLE in testimonials-data.ts) the section
@@ -195,7 +195,10 @@ function Cards({ items }: { items: Testimonial[] }) {
             {items.slice(0, 3).map((t) => (
                 <li key={t.name}>
                     <figure className="flex flex-col gap-5 h-full rounded-card border border-stroke bg-white p-6 lg:p-7 shadow-raised">
-                        <PixelQuote className="w-7 h-5 rotate-180 text-accent-strong" />
+                        <div className="flex items-center justify-between gap-3">
+                            <PixelQuote className="w-7 h-5 rotate-180 text-accent-strong" />
+                            <span className="rounded-pill bg-control-track px-2.5 py-1 text-xs text-ink-soft">{t.tag}</span>
+                        </div>
                         <blockquote className="flex-1 text-base leading-relaxed text-ink-soft">
                             <p>{t.quote}</p>
                         </blockquote>
@@ -205,7 +208,6 @@ function Cards({ items }: { items: Testimonial[] }) {
                                 <span className="text-sm font-semibold text-ink-strong">{t.name}</span>
                                 <span className="text-sm text-muted">{t.role}</span>
                             </span>
-                            <span className="ml-auto shrink-0 rounded-pill bg-control-track px-2.5 py-1 text-xs text-ink-soft">{t.tag}</span>
                         </figcaption>
                     </figure>
                 </li>
@@ -282,7 +284,7 @@ export default function TestimonialsSection({
     id?: string;
 }) {
     // Sample quotes never ship: see testimonials-data.ts.
-    if (SAMPLE && process.env.NODE_ENV === "production") return null;
+    if (!SHOW_TESTIMONIALS) return null;
 
     const Body = BODIES[variant];
     return (

@@ -4,6 +4,7 @@ import { FooterLink } from "@/components/footer-controls";
 import { WindowSky, useSkyPhase } from "@/components/landing/hero-scene";
 import PixelWordmark from "@/components/pixel-wordmark";
 import { CONTACT_EMAIL } from "@/lib/site-config";
+import { SHOW_TESTIMONIALS } from "@/components/landing/testimonials-data";
 
 /*
  * The footer doubles as mobile navigation (the header shows no section links
@@ -15,6 +16,7 @@ const LINK_GROUPS = [
         links: [
             { label: "How It Works", href: "/#how-it-works" },
             { label: "Features", href: "/#companions" },
+            ...(SHOW_TESTIMONIALS ? [{ label: "Testimonials", href: "/#testimonials" }] : []),
             { label: "Coming Soon", href: "/#coming-soon" },
             { label: "Download", href: "/#download" },
         ],

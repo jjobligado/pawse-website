@@ -30,6 +30,9 @@ export interface Testimonial {
 /** Flip to false once every entry below is a real, consented quote. */
 export const SAMPLE = true;
 
+/** Whether the section (and the nav links to it) show: always in development, and live only once the quotes are real. */
+export const SHOW_TESTIMONIALS = !SAMPLE || process.env.NODE_ENV !== "production";
+
 export const COMPANIONS: Record<Companion, { name: string; minutes: number; colour: string }> = {
     tux: { name: "Tux", minutes: 25, colour: "var(--color-companion-tux)" },
     ginger: { name: "Ginger", minutes: 15, colour: "var(--color-companion-ginger)" },
@@ -58,14 +61,6 @@ export const TESTIMONIALS: Testimonial[] = [
         name: "Aiko T.",
         role: "Remote Software Engineer",
         companion: "void",
-        tag: "Beta tester",
-        consent: "",
-    },
-    {
-        quote: "Sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus.",
-        name: "Sam O.",
-        role: "Graduate Researcher",
-        companion: "tux",
         tag: "Beta tester",
         consent: "",
     },
