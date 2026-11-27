@@ -91,13 +91,13 @@ function WalnutSillBand() {
 
 /** Extra light behind the footer copy, at night only. */
 const NIGHT_BACKDROP =
-    "hidden in-data-[sky=night]:block pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
+    "hidden in-data-[sky=night]:block in-data-[sky=dawn]:block pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
 
 export default function Footer() {
     // The canvas wordmark is drawn in script, so it takes the phase as a value;
     // the markup switches on <html data-sky> in CSS, so it is right from the first paint.
     const skyPhase = useSkyPhase();
-    const metaText = "text-[#33404D] in-data-[sky=night]:text-ink";
+    const metaText = "text-[#33404D] in-data-[sky=night]:text-ink in-data-[sky=dawn]:text-ink";
 
     return (
         <footer className="w-full flex flex-col bg-white">

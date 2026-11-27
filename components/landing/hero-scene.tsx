@@ -106,6 +106,15 @@ const SUN = [
     "....YYOOO....",
 ] as const;
 
+/** A small airliner, nose to the right (it flies with the clouds). */
+const PLANE = [
+    "B............",
+    "BB.....W.....",
+    "BBBBBBBBBBBB.",
+    ".BBBBBBBBBBBB",
+    "......BB.....",
+] as const;
+
 const BIRD_UP = ["B...B", ".B.B.", "..B.."] as const;
 const BIRD_DOWN = [".....", "BB.BB", "..B.."] as const;
 
@@ -143,9 +152,16 @@ const SKY_ROWS = 22;
 const HILLS = silhouette(SKY_COLS, 9, 3, 11);
 const ROOFS = rooftops(SKY_COLS, 7);
 
-/** Lit windows on the taller buildings (shown at dusk and night). Deterministic. */
+/**
+ * Lit windows on the taller buildings. Deterministic. Each has its own `on`
+ * threshold, scattered through 0..1: it shows once --lights-on (the share of
+ * the town that is home and awake, lib/sky-phase.ts) passes it, so windows come
+ * on one at a time through the evening and go out one at a time after midnight.
+ */
 const LIT_WINDOWS = ROOFS.flatMap((h, x) =>
-    h >= 8 && x % 3 === 1 && (x * 7) % 5 !== 0 ? [{ x, y: SKY_ROWS - h + 2 + ((x * 5) % 3) * 2 }] : [],
+    h >= 8 && x % 3 === 1 && (x * 7) % 5 !== 0
+        ? [{ x, y: SKY_ROWS - h + 2 + ((x * 5) % 3) * 2, on: 0.02 + (((x * 37 + 11) % 97) / 97) * 0.96 }]
+        : [],
 );
 
 /* ------------------------------------------------------------------ */
@@ -160,6 +176,7 @@ const LIT_WINDOWS = ROOFS.flatMap((h, x) =>
 
 /** Shows a per-phase layer only in its phase (crossfading when the phase changes). */
 const SHOW_IN: Record<SkyPhase, string> = {
+    dawn: "in-data-[sky=dawn]:opacity-100",
     morning: "in-data-[sky=morning]:opacity-100",
     day: "in-data-[sky=day]:opacity-100",
     dusk: "in-data-[sky=dusk]:opacity-100",
@@ -218,34 +235,41 @@ const STARS = [
 ] as const;
 
 /*
- * Where the sun and moon sit: a point on a low arc over the right of the
- * window, driven by --sun-t / --moon-t (0 at rise, 1 at set; lib/sky-phase.ts).
- * They climb from low on the right edge, peak around the middle of their time
- * up, and sink again, drifting a little rightward the whole way, so over a
- * visit the visitor sees them creep. The right side keeps them clear of the
- * copy. `a` is the arc's height (0 at rise and set, 1 at the peak).
+ * Where the sun and moon sit: a point on a wide, flat-topped arc across the top
+ * of the window, driven by --sun-t / --moon-t (0 at rise, 1 at set;
+ * lib/sky-phase.ts). Each rises low on the right, climbs quickly, crosses the
+ * top of the glass right to left over the hours, and sinks on the left, so its
+ * place tells the time. Its height goes with the sixth power of the distance
+ * from the middle of its time up (u = 2t - 1), so it only drops low near the
+ * sides (by the open panels, clear of the copy). Around the middle it rides up
+ * under the head of the frame, its top tucked behind it as a high sun is from
+ * indoors, which keeps it above the headline at every size.
  */
-const SUN_PATH = {
-    right: "calc(13% - 9% * var(--sun-t, 0.5))",
-    top: "calc(54% - 38% * 4 * var(--sun-t, 0.5) * (1 - var(--sun-t, 0.5)))",
-};
-const MOON_PATH = {
-    right: "calc(14% - 9% * var(--moon-t, 0.5))",
-    top: "calc(50% - 34% * 4 * var(--moon-t, 0.5) * (1 - var(--moon-t, 0.5)))",
-};
+const arcPath = (t: string): React.CSSProperties =>
+    ({
+        "--u": `calc(2 * var(${t}, 0.5) - 1)`,
+        "--u2": "calc(var(--u) * var(--u))",
+        left: `calc(92% - 84% * var(${t}, 0.5))`,
+        top: "calc(5% + 45% * var(--u2) * var(--u2) * var(--u2))",
+    }) as React.CSSProperties;
+const SUN_PATH = arcPath("--sun-t");
+const MOON_PATH = arcPath("--moon-t");
 
 /** Centres its children on a point of the sky. */
 const CENTRED = "absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2";
 
 const SUN_PALETTES: Partial<Record<SkyPhase, Palette>> = {
+    dawn: { Y: "#FFB88E", H: "#FFDCC6", O: "#F2906E" },
     morning: { Y: "#FFD69C", H: "#FFF1D9", O: "#FFBC80" },
     day: { Y: "#FFE59A", H: "#FFF6D6", O: "#FFD27A" },
     dusk: { Y: "#FFB36B", H: "#FFD7A3", O: "#F28E4E" },
 };
 
-function Celestial() {
-    const show = (p: SkyPhase) => `opacity-0 ${SHOW_IN[p]}`;
-    const fade = "transition-opacity duration-1000 ease-out";
+const show = (p: SkyPhase) => `opacity-0 ${SHOW_IN[p]}`;
+const fade = "transition-opacity duration-1000 ease-out";
+
+/** The sun (morning to dusk) and the moon (night), each on its arc, with its glow. */
+function SunAndMoon() {
     const glow = (p: SkyPhase) => (
         <div
             key={p}
@@ -256,9 +280,9 @@ function Celestial() {
     return (
         <>
             {/* Sun: one body on its arc, its colour warming at morning and dusk (crossfaded) */}
-            <div className="absolute w-0 h-0" style={SUN_PATH}>
-                {(["morning", "day", "dusk"] as const).map(glow)}
-                {(["morning", "day", "dusk"] as const).map((p) => (
+            <div className="absolute w-0 h-0" style={{ ...SUN_PATH, ...depth(15, "early") }}>
+                {(["dawn", "morning", "day", "dusk"] as const).map(glow)}
+                {(["dawn", "morning", "day", "dusk"] as const).map((p) => (
                     <PixelArt
                         key={p}
                         rows={SUN}
@@ -268,10 +292,10 @@ function Celestial() {
                 ))}
             </div>
 
-            {/* Night: moon on its own arc, and twinkling stars */}
-            <div className="absolute w-0 h-0" style={MOON_PATH}>
+            {/* Night: the moon on its own arc (at dawn it is setting) */}
+            <div className="absolute w-0 h-0" style={{ ...MOON_PATH, ...depth(14, "lag") }}>
                 {glow("night")}
-                <div className={`${fade} ${show("night")}`}>
+                <div className={`${fade} ${show("night")} ${SHOW_IN.dawn}`}>
                     <PixelArt
                         rows={MOON}
                         palette={{ M: "#FFF3C9", S: "#EBD99E" }}
@@ -279,19 +303,25 @@ function Celestial() {
                     />
                 </div>
             </div>
-            <div className={`${fade} ${show("night")}`}>
-                {STARS.map((s, i) => (
-                    <span
-                        key={i}
-                        // Phones: only the stars near the edges, so none land on the headline.
-                        className={`absolute animate-twinkle ${s.x > 14 && s.x < 86 ? "hidden sm:block" : ""}`}
-                        style={{ left: `${s.x}%`, top: `${s.y}%`, animationDelay: `${s.d}s` }}
-                    >
-                        <PixelArt rows={STAR} palette={{ S: "#FFFBEA" }} className={i % 3 === 0 ? "w-[9px] h-auto" : "w-[6px] h-auto"} />
-                    </span>
-                ))}
-            </div>
         </>
+    );
+}
+
+/** Twinkling stars at night, fading with the first light at dawn. */
+function Stars() {
+    return (
+        <div className={`${fade} ${show("night")} in-data-[sky=dawn]:opacity-40`}>
+            {STARS.map((s, i) => (
+                <span
+                    key={i}
+                    // Phones: only the stars near the edges, so none land on the headline.
+                    className={`absolute animate-twinkle ${s.x > 14 && s.x < 86 ? "hidden sm:block" : ""}`}
+                    style={{ left: `${s.x}%`, top: `${s.y}%`, animationDelay: `${s.d}s` }}
+                >
+                    <PixelArt rows={STAR} palette={{ S: "#FFFBEA" }} className={i % 3 === 0 ? "w-[9px] h-auto" : "w-[6px] h-auto"} />
+                </span>
+            ))}
+        </div>
     );
 }
 
@@ -301,32 +331,75 @@ function Celestial() {
  * 1 as it scrolls up and away (you look up at it, from below) and falling to -1
  * while it is still low on the screen (you look down into it, from above).
  *
- * Seen through a near frame, far things shift with your eye and near things
- * hardly at all, so each layer moves by its own share of the window's height:
- * looking up, the horizon sinks and more sky shows; looking down, the town
- * comes up into view. The sky, sun, moon and stars are farthest and shift most.
+ * The sky itself holds still (it is the backdrop), and everything in front of
+ * it moves on its own: each cloud, the birds, the sun, the moon, the hills, the
+ * town and any visitor gets its own depth (how far it shifts, in cqh of the
+ * window, at full look), its own response curve and, for a few, a small
+ * sideways drift, so nothing slides as one block. Overall it still reads as
+ * perspective: the farther a thing is, the more it shifts (the sun and the high
+ * clouds most, the hills and town least, so the ground stays put).
+ *
+ * The curves (see useWindowLook):
+ * - even:  the plain look, in step with the scroll;
+ * - early: reacts mostly while the window is near the middle of the screen;
+ * - late:  hardly moves at first, then catches up toward the edges;
+ * - lag:   the plain look, eased, so it trails the scroll a little and settles.
+ *
+ * Anything new in the view should take a `depth()` of its own. Things on the
+ * glass itself (prints, glints) are not in the view and do not shift.
  */
-const DEPTH = { sky: 14, farClouds: 11, hills: 10, town: 8, nearClouds: 6 } as const;
+type Curve = "even" | "early" | "late" | "lag";
+const CURVE_VAR: Record<Curve, string> = {
+    even: "--look",
+    early: "--look-early",
+    late: "--look-late",
+    lag: "--look-lag",
+};
 
-/** Shifts a window-sized layer by `percent` of the window's height at full look. */
-const lookShift = (percent: number): React.CSSProperties => ({ translate: `0 calc(var(--look, 0) * ${percent}%)` });
+/** The style that shifts one thing in the view by its depth (cqh), curve and sideways drift (cqw). */
+function depth(d: number, curve: Curve = "even", drift = 0): React.CSSProperties {
+    const look = `var(${CURVE_VAR[curve]}, 0)`;
+    return {
+        translate: `${drift ? `calc(${look} * ${drift}cqw)` : "0"} calc(${look} * ${d}cqh)`,
+        willChange: "translate",
+    };
+}
 
-/** Keeps --look on `ref` in step with the window's place on the screen. */
+/**
+ * Keeps the look variables on `ref` in step with the window's place on the
+ * screen: --look and its two curves are written in the frame the page moves,
+ * and --look-lag eases after them in one rAF loop that stops once it has
+ * caught up, so a still page costs nothing.
+ */
 function useWindowLook(ref: React.RefObject<HTMLDivElement | null>) {
     useEffect(() => {
         const el = ref.current;
         if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         let frame = 0;
+        let lagFrame = 0;
         let visible = false;
+        let look = 0;
+        let lag = 0;
+        const ease = () => {
+            lag += (look - lag) * 0.09;
+            const settled = Math.abs(look - lag) < 0.0005;
+            if (settled) lag = look;
+            el.style.setProperty("--look-lag", lag.toFixed(4));
+            lagFrame = settled ? 0 : requestAnimationFrame(ease);
+        };
         const apply = () => {
             frame = 0;
             if (!visible) return;
             const rect = el.getBoundingClientRect();
             const half = window.innerHeight / 2;
             // -1 just below the screen, 0 centred, 1 just above it
-            const look = (half - (rect.top + rect.height / 2)) / (half + rect.height / 2);
-            el.style.setProperty("--look", Math.min(1, Math.max(-1, look)).toFixed(4));
+            look = Math.min(1, Math.max(-1, (half - (rect.top + rect.height / 2)) / (half + rect.height / 2)));
+            const out = 1 - (1 - Math.abs(look)) ** 2;
+            el.style.setProperty("--look", look.toFixed(4));
+            el.style.setProperty("--look-early", (Math.sign(look) * out).toFixed(4));
+            el.style.setProperty("--look-late", (look ** 3).toFixed(4));
+            if (!lagFrame) lagFrame = requestAnimationFrame(ease);
         };
         const schedule = () => {
             if (!frame) frame = requestAnimationFrame(apply);
@@ -352,6 +425,7 @@ function useWindowLook(ref: React.RefObject<HTMLDivElement | null>) {
             window.removeEventListener("scroll", schedule);
             window.removeEventListener("resize", schedule);
             if (frame) cancelAnimationFrame(frame);
+            if (lagFrame) cancelAnimationFrame(lagFrame);
         };
     }, [ref]);
 }
@@ -361,7 +435,7 @@ const SKYLINE_HEIGHT = "h-[72px] sm:h-[88px] lg:h-[104px]";
 /*
  * Window panes on the town's lower floors (below the drawn rooftops), as two
  * offset grids of one-pixel squares. --u is one skyline pixel. Faint glass by
- * day; at dusk and night some of them light up.
+ * day; in the evening some of them light up, as brightly as the town is lit.
  */
 const pane = (color: string, w: number, h: number, x: number, y: number) =>
     `conic-gradient(from 270deg at var(--u) var(--u),${color} 25%,transparent 0) calc(var(--u)*${x}) calc(var(--u)*${y})/calc(var(--u)*${w}) calc(var(--u)*${h})`;
@@ -378,7 +452,7 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
     const town = part === "town";
     const fill = town ? "var(--sky-roof)" : "var(--sky-hill)";
     return (
-        <div className="absolute inset-0 will-change-[translate]" style={lookShift(town ? DEPTH.town : DEPTH.hills)}>
+        <div className="absolute inset-0" style={town ? depth(3) : depth(5)}>
             <div className="absolute inset-x-0 bottom-[var(--sky-lift,0px)]">
                 <svg
                     viewBox={`0 0 ${SKY_COLS} ${SKY_ROWS}`}
@@ -395,9 +469,22 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
                               <rect key={x} x={x} y={SKY_ROWS - h - 4} width={1.02} height={h + 4.1} style={{ fill }} />
                           ))}
                     {town && (
-                        <g style={{ opacity: "var(--sky-lights)" }} className="transition-opacity duration-1000">
-                            {LIT_WINDOWS.map(({ x, y }) => (
-                                <rect key={`w${x}`} x={x} y={y} width={1} height={1} fill="#FFE08A" />
+                        <g>
+                            {/* On load they also switch on in threshold order (town-light, globals.css) */}
+                            {LIT_WINDOWS.map(({ x, y, on }) => (
+                                <rect
+                                    key={`w${x}`}
+                                    x={x}
+                                    y={y}
+                                    width={1}
+                                    height={1}
+                                    fill="#FFE08A"
+                                    className="town-light transition-opacity duration-1000"
+                                    style={{
+                                        opacity: `clamp(0, (var(--lights-on, 0) - ${on.toFixed(3)}) * 25, 1)`,
+                                        animationDelay: `${(0.6 + on * 4).toFixed(2)}s`,
+                                    }}
+                                />
                             ))}
                         </g>
                     )}
@@ -410,7 +497,7 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
                     {town && (
                         <div
                             className="absolute inset-0 transition-opacity duration-1000"
-                            style={{ background: LIT_PANES, opacity: "var(--sky-lights)" }}
+                            style={{ background: LIT_PANES, opacity: "var(--lights-on, 0)" }}
                         />
                     )}
                 </div>
@@ -420,8 +507,9 @@ function SkylineLayer({ part }: { part: "hills" | "town" }) {
 }
 
 /**
- * Everything seen through the glass, for the visitor's time of day, shifting
- * with where you look from as the page scrolls (see DEPTH).
+ * Everything seen through the glass, for the visitor's time of day, each part
+ * shifting on its own with where you look from as the page scrolls (see depth()).
+ * The root is a size container, so depths are in cqh/cqw of this window.
  */
 export function WindowSky({
     entrance = true,
@@ -438,11 +526,11 @@ export function WindowSky({
         <div
             ref={ref}
             aria-hidden="true"
-            className={`absolute inset-0 overflow-hidden ${entrance ? "animate-hero-sky" : ""}`}
+            className={`absolute inset-0 overflow-hidden [container-type:size] ${entrance ? "animate-hero-sky" : ""}`}
             style={lift ? ({ "--sky-lift": lift } as React.CSSProperties) : undefined}
         >
-            {/* Farthest: the sky itself with the sun, moon and stars */}
-            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.sky)}>
+            {/* The backdrop: the sky itself, with the stars. It barely moves (under 1%). */}
+            <div className="absolute inset-0" style={depth(0.8)}>
                 {/* Sky gradients, crossfaded when the phase changes. Each is padded above
                     and below with its end colours, so a shifted view never runs out of sky. */}
                 {SKY_PHASES.map((p) => (
@@ -455,34 +543,44 @@ export function WindowSky({
                     />
                 ))}
 
-                <Celestial />
-            </div>
-
-            {/* Far layer: small clouds + birds */}
-            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.farClouds)}>
-                <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]">
-                    <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
-                </div>
-                <div className="absolute top-[46%] left-[62%] animate-cloud-drift-slow [animation-delay:-150s]">
-                    <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[80px] h-auto opacity-80" />
-                </div>
-                {/* Birds: morning to dusk, none at night */}
-                <div className="absolute top-[22%] left-[30%] animate-bird-flight in-data-[sky=night]:hidden">
-                    <div className="flex gap-3 items-start">
-                        <Bird className="w-[15px]" />
-                        <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
-                    </div>
+                <Stars />
+                {/* Now and then a shooting star, at night */}
+                <div className={`${fade} ${show("night")}`}>
+                    <ShootingStar className="top-[10%] left-[76%]" cycle={27} delay={-17} />
+                    <ShootingStar className="hidden sm:block top-[22%] left-[34%]" cycle={43} delay={-8} />
                 </div>
             </div>
 
-            {/* Near layer: big clouds, which shift least (still behind the town) */}
-            <div className="absolute inset-0 will-change-[translate]" style={lookShift(DEPTH.nearClouds)}>
-                <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]">
-                    <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
+            <SunAndMoon />
+
+            {/* Far: small clouds, the plane and the birds */}
+            <div className="absolute top-[14%] left-[8%] animate-cloud-drift-slow [animation-delay:-60s]" style={depth(12.5, "late", 2.5)}>
+                <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[96px] h-auto opacity-90" />
+            </div>
+            <div className="absolute top-[46%] left-[62%] animate-cloud-drift-slow [animation-delay:-150s]" style={depth(11, "lag", -1.5)}>
+                <PixelArt rows={CLOUD_SMALL} palette={CLOUD_PALETTE} className="w-[80px] h-auto opacity-80" />
+            </div>
+            {/* Now and then a plane crosses, high up (not at night) */}
+            <div className="sky-plane absolute top-[9%] left-0 in-data-[sky=night]:hidden" style={depth(13)}>
+                <div className="relative">
+                    <span className="absolute right-full top-[45%] mr-[2px] h-[2px] w-[90px] bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.75))]" />
+                    <PixelArt rows={PLANE} palette={{ B: "#7E98B8", W: "#DCE8F5" }} className="w-[30px] h-auto" />
                 </div>
-                <div className="absolute top-[58%] left-[74%] animate-cloud-drift [animation-delay:-75s]">
-                    <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[140px] lg:w-[168px] h-auto" />
+            </div>
+            {/* Birds: morning to dusk, none at night */}
+            <div className="absolute top-[22%] left-[30%] animate-bird-flight in-data-[sky=night]:hidden" style={depth(11.5, "early", 3)}>
+                <div className="flex gap-3 items-start">
+                    <Bird className="w-[15px]" />
+                    <Bird className="w-[12px] mt-2 [animation-delay:-180ms]" />
                 </div>
+            </div>
+
+            {/* Nearer: the big clouds (still behind the hills and town, so they shift more than those) */}
+            <div className="absolute top-[6%] left-[20%] animate-cloud-drift [animation-delay:-20s]" style={depth(9, "lag", -2)}>
+                <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[168px] lg:w-[196px] h-auto" />
+            </div>
+            <div className="absolute top-[58%] left-[74%] animate-cloud-drift [animation-delay:-75s]" style={depth(8, "late", 1.5)}>
+                <PixelArt rows={CLOUD_LARGE} palette={CLOUD_PALETTE} className="w-[140px] lg:w-[168px] h-auto" />
             </div>
 
             <SkylineLayer part="hills" />
@@ -553,9 +651,17 @@ function CasementPanel({ side, alwaysOpen }: { side: "left" | "right"; alwaysOpe
             className={`absolute inset-y-0 ${left ? "left-[clamp(9px,1.45vw,20px)] origin-left" : "right-[clamp(9px,1.45vw,20px)] origin-right"} ${phone} sm:w-[clamp(72px,20vw,290px)] [--p:clamp(480px,90vw,1300px)] sm:[--a:60deg] lg:[--a:58deg] shadow-[0_0_0_1px_var(--color-window-frame-edge)]`}
             style={{ transform: `perspective(var(--p)) rotateY(calc(var(--a) * ${left ? 1 : -1}))` }}
         >
-            {/* Glass: a cool tint, one broad glint and one thin one */}
+            {/* Glass: a cool tint, one broad glint and one thin one. The glints slide
+                across the pane with the sun or moon (--body-t) and are brightest on
+                the panel on its side of the sky. */}
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(205_232_255/0.16),rgb(255_255_255/0.05))]" />
-            <div className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.26)_0%,rgb(255_255_255/0.07)_30%,transparent_31%,transparent_58%,rgb(255_255_255/0.14)_59%,transparent_66%)]" />
+            <div
+                className="absolute inset-0 bg-[linear-gradient(125deg,rgb(255_255_255/0.26)_0%,rgb(255_255_255/0.07)_15%,transparent_16%,transparent_29%,rgb(255_255_255/0.14)_30%,transparent_33%)] bg-size-[200%_100%] transition-[opacity,background-position] duration-1000"
+                style={{
+                    backgroundPositionX: "calc(100% - var(--body-t, 0.5) * 100%)",
+                    opacity: `calc(0.45 + 0.55 * ${left ? "var(--body-t, 0.5)" : "(1 - var(--body-t, 0.5))"})`,
+                }}
+            />
 
             {/* Paw prints on the glass */}
             <div aria-hidden="true" className="hidden lg:block absolute inset-0">
@@ -647,6 +753,18 @@ export function WindowFrame({ alwaysOpen = false }: { alwaysOpen?: boolean } = {
     );
 }
 
+
+/** A streak that flashes across the night sky once every `cycle` seconds. */
+function ShootingStar({ className, cycle, delay }: { className: string; cycle: number; delay: number }) {
+    return (
+        <span className={`absolute rotate-[150deg] ${className}`}>
+            <span
+                className="sky-shooting-star block h-[2px] w-[64px] bg-[linear-gradient(90deg,transparent,rgb(255_251_234/0.9))]"
+                style={{ animationDuration: `${cycle}s`, animationDelay: `${delay}s` }}
+            />
+        </span>
+    );
+}
 
 function Bird({ className = "" }: { className?: string }) {
     const palette = { B: "#5B7FA3" };

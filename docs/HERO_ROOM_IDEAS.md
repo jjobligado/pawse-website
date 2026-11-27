@@ -9,17 +9,19 @@ Status key: **Loved** = picked to build next · **Parked** = keep for later · *
 
 ## Window view
 
-The depth-plane perspective fix is done (`fix/window-view-depth`). Ideas 1–6 were sent to be built
-on stacked `feat/sky-*` branches (Nov 27).
+The depth-plane perspective fix is done (`fix/window-view-depth`). Ideas 2–6 are built on stacked
+branches, waiting to be merged (Nov 27). The scroll perspective was then reworked
+(`fix/sky-independent-depth`). The sky backdrop holds still, and each cloud, the sun, the moon, the
+birds, the hills, the town and each visitor moves on its own depth and curve, so nothing slides as one block.
 
 | # | Idea | Status |
 |---|------|--------|
-| W1 | **Lean to look:** on desktop, the mouse nudges the view sideways a few percent, as if leaning toward the glass | Being built |
-| W2 | **Wider sun path along the top:** the sun crosses the top of the window from right to left over the day, staying above the headline | Being built |
-| W3 | **Golden hour:** when the sun is low, warm the bottom of the sky and tint the edges of the clouds | Being built |
-| W4 | **The town at night:** lit windows switch on one by one at dusk and off after midnight | Being built |
-| W5 | **Occasional visitors:** a rare plane by day, a shooting star at night, light pixel rain on some days | Being built |
-| W6 | **Glass that reacts to the sky:** the glare on the open panels follows the sun; the wall light below the window shifts with it | Being built |
+| W1 | **Lean to look:** on desktop, the mouse nudges the view sideways a few percent, as if leaning toward the glass | Dropped: the view follows scroll only, not the cursor |
+| W2 | **Wider sun path along the top:** the sun crosses the top of the window from right to left over the day, staying above the headline | Built (`feat/sky-sun-top-arc`) |
+| W3 | **Golden hour:** when the sun is low, warm the bottom of the sky and tint the edges of the clouds | Dropped (user decision, Nov 27) |
+| W4 | **The town at night:** lit windows switch on one by one at dusk, stay on all night and go out through dawn (no late-night thinning, user decision Nov 27) | Built (`feat/sky-town-lights`, changed on `experiment/sky-updates`) |
+| W5 | **Occasional visitors:** a rare plane by day, a shooting star at night, light pixel rain on some days | Built: plane by day, shooting stars at night. Rain dropped: no weather (decided Nov 27) |
+| W6 | **Glass that reacts to the sky:** the glare on the open panels follows the sun; the wall light below the window shifts with it | Built (`feat/sky-glass-light`) |
 | W7 | **Cats that notice:** the sill cat turns its head to follow a passing bird | Parked |
 
 ---
@@ -52,4 +54,5 @@ on stacked `feat/sky-*` branches (Nov 27).
 | 15 | **A working timer on the screen:** a real, tiny 25-minute timer you can start; if you are still on the page when it ends, a cat stretches on the sill | Interaction |
 | 16 | **Cursor as a cat paw:** over the laptop only, with paw prints that fade off the keyboard | Interaction |
 | 17 | **The download as part of the scene:** pressing Download plays a pixel progress bar on the laptop screen and a cat dragging a box across the desk | Story and launch |
-| 18 | **Seasons:** snow on the sill in December, petals in spring, a tiny pumpkin on the desk in October, seeded by date | Story and launch |
+
+> **Note:** idea 18 (**Seasons:** snow on the sill in December, petals in spring, a pumpkin in October) is off the list. No weather/snow in the window (decided Nov 27).
