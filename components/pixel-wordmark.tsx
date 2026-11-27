@@ -36,6 +36,18 @@ interface WordmarkPalette {
 }
 
 const COMPANION_PALETTES: Record<SkyPhase, WordmarkPalette> = {
+    // First light: the morning letters, lit by a rosy glow on their top edges
+    dawn: {
+        letters: [
+            { face: "#C6DD80", shade: "#465B12", light: "#FFE3D2" },
+            { face: "#F5BC78", shade: "#824B04", light: "#FFE3D2" },
+            { face: "#B9A3FA", shade: "#562D94", light: "#FFE3D2" },
+            { face: "#74BEF2", shade: "#124F7A", light: "#FFE3D2" },
+            { face: "#F99A86", shade: "#8B2E1B", light: "#FFE3D2" },
+        ],
+        outline: "#232323",
+        fallbackClass: "text-ink",
+    },
     morning: {
         letters: [
             { face: "#CFE58A", shade: "#465B12", light: "#ECFEA9" }, // P: Classic green

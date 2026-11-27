@@ -12,14 +12,6 @@ import DoneWord from "./done-word";
 import { OsIcon } from "./download-options";
 import { onSmoothScroll } from "@/lib/smooth-scroll";
 
-// Parallax speed per layer (px of offset per px scrolled), clamped to the hero's range.
-const PARALLAX_MAX_SCROLL = 700;
-// Positive = lags behind the page (reads as far away); negative = moves ahead (near).
-const PARALLAX_SPEED = {
-    skyFar: 0.16,
-    skyNear: 0.08,
-} as const;
-
 /**
  * Desk landing, with no hard stops: every speed change is gradual (see smoothRamp).
  * L = the section's `--land`. Two equal sin² ramps, offset by half:
@@ -64,6 +56,9 @@ const LAND_SHRINK = 0.04;
 const DESK_PITCH_FROM = 76;
 const DESK_PITCH_TO = 68;
 const WINDOW_LAG = 0.3;
+
+/** How much of the skyline's height stands above the laptop's lid at rest. */
+const TOWN_PEEK = 0.6;
 /** --cam as a multiple of the laptop's width (keep in step with the section's --cam). */
 const CAM_PER_WIDTH = 2.4;
 /** Approximate height (px) of the deck's front face, which hangs below its front edge. */
@@ -97,8 +92,7 @@ export default function HeroSection() {
     const deskRef = useRef<HTMLDivElement>(null);
     const deskEdgeRef = useRef<HTMLDivElement>(null);
     const windowRef = useRef<HTMLDivElement>(null);
-    const skyFarRef = useRef<HTMLDivElement>(null);
-    const skyNearRef = useRef<HTMLDivElement>(null);
+    const glassRef = useRef<HTMLDivElement>(null);
     const { copied, sendToDesktop } = useSendToDesktop();
     const [platformsOpen, setPlatformsOpen] = useState(false);
     const platformsTriggerRef = useRef<HTMLButtonElement>(null);
@@ -169,11 +163,6 @@ export default function HeroSection() {
         // deck is still fitted to the desk below.
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-        const layers: [React.RefObject<HTMLDivElement | null>, number][] = [
-            [skyFarRef, PARALLAX_SPEED.skyFar],
-            [skyNearRef, PARALLAX_SPEED.skyNear],
-        ];
-
         let frame = 0;
         let lastScroll = -1;
         // How far the laptop is lowered onto the desk (the section's --land; 0 on phones).
@@ -219,6 +208,8 @@ export default function HeroSection() {
                 const deskTransform = desk?.style.transform ?? "";
                 const sectionPitch = section?.style.getPropertyValue("--pitch") ?? "";
                 laptop.style.transform = "none";
+                const windowTransform = windowRef.current?.style.transform ?? "";
+                if (windowRef.current) windowRef.current.style.transform = "none";
                 if (desk) desk.style.transform = "none";
 
                 // Always lower the laptop far enough that you can see it travel onto the desk.
@@ -244,6 +235,15 @@ export default function HeroSection() {
 
                 section?.style.setProperty("--pitch", `${pitchTo}deg`);
                 const rect = laptop.getBoundingClientRect();
+
+                // Raise the town until the top of the skyline (TOWN_PEEK of its height)
+                // stands above the laptop's lid instead of behind it.
+                const glass = glassRef.current?.getBoundingClientRect();
+                const skyline = glassRef.current?.querySelector("svg[viewBox='0 0 240 22']")?.getBoundingClientRect();
+                if (section && glass && skyline) {
+                    const lift = Math.max(glass.bottom - rect.top - skyline.height * (1 - TOWN_PEEK), 0);
+                    section.style.setProperty("--town-lift", `${lift.toFixed(1)}px`);
+                }
                 const edgeBottom = edge ? edge.getBoundingClientRect().bottom + window.scrollY : 0;
                 const deskRect = desk?.getBoundingClientRect();
                 const footprint = laptopShadowRef.current?.getBoundingClientRect();
@@ -286,6 +286,7 @@ export default function HeroSection() {
                 }
 
                 laptop.style.transform = laptopTransform;
+                if (windowRef.current) windowRef.current.style.transform = windowTransform;
                 if (desk) desk.style.transform = deskTransform;
                 if (sectionPitch) section?.style.setProperty("--pitch", sectionPitch);
                 else section?.style.removeProperty("--pitch");
@@ -306,12 +307,6 @@ export default function HeroSection() {
             const raw = Math.max(window.scrollY, 0);
             if (raw === lastScroll) return;
             lastScroll = raw;
-            const scroll = Math.min(raw, PARALLAX_MAX_SCROLL);
-            for (const [ref, speed] of layers) {
-                if (ref.current && !reduceMotion) {
-                    ref.current.style.transform = `translate3d(0, ${(scroll * speed).toFixed(2)}px, 0)`;
-                }
-            }
 
             // Desk landing: the laptop eases to a near-standstill mid-screen while the
             // window scrolls away, then eases back into the scroll as the desk meets it.
@@ -408,7 +403,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section ref={sectionRef} id="hero" className="@container [--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-6 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
+        <section ref={sectionRef} id="hero" className="@container [--hero-done:var(--hero-done-sky)] relative w-full pb-20 sm:pb-4 md:pb-28 lg:pb-34 flex flex-col items-center bg-white overflow-x-clip [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--wt:clamp(10px,1.6cqw,24px)] [--so:clamp(8px,2cqw,32px)] [--lw:calc(var(--ww)*0.8)] lg:[--lw:min(900px,calc(var(--ww)_-_2*clamp(130px,14cqw,200px)))] [--ov:0.22] sm:[--ov:0.17] lg:[--ov:0.29] lg:short:[--ov:0.18] [--sill:22px] sm:[--sill:28px] lg:[--sill:36px] xl:[--sill:42px] [--wb:calc(var(--lw)*0.28_-_var(--lw)*var(--ov))] lg:[--wb:calc(var(--wt)/2)] [--land:0px] sm:[--land:140px] lg:[--land:220px] xl:[--land:260px] lg:short:[--land:180px] motion-reduce:[--land:0px] [--land-min:0.75] sm:[--land-min:0.45] [--cam:calc(var(--lw)*2.4)] [--pitch-from:58] [--pitch-to:58] [--pitch:58deg] sm:[--pitch-from:70] sm:[--pitch-to:62] sm:[--pitch:62deg] lg:[--pitch-from:76] lg:[--pitch-to:68] lg:[--pitch:68deg]">
             {/*
               The window hangs on the white wall (the page): a walnut French casement with
               wall space either side, a sill that sticks out past it, and the laptop in
@@ -426,8 +421,10 @@ export default function HeroSection() {
                           shadow, a mid one, and a long soft one falling down the wall), so
                           it sits on the wall instead of looking pasted on.
                         */}
-                        <div className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
-                            <WindowSky farRef={skyFarRef} nearRef={skyNearRef} />
+                        <div ref={glassRef} className="relative col-start-1 row-start-2 sm:row-start-1 overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
+                            {/* The town is raised so its rooftops show above the laptop's lid (--town-lift is
+                                measured; the fallback is a close guess for the first paint) */}
+                            <WindowSky lift="var(--town-lift, max(0px, calc(var(--lw) * var(--ov) * 0.68 - 40px)))" />
                             <WindowFrame />
                         </div>
 
@@ -435,7 +432,7 @@ export default function HeroSection() {
             <div className={`relative z-30 col-start-1 row-start-1 w-full flex flex-col items-center justify-center gap-7 sm:gap-6 sm:px-12 md:px-14 pt-12 pb-12 sm:pt-24 lg:short:pt-20 sm:pb-[calc(var(--lw)*var(--ov)_+_24px)] sm:min-h-[calc(100svh_-_64px_-_var(--wt)_-_var(--sill)_-_var(--wb))]`}>
                 <div
                     aria-hidden="true"
-                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 in-data-[sky=night]:opacity-100"
+                    className="hidden sm:block pointer-events-none absolute -z-10 left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-[min(1000px,135%)] h-[78%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl transition-opacity duration-1000 opacity-85 in-data-[sky=night]:opacity-100 in-data-[sky=dawn]:opacity-100"
                 />
                 <div className="w-full flex justify-center items-center">
                     <h1 className="font-pixel text-[clamp(1.8rem,calc(10.7vw_-_5px),2.9rem)] sm:text-display-xl font-semibold text-ink text-center leading-[1.02]">
@@ -451,7 +448,7 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <div className="w-full flex justify-center items-center px-4 animate-hero-fade-up-2">
-                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:in-data-[sky=night]:text-ink">
+                    <p className="max-w-[620px] text-base md:text-lg text-muted sm:font-medium sm:text-[#33404D] text-center tracking-[0.01em] leading-relaxed transition-colors duration-1000 sm:in-data-[sky=night]:text-ink sm:in-data-[sky=dawn]:text-ink">
                         A calm Pomodoro timer for your desktop, with a pixel cat who
                         focuses alongside you. Free to download.
                     </p>
@@ -535,7 +532,7 @@ export default function HeroSection() {
                     {/* Secondary meta row: other platforms (desktop) or platform note (mobile) */}
                     <div
                         suppressHydrationWarning
-                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:in-data-[sky=night]:text-ink"
+                        className="relative flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs md:text-sm text-muted sm:text-[#33404D] tracking-[0.02em] animate-hero-fade-up-3b transition-colors duration-1000 sm:in-data-[sky=night]:text-ink sm:in-data-[sky=dawn]:text-ink"
                     >
                         {isMobile ? (
                             <span>{platformInfo.altPlatformText}</span>
@@ -666,8 +663,10 @@ export default function HeroSection() {
                   Light from the window spilling onto the wall below the sill, tinted by
                   the time of day (--wall-light): brightest under the window and fading
                   softly in every direction, so the window and the desk read as one room.
+                  It falls away from the sun or moon (--body-t): left of centre while the
+                  sun is on the right in the morning, sliding right as it crosses the sky.
                 */}
-                <div aria-hidden="true" className="absolute -inset-x-[12%] top-full h-[calc(var(--land)_+_var(--lw)*0.7)] -z-10 pointer-events-none bg-[radial-gradient(ellipse_50%_100%_at_50%_0%,rgb(var(--wall-light)/var(--wall-a))_0%,rgb(var(--wall-light)/calc(var(--wall-a)*0.55))_35%,rgb(var(--wall-light)/calc(var(--wall-a)*0.18))_62%,transparent_85%)]" />
+                <div aria-hidden="true" className="absolute -inset-x-[12%] top-full h-[calc(var(--land)_+_var(--lw)*0.7)] -z-10 pointer-events-none bg-[radial-gradient(ellipse_50%_100%_at_calc(35%_+_30%_*_var(--body-t,0.5))_0%,rgb(var(--wall-light)/var(--wall-a))_0%,rgb(var(--wall-light)/calc(var(--wall-a)*0.55))_35%,rgb(var(--wall-light)/calc(var(--wall-a)*0.18))_62%,transparent_85%)]" />
             </div>
 
             {/*

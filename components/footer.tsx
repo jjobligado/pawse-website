@@ -1,7 +1,6 @@
 "use client";
 
 import { FooterLink } from "@/components/footer-controls";
-import FooterPawTrail from "@/components/footer-paw-trail";
 import { WindowSky, useSkyPhase } from "@/components/landing/hero-scene";
 import PixelWordmark from "@/components/pixel-wordmark";
 import { CONTACT_EMAIL } from "@/lib/site-config";
@@ -92,13 +91,13 @@ function WalnutSillBand() {
 
 /** Extra light behind the footer copy, at night only. */
 const NIGHT_BACKDROP =
-    "hidden in-data-[sky=night]:block pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
+    "hidden in-data-[sky=night]:block in-data-[sky=dawn]:block pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
 
 export default function Footer() {
-    // The canvas art (paw trail, wordmark) is drawn in script, so it takes the phase as a value;
+    // The canvas wordmark is drawn in script, so it takes the phase as a value;
     // the markup switches on <html data-sky> in CSS, so it is right from the first paint.
     const skyPhase = useSkyPhase();
-    const metaText = "text-[#33404D] in-data-[sky=night]:text-ink";
+    const metaText = "text-[#33404D] in-data-[sky=night]:text-ink in-data-[sky=dawn]:text-ink";
 
     return (
         <footer className="w-full flex flex-col bg-white">
@@ -108,7 +107,8 @@ export default function Footer() {
             <DitherEdge />
 
             {/* Sky stage matching the hero and download banner windows, ending on the walnut sill */}
-            <div className="relative w-full overflow-hidden">
+            {/* --sky-clear: the sun and moon peak below the 40px fade at the top, so they show whole */}
+            <div className="relative w-full overflow-hidden [--sky-clear:88px]">
                 <WindowSky />
 
                 {/* Neutralizes WindowSky's top frame-head shadow so DitherEdge meets the sky seamlessly */}
@@ -120,8 +120,6 @@ export default function Footer() {
                         background: "linear-gradient(180deg, currentColor 0%, currentColor 25%, transparent 100%)",
                     }}
                 />
-
-                <FooterPawTrail phase={skyPhase} />
 
                 <div className="relative z-10 w-full max-w-chrome mx-auto px-6 sm:px-12 md:px-14 lg:px-20 pt-16 md:pt-20 pb-0">
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-20">

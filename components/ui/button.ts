@@ -31,7 +31,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
         "not-disabled:hover:-translate-y-0.5 not-disabled:hover:shadow-glow-hover " +
         "not-disabled:active:translate-y-0 not-disabled:active:scale-[0.97] not-disabled:active:shadow-glow-active",
     ink:
-        "h-[38px] sm:h-[40px] px-4 sm:px-6 shrink-0 text-white focus-visible:ring-ink " +
+        "h-[38px] sm:h-[40px] px-4 sm:px-6 shrink-0 text-white focus-visible:ring-focus-ring " +
         "transition-colors duration-(--duration-micro)",
 };
 
