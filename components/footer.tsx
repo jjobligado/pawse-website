@@ -107,7 +107,8 @@ export default function Footer() {
             <DitherEdge />
 
             {/* Sky stage matching the hero and download banner windows, ending on the walnut sill */}
-            <div className="relative w-full overflow-hidden">
+            {/* --sky-clear: the sun and moon peak below the 40px fade at the top, so they show whole */}
+            <div className="relative w-full overflow-hidden [--sky-clear:88px]">
                 <WindowSky />
 
                 {/* Neutralizes WindowSky's top frame-head shadow so DitherEdge meets the sky seamlessly */}
