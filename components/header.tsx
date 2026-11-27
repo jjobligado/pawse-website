@@ -54,14 +54,14 @@ export default function Header() {
     }, [pathname]);
 
     // "/#id" so the links also work from About / Privacy / Terms (they go back to the homepage).
-    // In page order. Testimonials only while that section shows (see testimonials-data.ts).
+    // In page order, only the stops a first-time visitor looks for. Coming Soon and
+    // Contact keep their sections and are linked from the footer (and Contact from the FAQ).
+    // Testimonials only while that section shows (see testimonials-data.ts).
     const navLinks = [
         { label: "How It Works", id: "how-it-works" },
         { label: "Features", id: "companions" },
         ...(SHOW_TESTIMONIALS ? [{ label: "Testimonials", id: "testimonials" }] : []),
-        { label: "Coming Soon", id: "coming-soon" },
         { label: "FAQ", id: "faq" },
-        { label: "Contact Us", id: "contact" },
     ];
 
     const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -114,7 +114,7 @@ export default function Header() {
                 </HomeLink>
 
                 {/* Nav Links (Visible on laptops & desktops where space permits) */}
-                <nav aria-label="Main" className="hidden lg:flex items-center gap-5 xl:gap-8">
+                <nav aria-label="Main" className="hidden lg:flex items-center gap-7 xl:gap-9">
                     {navLinks.map((link) => {
                         const isActive = isHome && activeSection === link.id;
                         return (
