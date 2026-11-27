@@ -241,16 +241,17 @@ const STARS = [
  * top of the glass right to left over the hours, and sinks on the left, so its
  * place tells the time. Its height goes with the sixth power of the distance
  * from the middle of its time up (u = 2t - 1), so it only drops low near the
- * sides (by the open panels, clear of the copy). Around the middle it rides up
- * under the head of the frame, its top tucked behind it as a high sun is from
- * indoors, which keeps it above the headline at every size.
+ * sides (by the open panels, clear of the copy). At its highest its centre sits
+ * --sky-clear below the top of the glass: half the body plus whatever covers
+ * the top (the frame head here, the dithered edge in the footer), so the whole
+ * disc stays in view, and still above the headline.
  */
 const arcPath = (t: string): React.CSSProperties =>
     ({
         "--u": `calc(2 * var(${t}, 0.5) - 1)`,
         "--u2": "calc(var(--u) * var(--u))",
         left: `calc(92% - 84% * var(${t}, 0.5))`,
-        top: "calc(5% + 45% * var(--u2) * var(--u2) * var(--u2))",
+        top: "calc(var(--sky-clear, 68px) + (50% - var(--sky-clear, 68px)) * var(--u2) * var(--u2) * var(--u2))",
     }) as React.CSSProperties;
 const SUN_PATH = arcPath("--sun-t");
 const MOON_PATH = arcPath("--moon-t");
@@ -280,7 +281,7 @@ function SunAndMoon() {
     return (
         <>
             {/* Sun: one body on its arc, its colour warming at morning and dusk (crossfaded) */}
-            <div className="absolute w-0 h-0" style={{ ...SUN_PATH, ...depth(15, "early") }}>
+            <div className="absolute w-0 h-0" style={{ ...SUN_PATH, ...depth(15, "early", 0, true) }}>
                 {(["dawn", "morning", "day", "dusk"] as const).map(glow)}
                 {(["dawn", "morning", "day", "dusk"] as const).map((p) => (
                     <PixelArt
@@ -293,7 +294,7 @@ function SunAndMoon() {
             </div>
 
             {/* Night: the moon on its own arc (at dawn it is setting) */}
-            <div className="absolute w-0 h-0" style={{ ...MOON_PATH, ...depth(14, "lag") }}>
+            <div className="absolute w-0 h-0" style={{ ...MOON_PATH, ...depth(14, "lag", 0, true) }}>
                 {glow("night")}
                 <div className={`${fade} ${show("night")} ${SHOW_IN.dawn}`}>
                     <PixelArt
@@ -356,9 +357,13 @@ const CURVE_VAR: Record<Curve, string> = {
     lag: "--look-lag",
 };
 
-/** The style that shifts one thing in the view by its depth (cqh), curve and sideways drift (cqw). */
-function depth(d: number, curve: Curve = "even", drift = 0): React.CSSProperties {
-    const look = `var(${CURVE_VAR[curve]}, 0)`;
+/**
+ * The style that shifts one thing in the view by its depth (cqh), curve and
+ * sideways drift (cqw). With `sinkOnly` it only moves down, never up, for the
+ * sun and moon: an upward shift would push them under the top of the window.
+ */
+function depth(d: number, curve: Curve = "even", drift = 0, sinkOnly = false): React.CSSProperties {
+    const look = sinkOnly ? `max(var(${CURVE_VAR[curve]}, 0), 0)` : `var(${CURVE_VAR[curve]}, 0)`;
     return {
         translate: `${drift ? `calc(${look} * ${drift}cqw)` : "0"} calc(${look} * ${d}cqh)`,
         willChange: "translate",
