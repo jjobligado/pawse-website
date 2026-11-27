@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Inter, Pixelify_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
 import SmoothScrollProvider from "@/components/smooth-scroll-provider";
+import SkyPhaseSync from "@/components/sky-phase-sync";
+import { DEFAULT_SKY_PHASE, SKY_PHASE_CSS, SKY_PHASE_SCRIPT } from "@/lib/sky-phase";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site-config";
 
 const inter = Inter({
@@ -15,6 +18,17 @@ const inter = Inter({
 const pixelifySans = Pixelify_Sans({
   variable: "--font-pixelify",
   subsets: ["latin"],
+});
+
+// Handwriting for the How It Works wall notes only; never for UI or body copy.
+// Self-hosted Latin slice of Gaegu Bold (SIL OFL): the Google build of this Korean
+// font is ~240 files, and only the Latin one at 700 is ever used.
+const gaegu = localFont({
+  src: "./fonts/gaegu-700-latin.woff2",
+  weight: "700",
+  variable: "--font-gaegu",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -62,10 +76,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       // Next.js switches smooth scrolling off while changing pages, so a new page doesn't glide from the old position
       data-scroll-behavior="smooth"
+      // The visitor's time of day; the head script below replaces it before the first paint
+      data-sky={DEFAULT_SKY_PHASE}
       suppressHydrationWarning // This is to prevent hydration mismatch errors when using server-side rendering with Next.js
-      className={`${inter.variable} ${pixelifySans.variable} h-full antialiased scroll-smooth`}
+      className={`${inter.variable} ${pixelifySans.variable} ${gaegu.variable} h-full antialiased scroll-smooth`}
     >
+      <head>
+        {/* Per-phase sky colours, switched by <html data-sky> */}
+        <style dangerouslySetInnerHTML={{ __html: SKY_PHASE_CSS }} />
+        {/* Sets <html data-sky> from the visitor's clock before anything paints, so the windows never start on the wrong sky */}
+        <script dangerouslySetInnerHTML={{ __html: SKY_PHASE_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
+        <SkyPhaseSync />
         {/* Keyboard users can jump past the header; hidden until focused */}
         <a
           href="#main-content"
@@ -76,7 +99,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScrollProvider />
         <ScrollToTop />
         <Header />
-        <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+        <main id="main-content" tabIndex={-1} className="@container flex-1 focus:outline-none">
           {children}
         </main>
         <Footer />

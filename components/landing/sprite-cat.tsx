@@ -10,6 +10,8 @@ import { type CSSProperties, useCallback, useEffect, useRef, useState } from "re
  * - Action: hover with a mouse, or click / tap / Enter, plays the action sheet
  *   once from the start, then returns to idle. It always finishes, even if the
  *   pointer leaves mid-way, and a new hover is needed to play it again.
+ * - Ambient (interactive={false}): no hover, click or focus; the cat is pure
+ *   decoration and only loops its idle animation (the action never plays).
  * - Reduced motion: shows the first idle frame and never animates.
  *
  * Frames are stepped with a CSS transform on an <img> strip inside a clipping
@@ -43,6 +45,11 @@ interface SpriteCatProps {
     actionSequence?: readonly FrameStep[];
     /** Size (and any positioning) utilities for the square box. */
     className?: string;
+    /**
+     * false: an ambient cat with no hover, click or focus (and hidden from
+     * assistive tech) that only loops its idle animation. Defaults to true.
+     */
+    interactive?: boolean;
 }
 
 /**
@@ -84,6 +91,7 @@ export default function SpriteCat({
     idleSequence,
     actionSequence,
     className = "",
+    interactive = true,
 }: SpriteCatProps) {
     const [playing, setPlaying] = useState(false);
     const reducedMotion = useReducedMotion();
@@ -125,17 +133,8 @@ export default function SpriteCat({
         maxWidth: "none",
     });
 
-    return (
-        <button
-            type="button"
-            aria-label={label}
-            // Mouse hover only: touch browsers fire a fake pointerenter on tap, and the click below already covers that.
-            onPointerEnter={(e) => {
-                if (e.pointerType === "mouse") play();
-            }}
-            onClick={play}
-            className={`relative block overflow-hidden cursor-pointer select-none rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
-        >
+    const strips = (
+        <>
             <style>{idleAnim.css + actionAnim.css}</style>
             {/* Idle strip: always rendered; hidden while the action plays */}
             {/* eslint-disable-next-line @next/next/no-img-element -- sprite strips are tiny, pixel-exact and must not be resampled */}
@@ -170,6 +169,29 @@ export default function SpriteCat({
                     animation: playing ? `${actionName} ${actionAnim.durationMs}ms step-end 1 forwards` : "none",
                 }}
             />
+        </>
+    );
+
+    if (!interactive) {
+        return (
+            <div aria-hidden="true" className={`relative block overflow-hidden select-none pointer-events-none ${className}`}>
+                {strips}
+            </div>
+        );
+    }
+
+    return (
+        <button
+            type="button"
+            aria-label={label}
+            // Mouse hover only: touch browsers fire a fake pointerenter on tap, and the click below already covers that.
+            onPointerEnter={(e) => {
+                if (e.pointerType === "mouse") play();
+            }}
+            onClick={play}
+            className={`relative block overflow-hidden cursor-pointer select-none rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
+        >
+            {strips}
         </button>
     );
 }

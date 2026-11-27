@@ -56,6 +56,7 @@ export default function Header() {
     const navLinks = [
         { label: "How It Works", id: "how-it-works" },
         { label: "Features", id: "companions" },
+        { label: "Coming Soon", id: "coming-soon" },
         { label: "FAQ", id: "faq" },
         { label: "Contact Us", id: "contact" },
     ];
@@ -94,13 +95,14 @@ export default function Header() {
         >
             <div className="w-full h-full flex py-2 px-6 sm:px-12 md:px-14 lg:px-20 max-w-chrome mx-auto justify-between items-center">
                 {/* Brand / Logo */}
-                <HomeLink className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+                {/* Cat + wordmark are one unit: they lift 2px together on hover; pressing settles them and dims the pair */}
+                <HomeLink className="flex items-center gap-2 sm:gap-2.5 shrink-0 rounded transition-[translate,opacity] duration-(--duration-short) ease-out motion-safe:hover:-translate-y-0.5 active:translate-y-0 active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-4">
                     <Image
                         src="/images/logo.png"
                         alt="Pawse Logo"
-                        width={30}
-                        height={28}
-                        className="h-[22px] sm:h-[28px] w-auto object-contain group-hover:scale-110 transition-transform duration-300 ease-in-out"
+                        width={216}
+                        height={156}
+                        className="h-[17px] sm:h-[21px] w-auto object-contain [image-rendering:pixelated]"
                         priority
                     />
                     <span className="font-pixel text-2xl sm:text-3xl font-bold text-ink leading-none flex items-center">
@@ -118,7 +120,7 @@ export default function Header() {
                                 href={`/#${link.id}`}
                                 onClick={(e) => handleNavClick(e, link.id)}
                                 aria-current={isActive ? "location" : undefined}
-                                className={`text-sm tracking-[0.02em] transition-colors duration-200 ${
+                                className={`relative whitespace-nowrap text-sm tracking-[0.02em] rounded-sm transition-[color,opacity] duration-(--duration-micro) active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-4 ${
                                     isActive
                                         ? "text-black [-webkit-text-stroke:0.35px_currentColor]"
                                         : "text-muted hover:text-black hover:[-webkit-text-stroke:0.35px_currentColor]"

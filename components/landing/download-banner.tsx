@@ -1,21 +1,22 @@
 "use client";
 
-import Image from "next/image";
 import { OS_LABELS, otherDownloads, usePlatform, type DesktopOs } from "@/hooks/use-platform";
 import { useSendToDesktop } from "@/hooks/use-send-to-desktop";
-import Section from "./section";
+import { SECTION_SPACING } from "./section";
 import { SectionTitle } from "./section-heading";
 import { buttonClasses, buttonLabelClasses } from "@/components/ui/button";
+import SpriteCat from "./sprite-cat";
+import { CATS, CAT_SIZE, GINGER_SIZE } from "./cats";
+import { SillPlant, SillShadow, WindowFrame, WindowSill, WindowSky } from "./hero-scene";
 
-const FACES = [
-    { src: "/images/orange-cat-face.png", tilt: "-rotate-6" },
-    { src: "/images/tuxedo-cat-face.png", tilt: "-translate-y-1" },
-    { src: "/images/black-cat-face.png", tilt: "rotate-6" },
-];
+/** Where each cat sits on the sill (from the bottom of the window). */
+const ON_SILL = "absolute bottom-[calc(100%-12px)] sm:bottom-[calc(100%-16px)] lg:bottom-[calc(100%-20px)] xl:bottom-[calc(100%-22px)]";
 
 /**
- * Closing call to action, right after the FAQ: visitors who scrolled the whole
- * page can download without going back to the hero.
+ * Closing call to action, right after the FAQ: a smaller copy of the hero's
+ * window, showing the same sky (the visitor's time of day), with all three
+ * companions finally together on the sill. Visitors who scrolled the whole
+ * page can download without going back up.
  */
 export default function DownloadBanner() {
     const { config: platformInfo, isMobile } = usePlatform();
@@ -24,109 +25,134 @@ export default function DownloadBanner() {
     const others = otherDownloads(platformInfo.downloadId ?? "windows");
     const otherOses = [...new Set(others.map((d) => d.os))] as DesktopOs[];
 
+    // Meta text sits on the sky: a darker ink than `muted` keeps it readable on every phase.
+    const metaText = "text-[#33404D] transition-colors duration-1000 in-data-[sky=night]:text-ink";
+
     return (
-        <Section id="download" className="flex flex-col items-stretch">
-            <div className="relative overflow-hidden w-full rounded-card-lg border-2 border-stroke surface-sky px-6 py-12 sm:px-12 md:py-16 flex flex-col items-center text-center gap-5">
-                {/* The three companions, saying goodbye */}
-                <div aria-hidden="true" className="flex items-end gap-3">
-                    {FACES.map((face) => (
-                        <Image
-                            key={face.src}
-                            src={face.src}
-                            alt=""
-                            width={60}
-                            height={44}
-                            unoptimized
-                            className={`[image-rendering:pixelated] ${face.tilt}`}
+        // Full width (not the shared Section's padded column) so the window can use the
+        // hero's exact width formula (--wm/--ww in hero-section.tsx) and match it at every size.
+        <section id="download" className={`scroll-mt-20 w-full bg-white ${SECTION_SPACING}`}>
+            <div
+                className="@container relative w-full flex flex-col items-center [--wm:clamp(16px,calc(9cqw_-_24px),220px)] [--ww:min(1120px,calc(100cqw_-_2*var(--wm)))] [--so:clamp(8px,2cqw,32px)]"
+            >
+                <div className="relative w-[var(--ww)] flex flex-col items-center">
+                {/* The window, with the copy on its glass */}
+                <div className="relative w-full overflow-hidden rounded-[6px] sm:rounded-[9px] lg:rounded-[12px] shadow-[0_1px_2px_rgb(40_20_10/0.14),0_6px_12px_-6px_rgb(40_20_10/0.22),0_28px_48px_-24px_rgb(40_20_10/0.42)]">
+                    <WindowSky entrance={false} />
+                    <WindowFrame alwaysOpen />
+
+                    <div className="relative z-10 flex flex-col items-center text-center gap-3 md:gap-4 px-8 sm:px-16 pt-14 sm:pt-20 lg:pt-24 pb-28 sm:pb-36 lg:pb-44">
+                        {/* Soft light behind the copy, so it reads on every sky */}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -z-10 left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-[min(900px,130%)] h-[80%] rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.62),rgb(255_255_255/0.32)_55%,transparent)] blur-2xl opacity-85 transition-opacity duration-1000 in-data-[sky=night]:opacity-100"
                         />
-                    ))}
+
+                        <SectionTitle className="text-center text-balance">
+                            Ready to Focus with a Friend?
+                        </SectionTitle>
+                        <p className={`max-w-[480px] text-base md:text-lg sm:font-medium text-balance ${metaText}`}>
+                            Free to download. No account needed. Your companions are waiting.
+                        </p>
+
+                        <div className="mt-5 md:mt-6 flex flex-col items-center gap-3">
+                            {isMobile ? (
+                                <button
+                                    type="button"
+                                    onClick={() => void sendToDesktop()}
+                                    className={buttonClasses({ success: copied })}
+                                >
+                                    <span className={buttonLabelClasses("lg")}>
+                                        {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
+                                    </span>
+                                </button>
+                            ) : (
+                                <a
+                                    href={platformInfo.href}
+                                    download={platformInfo.fileName}
+                                    suppressHydrationWarning
+                                    className={buttonClasses()}
+                                >
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <path d="M7 10l5 5 5-5" />
+                                        <path d="M12 15V3" />
+                                    </svg>
+                                    <span className={buttonLabelClasses("lg")}>
+                                        {platformInfo.label}
+                                    </span>
+                                </a>
+                            )}
+
+                            {/* Other platforms as plain links (no popover needed this far down) */}
+                            <p suppressHydrationWarning className={`text-xs md:text-sm text-balance tracking-[0.02em] ${metaText}`}>
+                                {isMobile ? (
+                                    platformInfo.altPlatformText
+                                ) : (
+                                    <>
+                                        Also available for{" "}
+                                        {otherOses.map((os, i) => {
+                                            const builds = others.filter((d) => d.os === os);
+                                            return (
+                                                <span key={os}>
+                                                    {i > 0 && (i === otherOses.length - 1 ? " and " : ", ")}
+                                                    {builds.length === 1 && builds[0].short === OS_LABELS[os] ? (
+                                                        <a href={builds[0].href} download={builds[0].fileName} className="font-medium text-ink link-underline">
+                                                            {OS_LABELS[os]}
+                                                        </a>
+                                                    ) : (
+                                                        <>
+                                                            {OS_LABELS[os]} (
+                                                            {builds.map((d, j) => (
+                                                                <span key={d.id}>
+                                                                    {j > 0 && ", "}
+                                                                    <a href={d.href} download={d.fileName} className="font-medium text-ink link-underline">
+                                                                        {d.short}
+                                                                    </a>
+                                                                </span>
+                                                            ))}
+                                                            )
+                                                        </>
+                                                    )}
+                                                </span>
+                                            );
+                                        })}
+                                        .
+                                    </>
+                                )}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
-                <SectionTitle className="text-center text-balance">
-                    Ready to Focus with a Friend?
-                </SectionTitle>
-                <p className="max-w-[480px] text-base md:text-lg text-muted text-balance">
-                    Free to download. No account needed. Your companions are waiting.
-                </p>
-
-                <div className="mt-1 flex flex-col items-center gap-3">
-                    {isMobile ? (
-                        <button
-                            type="button"
-                            onClick={() => void sendToDesktop()}
-                            className={buttonClasses({ success: copied })}
-                        >
-                            <span className={buttonLabelClasses("lg")}>
-                                {copied ? "Link Copied to Clipboard! 🐾" : platformInfo.label}
-                            </span>
-                        </button>
-                    ) : (
-                        <a
-                            href={platformInfo.href}
-                            download={platformInfo.fileName}
-                            suppressHydrationWarning
-                            className={buttonClasses()}
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                            >
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <path d="M7 10l5 5 5-5" />
-                                <path d="M12 15V3" />
-                            </svg>
-                            <span className={buttonLabelClasses("lg")}>
-                                {platformInfo.label}
-                            </span>
-                        </a>
-                    )}
-
-                    {/* Other platforms as plain links (no popover needed this far down) */}
-                    <p suppressHydrationWarning className="text-xs md:text-sm text-muted text-balance">
-                        {isMobile ? (
-                            platformInfo.altPlatformText
-                        ) : (
-                            <>
-                                Also available for{" "}
-                                {otherOses.map((os, i) => {
-                                    const builds = others.filter((d) => d.os === os);
-                                    return (
-                                        <span key={os}>
-                                            {i > 0 && (i === otherOses.length - 1 ? " and " : ", ")}
-                                            {builds.length === 1 && builds[0].short === OS_LABELS[os] ? (
-                                                <a href={builds[0].href} download={builds[0].fileName} className="font-medium text-ink link-underline">
-                                                    {OS_LABELS[os]}
-                                                </a>
-                                            ) : (
-                                                <>
-                                                    {OS_LABELS[os]} (
-                                                    {builds.map((d, j) => (
-                                                        <span key={d.id}>
-                                                            {j > 0 && ", "}
-                                                            <a href={d.href} download={d.fileName} className="font-medium text-ink link-underline">
-                                                                {d.short}
-                                                            </a>
-                                                        </span>
-                                                    ))}
-                                                    )
-                                                </>
-                                            )}
-                                        </span>
-                                    );
-                                })}
-                                .
-                            </>
-                        )}
-                    </p>
+                {/* The sill, with all three companions together for the first time */}
+                <WindowSill className="z-20">
+                    <div className={`${ON_SILL} left-[2%]`}>
+                        <SillShadow />
+                        <SpriteCat {...CATS.ginger} interactive={false} className={GINGER_SIZE} />
+                    </div>
+                    <div className={`hidden sm:block ${ON_SILL} left-[17%] lg:left-[15%]`}>
+                        <SillShadow />
+                        <SpriteCat {...CATS.void} interactive={false} className={CAT_SIZE} />
+                    </div>
+                    <SillPlant className="hidden xl:block absolute bottom-[calc(100%-14px)] right-[1.5%] w-[64px] h-auto" />
+                    <div className={`${ON_SILL} right-[3%] xl:right-[6.5%]`}>
+                        <SillShadow />
+                        <SpriteCat {...CATS.tux} interactive={false} className={CAT_SIZE} />
+                    </div>
+                </WindowSill>
                 </div>
             </div>
-        </Section>
+        </section>
     );
 }

@@ -62,7 +62,7 @@ export default function LaptopDesktop() {
             {/* Menu bar */}
             <div className="absolute inset-x-0 top-0 h-[3cqw] flex items-center justify-between px-[1.6cqw] bg-white/55 backdrop-blur-sm text-[1.25cqw] text-ink-soft">
                 <span className="flex items-center gap-[0.9cqw]">
-                    <Image src="/images/logo.png" alt="" width={20} height={19} className="w-[1.6cqw] h-auto" />
+                    <Image src="/images/logo.png" alt="" width={216} height={156} className="w-[1.6cqw] h-auto" />
                     <span className="font-semibold text-ink">PAWSE</span>
                     <span>File</span>
                     <span>View</span>

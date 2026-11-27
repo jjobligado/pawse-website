@@ -1,7 +1,7 @@
 "use client";
 
 import { FooterLink } from "@/components/footer-controls";
-import { WindowSky, useSkyPhase, type SkyPhase } from "@/components/landing/hero-scene";
+import { WindowSky, useSkyPhase } from "@/components/landing/hero-scene";
 import PixelWordmark from "@/components/pixel-wordmark";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 
@@ -36,13 +36,8 @@ const LINK_GROUPS = [
     },
 ] as const;
 
-/** Top gradient stop of THEMES[phase].gradient in hero-scene.tsx, for seamless dithered edges. */
-const SKY_TOP_COLOR: Record<SkyPhase, string> = {
-    morning: "#B9DDFB",
-    day: "#9FD6FF",
-    dusk: "#F0A79C",
-    night: "#5E73B8",
-};
+/** The sky's top colour for the visitor's time of day (lib/sky-phase.ts), for seamless dithered edges. */
+const SKY_TOP = "var(--sky-top)";
 
 function hash01(c: number, r: number): number {
     let h = (Math.imul(c + 1, 374761393) + Math.imul(r + 1, 668265263)) >>> 0;
@@ -64,14 +59,14 @@ const DITHER_CELLS = DITHER_DENSITY.flatMap((d, r) =>
  * The bottom bridge row is 100% solid and bleeds past the SVG edge (-mb-px) so
  * there is never a gap or visible seam above WindowSky.
  */
-function DitherEdge({ color }: { color: string }) {
+function DitherEdge() {
     return (
         <svg
             aria-hidden="true"
             viewBox={`0 0 ${DITHER_COLS} ${DITHER_DENSITY.length + 1}`}
             shapeRendering="crispEdges"
             className="relative z-10 -mb-0.5 block w-full transition-colors duration-1000 ease-out"
-            style={{ color }}
+            style={{ color: SKY_TOP }}
         >
             {DITHER_CELLS.map(({ c, r }) => (
                 <rect key={`${c}-${r}`} x={c - 0.02} y={r} width={1.04} height={1.06} fill="currentColor" />
@@ -94,31 +89,33 @@ function WalnutSillBand() {
     );
 }
 
+/** Extra light behind the footer copy, at night only. */
 const NIGHT_BACKDROP =
-    "pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
+    "hidden in-data-[sky=night]:block pointer-events-none absolute -z-10 -inset-x-16 -inset-y-12 rounded-[50%] bg-[radial-gradient(closest-side,rgb(255_255_255/0.68),rgb(255_255_255/0.42)_58%,transparent)] blur-2xl";
 
 export default function Footer() {
+    // The canvas wordmark is drawn in script, so it takes the phase as a value;
+    // the markup switches on <html data-sky> in CSS, so it is right from the first paint.
     const skyPhase = useSkyPhase();
-    const isNight = skyPhase === "night";
-    const metaText = isNight ? "text-ink" : "text-[#33404D]";
+    const metaText = "text-[#33404D] in-data-[sky=night]:text-ink";
 
     return (
         <footer className="w-full flex flex-col bg-white">
             {/* Breathing room above the dithered sky edge */}
             <div className="w-full h-8 md:h-14 bg-white" />
 
-            <DitherEdge color={SKY_TOP_COLOR[skyPhase]} />
+            <DitherEdge />
 
             {/* Sky stage matching the hero and download banner windows, ending on the walnut sill */}
             <div className="relative w-full overflow-hidden">
-                <WindowSky phase={skyPhase} />
+                <WindowSky />
 
                 {/* Neutralizes WindowSky's top frame-head shadow so DitherEdge meets the sky seamlessly */}
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-10 transition-colors duration-1000 ease-out"
                     style={{
-                        color: SKY_TOP_COLOR[skyPhase],
+                        color: SKY_TOP,
                         background: "linear-gradient(180deg, currentColor 0%, currentColor 25%, transparent 100%)",
                     }}
                 />
@@ -127,7 +124,7 @@ export default function Footer() {
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-20">
                         {/* Left: Editorial closing + direct team email */}
                         <div className="relative w-full max-w-[264px] flex flex-col items-start">
-                            {isNight && <div aria-hidden="true" className={NIGHT_BACKDROP} />}
+                            <div aria-hidden="true" className={NIGHT_BACKDROP} />
                             <h2 className="font-pixel text-3xl sm:text-4xl font-semibold text-ink leading-[1.08] tracking-tight">
                                 Focus, without{" "}
                                 <br />
@@ -167,7 +164,7 @@ export default function Footer() {
                             aria-label="Footer"
                             className="relative w-full lg:w-auto lg:shrink-0 grid grid-cols-2 sm:grid-cols-3 gap-x-10 gap-y-8 sm:gap-x-12 xl:gap-x-16"
                         >
-                            {isNight && <div aria-hidden="true" className={NIGHT_BACKDROP} />}
+                            <div aria-hidden="true" className={NIGHT_BACKDROP} />
                             {LINK_GROUPS.map((group) => (
                                 <div key={group.heading} className="flex flex-col gap-2.5">
                                     <h3 className={`text-xs font-semibold uppercase tracking-[0.08em] transition-colors duration-1000 ${metaText}`}>
